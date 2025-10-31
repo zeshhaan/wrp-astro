@@ -25,6 +25,16 @@
 			"database_name": "wrp-contact-forms",
 			"database_id": "45b2fc45-c9ed-45f4-ad9f-2a29b35b263d"
 		}
+	],
+	"routes": [
+		{
+			"pattern": "wrpdetailing.ae",
+			"custom_domain": true
+		},
+		{
+			"pattern": "www.wrpdetailing.ae",
+			"custom_domain": true
+		}
 	]
 	/**
 	 * Smart Placement

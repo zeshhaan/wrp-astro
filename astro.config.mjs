@@ -12,7 +12,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://wrp.ae',
+  site: 'https://wrpdetailing.ae',
   output: 'server',
   vite: {
     plugins: [tailwindcss()],
