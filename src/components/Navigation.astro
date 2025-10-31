@@ -24,7 +24,9 @@ import { Button } from "@/components/ui/button";
         CONTACT
       </a>
     </div>
-    <Button className="hidden md:flex">BOOK APPOINTMENT</Button>
+    <Button className="hidden md:flex">
+      <a href="/contact-us">BOOK APPOINTMENT</a>
+    </Button>
     <button
       class="md:hidden z-50"
       @click="mobileMenuOpen = !mobileMenuOpen"
@@ -77,7 +79,7 @@ import { Button } from "@/components/ui/button";
         CONTACT
       </a>
       <Button className="w-full" @click="mobileMenuOpen = false">
-        BOOK APPOINTMENT
+        <a href="/contact-us" class="w-full">BOOK APPOINTMENT</a>
       </Button>
     </div>
   </div>

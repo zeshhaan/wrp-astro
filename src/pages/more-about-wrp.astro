@@ -1,0 +1,311 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+export const prerender = true;
+---
+
+<BaseLayout
+  title="About WRP | Premium Car Detailing Studio Dubai"
+  description="Learn about WRP Dubai - Founded in 2010, we're Dubai's most trusted name in premium automotive protection and enhancement."
+>
+  <!-- Hero Section -->
+  <section class="relative h-[70vh] flex items-center justify-center overflow-hidden mt-16">
+    <div class="absolute inset-0 bg-black">
+      <img
+        src="/luxury-car-detailing-studio-interior-minimal-black.jpg"
+        alt="WRP Studio"
+        class="w-full h-full object-cover opacity-50"
+      />
+    </div>
+    <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+      <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">The WRP. Story</h1>
+      <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+        Where passion for automotive excellence meets uncompromising craftsmanship
+      </p>
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section class="py-32 px-6">
+    <div class="container mx-auto max-w-6xl">
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6 leading-tight">
+            Born from Passion,<br />Built on Excellence
+          </h2>
+          <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+            WRP. was founded in 2010 by a team of automotive enthusiasts who recognized a gap in Dubai's luxury car
+            care market. We saw vehicles worth millions receiving treatment that didn't match their value or the
+            expectations of their owners.
+          </p>
+          <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+            What started as a small studio with a single bay has grown into Dubai's most trusted name in premium
+            automotive protection and enhancement. Our reputation is built on one simple principle: treat every
+            vehicle as if it were our own masterpiece.
+          </p>
+          <p class="text-lg text-muted-foreground leading-relaxed">
+            Today, we serve an exclusive clientele of collectors, enthusiasts, and connoisseurs who demand nothing
+            but perfection. From rare hypercars to bespoke luxury sedans, we've protected some of the world's most
+            valuable automobiles.
+          </p>
+        </div>
+        <div class="relative h-[600px]">
+          <img
+            src="/luxury-car-detailing-craftsman-working-black-and-w.jpg"
+            alt="Craftsman at work"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Core Values -->
+  <section class="py-32 px-6 bg-muted/30">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center mb-20">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Our Core Values</h2>
+        <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+          The principles that guide every service we provide
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
+          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Excellence</h3>
+          <p class="text-muted-foreground leading-relaxed">
+            We never compromise on quality. Every detail matters, every surface is perfected, every client receives
+            our absolute best.
+          </p>
+        </Card>
+
+        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
+          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Expertise</h3>
+          <p class="text-muted-foreground leading-relaxed">
+            Our team brings decades of combined experience working with the world's most prestigious automotive
+            brands.
+          </p>
+        </Card>
+
+        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
+          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Precision</h3>
+          <p class="text-muted-foreground leading-relaxed">
+            Meticulous attention to detail in every step of our process ensures flawless results that exceed
+            expectations.
+          </p>
+        </Card>
+
+        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
+          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Innovation</h3>
+          <p class="text-muted-foreground leading-relaxed">
+            We continuously invest in the latest technology and techniques to deliver cutting-edge protection
+            solutions.
+          </p>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <!-- The WRP. Process -->
+  <section class="py-32 px-6">
+    <div class="container mx-auto max-w-6xl">
+      <div class="text-center mb-20">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">The WRP. Process</h2>
+        <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+          A systematic approach to automotive perfection
+        </p>
+      </div>
+
+      <div class="space-y-16">
+        <!-- Step 1 -->
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="order-2 md:order-1">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+                1
+              </div>
+              <div>
+                <h3 class="font-serif text-2xl font-bold mb-3">Consultation & Assessment</h3>
+                <p class="text-muted-foreground leading-relaxed">
+                  We begin with a comprehensive consultation to understand your vehicle's needs and your
+                  expectations. Our experts conduct a detailed assessment of your vehicle's current condition,
+                  identifying areas that require special attention.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="order-1 md:order-2 relative h-[300px]">
+            <img
+              src="/luxury-sedan-close-up-black-and-white-elegant.jpg"
+              alt="Assessment"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="relative h-[300px]">
+            <img
+              src="/luxury-sports-car-detail-black-and-white-dramatic.jpg"
+              alt="Preparation"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+                2
+              </div>
+              <div>
+                <h3 class="font-serif text-2xl font-bold mb-3">Preparation & Correction</h3>
+                <p class="text-muted-foreground leading-relaxed">
+                  Every surface is meticulously cleaned and prepared. Paint correction removes imperfections, swirls,
+                  and scratches, creating the perfect foundation for protection treatments. This stage is crucial for
+                  achieving showroom-quality results.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="order-2 md:order-1">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+                3
+              </div>
+              <div>
+                <h3 class="font-serif text-2xl font-bold mb-3">Application & Protection</h3>
+                <p class="text-muted-foreground leading-relaxed">
+                  Using premium materials and advanced techniques, we apply your chosen protection systems. Whether
+                  it's PPF, ceramic coating, or vinyl wrap, every application is executed with precision and care by
+                  our master craftsmen.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="order-1 md:order-2 relative h-[300px]">
+            <img
+              src="/supercar-wheel-detail-black-and-white-luxury.jpg"
+              alt="Application"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div class="relative h-[300px]">
+            <img
+              src="/luxury-suv-black-and-white-premium-detail.jpg"
+              alt="Final Inspection"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold">
+                4
+              </div>
+              <div>
+                <h3 class="font-serif text-2xl font-bold mb-3">Final Inspection & Delivery</h3>
+                <p class="text-muted-foreground leading-relaxed">
+                  Before delivery, every vehicle undergoes rigorous quality inspection. We ensure every detail meets
+                  our exacting standards. Your vehicle is then presented to you with complete care instructions and
+                  warranty documentation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose WRP. -->
+  <section class="py-32 px-6 bg-muted/30">
+    <div class="container mx-auto max-w-6xl">
+      <div class="text-center mb-20">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Why Choose WRP.</h2>
+        <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+          What sets us apart in Dubai's competitive luxury automotive market
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-12 mb-16">
+        <div class="text-center">
+          <div class="text-6xl font-bold mb-4">500+</div>
+          <div class="text-xl font-bold mb-2">Vehicles Protected</div>
+          <p class="text-muted-foreground">
+            From everyday luxury to million-dollar hypercars, we've protected Dubai's finest automobiles
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="text-6xl font-bold mb-4">15+</div>
+          <div class="text-xl font-bold mb-2">Years Experience</div>
+          <p class="text-muted-foreground">
+            Over a decade of expertise working with the world's most prestigious automotive brands
+          </p>
+        </div>
+        <div class="text-center">
+          <div class="text-6xl font-bold mb-4">100%</div>
+          <div class="text-xl font-bold mb-2">Satisfaction Rate</div>
+          <p class="text-muted-foreground">
+            Every client receives service that exceeds expectations, guaranteed by our commitment to excellence
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-background p-8 rounded-lg border border-border">
+        <h3 class="font-serif text-2xl font-bold mb-4">Premium Materials & Technology</h3>
+        <p class="text-muted-foreground leading-relaxed">
+          We exclusively use industry-leading products from XPEL, 3M, Gtechniq, and other premium manufacturers. Our
+          climate-controlled facility features state-of-the-art equipment including precision cutting systems,
+          professional spray booths, and advanced curing technology.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-32 px-6 bg-primary text-primary-foreground text-center">
+    <div class="container mx-auto max-w-3xl">
+      <h2 class="font-serif text-4xl font-bold mb-6">Ready to Experience WRP.?</h2>
+      <p class="text-xl mb-8 opacity-90">
+        Schedule a consultation to discover how we can elevate your vehicle to its full potential
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button size="lg" className="bg-background text-foreground hover:bg-background/90">
+          <a href="/#contact">BOOK CONSULTATION</a>
+        </Button>
+        <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+          <a href="/#services">VIEW SERVICES</a>
+        </Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
