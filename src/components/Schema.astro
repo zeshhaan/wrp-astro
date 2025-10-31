@@ -1,0 +1,64 @@
+---
+interface Props {
+  type?: 'LocalBusiness' | 'AutoRepair';
+}
+
+const { type = 'LocalBusiness' } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': type,
+  name: 'WRP Dubai',
+  alternateName: 'Wrap, Reinforce, Protect',
+  description: 'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
+  url: 'https://wrpdetailing.ae',
+  logo: 'https://wrpdetailing.ae/wrp-logo.svg',
+  image: 'https://wrpdetailing.ae/og-image.jpg',
+  telephone: '+971547173000',
+  email: 'noreply@wrpdetailing.ae',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Al Qusais Industrial Area 1',
+    addressLocality: 'Dubai',
+    addressRegion: 'Dubai',
+    addressCountry: 'AE',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 25.2854,
+    longitude: 55.3781,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+      opens: '09:00',
+      closes: '19:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Friday', 'Saturday'],
+      opens: 'By Appointment',
+      closes: 'By Appointment',
+    },
+  ],
+  priceRange: 'AED 500 - AED 15000',
+  areaServed: {
+    '@type': 'City',
+    name: 'Dubai',
+  },
+  sameAs: [
+    'https://instagram.com/wrp_ae',
+  ],
+  serviceType: [
+    'Ceramic Coating',
+    'Paint Protection Film (PPF)',
+    'Paint Correction & Polish',
+    'Window Tinting',
+    'Premium Car Wash',
+    'Vehicle Wrapping',
+  ],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

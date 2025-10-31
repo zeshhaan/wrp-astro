@@ -1,6 +1,8 @@
 ---
 import Navigation from '../components/Navigation.astro';
 import WRPFooter from '../components/WRPFooter.astro';
+import Schema from '../components/Schema.astro';
+import { SEO } from 'astro-seo';
 import '../styles/global.css';
 
 interface Props {
@@ -8,19 +10,71 @@ interface Props {
   description: string;
   showNav?: boolean;
   showFooter?: boolean;
+  ogImage?: string;
+  noindex?: boolean;
+  includeSchema?: boolean;
 }
 
-const { title, description, showNav = true, showFooter = true } = Astro.props;
+const {
+  title,
+  description,
+  showNav = true,
+  showFooter = true,
+  ogImage = '/og-image.jpg',
+  noindex = false,
+  includeSchema = true,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageURL = new URL(ogImage, Astro.site).toString();
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content={description} />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonicalURL}
+      noindex={noindex}
+      openGraph={{
+        basic: {
+          title: title,
+          type: 'website',
+          image: ogImageURL,
+          url: canonicalURL,
+        },
+        optional: {
+          description: description,
+          siteName: 'WRP Dubai',
+          locale: 'en_AE',
+        },
+        image: {
+          alt: title,
+          width: 1200,
+          height: 630,
+          type: 'image/png',
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        site: '@wrp_ae',
+        creator: '@wrp_ae',
+        title: title,
+        description: description,
+        image: ogImageURL,
+        imageAlt: title,
+      }}
+      extend={{
+        link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+        meta: [
+          { name: 'viewport', content: 'width=device-width' },
+          { name: 'theme-color', content: '#000000' },
+        ],
+      }}
+    />
+
+    {includeSchema && <Schema />}
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

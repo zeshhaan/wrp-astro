@@ -3,17 +3,61 @@ export const prerender = true;
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SEO } from 'astro-seo';
+import Schema from '../components/Schema.astro';
 import '../styles/global.css';
+
+const title = 'WRP. | Premium Car Detailing Studio Dubai';
+const description = "Dubai's most exclusive automotive care studio. Wrap, Reinforce, Protect your luxury vehicle with precision craftsmanship.";
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Dubai's most exclusive automotive care studio. Wrap, Reinforce, Protect your luxury vehicle with precision craftsmanship." />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>WRP. | Premium Car Detailing Studio Dubai</title>
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonicalURL}
+      openGraph={{
+        basic: {
+          title: title,
+          type: 'website',
+          image: ogImageURL,
+          url: canonicalURL,
+        },
+        optional: {
+          description: description,
+          siteName: 'WRP Dubai',
+          locale: 'en_AE',
+        },
+        image: {
+          alt: 'WRP Premium Car Detailing Dubai',
+          width: 1200,
+          height: 630,
+          type: 'image/png',
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        site: '@wrp_ae',
+        creator: '@wrp_ae',
+        title: title,
+        description: description,
+        image: ogImageURL,
+        imageAlt: 'WRP Premium Car Detailing Dubai',
+      }}
+      extend={{
+        link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+        meta: [
+          { name: 'viewport', content: 'width=device-width' },
+          { name: 'theme-color', content: '#000000' },
+        ],
+      }}
+    />
+
+    <Schema />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
