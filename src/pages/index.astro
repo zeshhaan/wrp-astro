@@ -3,6 +3,7 @@ export const prerender = true;
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import '../styles/global.css';
 ---
 
 <!doctype html>
@@ -13,7 +14,6 @@ import { Card } from "@/components/ui/card";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>WRP. | Premium Car Detailing Studio Dubai</title>
-    <link rel="stylesheet" href="/src/styles/global.css" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -168,7 +168,7 @@ import { Card } from "@/components/ui/card";
               </p>
               <p class="text-lg text-muted-foreground leading-relaxed">
                 Our studio in the heart of Dubai serves the region's most discerning automotive enthusiasts, offering
-                bespoke protection and enhancement services that set new standards in luxury vehicle care.
+                bespoke protection and enhancement services that set new standards in luxury vehicle care. <a href="/more-about-wrp" class="text-foreground font-medium hover:underline underline-offset-4 transition-all">Discover our story</a> and the passion that drives every detail.
               </p>
             </div>
             <div class="relative h-[600px]">
@@ -463,7 +463,7 @@ import { Card } from "@/components/ui/card";
                 worthy of its pedigree. From rare hypercars to bespoke luxury sedans, every vehicle that enters our
                 studio leaves transformed.
               </p>
-              <div class="grid grid-cols-3 gap-8 mb-8">
+              <div class="grid grid-cols-3 gap-8">
                 <div>
                   <div class="text-4xl font-bold mb-2">500+</div>
                   <div class="text-sm text-muted-foreground">Vehicles Protected</div>
@@ -477,12 +477,6 @@ import { Card } from "@/components/ui/card";
                   <div class="text-sm text-muted-foreground">Satisfaction Rate</div>
                 </div>
               </div>
-              <Button variant="outline" size="lg">
-                <a href="/more-about-wrp">
-                  LEARN MORE ABOUT WRP.
-                  <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
-                </a>
-              </Button>
             </div>
           </div>
         </div>
@@ -491,138 +485,71 @@ import { Card } from "@/components/ui/card";
       <!-- Brand Logos Section -->
       <section class="py-32 px-6 bg-black text-white">
         <div class="container mx-auto max-w-7xl">
-          <div class="text-center mb-20">
+          <div class="max-w-2xl mx-auto text-center mb-20">
             <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              We Made It Shinier Than The Showroom.
+              Signature Fleet
             </h2>
           </div>
 
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-12 items-center justify-items-center opacity-60">
-            <!-- Ferrari -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <text x="50" y="55" font-size="14" font-weight="bold" text-anchor="middle" font-family="serif">
-                  FERRARI
-                </text>
-              </svg>
-            </div>
-
             <!-- Lamborghini -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <polygon points="50,20 70,40 70,60 50,80 30,60 30,40" />
-                <text x="50" y="95" font-size="10" font-weight="bold" text-anchor="middle">
-                  LAMBORGHINI
-                </text>
-              </svg>
+              <img src="/logos/lamborghini-alt-svgrepo-com.svg" alt="Lamborghini" class="w-full h-full object-contain invert" />
             </div>
 
             <!-- Porsche -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <text x="50" y="55" font-size="16" font-weight="bold" text-anchor="middle" font-family="sans-serif">
-                  PORSCHE
-                </text>
-              </svg>
+              <img src="/logos/porsche-svgrepo-com.svg" alt="Porsche" class="w-full h-full object-contain invert" />
             </div>
 
             <!-- Rolls-Royce -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <rect x="30" y="40" width="40" height="20" />
-                <text x="50" y="75" font-size="10" font-weight="bold" text-anchor="middle">
-                  ROLLS-ROYCE
-                </text>
-              </svg>
+              <img src="/logos/rolls-royce-svgrepo-com.svg" alt="Rolls-Royce" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- Bentley -->
+            <!-- Lexus -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <text x="50" y="50" font-size="32" font-weight="bold" text-anchor="middle" font-family="serif">
-                  B
-                </text>
-                <text x="50" y="70" font-size="10" font-weight="bold" text-anchor="middle">
-                  BENTLEY
-                </text>
-              </svg>
+              <img src="/logos/lexus-svgrepo-com.svg" alt="Lexus" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- McLaren -->
+            <!-- Ferrari -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <path d="M 30 50 Q 50 30 70 50" stroke="white" stroke-width="3" fill="none" />
-                <text x="50" y="75" font-size="11" font-weight="bold" text-anchor="middle">
-                  McLAREN
-                </text>
-              </svg>
-            </div>
-
-            <!-- Aston Martin -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <path d="M 35 60 L 50 35 L 65 60" stroke="white" stroke-width="2" fill="none" />
-                <text x="50" y="80" font-size="9" font-weight="bold" text-anchor="middle">
-                  ASTON MARTIN
-                </text>
-              </svg>
+              <img src="/logos/ferrari-svgrepo-com.svg" alt="Ferrari" class="w-full h-full object-contain invert" />
             </div>
 
             <!-- Mercedes-Benz -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <circle cx="50" cy="45" r="20" stroke="white" stroke-width="2" fill="none" />
-                <line x1="50" y1="45" x2="50" y2="25" stroke="white" stroke-width="2" />
-                <line x1="50" y1="45" x2="35" y2="60" stroke="white" stroke-width="2" />
-                <line x1="50" y1="45" x2="65" y2="60" stroke="white" stroke-width="2" />
-                <text x="50" y="85" font-size="9" font-weight="bold" text-anchor="middle">
-                  MERCEDES
-                </text>
-              </svg>
+              <img src="/logos/mercedes-benz-svgrepo-com.svg" alt="Mercedes-Benz" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- BMW -->
+            <!-- Land Rover -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <circle cx="35" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <circle cx="50" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <circle cx="65" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <text x="50" y="75" font-size="14" font-weight="bold" text-anchor="middle">
-                  BMW
-                </text>
-              </svg>
+              <img src="/logos/land-rover-svgrepo-com.svg" alt="Land Rover" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- Audi -->
+            <!-- Jaguar -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <circle cx="35" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <circle cx="50" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <circle cx="65" cy="45" r="8" stroke="white" stroke-width="2" fill="none" />
-                <text x="50" y="75" font-size="14" font-weight="bold" text-anchor="middle">
-                  AUDI
-                </text>
-              </svg>
+              <img src="/logos/jaguar-svgrepo-com.svg" alt="Jaguar" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- Bugatti -->
+            <!-- McLaren -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <ellipse cx="50" cy="45" rx="25" ry="15" stroke="white" stroke-width="2" fill="none" />
-                <text x="50" y="75" font-size="12" font-weight="bold" text-anchor="middle">
-                  BUGATTI
-                </text>
-              </svg>
+              <img src="/logos/mclaren-alt-svgrepo-com.svg" alt="McLaren" class="w-full h-full object-contain invert" />
             </div>
 
-            <!-- Maserati -->
+            <!-- Nissan -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <path d="M 40 55 L 50 30 L 60 55" stroke="white" stroke-width="2" fill="none" />
-                <text x="50" y="75" font-size="11" font-weight="bold" text-anchor="middle">
-                  MASERATI
-                </text>
-              </svg>
+              <img src="/logos/nissan-svgrepo-com.svg" alt="Nissan" class="w-full h-full object-contain invert" />
+            </div>
+
+            <!-- Aston Martin -->
+            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+              <img src="/logos/aston-martin-svgrepo-com.svg" alt="Aston Martin" class="w-full h-full object-contain invert" />
+            </div>
+
+            <!-- Alfa Romeo -->
+            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+              <img src="/logos/alfa-romeo-svgrepo-com.svg" alt="Alfa Romeo" class="w-full h-full object-contain invert" />
             </div>
           </div>
 
@@ -686,13 +613,6 @@ import { Card } from "@/components/ui/card";
                   <p>Friday - Saturday: By Appointment</p>
                 </div>
               </div>
-
-              <Button variant="outline" size="lg" className="mt-8 bg-transparent">
-                <a href="/contact-us">
-                  VISIT FULL CONTACT PAGE
-                  <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
-                </a>
-              </Button>
             </div>
 
             <div>

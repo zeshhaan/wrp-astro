@@ -161,6 +161,20 @@ export const prerender = false; // Server-rendered for D1 access
               </div>
             </div>
 
+            <!-- Vehicle -->
+            <div class="sm:col-span-2">
+              <label for="vehicle" class="block text-sm font-semibold text-foreground">Vehicle</label>
+              <div class="mt-2.5">
+                <input
+                  id="vehicle"
+                  type="text"
+                  name="vehicle"
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
+                  placeholder="Make & Model"
+                />
+              </div>
+            </div>
+
             <!-- Service Interest -->
             <div class="sm:col-span-2">
               <label for="service" class="block text-sm font-semibold text-foreground">Service Interest</label>
@@ -197,9 +211,10 @@ export const prerender = false; // Server-rendered for D1 access
 
           <!-- Submit Button -->
           <div class="mt-8 flex justify-end">
-            <Button type="submit" size="lg" :disabled="submitting">
-              <span x-show="!submitting">Send message</span>
+            <Button type="submit" size="lg" className="w-full sm:w-auto" :disabled="submitting">
+              <span x-show="!submitting">SEND MESSAGE</span>
               <span x-show="submitting" x-cloak>Sending...</span>
+              <i x-show="!submitting" data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
             </Button>
           </div>
 

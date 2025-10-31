@@ -11,12 +11,12 @@ export const prerender = true;
   description="Learn about WRP Dubai - Founded in 2010, we're Dubai's most trusted name in premium automotive protection and enhancement."
 >
   <!-- Hero Section -->
-  <section class="relative h-[70vh] flex items-center justify-center overflow-hidden mt-16">
+  <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 bg-black">
       <img
         src="/luxury-car-detailing-studio-interior-minimal-black.jpg"
         alt="WRP Studio"
-        class="w-full h-full object-cover opacity-50"
+        class="absolute inset-0 w-full h-full object-cover opacity-50"
       />
     </div>
     <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
@@ -77,82 +77,82 @@ export const prerender = true;
       <div class="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
         <!-- Excellence - Large Top Left -->
         <div class="relative lg:col-span-3">
-          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
+          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-t-4xl lg:rounded-tl-4xl"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
             <img src="/luxury-sports-car-detail-black-and-white-dramatic.jpg" alt="Excellence" class="h-80 object-cover" />
             <div class="p-10 pt-4">
-              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
-              <p class="mt-2 text-2xl font-serif font-bold tracking-tight text-foreground">Excellence</p>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                We never compromise on quality. Every detail matters, every surface is perfected, every client receives our absolute best work on every vehicle.
+              <h3 class="text-sm/4 font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-medium tracking-tight text-foreground">Excellence</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                We never compromise on quality. Every detail matters, every surface is perfected, every client receives our absolute best work.
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-t-4xl lg:rounded-tl-4xl"></div>
         </div>
 
         <!-- Expertise - Large Top Right -->
         <div class="relative lg:col-span-3">
-          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-tr-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
+          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-tr-4xl"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
             <img src="/luxury-car-detailing-craftsman-working-black-and-w.jpg" alt="Expertise" class="h-80 object-cover lg:object-right" />
             <div class="p-10 pt-4">
-              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
-              <p class="mt-2 text-2xl font-serif font-bold tracking-tight text-foreground">Expertise</p>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                Our team brings decades of combined experience working with the world's most prestigious automotive brands and luxury vehicles.
+              <h3 class="text-sm/4 font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-medium tracking-tight text-foreground">Expertise</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                Our team brings decades of combined experience working with the world's most prestigious automotive brands.
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border lg:rounded-tr-[2rem]"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 lg:rounded-tr-4xl"></div>
         </div>
 
         <!-- Precision - Bottom Left -->
         <div class="relative lg:col-span-2">
-          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-bl-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
+          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-bl-4xl"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
             <img src="/supercar-wheel-detail-black-and-white-luxury.jpg" alt="Precision" class="h-80 object-cover object-center" />
             <div class="p-10 pt-4">
-              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
-              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Precision</p>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                Meticulous attention to detail ensures flawless results.
+              <h3 class="text-sm/4 font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-medium tracking-tight text-foreground">Precision</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                Meticulous attention to detail in every step ensures flawless results.
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border lg:rounded-bl-[2rem]"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 lg:rounded-bl-4xl"></div>
         </div>
 
         <!-- Innovation - Bottom Middle -->
         <div class="relative lg:col-span-2">
           <div class="absolute inset-0 rounded-lg bg-card"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
             <img src="/luxury-sedan-close-up-black-and-white-elegant.jpg" alt="Innovation" class="h-80 object-cover" />
             <div class="p-10 pt-4">
-              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
-              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Innovation</p>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                Latest technology and cutting-edge techniques.
+              <h3 class="text-sm/4 font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-medium tracking-tight text-foreground">Innovation</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-muted-foreground">
+                Continuously investing in the latest technology and techniques.
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5"></div>
         </div>
 
         <!-- Commitment - Bottom Right -->
         <div class="relative lg:col-span-2">
-          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-br-[calc(2rem+1px)]">
+          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-b-4xl lg:rounded-br-4xl"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-br-[calc(2rem+1px)]">
             <img src="/luxury-suv-black-and-white-premium-detail.jpg" alt="Commitment" class="h-80 object-cover" />
             <div class="p-10 pt-4">
-              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
-              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Commitment</p>
-              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+              <h3 class="text-sm/4 font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-medium tracking-tight text-foreground">Commitment</p>
+              <p class="mt-2 max-w-lg text-sm/6 text-muted-foreground">
                 Dedicated to exceeding expectations on every project.
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-br-4xl"></div>
         </div>
       </div>
     </div>

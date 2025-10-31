@@ -6,6 +6,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const name = formData.get('name')?.toString();
     const email = formData.get('email')?.toString();
     const phone = formData.get('phone')?.toString();
+    const vehicle = formData.get('vehicle')?.toString();
     const service = formData.get('service')?.toString();
     const message = formData.get('message')?.toString();
 
@@ -42,9 +43,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const db = locals.runtime.env.DB;
 
     await db.prepare(`
-      INSERT INTO contact_submissions (name, email, phone, service_interest, message)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(name, email, phone || null, service || null, message).run();
+      INSERT INTO contact_submissions (name, email, phone, vehicle, service_interest, message)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(name, email, phone || null, vehicle || null, service || null, message).run();
 
     // TODO: Send email notification (optional - can use Cloudflare Email Workers or external service)
 
