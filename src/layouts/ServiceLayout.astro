@@ -32,13 +32,12 @@ const { title, subtitle, description, heroImage } = Astro.props;
     <div class="container mx-auto max-w-3xl">
       <h2 class="font-serif text-4xl font-bold mb-6">Ready to Protect Your Investment?</h2>
       <p class="text-xl mb-8 opacity-90">Contact us today for a free consultation and quote</p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button size="lg" className="bg-background text-foreground hover:bg-background/90">
-          <a href="tel:+971547173000">Call +971 54 717 3000</a>
-        </Button>
-        <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-          <a href="/contact-us">Get a Quote</a>
-        </Button>
+      <div class="flex justify-center">
+        <a href="/contact-us">
+          <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base tracking-wide">
+            BOOK SLOT NOW
+          </Button>
+        </a>
       </div>
     </div>
   </section>
