@@ -62,68 +62,98 @@ export const prerender = true;
     </div>
   </section>
 
-  <!-- Our Core Values -->
-  <section class="py-32 px-6 bg-muted/30">
-    <div class="container mx-auto max-w-7xl">
-      <div class="text-center mb-20">
-        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Our Core Values</h2>
+  <!-- Our Core Values - Bento Grid -->
+  <section class="py-24 sm:py-32 px-6 bg-background">
+    <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
+      <!-- Centered Header -->
+      <div class="text-center mb-16">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6 text-foreground">Our Core Values</h2>
         <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
           The principles that guide every service we provide
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-            </svg>
+      <!-- Bento Grid -->
+      <div class="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
+        <!-- Excellence - Large Top Left -->
+        <div class="relative lg:col-span-3">
+          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
+            <img src="/luxury-sports-car-detail-black-and-white-dramatic.jpg" alt="Excellence" class="h-80 object-cover" />
+            <div class="p-10 pt-4">
+              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-2xl font-serif font-bold tracking-tight text-foreground">Excellence</p>
+              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+                We never compromise on quality. Every detail matters, every surface is perfected, every client receives our absolute best work on every vehicle.
+              </p>
+            </div>
           </div>
-          <h3 class="font-serif text-2xl font-bold mb-4">Excellence</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            We never compromise on quality. Every detail matters, every surface is perfected, every client receives
-            our absolute best.
-          </p>
-        </Card>
+          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border max-lg:rounded-t-[2rem] lg:rounded-tl-[2rem]"></div>
+        </div>
 
-        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-            </svg>
+        <!-- Expertise - Large Top Right -->
+        <div class="relative lg:col-span-3">
+          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-tr-[2rem]"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
+            <img src="/luxury-car-detailing-craftsman-working-black-and-w.jpg" alt="Expertise" class="h-80 object-cover lg:object-right" />
+            <div class="p-10 pt-4">
+              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-2xl font-serif font-bold tracking-tight text-foreground">Expertise</p>
+              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+                Our team brings decades of combined experience working with the world's most prestigious automotive brands and luxury vehicles.
+              </p>
+            </div>
           </div>
-          <h3 class="font-serif text-2xl font-bold mb-4">Expertise</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            Our team brings decades of combined experience working with the world's most prestigious automotive
-            brands.
-          </p>
-        </Card>
+          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border lg:rounded-tr-[2rem]"></div>
+        </div>
 
-        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
+        <!-- Precision - Bottom Left -->
+        <div class="relative lg:col-span-2">
+          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-bl-[2rem]"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
+            <img src="/supercar-wheel-detail-black-and-white-luxury.jpg" alt="Precision" class="h-80 object-cover object-center" />
+            <div class="p-10 pt-4">
+              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Precision</p>
+              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+                Meticulous attention to detail ensures flawless results.
+              </p>
+            </div>
           </div>
-          <h3 class="font-serif text-2xl font-bold mb-4">Precision</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            Meticulous attention to detail in every step of our process ensures flawless results that exceed
-            expectations.
-          </p>
-        </Card>
+          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border lg:rounded-bl-[2rem]"></div>
+        </div>
 
-        <Card className="p-8 text-center hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
+        <!-- Innovation - Bottom Middle -->
+        <div class="relative lg:col-span-2">
+          <div class="absolute inset-0 rounded-lg bg-card"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
+            <img src="/luxury-sedan-close-up-black-and-white-elegant.jpg" alt="Innovation" class="h-80 object-cover" />
+            <div class="p-10 pt-4">
+              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Innovation</p>
+              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+                Latest technology and cutting-edge techniques.
+              </p>
+            </div>
           </div>
-          <h3 class="font-serif text-2xl font-bold mb-4">Innovation</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            We continuously invest in the latest technology and techniques to deliver cutting-edge protection
-            solutions.
-          </p>
-        </Card>
+          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border"></div>
+        </div>
+
+        <!-- Commitment - Bottom Right -->
+        <div class="relative lg:col-span-2">
+          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
+          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-br-[calc(2rem+1px)]">
+            <img src="/luxury-suv-black-and-white-premium-detail.jpg" alt="Commitment" class="h-80 object-cover" />
+            <div class="p-10 pt-4">
+              <h3 class="text-sm font-semibold text-primary uppercase tracking-wide">Core Value</h3>
+              <p class="mt-2 text-lg font-serif font-bold tracking-tight text-foreground">Commitment</p>
+              <p class="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+                Dedicated to exceeding expectations on every project.
+              </p>
+            </div>
+          </div>
+          <div class="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border max-lg:rounded-b-[2rem] lg:rounded-br-[2rem]"></div>
+        </div>
       </div>
     </div>
   </section>
