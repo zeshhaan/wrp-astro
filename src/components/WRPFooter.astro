@@ -1,7 +1,27 @@
 ---
-// Simple footer for service and contact pages
+// Footer component for service and contact pages
 ---
 
-<footer class="bg-background border-t border-border py-8 px-6 text-center text-muted-foreground">
-  <p>&copy; {new Date().getFullYear()} WRP Dubai. All rights reserved.</p>
+<footer class="bg-black text-white py-12 px-6">
+  <div class="container mx-auto max-w-7xl">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center">
+        <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" />
+      </div>
+      <div class="flex gap-8 text-sm">
+        <a href="/#services" class="hover:text-white/70 transition-colors">
+          Services
+        </a>
+        <a href="/more-about-wrp" class="hover:text-white/70 transition-colors">
+          About
+        </a>
+        <a href="/contact-us" class="hover:text-white/70 transition-colors">
+          Contact
+        </a>
+      </div>
+    </div>
+    <div class="text-center mt-8 text-white/40 text-xs">
+      <p>&copy; {new Date().getFullYear()} WRP Dubai. All rights reserved.</p>
+    </div>
+  </div>
 </footer>
