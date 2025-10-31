@@ -5,6 +5,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "wrp-astro",
+	"account_id": "fa7eb70f2bedd4013dba6420fd975f92",
 	"main": "./dist/_worker.js/index.js",
 	"compatibility_date": "2025-10-29",
 	"compatibility_flags": [
@@ -17,7 +18,14 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "wrp-contact-forms",
+			"database_id": "45b2fc45-c9ed-45f4-ad9f-2a29b35b263d"
+		}
+	]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

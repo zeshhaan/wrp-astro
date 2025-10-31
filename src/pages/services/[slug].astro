@@ -1,0 +1,172 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import { Button } from "@/components/ui/button";
+
+export const prerender = true;
+
+export const getStaticPaths = (async () => {
+  const services = await getCollection('services');
+  return services.map((service) => ({
+    params: { slug: service.id },
+    props: { service },
+  }));
+}) satisfies GetStaticPaths;
+
+const { service } = Astro.props;
+const { Content } = await render(service);
+const { title, subtitle, description, heroImage, packages, benefits, process, faqs } = service.data;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} | WRP Dubai - Premium Car Detailing</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@1,900&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Navigation will go here -->
+    <nav class="bg-background border-b border-border">
+      <div class="container mx-auto px-6 py-4">
+        <a href="/" class="text-2xl font-logo font-black italic">WRP.</a>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
+      <img src={heroImage} alt={title} class="absolute inset-0 w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-black/50"></div>
+      <div class="relative z-10 text-center text-white px-6">
+        <p class="text-sm tracking-[0.3em] mb-4 font-mono uppercase">{subtitle}</p>
+        <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6">{title}</h1>
+        <p class="text-xl max-w-2xl mx-auto text-white/90">{description}</p>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <article class="py-20 px-6">
+      <div class="container mx-auto max-w-4xl prose prose-lg prose-slate">
+        <Content />
+      </div>
+    </article>
+
+    <!-- Benefits Grid -->
+    {benefits && benefits.length > 0 && (
+      <section class="py-20 px-6 bg-muted">
+        <div class="container mx-auto max-w-6xl">
+          <h2 class="font-serif text-4xl font-bold text-center mb-12">Why Choose This Service</h2>
+          <div class="grid md:grid-cols-3 gap-8">
+            {benefits.map((benefit) => (
+              <div class="bg-background p-6 rounded-lg border border-border">
+                <p class="text-lg">{benefit}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Packages -->
+    {packages && packages.length > 0 && (
+      <section class="py-20 px-6">
+        <div class="container mx-auto max-w-6xl">
+          <h2 class="font-serif text-4xl font-bold text-center mb-12">Our Packages</h2>
+          <div class="grid md:grid-cols-3 gap-8">
+            {packages.map((pkg) => (
+              <div class="border border-border rounded-lg p-8 hover:border-primary transition-colors">
+                <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
+                <div class="mb-6">
+                  <span class="text-4xl font-bold">AED {pkg.price}</span>
+                  {pkg.duration && <span class="text-muted-foreground ml-2">/ {pkg.duration}</span>}
+                </div>
+                <ul class="space-y-3">
+                  {pkg.features.map((feature) => (
+                    <li class="flex items-start gap-2">
+                      <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Process -->
+    {process && process.length > 0 && (
+      <section class="py-20 px-6 bg-muted">
+        <div class="container mx-auto max-w-4xl">
+          <h2 class="font-serif text-4xl font-bold text-center mb-12">Our Process</h2>
+          <div class="space-y-8">
+            {process.map((step) => (
+              <div class="flex gap-6">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  {step.step}
+                </div>
+                <div>
+                  <h3 class="font-bold text-xl mb-2">{step.title}</h3>
+                  <p class="text-muted-foreground">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- FAQs -->
+    {faqs && faqs.length > 0 && (
+      <section class="py-20 px-6">
+        <div class="container mx-auto max-w-4xl">
+          <h2 class="font-serif text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <div class="space-y-4">
+            {faqs.map((faq, index) => (
+              <details class="group border border-border rounded-lg p-6 hover:border-primary transition-colors">
+                <summary class="cursor-pointer font-bold text-lg list-none flex items-center justify-between">
+                  {faq.question}
+                  <svg class="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </summary>
+                <p class="mt-4 text-muted-foreground leading-relaxed">{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6 bg-primary text-primary-foreground text-center">
+      <div class="container mx-auto max-w-3xl">
+        <h2 class="font-serif text-4xl font-bold mb-6">Ready to Protect Your Investment?</h2>
+        <p class="text-xl mb-8 opacity-90">Contact us today for a free consultation and quote</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" className="bg-background text-foreground hover:bg-background/90">
+            <a href="tel:+971547173000">Call +971 54 717 3000</a>
+          </Button>
+          <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <a href="/contact-us">Get a Quote</a>
+          </Button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-background border-t border-border py-8 px-6 text-center text-muted-foreground">
+      <p>&copy; {new Date().getFullYear()} WRP Dubai. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
