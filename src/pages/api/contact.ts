@@ -1,4 +1,6 @@
 import type { APIRoute } from 'astro';
+import { EmailMessage } from 'cloudflare:email';
+import { createMimeMessage } from 'mimetext';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -47,7 +49,39 @@ export const POST: APIRoute = async ({ request, locals }) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `).bind(name, email, phone || null, vehicle || null, service || null, message).run();
 
-    // TODO: Send email notification (optional - can use Cloudflare Email Workers or external service)
+    // Send email notification
+    try {
+      const msg = createMimeMessage();
+      msg.setSender({ name: 'WRP Contact Form', addr: 'noreply@wrpdetailing.ae' });
+      msg.setRecipient('wrp.detailing@gmail.com');
+      msg.setSubject(`New Contact Form Submission from ${name}`);
+      msg.addMessage({
+        contentType: 'text/html',
+        data: `
+          <h2>New Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
+          <p><strong>Vehicle:</strong> ${vehicle || 'Not provided'}</p>
+          <p><strong>Service Interest:</strong> ${service || 'Not specified'}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message}</p>
+          <hr>
+          <p style="color: #666; font-size: 12px;">Submitted via wrpdetailing.ae contact form</p>
+        `,
+      });
+
+      const emailMessage = new EmailMessage(
+        'noreply@wrpdetailing.ae',
+        'wrp.detailing@gmail.com',
+        msg.asRaw()
+      );
+
+      await locals.runtime.env.EMAIL.send(emailMessage);
+    } catch (emailError) {
+      // Log email error but don't fail the request
+      console.error('Failed to send email notification:', emailError);
+    }
 
     return new Response(
       JSON.stringify({

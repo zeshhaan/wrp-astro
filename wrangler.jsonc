@@ -35,6 +35,12 @@
 			"pattern": "www.wrpdetailing.ae",
 			"custom_domain": true
 		}
+	],
+	"send_email": [
+		{
+			"name": "EMAIL",
+			"destination_address": "wrp.detailing@gmail.com"
+		}
 	]
 	/**
 	 * Smart Placement
