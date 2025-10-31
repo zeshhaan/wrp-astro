@@ -1,179 +1,174 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { Button } from "@/components/ui/button";
 
-export const prerender = false; // This page needs to be server-rendered for D1 access
+export const prerender = false; // Server-rendered for D1 access
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Contact WRP Dubai - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Contact Us | WRP Dubai - Premium Car Detailing</title>
-    <link rel="stylesheet" href="/src/styles/global.css" />
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@1,900&display=swap" rel="stylesheet" />
-
-    <style>
-      [x-cloak] { display: none !important; }
-    </style>
-  </head>
-  <body>
-    <!-- Navigation -->
-    <nav class="bg-background border-b border-border">
-      <div class="container mx-auto px-6 py-4">
-        <a href="/" class="text-2xl font-logo font-black italic">WRP.</a>
-      </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="py-20 px-6 bg-muted">
-      <div class="container mx-auto max-w-4xl text-center">
-        <p class="text-sm tracking-[0.3em] mb-4 font-mono uppercase text-muted-foreground">GET IN TOUCH</p>
-        <h1 class="font-serif text-5xl md:text-6xl font-bold mb-6">Contact WRP Dubai</h1>
-        <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Experience premium car detailing excellence. Reach out for a free consultation and quote.
-        </p>
-      </div>
-    </section>
-
-    <!-- Contact Information & Form -->
-    <section class="py-20 px-6">
-      <div class="container mx-auto max-w-6xl">
-        <div class="grid md:grid-cols-2 gap-12">
-          <!-- Contact Info -->
-          <div>
-            <h2 class="font-serif text-3xl font-bold mb-8">Visit Our Studio</h2>
-
-            <div class="space-y-6 mb-12">
-              <div>
-                <h3 class="font-bold mb-2">Location</h3>
-                <p class="text-muted-foreground">
-                  Al Qusais Industrial Area 1<br />
-                  Dubai, UAE
-                </p>
-              </div>
-
-              <div>
-                <h3 class="font-bold mb-2">Phone</h3>
-                <a href="tel:+971547173000" class="text-muted-foreground hover:text-foreground transition-colors">
-                  +971 54 717 3000
-                </a>
-              </div>
-
-              <div>
-                <h3 class="font-bold mb-2">Email</h3>
-                <a href="mailto:wrpdetailing@gmail.com" class="text-muted-foreground hover:text-foreground transition-colors">
-                  wrpdetailing@gmail.com
-                </a>
-              </div>
-
-              <div>
-                <h3 class="font-bold mb-2">Social Media</h3>
-                <a href="https://instagram.com/wrp_ae" target="_blank" rel="noopener" class="text-muted-foreground hover:text-foreground transition-colors">
-                  @wrp_ae
-                </a>
-              </div>
-            </div>
-
-            <div class="bg-muted p-6 rounded-lg">
-              <h3 class="font-bold mb-4">Opening Hours</h3>
-              <div class="space-y-2 text-muted-foreground">
-                <p>Monday - Saturday: 8:00 AM - 7:00 PM</p>
-                <p>Sunday: 10:00 AM - 5:00 PM</p>
-              </div>
-            </div>
+<BaseLayout
+  title="Contact Us | WRP Dubai - Premium Car Detailing"
+  description="Contact WRP Dubai - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000"
+>
+  <div class="relative isolate bg-background mt-16">
+    <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
+      <!-- Left Side - Contact Info -->
+      <div class="relative px-6 pb-20 pt-24 sm:pt-32 lg:static lg:px-8 lg:py-48">
+        <div class="mx-auto max-w-xl lg:mx-0 lg:max-w-lg">
+          <!-- Background Pattern -->
+          <div class="absolute inset-y-0 left-0 -z-10 w-full overflow-hidden bg-muted ring-1 ring-border lg:w-1/2">
+            <svg aria-hidden="true" class="absolute inset-0 size-full stroke-border [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]">
+              <defs>
+                <pattern id="contact-pattern" width="200" height="200" x="100%" y="-1" patternUnits="userSpaceOnUse">
+                  <path d="M130 200V.5M.5 .5H200" fill="none" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" stroke-width="0" class="fill-background" />
+              <svg x="100%" y="-1" class="overflow-visible fill-muted">
+                <path d="M-470.5 0h201v201h-201Z" stroke-width="0" />
+              </svg>
+              <rect width="100%" height="100%" fill="url(#contact-pattern)" stroke-width="0" />
+            </svg>
           </div>
 
-          <!-- Contact Form -->
-          <div>
-            <h2 class="font-serif text-3xl font-bold mb-8">Send Us a Message</h2>
+          <h2 class="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Get in touch</h2>
+          <p class="mt-6 text-lg leading-8 text-muted-foreground">
+            Ready to elevate your vehicle to perfection? Contact our Dubai studio for premium ceramic coating, PPF, and detailing services.
+          </p>
 
-            <form
-              x-data="{
-                submitting: false,
-                success: false,
-                error: '',
-                async submitForm(event) {
-                  event.preventDefault();
-                  this.submitting = true;
-                  this.error = '';
+          <dl class="mt-10 space-y-4 text-base leading-7 text-foreground">
+            <div class="flex gap-x-4">
+              <dt class="flex-none">
+                <span class="sr-only">Address</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="h-7 w-6 text-muted-foreground">
+                  <path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </dt>
+              <dd>Al Qusais Industrial Area 1<br />Dubai, UAE</dd>
+            </div>
+            <div class="flex gap-x-4">
+              <dt class="flex-none">
+                <span class="sr-only">Telephone</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="h-7 w-6 text-muted-foreground">
+                  <path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </dt>
+              <dd><a href="tel:+971547173000" class="hover:text-foreground">+971 54 717 3000</a></dd>
+            </div>
+            <div class="flex gap-x-4">
+              <dt class="flex-none">
+                <span class="sr-only">Email</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class="h-7 w-6 text-muted-foreground">
+                  <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </dt>
+              <dd><a href="mailto:wrpdetailing@gmail.com" class="hover:text-foreground">wrpdetailing@gmail.com</a></dd>
+            </div>
+            <div class="flex gap-x-4">
+              <dt class="flex-none">
+                <span class="sr-only">Instagram</span>
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="h-7 w-6 text-muted-foreground">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="currentColor" stroke-width="2" fill="none"></rect>
+                  <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke="currentColor" stroke-width="2" fill="none"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" stroke-width="2"></line>
+                </svg>
+              </dt>
+              <dd><a href="https://instagram.com/wrp_ae" target="_blank" rel="noopener" class="hover:text-foreground">@wrp_ae</a></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
 
-                  try {
-                    const formData = new FormData(event.target);
-                    const response = await fetch('/api/contact', {
-                      method: 'POST',
-                      body: formData
-                    });
+      <!-- Right Side - Form -->
+      <form
+        x-data="{
+          submitting: false,
+          success: false,
+          error: '',
+          async submitForm(event) {
+            event.preventDefault();
+            this.submitting = true;
+            this.error = '';
 
-                    const result = await response.json();
+            try {
+              const formData = new FormData(event.target);
+              const response = await fetch('/api/contact', {
+                method: 'POST',
+                body: formData
+              });
 
-                    if (result.success) {
-                      this.success = true;
-                      event.target.reset();
-                    } else {
-                      this.error = result.error || 'Something went wrong';
-                    }
-                  } catch (err) {
-                    this.error = 'Network error. Please try again or call us directly.';
-                  } finally {
-                    this.submitting = false;
-                  }
-                }
-              }"
-              @submit="submitForm($event)"
-              class="space-y-6"
-            >
-              <!-- Name Field -->
-              <div>
-                <label for="name" class="block font-medium mb-2">Name *</label>
+              const result = await response.json();
+
+              if (result.success) {
+                this.success = true;
+                event.target.reset();
+              } else {
+                this.error = result.error || 'Something went wrong';
+              }
+            } catch (err) {
+              this.error = 'Network error. Please try again or call us directly.';
+            } finally {
+              this.submitting = false;
+            }
+          }
+        }"
+        @submit="submitForm($event)"
+        class="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-48"
+      >
+        <div class="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
+          <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+            <!-- Full Name (combined field matching API) -->
+            <div class="sm:col-span-2">
+              <label for="name" class="block text-sm font-semibold text-foreground">Full name *</label>
+              <div class="mt-2.5">
                 <input
-                  type="text"
                   id="name"
+                  type="text"
                   name="name"
+                  autocomplete="name"
                   required
-                  class="w-full px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                   placeholder="Your full name"
                 />
               </div>
+            </div>
 
-              <!-- Email Field -->
-              <div>
-                <label for="email" class="block font-medium mb-2">Email *</label>
+            <!-- Email -->
+            <div class="sm:col-span-2">
+              <label for="email" class="block text-sm font-semibold text-foreground">Email *</label>
+              <div class="mt-2.5">
                 <input
-                  type="email"
                   id="email"
+                  type="email"
                   name="email"
+                  autocomplete="email"
                   required
-                  class="w-full px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="your.email@example.com"
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                 />
               </div>
+            </div>
 
-              <!-- Phone Field -->
-              <div>
-                <label for="phone" class="block font-medium mb-2">Phone</label>
+            <!-- Phone -->
+            <div class="sm:col-span-2">
+              <label for="phone" class="block text-sm font-semibold text-foreground">Phone number</label>
+              <div class="mt-2.5">
                 <input
-                  type="tel"
                   id="phone"
+                  type="tel"
                   name="phone"
-                  class="w-full px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="+971 XX XXX XXXX"
+                  autocomplete="tel"
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                 />
               </div>
+            </div>
 
-              <!-- Service Interest -->
-              <div>
-                <label for="service" class="block font-medium mb-2">Service of Interest</label>
+            <!-- Service Interest -->
+            <div class="sm:col-span-2">
+              <label for="service" class="block text-sm font-semibold text-foreground">Service Interest</label>
+              <div class="mt-2.5">
                 <select
                   id="service"
                   name="service"
-                  class="w-full px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                 >
                   <option value="">Select a service</option>
                   <option value="ceramic-coating">Ceramic Coating</option>
@@ -183,52 +178,53 @@ export const prerender = false; // This page needs to be server-rendered for D1 
                   <option value="premium-car-wash">Premium Car Wash</option>
                 </select>
               </div>
+            </div>
 
-              <!-- Message Field -->
-              <div>
-                <label for="message" class="block font-medium mb-2">Message *</label>
+            <!-- Message -->
+            <div class="sm:col-span-2">
+              <label for="message" class="block text-sm font-semibold text-foreground">Message *</label>
+              <div class="mt-2.5">
                 <textarea
                   id="message"
                   name="message"
+                  rows="4"
                   required
-                  rows="5"
-                  class="w-full px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                  placeholder="Tell us about your vehicle and what service you're interested in..."
+                  class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                 ></textarea>
               </div>
+            </div>
+          </div>
 
-              <!-- Submit Button -->
-              <Button size="lg" className="w-full" type="submit" :disabled="submitting">
-                <span x-show="!submitting">Send Message</span>
-                <span x-show="submitting" x-cloak>Sending...</span>
-              </Button>
+          <!-- Submit Button -->
+          <div class="mt-8 flex justify-end">
+            <Button type="submit" size="lg" :disabled="submitting">
+              <span x-show="!submitting">Send message</span>
+              <span x-show="submitting" x-cloak>Sending...</span>
+            </Button>
+          </div>
 
-              <!-- Success Message -->
-              <div
-                x-show="success"
-                x-transition
-                class="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
-              >
-                <p class="font-bold">Message sent successfully!</p>
-                <p class="text-sm mt-1">We'll get back to you within 24 hours.</p>
-              </div>
+          <!-- Success Message -->
+          <div
+            x-show="success"
+            x-cloak
+            x-transition
+            class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
+          >
+            <p class="font-bold">Message sent successfully!</p>
+            <p class="text-sm mt-1">We'll get back to you within 24 hours.</p>
+          </div>
 
-              <!-- Error Message -->
-              <div
-                x-show="error"
-                x-transition
-                class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800"
-                x-text="error"
-              >
-              </div>
-            </form>
+          <!-- Error Message -->
+          <div
+            x-show="error"
+            x-cloak
+            x-transition
+            class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800"
+            x-text="error"
+          >
           </div>
         </div>
-      </div>
-    </section>
-
-    <footer class="bg-background border-t border-border py-8 px-6 text-center text-muted-foreground">
-      <p>&copy; 2025 WRP Dubai. All rights reserved.</p>
-    </footer>
-  </body>
-</html>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
