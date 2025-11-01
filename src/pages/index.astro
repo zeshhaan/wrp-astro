@@ -100,16 +100,45 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
             </a>
           </div>
           <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-            <a href="#services" class="hover:text-muted-foreground transition-colors">
-              SERVICES
-            </a>
+            <!-- Services Dropdown -->
+            <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+              <button
+                class="hover:text-muted-foreground transition-colors flex items-center gap-1"
+                @click="open = !open"
+              >
+                SERVICES
+                <i data-lucide="chevron-down" class="h-4 w-4"></i>
+              </button>
+              <div
+                x-show="open"
+                x-cloak
+                x-transition
+                class="absolute top-full left-0 mt-2 w-64 bg-background border border-border rounded-lg shadow-lg py-2"
+              >
+                <a href="/services/ceramic-coating" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                  Ceramic Coating
+                </a>
+                <a href="/services/paint-protection-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                  Paint Protection Film
+                </a>
+                <a href="/services/polish" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                  Paint Correction & Polish
+                </a>
+                <a href="/services/window-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                  Window Film
+                </a>
+                <a href="/services/premium-car-wash" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                  Premium Car Wash
+                </a>
+              </div>
+            </div>
             <a href="#portfolio" class="hover:text-muted-foreground transition-colors">
               PORTFOLIO
             </a>
-            <a href="#about" class="hover:text-muted-foreground transition-colors">
+            <a href="/more-about-wrp" class="hover:text-muted-foreground transition-colors">
               ABOUT
             </a>
-            <a href="#contact" class="hover:text-muted-foreground transition-colors">
+            <a href="/contact-us" class="hover:text-muted-foreground transition-colors">
               CONTACT
             </a>
           </div>
@@ -136,13 +165,28 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
           class="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border overflow-hidden"
         >
           <div class="container mx-auto px-6 py-6 flex flex-col gap-6">
-            <a
-              href="#services"
-              class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-              @click="mobileMenuOpen = false"
-            >
-              SERVICES
-            </a>
+            <!-- Services Section -->
+            <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
+            <div class="ml-4 flex flex-col gap-4">
+              <a href="/services/ceramic-coating" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
+                Ceramic Coating
+              </a>
+              <a href="/services/paint-protection-film" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
+                Paint Protection Film
+              </a>
+              <a href="/services/polish" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
+                Paint Correction & Polish
+              </a>
+              <a href="/services/window-film" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
+                Window Film
+              </a>
+              <a href="/services/premium-car-wash" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
+                Premium Car Wash
+              </a>
+            </div>
+
+            <div class="border-t border-border pt-4"></div>
+
             <a
               href="#portfolio"
               class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
@@ -151,21 +195,21 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
               PORTFOLIO
             </a>
             <a
-              href="#about"
+              href="/more-about-wrp"
               class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
               @click="mobileMenuOpen = false"
             >
               ABOUT
             </a>
             <a
-              href="#contact"
+              href="/contact-us"
               class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
               @click="mobileMenuOpen = false"
             >
               CONTACT
             </a>
             <Button className="w-full" @click="mobileMenuOpen = false">
-              BOOK APPOINTMENT
+              <a href="/contact-us" class="w-full">BOOK APPOINTMENT</a>
             </Button>
           </div>
         </div>
@@ -814,10 +858,10 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
               <a href="#portfolio" class="hover:text-white/70 transition-colors">
                 Portfolio
               </a>
-              <a href="#about" class="hover:text-white/70 transition-colors">
+              <a href="/more-about-wrp" class="hover:text-white/70 transition-colors">
                 About
               </a>
-              <a href="#contact" class="hover:text-white/70 transition-colors">
+              <a href="/contact-us" class="hover:text-white/70 transition-colors">
                 Contact
               </a>
             </div>

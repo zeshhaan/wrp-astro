@@ -90,27 +90,22 @@ const services = [
     class="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border overflow-hidden"
   >
     <div class="container mx-auto px-6 py-6 flex flex-col gap-6">
-      <!-- Services in Mobile -->
-      <div x-data="{ open: false }">
-        <button
-          @click="open = !open"
-          class="text-lg tracking-wide hover:text-muted-foreground transition-colors flex items-center justify-between w-full"
-        >
-          SERVICES
-          <i data-lucide="chevron-down" class="h-5 w-5" :class="{ 'rotate-180': open }"></i>
-        </button>
-        <div x-show="open" x-collapse class="mt-2 ml-4 flex flex-col gap-3">
-          {services.map((service) => (
-            <a
-              href={service.href}
-              class="text-base hover:text-muted-foreground transition-colors"
-              @click="mobileMenuOpen = false"
-            >
-              {service.name}
-            </a>
-          ))}
-        </div>
+      <!-- Services Section -->
+      <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
+      <div class="ml-4 flex flex-col gap-4">
+        {services.map((service) => (
+          <a
+            href={service.href}
+            class="text-base hover:text-muted-foreground transition-colors"
+            @click="mobileMenuOpen = false"
+          >
+            {service.name}
+          </a>
+        ))}
       </div>
+
+      <div class="border-t border-border pt-4"></div>
+
       <a
         href="/#portfolio"
         class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
