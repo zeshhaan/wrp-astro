@@ -1,9 +1,25 @@
 ---
 import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+
+const services = [
+  { name: "Ceramic Coating", href: "/services/ceramic-coating" },
+  { name: "Paint Protection Film", href: "/services/paint-protection-film" },
+  { name: "Paint Correction & Polish", href: "/services/polish" },
+  { name: "Window Film", href: "/services/window-film" },
+  { name: "Premium Car Wash", href: "/services/premium-car-wash" },
+];
 ---
 
 <nav
-  x-data="{ mobileMenuOpen: false }"
+  x-data="{ mobileMenuOpen: false, servicesOpen: false }"
   class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border"
 >
   <div class="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -13,16 +29,38 @@ import { Button } from "@/components/ui/button";
       </a>
     </div>
     <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-      <a href="/#services" class="hover:text-muted-foreground transition-colors">
-        SERVICES
-      </a>
+      <!-- Services Dropdown -->
+      <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+        <button
+          class="hover:text-muted-foreground transition-colors flex items-center gap-1"
+          @click="open = !open"
+        >
+          SERVICES
+          <i data-lucide="chevron-down" class="h-4 w-4"></i>
+        </button>
+        <div
+          x-show="open"
+          x-cloak
+          x-transition
+          class="absolute top-full left-0 mt-2 w-64 bg-background border border-border rounded-lg shadow-lg py-2"
+        >
+          {services.map((service) => (
+            <a
+              href={service.href}
+              class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
+            >
+              {service.name}
+            </a>
+          ))}
+        </div>
+      </div>
       <a href="/#portfolio" class="hover:text-muted-foreground transition-colors">
         PORTFOLIO
       </a>
-      <a href="/#about" class="hover:text-muted-foreground transition-colors">
+      <a href="/more-about-wrp" class="hover:text-muted-foreground transition-colors">
         ABOUT
       </a>
-      <a href="/#contact" class="hover:text-muted-foreground transition-colors">
+      <a href="/contact-us" class="hover:text-muted-foreground transition-colors">
         CONTACT
       </a>
     </div>
@@ -52,13 +90,27 @@ import { Button } from "@/components/ui/button";
     class="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border overflow-hidden"
   >
     <div class="container mx-auto px-6 py-6 flex flex-col gap-6">
-      <a
-        href="/#services"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        SERVICES
-      </a>
+      <!-- Services in Mobile -->
+      <div x-data="{ open: false }">
+        <button
+          @click="open = !open"
+          class="text-lg tracking-wide hover:text-muted-foreground transition-colors flex items-center justify-between w-full"
+        >
+          SERVICES
+          <i data-lucide="chevron-down" class="h-5 w-5" :class="{ 'rotate-180': open }"></i>
+        </button>
+        <div x-show="open" x-collapse class="mt-2 ml-4 flex flex-col gap-3">
+          {services.map((service) => (
+            <a
+              href={service.href}
+              class="text-base hover:text-muted-foreground transition-colors"
+              @click="mobileMenuOpen = false"
+            >
+              {service.name}
+            </a>
+          ))}
+        </div>
+      </div>
       <a
         href="/#portfolio"
         class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
@@ -67,14 +119,14 @@ import { Button } from "@/components/ui/button";
         PORTFOLIO
       </a>
       <a
-        href="/#about"
+        href="/more-about-wrp"
         class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
         @click="mobileMenuOpen = false"
       >
         ABOUT
       </a>
       <a
-        href="/#contact"
+        href="/contact-us"
         class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
         @click="mobileMenuOpen = false"
       >

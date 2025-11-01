@@ -1,0 +1,24 @@
+{
+  "name": "WRP | Premium Car Detailing Dubai",
+  "short_name": "WRP",
+  "description": "Dubai's most exclusive automotive care studio. Wrap, Reinforce, Protect.",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
