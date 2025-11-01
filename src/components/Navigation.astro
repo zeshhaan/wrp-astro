@@ -1,5 +1,6 @@
 ---
 import { Button } from "@/components/ui/button";
+import ShimmerButton from './ShimmerButton.astro';
 import { Icon } from 'astro-icon/components';
 
 const services = [
@@ -35,7 +36,7 @@ const services = [
           x-show="open"
           x-cloak
           x-transition
-          class="absolute top-full left-0 mt-2 w-64 bg-background border border-border rounded-lg shadow-lg py-2"
+          class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
         >
           {services.map((service) => (
             <a
@@ -57,9 +58,9 @@ const services = [
         CONTACT
       </a>
     </div>
-    <Button className="hidden md:flex">
-      <a href="/contact-us">BOOK APPOINTMENT</a>
-    </Button>
+    <ShimmerButton href="/contact-us" className="hidden md:flex">
+      BOOK APPOINTMENT
+    </ShimmerButton>
     <button
       class="md:hidden z-50"
       @click="mobileMenuOpen = !mobileMenuOpen"

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import OtherServices from '@/components/OtherServices.astro';
+import GridPattern from '@/components/GridPattern.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
@@ -277,8 +278,9 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
   <OtherServices currentService={service.id} />
 
   <!-- Final CTA Section -->
-  <section class="py-32 px-6 bg-black text-white">
-    <div class="container mx-auto max-w-4xl text-center">
+  <section class="relative py-32 px-6 bg-black text-white overflow-hidden">
+    <GridPattern />
+    <div class="container mx-auto max-w-4xl text-center relative z-10">
       <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">{ctaHeading || `Experience ${title}`}</h2>
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         {ctaDescription || 'Contact us today for a free consultation and quote'}

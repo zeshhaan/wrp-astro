@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import GridPattern from '../components/GridPattern.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -77,8 +78,8 @@ export const prerender = true;
       <div class="mt-10 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-6 lg:grid-rows-2">
         <!-- Excellence - Large Top Left -->
         <div class="relative lg:col-span-3">
-          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-t-4xl lg:rounded-tl-4xl"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)] lg:rounded-tl-[calc(2rem+1px)]">
+          <div class="absolute inset-0  bg-card "></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
             <img src="/luxury-sports-car-detail-black-and-white-dramatic.jpg" alt="Excellence" class="h-80 object-cover" />
             <div class="p-10 pt-4">
               <p class="text-lg font-medium tracking-tight text-foreground">Excellence</p>
@@ -87,13 +88,13 @@ export const prerender = true;
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-t-4xl lg:rounded-tl-4xl"></div>
+          <div class="pointer-events-none absolute inset-0  shadow-sm outline outline-black/5 "></div>
         </div>
 
         <!-- Expertise - Large Top Right -->
         <div class="relative lg:col-span-3">
-          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-tr-4xl"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-tr-[calc(2rem+1px)]">
+          <div class="absolute inset-0  bg-card "></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
             <img src="/luxury-car-detailing-craftsman-working-black-and-w.jpg" alt="Expertise" class="h-80 object-cover lg:object-right" />
             <div class="p-10 pt-4">
               <p class="text-lg font-medium tracking-tight text-foreground">Expertise</p>
@@ -102,13 +103,13 @@ export const prerender = true;
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 lg:rounded-tr-4xl"></div>
+          <div class="pointer-events-none absolute inset-0  shadow-sm outline outline-black/5 "></div>
         </div>
 
         <!-- Precision - Bottom Left -->
         <div class="relative lg:col-span-2">
-          <div class="absolute inset-0 rounded-lg bg-card lg:rounded-bl-4xl"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] lg:rounded-bl-[calc(2rem+1px)]">
+          <div class="absolute inset-0  bg-card "></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
             <img src="/supercar-wheel-detail-black-and-white-luxury.jpg" alt="Precision" class="h-80 object-cover object-center" />
             <div class="p-10 pt-4">
               <p class="text-lg font-medium tracking-tight text-foreground">Precision</p>
@@ -117,13 +118,13 @@ export const prerender = true;
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 lg:rounded-bl-4xl"></div>
+          <div class="pointer-events-none absolute inset-0  shadow-sm outline outline-black/5 "></div>
         </div>
 
         <!-- Innovation - Bottom Middle -->
         <div class="relative lg:col-span-2">
-          <div class="absolute inset-0 rounded-lg bg-card"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)]">
+          <div class="absolute inset-0  bg-card"></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
             <img src="/luxury-sedan-close-up-black-and-white-elegant.jpg" alt="Innovation" class="h-80 object-cover" />
             <div class="p-10 pt-4">
               <p class="text-lg font-medium tracking-tight text-foreground">Innovation</p>
@@ -132,13 +133,13 @@ export const prerender = true;
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5"></div>
+          <div class="pointer-events-none absolute inset-0  shadow-sm outline outline-black/5"></div>
         </div>
 
         <!-- Commitment - Bottom Right -->
         <div class="relative lg:col-span-2">
-          <div class="absolute inset-0 rounded-lg bg-card max-lg:rounded-b-4xl lg:rounded-br-4xl"></div>
-          <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(var(--radius-lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-br-[calc(2rem+1px)]">
+          <div class="absolute inset-0  bg-card "></div>
+          <div class="relative flex h-full flex-col overflow-hidden ">
             <img src="/luxury-suv-black-and-white-premium-detail.jpg" alt="Commitment" class="h-80 object-cover" />
             <div class="p-10 pt-4">
               <p class="text-lg font-medium tracking-tight text-foreground">Commitment</p>
@@ -147,7 +148,7 @@ export const prerender = true;
               </p>
             </div>
           </div>
-          <div class="pointer-events-none absolute inset-0 rounded-lg shadow-sm outline outline-black/5 max-lg:rounded-b-4xl lg:rounded-br-4xl"></div>
+          <div class="pointer-events-none absolute inset-0  shadow-sm outline outline-black/5 "></div>
         </div>
       </div>
     </div>
@@ -305,7 +306,7 @@ export const prerender = true;
         </div>
       </div>
 
-      <div class="bg-background p-8 rounded-lg border border-border">
+      <div class="bg-background p-8  border border-border">
         <h3 class="font-serif text-2xl font-bold mb-4">Premium Materials & Technology</h3>
         <p class="text-muted-foreground leading-relaxed">
           We exclusively use industry-leading products from XPEL, 3M, Gtechniq, and other premium manufacturers. Our
@@ -317,8 +318,9 @@ export const prerender = true;
   </section>
 
   <!-- CTA Section -->
-  <section class="py-32 px-6 bg-primary text-primary-foreground text-center">
-    <div class="container mx-auto max-w-3xl">
+  <section class="relative py-32 px-6 bg-primary text-primary-foreground text-center overflow-hidden">
+    <GridPattern />
+    <div class="container mx-auto max-w-3xl relative z-10">
       <h2 class="font-serif text-4xl font-bold mb-6">Ready to Experience WRP.?</h2>
       <p class="text-xl mb-8 opacity-90">
         Schedule a consultation to discover how we can elevate your vehicle to its full potential

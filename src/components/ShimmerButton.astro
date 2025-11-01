@@ -1,0 +1,63 @@
+---
+interface Props {
+  href?: string;
+  className?: string;
+}
+
+const { href, className = '' } = Astro.props;
+---
+
+<style>
+  .shimmer-button {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .shimmer-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    animation: shimmer-slide 2.5s infinite;
+    z-index: 1;
+  }
+
+  @keyframes shimmer-slide {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 200%;
+    }
+  }
+
+  .shimmer-button > * {
+    position: relative;
+    z-index: 2;
+  }
+</style>
+
+{href ? (
+  <a href={href} class={className}>
+    <button
+      class="shimmer-button inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all px-6 py-2 h-10 bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/30"
+    >
+      <slot />
+    </button>
+  </a>
+) : (
+  <button
+    class={`shimmer-button inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all px-6 py-2 h-10 bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/30 ${className}`}
+  >
+    <slot />
+  </button>
+)}
