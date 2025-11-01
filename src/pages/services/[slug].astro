@@ -5,6 +5,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import OtherServices from '@/components/OtherServices.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
 
 export const prerender = true;
 
@@ -64,7 +65,7 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
       <a href="/contact-us">
         <Button size="lg" className="bg-white text-black hover:bg-white/90">
           BOOK CONSULTATION
-          <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
         </Button>
       </a>
     </div>
@@ -91,7 +92,7 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
               <div class="grid grid-cols-2 gap-6">
                 {iconFeatures.map((feature) => (
                   <div class="flex items-start gap-3">
-                    <i data-lucide={feature.icon} class="h-6 w-6 flex-shrink-0 mt-1"></i>
+                    <Icon name={`lucide:${feature.icon}`} class="h-6 w-6 flex-shrink-0 mt-1" />
                     <div>
                       <h3 class="font-bold mb-1">{feature.title}</h3>
                       <p class="text-sm text-muted-foreground">{feature.description}</p>
@@ -141,7 +142,7 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
             <ul class="space-y-3 mb-8">
               {pkg.features.map((feature) => (
                 <li class="flex items-start gap-2">
-                  <i data-lucide="check" class="h-5 w-5 flex-shrink-0 mt-0.5"></i>
+                  <Icon name="lucide:check" class="h-5 w-5 flex-shrink-0 mt-0.5" />
                   <span class="text-sm">{feature}</span>
                 </li>
               ))}
@@ -285,7 +286,7 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
       <a href="/contact-us">
         <Button size="lg" className="bg-white text-black hover:bg-white/90">
           BOOK CONSULTATION
-          <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
         </Button>
       </a>
     </div>

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { SEO } from 'astro-seo';
 import Schema from '../components/Schema.astro';
 import { ClientRouter } from 'astro:transitions';
+import { Icon } from 'astro-icon/components';
 import '../styles/global.css';
 
 const title = 'WRP. | Premium Car Detailing Studio Dubai';
@@ -107,7 +108,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                 @click="open = !open"
               >
                 SERVICES
-                <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                <Icon name="lucide:chevron-down" class="h-4 w-4" />
               </button>
               <div
                 x-show="open"
@@ -148,8 +149,8 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
             @click="mobileMenuOpen = !mobileMenuOpen"
             aria-label="Toggle menu"
           >
-            <i x-show="!mobileMenuOpen" data-lucide="menu" class="h-6 w-6"></i>
-            <i x-show="mobileMenuOpen" x-cloak data-lucide="x" class="h-6 w-6"></i>
+            <Icon name="lucide:menu" class="h-6 w-6" x-show="!mobileMenuOpen" />
+            <Icon name="lucide:x" class="h-6 w-6" x-show="mobileMenuOpen" x-cloak />
           </button>
         </div>
 
@@ -248,7 +249,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
           </div>
         </div>
         <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <i data-lucide="chevron-down" class="h-8 w-8 text-white/60"></i>
+          <Icon name="lucide:chevron-down" class="h-8 w-8 text-white/60" />
         </div>
       </section>
 
@@ -674,7 +675,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
               <h3 class="font-serif text-3xl font-bold mb-8">Contact Information</h3>
               <div class="space-y-6">
                 <div class="flex items-start gap-4">
-                  <i data-lucide="map-pin" class="h-6 w-6 mt-1 flex-shrink-0"></i>
+                  <Icon name="lucide:map-pin" class="h-6 w-6 mt-1 flex-shrink-0" />
                   <div>
                     <p class="font-bold mb-1">Studio Location</p>
                     <p class="text-muted-foreground">
@@ -684,21 +685,21 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                   </div>
                 </div>
                 <div class="flex items-start gap-4">
-                  <i data-lucide="phone" class="h-6 w-6 mt-1 flex-shrink-0"></i>
+                  <Icon name="lucide:phone" class="h-6 w-6 mt-1 flex-shrink-0" />
                   <div>
                     <p class="font-bold mb-1">Phone</p>
                     <p class="text-muted-foreground">+971 54 717 3000 </p>
                   </div>
                 </div>
                 <div class="flex items-start gap-4">
-                  <i data-lucide="mail" class="h-6 w-6 mt-1 flex-shrink-0"></i>
+                  <Icon name="lucide:mail" class="h-6 w-6 mt-1 flex-shrink-0" />
                   <div>
                     <p class="font-bold mb-1">Email</p>
                     <p class="text-muted-foreground">wrpdetailing@gmail.com</p>
                   </div>
                 </div>
                 <div class="flex items-start gap-4">
-                  <i data-lucide="instagram" class="h-6 w-6 mt-1 flex-shrink-0"></i>
+                  <Icon name="lucide:instagram" class="h-6 w-6 mt-1 flex-shrink-0" />
                   <div>
                     <p class="font-bold mb-1">Follow Us</p>
                     <p class="text-muted-foreground">@wrp_ae</p>
@@ -815,7 +816,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                 <Button size="lg" className="w-full" type="submit" :disabled="submitting">
                   <span x-show="!submitting">SUBMIT INQUIRY</span>
                   <span x-show="submitting" x-cloak>Sending...</span>
-                  <i x-show="!submitting" data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+                  <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
                 </Button>
 
                 <!-- Success Message -->

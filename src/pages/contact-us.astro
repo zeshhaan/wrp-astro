@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
 
 export const prerender = false; // Server-rendered for D1 access
 ---
@@ -214,7 +215,7 @@ export const prerender = false; // Server-rendered for D1 access
             <Button type="submit" size="lg" className="w-full sm:w-auto" :disabled="submitting">
               <span x-show="!submitting">SEND MESSAGE</span>
               <span x-show="submitting" x-cloak>Sending...</span>
-              <i x-show="!submitting" data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+              <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
             </Button>
           </div>
 

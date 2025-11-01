@@ -1,13 +1,6 @@
 ---
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+import { Icon } from 'astro-icon/components';
 
 const services = [
   { name: "Ceramic Coating", href: "/services/ceramic-coating" },
@@ -36,7 +29,7 @@ const services = [
           @click="open = !open"
         >
           SERVICES
-          <i data-lucide="chevron-down" class="h-4 w-4"></i>
+          <Icon name="lucide:chevron-down" class="h-4 w-4" />
         </button>
         <div
           x-show="open"
@@ -72,8 +65,8 @@ const services = [
       @click="mobileMenuOpen = !mobileMenuOpen"
       aria-label="Toggle menu"
     >
-      <i x-show="!mobileMenuOpen" data-lucide="menu" class="h-6 w-6"></i>
-      <i x-show="mobileMenuOpen" x-cloak data-lucide="x" class="h-6 w-6"></i>
+      <Icon name="lucide:menu" class="h-6 w-6" x-show="!mobileMenuOpen" />
+      <Icon name="lucide:x" class="h-6 w-6" x-show="mobileMenuOpen" x-cloak />
     </button>
   </div>
 
