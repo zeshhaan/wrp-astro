@@ -1,7 +1,10 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
-import ServiceLayout from '@/layouts/ServiceLayout.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import OtherServices from '@/components/OtherServices.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export const prerender = true;
 
@@ -14,105 +17,277 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { service } = Astro.props;
-const { Content } = await render(service);
-const { title, subtitle, description, heroImage, packages, benefits, process, faqs } = service.data;
+const {
+  title,
+  subtitle,
+  description,
+  heroImage,
+  mainHeading,
+  mainDescription1,
+  mainDescription2,
+  mainImage,
+  iconFeatures,
+  packagesHeading,
+  packagesSubheading,
+  packages,
+  additionalSection,
+  processHeading,
+  processSubheading,
+  process,
+  benefits,
+  faqs,
+  ctaHeading,
+  ctaDescription,
+} = service.data;
+
+const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
 ---
 
-<ServiceLayout title={title} subtitle={subtitle} description={description} heroImage={heroImage}>
-  <!-- Content Section -->
-  <article class="py-20 px-6">
-    <div class="container mx-auto max-w-4xl prose prose-lg prose-slate">
-      <Content />
+<BaseLayout
+  title={`${title} | WRP Dubai`}
+  description={description}
+  ogImage={ogImage}
+>
+  <!-- Hero Section -->
+  <section class="relative h-[70vh] flex items-center justify-center overflow-hidden mt-16">
+    <div class="absolute inset-0 bg-black">
+      <img
+        src={heroImage}
+        alt={title}
+        class="w-full h-full object-cover opacity-30"
+      />
     </div>
-  </article>
+    <div class="relative z-10 text-center px-6 max-w-4xl mx-auto text-white">
+      <div class="text-sm tracking-widest mb-4 text-white/70">{subtitle}</div>
+      <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">{title}</h1>
+      <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">{description}</p>
+      <a href="/contact-us">
+        <Button size="lg" className="bg-white text-black hover:bg-white/90">
+          BOOK CONSULTATION
+          <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+        </Button>
+      </a>
+    </div>
+  </section>
 
-  <!-- Benefits Grid -->
-  {benefits && benefits.length > 0 && (
-    <section class="py-20 px-6 bg-muted">
+  <!-- What is [Service] Section -->
+  {mainHeading && mainDescription1 && (
+    <section class="py-32 px-6">
       <div class="container mx-auto max-w-6xl">
-        <h2 class="font-serif text-4xl font-bold text-center mb-12">Why Choose This Service</h2>
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6 leading-tight">
+              {mainHeading}
+            </h2>
+            <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+              {mainDescription1}
+            </p>
+            {mainDescription2 && (
+              <p class="text-lg text-muted-foreground leading-relaxed mb-8">
+                {mainDescription2}
+              </p>
+            )}
+            {iconFeatures && iconFeatures.length > 0 && (
+              <div class="grid grid-cols-2 gap-6">
+                {iconFeatures.map((feature) => (
+                  <div class="flex items-start gap-3">
+                    <i data-lucide={feature.icon} class="h-6 w-6 flex-shrink-0 mt-1"></i>
+                    <div>
+                      <h3 class="font-bold mb-1">{feature.title}</h3>
+                      <p class="text-sm text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div class="relative h-[600px]">
+            <img
+              src={mainImage || heroImage}
+              alt={`${title} Detail`}
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Packages Section -->
+  {packages && packages.length > 0 && (
+    <section class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{packagesHeading || 'Our Packages'}</h2>
+          <p class="text-muted-foreground max-w-2xl mx-auto">
+            {packagesSubheading || 'Choose the package that best suits your needs'}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          {packages.map((pkg, index) => {
+            const cardClass = `p-8 hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`;
+            return (
+          <Card className={cardClass}>
+            {pkg.badge && (
+              <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold">
+                {pkg.badge}
+              </div>
+            )}
+            <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
+            <div class="text-3xl font-bold mb-6">
+              From AED {pkg.price.toLocaleString()}<span class="text-base font-normal text-muted-foreground">/vehicle</span>
+            </div>
+            <ul class="space-y-3 mb-8">
+              {pkg.features.map((feature) => (
+                <li class="flex items-start gap-2">
+                  <i data-lucide="check" class="h-5 w-5 flex-shrink-0 mt-0.5"></i>
+                  <span class="text-sm">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <Button variant={pkg.badge ? 'default' : 'outline'} className={pkg.badge ? 'w-full' : 'w-full bg-transparent'}>
+              SELECT PACKAGE
+            </Button>
+          </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Additional Content Section (Service-Specific) -->
+  {additionalSection && (
+    <section class="py-32 px-6">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{additionalSection.heading}</h2>
+          {additionalSection.subheading && (
+            <p class="text-muted-foreground">{additionalSection.subheading}</p>
+          )}
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          {additionalSection.cards.map((card) => (
+            <Card className="p-8">
+              <h3 class="font-bold text-xl mb-4">{card.title}</h3>
+              <p class="text-muted-foreground leading-relaxed mb-4">
+                {card.description}
+              </p>
+              {card.solution && (
+                <p class="text-sm text-muted-foreground italic">
+                  Solution: {card.solution}
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Benefits Grid (Alternative to Additional Section) -->
+  {benefits && benefits.length > 0 && !additionalSection && (
+    <section class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Why Choose This Service?</h2>
+          <p class="text-muted-foreground">The ultimate protection for Dubai's luxury vehicles</p>
+        </div>
+
         <div class="grid md:grid-cols-3 gap-8">
           {benefits.map((benefit) => (
-            <div class="bg-background p-6 rounded-lg border border-border">
-              <p class="text-lg">{benefit}</p>
-            </div>
+            <Card className="p-6">
+              <h3 class="font-bold text-lg mb-3">{benefit.title}</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">
+                {benefit.description}
+              </p>
+            </Card>
           ))}
         </div>
       </div>
     </section>
   )}
 
-  <!-- Packages -->
-  {packages && packages.length > 0 && (
-    <section class="py-20 px-6">
-      <div class="container mx-auto max-w-6xl">
-        <h2 class="font-serif text-4xl font-bold text-center mb-12">Our Packages</h2>
-        <div class="grid md:grid-cols-3 gap-8">
-          {packages.map((pkg) => (
-            <div class="border border-border rounded-lg p-8 hover:border-primary transition-colors">
-              <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
-              <div class="mb-6">
-                <span class="text-4xl font-bold">AED {pkg.price}</span>
-                {pkg.duration && <span class="text-muted-foreground ml-2">/ {pkg.duration}</span>}
-              </div>
-              <ul class="space-y-3">
-                {pkg.features.map((feature) => (
-                  <li class="flex items-start gap-2">
-                    <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Process -->
+  <!-- Process Section -->
   {process && process.length > 0 && (
-    <section class="py-20 px-6 bg-muted">
-      <div class="container mx-auto max-w-4xl">
-        <h2 class="font-serif text-4xl font-bold text-center mb-12">Our Process</h2>
-        <div class="space-y-8">
+    <section class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{processHeading || 'Our Process'}</h2>
+          <p class="text-muted-foreground">{processSubheading || 'Step by step excellence'}</p>
+        </div>
+
+        <div class={`grid gap-6 ${process.length === 4 ? 'md:grid-cols-4' : 'md:grid-cols-5'}`}>
           {process.map((step) => (
-            <div class="flex gap-6">
-              <div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                {step.step}
-              </div>
-              <div>
-                <h3 class="font-bold text-xl mb-2">{step.title}</h3>
-                <p class="text-muted-foreground">{step.description}</p>
-              </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              {step.step}
             </div>
+            <h3 class="font-bold mb-2">{step.title}</h3>
+            <p class="text-sm text-muted-foreground">
+              {step.description}
+            </p>
+          </div>
           ))}
         </div>
       </div>
     </section>
   )}
 
-  <!-- FAQs -->
-  {faqs && faqs.length > 0 && (
-    <section class="py-20 px-6">
-      <div class="container mx-auto max-w-4xl">
-        <h2 class="font-serif text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-        <div class="space-y-4">
-          {faqs.map((faq) => (
-            <details class="group border border-border rounded-lg p-6 hover:border-primary transition-colors">
-              <summary class="cursor-pointer font-bold text-lg list-none flex items-center justify-between">
-                {faq.question}
-                <svg class="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </summary>
-              <p class="mt-4 text-muted-foreground leading-relaxed">{faq.answer}</p>
-            </details>
-          ))}
-        </div>
+  <!-- FAQ Section with FAQPage Schema -->
+  <section class="py-32 px-6">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
+        <p class="mt-6 text-base text-muted-foreground">
+          Have a different question? <a href="/contact-us" class="font-semibold hover:underline">Contact us</a> and we'll get back to you as soon as possible.
+        </p>
       </div>
-    </section>
-  )}
-</ServiceLayout>
+      <div class="mt-20">
+        <dl class="space-y-16 sm:grid sm:grid-cols-2 sm:space-y-0 sm:gap-x-6 sm:gap-y-16 lg:gap-x-10">
+          {faqs.map((faq) => (
+            <div>
+              <dt class="text-base font-semibold">{faq.question}</dt>
+              <dd class="mt-2 text-base text-muted-foreground leading-relaxed">{faq.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+
+    <!-- FAQPage Schema for SEO -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    })} />
+  </section>
+
+  <!-- Other Services Section -->
+  <OtherServices currentService={service.id} />
+
+  <!-- Final CTA Section -->
+  <section class="py-32 px-6 bg-black text-white">
+    <div class="container mx-auto max-w-4xl text-center">
+      <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">{ctaHeading || `Experience ${title}`}</h2>
+      <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+        {ctaDescription || 'Contact us today for a free consultation and quote'}
+      </p>
+      <a href="/contact-us">
+        <Button size="lg" className="bg-white text-black hover:bg-white/90">
+          BOOK CONSULTATION
+          <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+        </Button>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SEO } from 'astro-seo';
 import Schema from '../components/Schema.astro';
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 const title = 'WRP. | Premium Car Detailing Studio Dubai';
@@ -58,6 +59,9 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
     />
 
     <Schema />
+
+    <!-- View Transitions Fallback for browsers without native support -->
+    <ClientRouter />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

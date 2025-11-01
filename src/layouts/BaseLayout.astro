@@ -3,6 +3,7 @@ import Navigation from '../components/Navigation.astro';
 import WRPFooter from '../components/WRPFooter.astro';
 import Schema from '../components/Schema.astro';
 import { SEO } from 'astro-seo';
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 
 interface Props {
@@ -75,6 +76,9 @@ const ogImageURL = new URL(ogImage, Astro.site).toString();
     />
 
     {includeSchema && <Schema />}
+
+    <!-- View Transitions Fallback for browsers without native support -->
+    <ClientRouter />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
