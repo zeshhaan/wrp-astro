@@ -78,9 +78,6 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
       [x-cloak] {
         display: none !important;
@@ -873,17 +870,5 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
         </div>
       </footer>
     </div>
-
-    <script>
-      // Initialize Lucide icons after page load
-      document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-      });
-
-      // Re-initialize icons after Alpine.js updates the DOM
-      document.addEventListener('alpine:initialized', () => {
-        lucide.createIcons();
-      });
-    </script>
   </body>
 </html>
