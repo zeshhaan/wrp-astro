@@ -26,6 +26,7 @@
 			"database_id": "45b2fc45-c9ed-45f4-ad9f-2a29b35b263d"
 		}
 	],
+	"workers_dev": true,
 	"routes": [
 		{
 			"pattern": "wrpdetailing.ae",
