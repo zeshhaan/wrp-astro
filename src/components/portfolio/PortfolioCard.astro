@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  title: string;
+  subtitle: string;
+  heroImage: string;
+  index: number;
+}
+
+const { title, subtitle, heroImage, index } = Astro.props;
+---
+
+<div
+  class="portfolio-item group cursor-pointer break-inside-avoid mb-8 transition-all duration-700"
+  data-index={index}
+  style={`--index: ${index};`}
+>
+  <div class="relative overflow-hidden bg-black">
+    <img
+      src={heroImage}
+      alt={title}
+      width="800"
+      height="600"
+      class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div class="absolute bottom-6 left-6 right-6 text-white">
+        <h3 class="font-serif text-2xl md:text-3xl font-bold mb-2">{title}</h3>
+        <p class="text-sm md:text-base text-white/80">{subtitle}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .portfolio-item {
+    opacity: 0;
+    animation: fadeInUp 0.7s ease-out forwards;
+  }
+</style>

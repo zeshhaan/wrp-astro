@@ -80,4 +80,24 @@ const services = defineCollection({
 	}),
 });
 
-export const collections = { blog, services };
+// Portfolio collection
+const portfolio = defineCollection({
+	loader: glob({ base: './src/content/portfolio', pattern: '**/*.{md,mdx}' }),
+	schema: z.object({
+		title: z.string(),
+		subtitle: z.string(),
+		vehicle: z.object({
+			make: z.string(),
+			model: z.string(),
+			year: z.number(),
+		}),
+		services: z.array(z.string()),
+		heroImage: z.string(),
+		gallery: z.array(z.string()),
+		description: z.string(),
+		completionDate: z.coerce.date(),
+		featured: z.boolean().default(false),
+	}),
+});
+
+export const collections = { blog, services, portfolio };

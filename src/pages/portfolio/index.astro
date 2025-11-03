@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PortfolioCard from '@/components/portfolio/PortfolioCard.astro';
+import { PortfolioLightbox } from '@/components/portfolio/PortfolioLightbox';
+import GridPattern from '@/components/GridPattern.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from 'astro-icon/components';
+
+export const prerender = true;
+
+const portfolioItems = await getCollection('portfolio');
+// Sort by completion date (newest first), then by featured
+const sortedItems = portfolioItems.sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return b.data.completionDate.getTime() - a.data.completionDate.getTime();
+});
+
+const lightboxData = sortedItems.map(item => ({
+  title: item.data.title,
+  subtitle: item.data.subtitle,
+  gallery: item.data.gallery,
+}));
+---
+
+<BaseLayout
+  title="Portfolio | WRP Dubai - Our Work"
+  description="Explore our portfolio of premium car detailing, ceramic coating, and paint protection projects in Dubai"
+  ogImage="/og-image.jpg"
+>
+  <!-- Hero Section -->
+  <section class="relative py-32 px-6 bg-black text-white mt-16">
+    <div class="container mx-auto max-w-7xl text-center">
+      <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6">Our Work</h1>
+      <p class="text-lg md:text-xl text-white/70 max-w-2xl mx-auto">
+        Dubai's finest automotive transformations. Each project represents our commitment to perfection.
+      </p>
+    </div>
+  </section>
+
+  <!-- Masonry Grid -->
+  <section class="py-20 px-6">
+    <div class="container mx-auto max-w-7xl">
+      <div class="masonry-grid">
+        {sortedItems.map((item, index) => (
+          <div
+            onclick={`window.openPortfolioLightbox(${index})`}
+          >
+            <PortfolioCard
+              title={item.data.title}
+              subtitle={item.data.subtitle}
+              heroImage={item.data.heroImage}
+              index={index}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="relative py-32 px-6 bg-black text-white overflow-hidden">
+    <GridPattern />
+    <div class="container mx-auto max-w-4xl text-center relative z-10">
+      <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Ready to Transform Your Vehicle?</h2>
+      <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+        Join our portfolio of satisfied clients. Experience the WRP difference with our premium detailing services.
+      </p>
+      <a href="/contact-us">
+        <Button size="lg" className="bg-white text-black hover:bg-white/90">
+          BOOK CONSULTATION
+          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+        </Button>
+      </a>
+    </div>
+  </section>
+
+  <!-- Lightbox Component -->
+  <PortfolioLightbox items={lightboxData} client:load />
+</BaseLayout>
+
+<style>
+  /* Masonry Grid using CSS Columns */
+  .masonry-grid {
+    column-count: 1;
+    column-gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .masonry-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .masonry-grid {
+      column-count: 3;
+    }
+  }
+</style>
+
