@@ -3,11 +3,17 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PortfolioCard from '@/components/portfolio/PortfolioCard.astro';
 import { PortfolioLightbox } from '@/components/portfolio/PortfolioLightbox';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import GridPattern from '@/components/GridPattern.astro';
 import { Button } from '@/components/ui/button';
 import { Icon } from 'astro-icon/components';
 
 export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Portfolio', url: 'https://wrpdetailing.ae/portfolio' },
+];
 
 const portfolioItems = await getCollection('portfolio');
 // Sort by completion date (newest first), then by featured
@@ -29,8 +35,11 @@ const lightboxData = sortedItems.map(item => ({
   description="Explore our portfolio of premium car detailing, ceramic coating, and paint protection projects in Dubai"
   ogImage="/og-image.jpg"
 >
+  <!-- Breadcrumbs -->
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-24" />
+
   <!-- Hero Section -->
-  <section class="relative py-32 px-6 bg-black text-white mt-16">
+  <section class="relative py-20 px-6 bg-black text-white">
     <div class="container mx-auto max-w-7xl text-center">
       <h1 class="font-serif text-5xl md:text-7xl font-bold mb-6">Our Work</h1>
       <p class="text-lg md:text-xl text-white/70 max-w-2xl mx-auto">

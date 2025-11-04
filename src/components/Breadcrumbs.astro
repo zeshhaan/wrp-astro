@@ -1,0 +1,45 @@
+---
+interface Crumb {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  crumbs: Crumb[];
+  className?: string;
+}
+
+const { crumbs, className = '' } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.name,
+    item: crumb.url,
+  })),
+};
+---
+
+<!-- Visual Breadcrumbs -->
+<nav aria-label="Breadcrumb" class={`py-4 ${className}`}>
+  <ol class="flex items-center gap-2 text-sm text-muted-foreground">
+    {crumbs.map((crumb, index) => (
+      <li class="flex items-center gap-2">
+        {index > 0 && <span class="text-muted-foreground/50">/</span>}
+        {index === crumbs.length - 1 ? (
+          <span class="text-foreground font-medium">{crumb.name}</span>
+        ) : (
+          <a href={crumb.url} class="hover:text-foreground transition-colors">
+            {crumb.name}
+          </a>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<!-- BreadcrumbList Schema -->
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

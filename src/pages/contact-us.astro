@@ -1,16 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
 
 export const prerender = false; // Server-rendered for D1 access
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Contact', url: 'https://wrpdetailing.ae/contact-us' },
+];
+
+const contactPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact WRP Dubai',
+  url: 'https://wrpdetailing.ae/contact-us',
+  mainEntity: {
+    '@type': 'LocalBusiness',
+    name: 'WRP Dubai',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+971547173000',
+      contactType: 'customer service',
+      email: 'wrpdetailing@gmail.com',
+      areaServed: 'AE',
+      availableLanguage: 'English',
+    },
+  },
+};
 ---
 
 <BaseLayout
   title="Contact Us | WRP Dubai - Premium Car Detailing"
   description="Contact WRP Dubai - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000"
 >
-  <div class="relative isolate bg-background mt-16">
+  <!-- Breadcrumbs -->
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-24" />
+
+  <!-- ContactPage Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(contactPageSchema)} />
+
+  <div class="relative isolate bg-background">
     <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
       <!-- Left Side - Contact Info -->
       <div class="relative px-6 pb-20 pt-24 sm:pt-32 lg:static lg:px-8 lg:py-48">

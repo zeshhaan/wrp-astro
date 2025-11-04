@@ -1,0 +1,203 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import GridPattern from '@/components/GridPattern.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
+
+export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Reinforce', url: 'https://wrpdetailing.ae/reinforce' },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What does "Reinforce" mean at WRP?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Reinforce represents our paint protection philosophy - strengthening your vehicle\'s defense against environmental damage through PPF and ceramic coating technologies.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Should I get PPF or ceramic coating?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Both serve different purposes. PPF protects against physical damage (rock chips, scratches), while ceramic coating provides chemical resistance and easier maintenance. For ultimate protection in Dubai, we recommend both.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can PPF and ceramic coating be combined?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Absolutely! Applying ceramic coating over PPF is our most popular protection package. It combines physical impact protection with chemical resistance and enhanced gloss.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="R is for Reinforce | Paint Protection Dubai | WRP"
+  description="Discover WRP's paint protection philosophy - ceramic coating and PPF solutions that reinforce your vehicle's defense against Dubai's harsh environment"
+  ogImage="/og-image.jpg"
+>
+  <!-- Breadcrumbs -->
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-24" />
+
+  <!-- Hero Section -->
+  <section class="relative py-32 px-6">
+    <div class="container mx-auto max-w-4xl text-center">
+      <div class="text-sm tracking-widest mb-4 text-muted-foreground">THE SECOND PILLAR</div>
+      <h1 class="font-serif text-6xl md:text-8xl font-bold mb-6">R is for Reinforce</h1>
+      <p class="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        Advanced protection systems that strengthen your vehicle's defense against Dubai's extreme climate.
+      </p>
+    </div>
+  </section>
+
+  <!-- Protection Philosophy -->
+  <section class="py-20 px-6 bg-muted/30">
+    <div class="container mx-auto max-w-6xl">
+      <div class="grid md:grid-cols-2 gap-16 items-center">
+        <div>
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Protection Layered to Perfection</h2>
+          <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+            Reinforce represents our commitment to long-term paint protection. In Dubai's harsh environment—with
+            extreme heat, sandstorms, and intense UV radiation—your vehicle needs more than basic care.
+          </p>
+          <p class="text-lg text-muted-foreground leading-relaxed mb-8">
+            Our reinforcement solutions combine military-grade Paint Protection Film with nano-ceramic coating
+            technology, creating multiple layers of defense that work together to preserve your vehicle's finish
+            for years to come.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <Card className="p-6">
+            <Icon name="lucide:shield-check" class="h-8 w-8 mb-3" />
+            <h3 class="font-bold mb-2">PPF Protection</h3>
+            <p class="text-sm text-muted-foreground">Military-grade film guards against impacts</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:droplets" class="h-8 w-8 mb-3" />
+            <h3 class="font-bold mb-2">Ceramic Shield</h3>
+            <p class="text-sm text-muted-foreground">Nano-coating for chemical resistance</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:layers" class="h-8 w-8 mb-3" />
+            <h3 class="font-bold mb-2">Combined Defense</h3>
+            <p class="text-sm text-muted-foreground">Synergistic protection system</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:clock" class="h-8 w-8 mb-3" />
+            <h3 class="font-bold mb-2">Long-Term Value</h3>
+            <p class="text-sm text-muted-foreground">7-10 years of protection</p>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reinforcement Services -->
+  <section class="py-20 px-6">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center mb-16">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Reinforcement Solutions</h2>
+        <p class="text-muted-foreground max-w-2xl mx-auto">
+          Premium protection systems engineered for Dubai's extreme conditions
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
+          <h3 class="font-serif text-3xl font-bold mb-4">Paint Protection Film</h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            Transparent thermoplastic urethane film that absorbs impacts from rocks, debris, and scratches.
+            Self-healing technology repairs minor damage with heat. The ultimate physical barrier for your paint.
+          </p>
+          <a href="/services/paint-protection-film">
+            <Button variant="outline" className="w-full">
+              EXPLORE PPF
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
+          <h3 class="font-serif text-3xl font-bold mb-4">Ceramic Coating</h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            Liquid polymer that chemically bonds with paint, creating a permanent nano-ceramic layer. Provides
+            9H hardness, hydrophobic properties, and chemical resistance. Essential for Dubai's environment.
+          </p>
+          <a href="/services/ceramic-coating">
+            <Button variant="outline" className="w-full">
+              EXPLORE CERAMIC
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs -->
+  <section class="py-20 px-6 bg-muted/30">
+    <div class="container mx-auto max-w-4xl">
+      <div class="text-center mb-16">
+        <h2 class="font-serif text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+      </div>
+      <dl class="space-y-8">
+        <div>
+          <dt class="text-base font-semibold mb-2">What does "Reinforce" mean at WRP?</dt>
+          <dd class="text-base text-muted-foreground leading-relaxed">
+            Reinforce represents our paint protection philosophy - strengthening your vehicle's defense against
+            environmental damage through PPF and ceramic coating technologies.
+          </dd>
+        </div>
+        <div>
+          <dt class="text-base font-semibold mb-2">Should I get PPF or ceramic coating?</dt>
+          <dd class="text-base text-muted-foreground leading-relaxed">
+            Both serve different purposes. PPF protects against physical damage (rock chips, scratches), while
+            ceramic coating provides chemical resistance and easier maintenance. For ultimate protection in Dubai,
+            we recommend both.
+          </dd>
+        </div>
+        <div>
+          <dt class="text-base font-semibold mb-2">Can PPF and ceramic coating be combined?</dt>
+          <dd class="text-base text-muted-foreground leading-relaxed">
+            Absolutely! Applying ceramic coating over PPF is our most popular protection package. It combines
+            physical impact protection with chemical resistance and enhanced gloss.
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </section>
+
+  <!-- CTA -->
+  <section class="relative py-32 px-6 bg-black text-white overflow-hidden">
+    <GridPattern />
+    <div class="container mx-auto max-w-4xl text-center relative z-10">
+      <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Reinforce Your Investment</h2>
+      <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+        Protect your vehicle with our advanced protection systems. Schedule a consultation today.
+      </p>
+      <a href="/contact-us">
+        <Button size="lg" className="bg-white text-black hover:bg-white/90">
+          BOOK CONSULTATION
+          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+        </Button>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

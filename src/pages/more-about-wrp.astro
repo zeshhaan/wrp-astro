@@ -1,16 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GridPattern from '../components/GridPattern.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'About', url: 'https://wrpdetailing.ae/more-about-wrp' },
+];
+
+const aboutPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About WRP Dubai',
+  url: 'https://wrpdetailing.ae/more-about-wrp',
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'WRP Dubai',
+    alternateName: 'Wrap, Reinforce, Protect',
+    foundingDate: '2010',
+    description: 'Dubai\'s premier automotive care studio specializing in luxury vehicle protection and enhancement',
+    slogan: 'Wrap, Reinforce, Protect',
+    numberOfEmployees: {
+      '@type': 'QuantitativeValue',
+      value: '10',
+    },
+  },
+};
 ---
 
 <BaseLayout
   title="About WRP | Premium Car Detailing Studio Dubai"
   description="Learn about WRP Dubai - Founded in 2010, we're Dubai's most trusted name in premium automotive protection and enhancement."
 >
+  <!-- Breadcrumbs -->
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-24" />
+
+  <!-- AboutPage Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(aboutPageSchema)} />
+
   <!-- Hero Section -->
   <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 bg-black">

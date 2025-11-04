@@ -5,6 +5,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import OtherServices from '@/components/OtherServices.astro';
 import GridPattern from '@/components/GridPattern.astro';
 import ServiceSchema from '@/components/ServiceSchema.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
@@ -48,6 +49,13 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
 // Calculate price range from packages for Service schema
 const lowPrice = packages && packages.length > 0 ? Math.min(...packages.map(p => p.price)) : 500;
 const highPrice = packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : 15000;
+
+// Breadcrumbs
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Services', url: 'https://wrpdetailing.ae/#services' },
+  { name: title, url: `https://wrpdetailing.ae/services/${service.id}` },
+];
 ---
 
 <BaseLayout
@@ -55,6 +63,9 @@ const highPrice = packages && packages.length > 0 ? Math.max(...packages.map(p =
   description={description}
   ogImage={ogImage}
 >
+  <!-- Breadcrumbs -->
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-24" />
+
   <!-- Service Schema -->
   <ServiceSchema
     serviceName={title}
