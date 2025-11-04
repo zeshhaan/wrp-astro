@@ -148,8 +148,52 @@ const faqSchema = {
     </div>
   </section>
 
-  <!-- FAQs -->
+  <!-- Explore Other Pillars -->
   <section class="py-20 px-6 bg-muted/30">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center mb-16">
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">The Three Pillars of WRP</h2>
+        <p class="text-muted-foreground max-w-2xl mx-auto">
+          Discover our complete philosophy of automotive excellence
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
+          <div class="text-4xl font-bold mb-3">W</div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Wrap</h3>
+          <p class="text-muted-foreground mb-6">
+            Transform your vehicle's appearance with premium vinyl wrapping. Complete color changes, custom designs,
+            and chrome delete services that express your personality while protecting factory paint.
+          </p>
+          <a href="/wrap">
+            <Button variant="outline" className="w-full">
+              EXPLORE WRAP
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
+          <div class="text-4xl font-bold mb-3">P</div>
+          <h3 class="font-serif text-2xl font-bold mb-4">Protect</h3>
+          <p class="text-muted-foreground mb-6">
+            Meticulous care and maintenance programs that preserve your vehicle's perfection. Premium wash, paint
+            correction, and detailing services that maintain showroom condition.
+          </p>
+          <a href="/protect">
+            <Button variant="outline" className="w-full">
+              EXPLORE PROTECT
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs -->
+  <section class="py-20 px-6">
     <div class="container mx-auto max-w-4xl">
       <div class="text-center mb-16">
         <h2 class="font-serif text-4xl font-bold mb-4">Frequently Asked Questions</h2>

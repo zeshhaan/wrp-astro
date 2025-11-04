@@ -297,9 +297,9 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
       <section id="services" class="py-32 px-6 bg-muted/30">
         <div class="container mx-auto max-w-7xl">
           <div class="text-center mb-20">
-            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Our Services</h2>
+            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">The WRP Philosophy</h2>
             <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive protection and enhancement for the world's finest automobiles
+              Three pillars of automotive excellence: Wrap, Reinforce, Protect
             </p>
           </div>
 
@@ -330,7 +330,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                 </li>
               </ul>
               <Button variant="outline" className="w-full bg-transparent">
-                <a href="/services/paint-protection-film">LEARN MORE</a>
+                <a href="/wrap">LEARN MORE</a>
               </Button>
             </Card>
 
@@ -360,7 +360,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                 </li>
               </ul>
               <Button variant="outline" className="w-full bg-transparent">
-                <a href="/services/ceramic-coating">LEARN MORE</a>
+                <a href="/reinforce">LEARN MORE</a>
               </Button>
             </Card>
 
@@ -390,9 +390,294 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                 </li>
               </ul>
               <Button variant="outline" className="w-full bg-transparent">
-                <a href="/services/premium-car-wash">LEARN MORE</a>
+                <a href="/protect">LEARN MORE</a>
               </Button>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      <!-- Our Services Section -->
+      <section class="py-24 sm:py-32">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+          <div class="mx-auto max-w-2xl text-center mb-20">
+            <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Our Services</h2>
+            <p class="text-lg text-muted-foreground">
+              Premium automotive care solutions for Dubai's luxury vehicles
+            </p>
+          </div>
+
+          <!-- Service 1: Ceramic Coating - Photo RIGHT -->
+          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24">
+            <div class="lg:pt-4 lg:pr-8">
+              <div class="lg:max-w-lg">
+                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Ceramic Coating</h3>
+                <p class="text-lg text-muted-foreground mb-8">
+                  Nano-ceramic technology that creates a permanent hydrophobic shield. Delivers unmatched gloss, chemical resistance, and UV protection for years.
+                </p>
+                <dl class="space-y-6 text-base text-muted-foreground">
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:shield" class="absolute top-1 left-1 h-5 w-5" />
+                      9H Hardness Protection.
+                    </dt>
+                    <dd class="inline">Scratch and swirl resistance with nano-ceramic shield technology</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:droplets" class="absolute top-1 left-1 h-5 w-5" />
+                      Hydrophobic Properties.
+                    </dt>
+                    <dd class="inline">Water beads and rolls off instantly, making washing effortless</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:clock" class="absolute top-1 left-1 h-5 w-5" />
+                      2-7 Year Warranty.
+                    </dt>
+                    <dd class="inline">Long-lasting protection engineered for Dubai's extreme climate</dd>
+                  </div>
+                </dl>
+                <div class="mt-8">
+                  <a href="/services/ceramic-coating">
+                    <Button size="lg">
+                      EXPLORE SERVICE
+                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                    </Button>
+                  </a>
+                  <span class="ml-4 text-sm text-muted-foreground">From AED 2,800</span>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-hidden">
+              <img
+                src="/portfolio/team-detailing-black-lexus-hood.webp"
+                alt="WRP Dubai technician applying professional ceramic coating on Lexus luxury vehicle hood"
+                width="1200"
+                height="800"
+                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
+          </div>
+
+          <!-- Service 2: Paint Protection Film - Photo LEFT -->
+          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30 p-12">
+            <div class="flex items-start justify-end lg:order-first overflow-hidden">
+              <img
+                src="/portfolio/porsche-boxster-spyder-gray.webp"
+                alt="Porsche Boxster Spyder with paint protection film installation at WRP Dubai showroom"
+                width="1200"
+                height="800"
+                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
+            <div class="lg:ml-auto lg:pt-4 lg:pl-8">
+              <div class="lg:max-w-lg">
+                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Protection Film</h3>
+                <p class="text-lg text-muted-foreground mb-8">
+                  Military-grade transparent film that shields your paint from rock chips, scratches, and environmental damage. Self-healing technology repairs minor scratches.
+                </p>
+                <dl class="space-y-6 text-base text-muted-foreground">
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:shield-check" class="absolute top-1 left-1 h-5 w-5" />
+                      Impact Protection.
+                    </dt>
+                    <dd class="inline">Guards against rock chips, road debris, and minor collisions</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:rotate-cw" class="absolute top-1 left-1 h-5 w-5" />
+                      Self-Healing Technology.
+                    </dt>
+                    <dd class="inline">Minor scratches disappear with heat exposure from sun or water</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
+                      UV Resistance.
+                    </dt>
+                    <dd class="inline">Prevents paint fading and oxidation from Dubai's intense sunlight</dd>
+                  </div>
+                </dl>
+                <div class="mt-8">
+                  <a href="/services/paint-protection-film">
+                    <Button size="lg">
+                      EXPLORE SERVICE
+                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                    </Button>
+                  </a>
+                  <span class="ml-4 text-sm text-muted-foreground">From AED 4,500</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service 3: Paint Correction - Photo RIGHT with Testimonial -->
+          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start mb-24">
+            <div class="lg:pt-4 lg:pr-8">
+              <div class="lg:max-w-lg">
+                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Correction & Polish</h3>
+                <p class="text-lg text-muted-foreground mb-8">
+                  Multi-stage machine polishing that removes swirl marks, scratches, and oxidation. Restore your paint's original depth and mirror-like clarity.
+                </p>
+                <dl class="space-y-6 text-base text-muted-foreground">
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
+                      Mirror Finish.
+                    </dt>
+                    <dd class="inline">Deep, reflective gloss that makes paint look better than new</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:eraser" class="absolute top-1 left-1 h-5 w-5" />
+                      Defect Removal.
+                    </dt>
+                    <dd class="inline">Eliminates 85-95% of swirls, scratches, and water spots</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:gauge" class="absolute top-1 left-1 h-5 w-5" />
+                      Paint Depth Measurement.
+                    </dt>
+                    <dd class="inline">Safe correction using precision gauges and professional compounds</dd>
+                  </div>
+                </dl>
+                <div class="mt-8">
+                  <a href="/services/polish">
+                    <Button size="lg">
+                      EXPLORE SERVICE
+                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                    </Button>
+                  </a>
+                  <span class="ml-4 text-sm text-muted-foreground">From AED 1,200</span>
+                </div>
+                <figure class="mt-12 border-l-2 border-border pl-8">
+                  <blockquote class="text-base text-muted-foreground italic">
+                    <p>"Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless."</p>
+                  </blockquote>
+                  <figcaption class="mt-4 flex gap-x-4 text-sm">
+                    <div><span class="font-semibold">Ahmed Al-Maktoum</span> – <span class="text-muted-foreground">Porsche 911 GT3 RS Owner</span></div>
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+            <div class="overflow-hidden">
+              <img
+                src="/portfolio/green-porsche-911-showroom-event.webp"
+                alt="Green Porsche 911 showcasing mirror-finish paint correction and ceramic coating at WRP Dubai"
+                width="1200"
+                height="800"
+                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
+          </div>
+
+          <!-- Service 4: Window Film - Photo LEFT -->
+          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30 p-12">
+            <div class="flex items-start justify-end lg:order-first overflow-hidden">
+              <img
+                src="/portfolio/black-lexus-lx-570-showroom.webp"
+                alt="Lexus LX 570 with professional window tinting and ceramic coating completed at WRP Dubai"
+                width="1200"
+                height="800"
+                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
+            <div class="lg:ml-auto lg:pt-4 lg:pl-8">
+              <div class="lg:max-w-lg">
+                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Window Film</h3>
+                <p class="text-lg text-muted-foreground mb-8">
+                  Advanced ceramic technology that blocks 99% UV rays and up to 80% heat. Enhanced privacy and comfort for Dubai's intense climate.
+                </p>
+                <dl class="space-y-6 text-base text-muted-foreground">
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
+                      Heat Rejection.
+                    </dt>
+                    <dd class="inline">Block up to 80% of solar heat for cooler cabin temperature</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:eye-off" class="absolute top-1 left-1 h-5 w-5" />
+                      Enhanced Privacy.
+                    </dt>
+                    <dd class="inline">Discreet tinting while maintaining crystal-clear visibility</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:signal" class="absolute top-1 left-1 h-5 w-5" />
+                      Signal Safe.
+                    </dt>
+                    <dd class="inline">Ceramic films won't interfere with GPS, radio, or mobile signals</dd>
+                  </div>
+                </dl>
+                <div class="mt-8">
+                  <a href="/services/window-film">
+                    <Button size="lg">
+                      EXPLORE SERVICE
+                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                    </Button>
+                  </a>
+                  <span class="ml-4 text-sm text-muted-foreground">From AED 1,800</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Service 5: Premium Car Wash - Photo RIGHT -->
+          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+            <div class="lg:pt-4 lg:pr-8">
+              <div class="lg:max-w-lg">
+                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Premium Car Wash</h3>
+                <p class="text-lg text-muted-foreground mb-8">
+                  Meticulous hand-wash service using pH-neutral products, microfiber techniques, and premium wax polish. Professional care that delivers a showroom-shiny finish.
+                </p>
+                <dl class="space-y-6 text-base text-muted-foreground">
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:hand" class="absolute top-1 left-1 h-5 w-5" />
+                      Hand Wash Only.
+                    </dt>
+                    <dd class="inline">No harsh brushes or automated systems that damage paint</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
+                      Premium Wax Polish.
+                    </dt>
+                    <dd class="inline">Showroom-shiny finish with protective wax layer application</dd>
+                  </div>
+                  <div class="relative pl-9">
+                    <dt class="inline font-semibold text-foreground">
+                      <Icon name="lucide:droplet" class="absolute top-1 left-1 h-5 w-5" />
+                      Spot-Free Finish.
+                    </dt>
+                    <dd class="inline">Filtered water rinse prevents water spots in Dubai's hard water</dd>
+                  </div>
+                </dl>
+                <div class="mt-8">
+                  <a href="/services/premium-car-wash">
+                    <Button size="lg">
+                      EXPLORE SERVICE
+                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                    </Button>
+                  </a>
+                  <span class="ml-4 text-sm text-muted-foreground">From AED 350</span>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-hidden">
+              <img
+                src="/portfolio/team-washing-subaru-sti-foam.webp"
+                alt="WRP Dubai team performing premium hand car wash with foam treatment on Subaru WRX STI"
+                width="1200"
+                height="800"
+                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+              />
+            </div>
           </div>
         </div>
       </section>
