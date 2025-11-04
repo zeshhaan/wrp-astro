@@ -101,36 +101,38 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
             </a>
           </div>
           <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-            <!-- Services Dropdown -->
-            <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-              <button
-                class="hover:text-muted-foreground transition-colors flex items-center gap-1"
-                @click="open = !open"
-              >
-                SERVICES
-                <Icon name="lucide:chevron-down" class="h-4 w-4" />
-              </button>
-              <div
-                x-show="open"
-                x-cloak
-                x-transition
-                class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
-              >
-                <a href="/services/ceramic-coating" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                  Ceramic Coating
-                </a>
-                <a href="/services/paint-protection-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                  Paint Protection Film
-                </a>
-                <a href="/services/polish" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                  Paint Correction & Polish
-                </a>
-                <a href="/services/window-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                  Window Film
-                </a>
-                <a href="/services/premium-car-wash" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                  Premium Car Wash
-                </a>
+            <!-- Services Dropdown - Fixed hover behavior -->
+            <div class="relative">
+              <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                <button
+                  class="hover:text-muted-foreground transition-colors flex items-center gap-1"
+                  @click="open = !open"
+                >
+                  SERVICES
+                  <Icon name="lucide:chevron-down" class="h-4 w-4" />
+                </button>
+                <div
+                  x-show="open"
+                  x-cloak
+                  x-transition
+                  class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
+                >
+                  <a href="/services/ceramic-coating" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                    Ceramic Coating
+                  </a>
+                  <a href="/services/paint-protection-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                    Paint Protection Film
+                  </a>
+                  <a href="/services/polish" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                    Paint Correction & Polish
+                  </a>
+                  <a href="/services/window-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                    Window Film
+                  </a>
+                  <a href="/services/premium-car-wash" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
+                    Premium Car Wash
+                  </a>
+                </div>
               </div>
             </div>
             <a href="/portfolio" class="hover:text-muted-foreground transition-colors">
@@ -220,13 +222,14 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
 
       <!-- Hero Section -->
       <section class="relative h-screen flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 bg-black">
+        <div class="absolute inset-0 bg-black" id="hero-bg">
           <img
             src="/luxury-supercar-close-up-detail-black-and-white.jpg"
             alt="Luxury supercar receiving premium ceramic coating and paint protection at WRP Dubai detailing studio"
             width="1920"
             height="1080"
             class="w-full h-full object-cover opacity-40"
+            id="hero-image"
           />
         </div>
         <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
@@ -1177,5 +1180,37 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
         </div>
       </footer>
     </div>
+
+    <script>
+      // Parallax effect on hero image
+      let ticking = false;
+
+      function updateParallax() {
+        const heroImage = document.getElementById('hero-image');
+        if (!heroImage) return;
+
+        const scrolled = window.pageYOffset;
+        const heroHeight = window.innerHeight;
+
+        if (scrolled < heroHeight) {
+          // Move image slower than scroll (0.5 = half speed for subtle effect)
+          heroImage.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
+        }
+
+        ticking = false;
+      }
+
+      function requestTick() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', requestTick, { passive: true });
+
+      // Initial call
+      updateParallax();
+    </script>
   </body>
 </html>

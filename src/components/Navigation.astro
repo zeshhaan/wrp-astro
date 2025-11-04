@@ -23,29 +23,31 @@ const services = [
       </a>
     </div>
     <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-      <!-- Services Dropdown -->
-      <div class="relative" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-        <button
-          class="hover:text-muted-foreground transition-colors flex items-center gap-1"
-          @click="open = !open"
-        >
-          SERVICES
-          <Icon name="lucide:chevron-down" class="h-4 w-4" />
-        </button>
-        <div
-          x-show="open"
-          x-cloak
-          x-transition
-          class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
-        >
-          {services.map((service) => (
-            <a
-              href={service.href}
-              class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
-            >
-              {service.name}
-            </a>
-          ))}
+      <!-- Services Dropdown - Fixed hover behavior -->
+      <div class="relative">
+        <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+          <button
+            class="hover:text-muted-foreground transition-colors flex items-center gap-1"
+            @click="open = !open"
+          >
+            SERVICES
+            <Icon name="lucide:chevron-down" class="h-4 w-4" />
+          </button>
+          <div
+            x-show="open"
+            x-cloak
+            x-transition
+            class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
+          >
+            {services.map((service) => (
+              <a
+                href={service.href}
+                class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
+              >
+                {service.name}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
       <a href="/portfolio" class="hover:text-muted-foreground transition-colors">
