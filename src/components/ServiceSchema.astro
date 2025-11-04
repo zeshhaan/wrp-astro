@@ -1,0 +1,47 @@
+---
+interface Props {
+  serviceName: string;
+  serviceType: string;
+  description: string;
+  lowPrice: number;
+  highPrice: number;
+}
+
+const { serviceName, serviceType, description, lowPrice, highPrice } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: serviceType,
+  name: `${serviceName} Dubai`,
+  description: description,
+  provider: {
+    '@type': 'LocalBusiness',
+    name: 'WRP Dubai',
+    url: 'https://wrpdetailing.ae',
+  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Dubai',
+    },
+    {
+      '@type': 'City',
+      name: 'Sharjah',
+    },
+    {
+      '@type': 'City',
+      name: 'Ajman',
+    },
+  ],
+  offers: {
+    '@type': 'AggregateOffer',
+    lowPrice: lowPrice.toString(),
+    highPrice: highPrice.toString(),
+    priceCurrency: 'AED',
+    availability: 'https://schema.org/InStock',
+  },
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

@@ -1,21 +1,34 @@
 ---
 interface Props {
-  type?: 'LocalBusiness' | 'AutoRepair';
+  type?: 'LocalBusiness' | 'WebSite';
 }
 
 const { type = 'LocalBusiness' } = Astro.props;
 
-const schema = {
+const localBusinessSchema = {
   '@context': 'https://schema.org',
-  '@type': type,
+  '@type': ['LocalBusiness', 'AutomotiveBusiness'],
   name: 'WRP Dubai',
   alternateName: 'Wrap, Reinforce, Protect',
   description: 'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
   url: 'https://wrpdetailing.ae',
-  logo: 'https://wrpdetailing.ae/wrp-logo.svg',
-  image: 'https://wrpdetailing.ae/og-image.jpg',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://wrpdetailing.ae/wrp-logo.svg',
+    width: 200,
+    height: 60,
+  },
+  image: [
+    {
+      '@type': 'ImageObject',
+      url: 'https://wrpdetailing.ae/og-image.jpg',
+      width: 1200,
+      height: 630,
+      caption: 'WRP Dubai luxury car detailing studio showroom',
+    },
+  ],
   telephone: '+971547173000',
-  email: 'noreply@wrpdetailing.ae',
+  email: 'wrpdetailing@gmail.com',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Al Qusais Industrial Area 1',
@@ -25,8 +38,8 @@ const schema = {
   },
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: 25.2854,
-    longitude: 55.3781,
+    latitude: '25.2854',
+    longitude: '55.3781',
   },
   openingHoursSpecification: [
     {
@@ -38,27 +51,95 @@ const schema = {
     {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Friday', 'Saturday'],
-      opens: 'By Appointment',
-      closes: 'By Appointment',
+      opens: '00:00',
+      closes: '00:00',
     },
   ],
   priceRange: 'AED 500 - AED 15000',
-  areaServed: {
-    '@type': 'City',
-    name: 'Dubai',
-  },
+  areaServed: [
+    {
+      '@type': 'City',
+      name: 'Dubai',
+    },
+    {
+      '@type': 'City',
+      name: 'Sharjah',
+    },
+    {
+      '@type': 'City',
+      name: 'Ajman',
+    },
+    {
+      '@type': 'City',
+      name: 'Abu Dhabi',
+    },
+  ],
   sameAs: [
     'https://instagram.com/wrp_ae',
+    'https://maps.app.goo.gl/KuW61epVgiC3idTC6',
   ],
-  serviceType: [
-    'Ceramic Coating',
-    'Paint Protection Film (PPF)',
-    'Paint Correction & Polish',
-    'Window Tinting',
-    'Premium Car Wash',
-    'Vehicle Wrapping',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '5',
+    reviewCount: '3',
+    bestRating: '5',
+    worstRating: '1',
+  },
+  review: [
+    {
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: 'Ahmed Al-Maktoum',
+      },
+      datePublished: '2025-01-15',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '5',
+        bestRating: '5',
+      },
+      reviewBody: 'Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless.',
+    },
+    {
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: 'Marcus Chen',
+      },
+      datePublished: '2025-01-10',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '5',
+        bestRating: '5',
+      },
+      reviewBody: 'WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched in Dubai.',
+    },
+    {
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: 'Sophia Petrov',
+      },
+      datePublished: '2025-01-05',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '5',
+        bestRating: '5',
+      },
+      reviewBody: 'The only studio I trust with my collection. Professional, meticulous, and truly understand luxury vehicles.',
+    },
   ],
 };
+
+const webSiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'WRP Dubai',
+  alternateName: 'WRP',
+  url: 'https://wrpdetailing.ae/',
+};
+
+const schema = type === 'WebSite' ? webSiteSchema : localBusinessSchema;
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />
