@@ -1,0 +1,147 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+
+export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Privacy Policy', url: 'https://wrpdetailing.ae/privacy' },
+];
+---
+
+<BaseLayout
+  title="Privacy Policy | WRP Detailing Solutions"
+  description="WRP Detailing Solutions's privacy policy explaining how we collect and use data to improve our services"
+  noindex={false}
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+
+  <section class="py-20 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="font-serif text-4xl md:text-5xl font-bold mb-6">Privacy Policy</h1>
+      <p class="text-sm text-muted-foreground mb-12">Last updated: November 4, 2025</p>
+
+      <div class="prose prose-lg max-w-none">
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Introduction</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          At WRP Detailing Solutions, we respect your privacy and are committed to protecting your personal information. This
+          Privacy Policy explains how we collect, use, and safeguard your data when you visit our website.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Information We Collect</h2>
+
+        <h3 class="font-semibold text-xl mt-8 mb-3">Contact Information</h3>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          When you submit a contact form or book a consultation, we collect:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Your name</li>
+          <li>Email address</li>
+          <li>Phone number</li>
+          <li>Vehicle information (make, model)</li>
+          <li>Service preferences</li>
+          <li>Your message or inquiry details</li>
+        </ul>
+
+        <h3 class="font-semibold text-xl mt-8 mb-3">Usage Analytics</h3>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          We partner with <strong>Microsoft Clarity</strong> to better understand how visitors use our website.
+          Clarity captures how you interact with our site through session recordings and heatmaps. This helps us
+          identify areas for improvement and enhance your user experience.
+        </p>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>What Clarity Collects:</strong>
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Page views and navigation patterns</li>
+          <li>Mouse movements, clicks, and scrolling behavior</li>
+          <li>Device type, browser, and screen resolution</li>
+          <li>Session duration and interaction timing</li>
+        </ul>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>Privacy Protection:</strong> Clarity uses <em>Balanced Masking</em> by default, which means
+          all sensitive content (email addresses, phone numbers, credit card information) is automatically masked
+          and never captured. All form inputs are also masked for your privacy.
+        </p>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          For more information about how Microsoft handles data, please review the{' '}
+          <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer" class="text-foreground font-semibold hover:underline">
+            Microsoft Privacy Statement
+          </a>.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">How We Use Your Information</h2>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li><strong>Service Requests:</strong> To respond to your inquiries and schedule appointments</li>
+          <li><strong>Email Notifications:</strong> To send you service updates and appointment confirmations</li>
+          <li><strong>Website Improvement:</strong> To analyze user behavior and optimize our website</li>
+          <li><strong>Service Enhancement:</strong> To better understand customer needs and improve our offerings</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Data Storage & Security</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          Your contact form submissions are stored securely in our database hosted on Cloudflare's infrastructure.
+          We implement industry-standard security measures to protect your personal information from unauthorized
+          access, alteration, or disclosure.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Cookies & Tracking Technologies</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          We use cookies and similar tracking technologies to improve your browsing experience and analyze site
+          traffic. These include:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li><strong>Essential Cookies:</strong> Required for basic website functionality</li>
+          <li><strong>Analytics Cookies:</strong> Microsoft Clarity for usage analytics (first-party and third-party)</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Your Rights</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          You have the right to:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Request access to your personal data</li>
+          <li>Request correction of inaccurate data</li>
+          <li>Request deletion of your data</li>
+          <li>Opt-out of analytics tracking (contact us)</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Third-Party Services</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          We use the following third-party services:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li><strong>Microsoft Clarity:</strong> Behavioral analytics and session recordings</li>
+          <li><strong>Cloudflare:</strong> Website hosting, security, and email routing</li>
+          <li><strong>Google Fonts:</strong> Typography (font delivery)</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Contact Us</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          If you have questions about this Privacy Policy or your data, please contact us:
+        </p>
+        <ul class="list-none text-muted-foreground space-y-2 mb-6">
+          <li><strong>Email:</strong> wrpdetailing@gmail.com</li>
+          <li><strong>Phone:</strong> +971 54 717 3000</li>
+          <li><strong>Address:</strong> Al Qusais Industrial Area 1, Dubai, UAE</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Changes to This Policy</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          We may update this Privacy Policy from time to time. The updated version will be indicated by the
+          "Last updated" date at the top of this page. We encourage you to review this Privacy Policy
+          periodically.
+        </p>
+
+        <div class="mt-12 p-6 bg-muted border-l-4 border-primary">
+          <p class="text-sm text-muted-foreground">
+            <strong>Analytics Disclosure:</strong> We use Microsoft Clarity to understand how you interact with
+            our website. This information helps us improve your experience and better serve you. Both WRP Detailing Solutions
+            and Microsoft may collect and use this data for site optimization and service improvement purposes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

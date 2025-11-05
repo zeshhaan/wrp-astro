@@ -94,6 +94,17 @@ const ogImageURL = new URL(ogImage, Astro.site).toString();
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Microsoft Clarity -->
+    <script type="module">
+      import clarity from '@microsoft/clarity';
+
+      const clarityProjectId = 'u18n0h2k1x';
+
+      if (clarityProjectId && clarityProjectId !== 'YOUR_PROJECT_ID') {
+        clarity.init(clarityProjectId);
+      }
+    </script>
+
     <style>
       [x-cloak] {
         display: none !important;

@@ -1,0 +1,176 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+
+export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Terms of Service', url: 'https://wrpdetailing.ae/terms' },
+];
+---
+
+<BaseLayout
+  title="Terms of Service | WRP Detailing Solutions"
+  description="Terms and conditions for using WRP Detailing Solutions's website and services"
+  noindex={false}
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+
+  <section class="py-20 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="font-serif text-4xl md:text-5xl font-bold mb-6">Terms of Service</h1>
+      <p class="text-sm text-muted-foreground mb-12">Last updated: November 4, 2025</p>
+
+      <div class="prose prose-lg max-w-none">
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">1. Agreement to Terms</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          By accessing and using the WRP Detailing Solutions website (wrpdetailing.ae), you agree to be bound by these Terms of
+          Service and all applicable laws and regulations of the United Arab Emirates. If you do not agree with
+          any of these terms, you are prohibited from using this site.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">2. Service Information Disclaimer</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>Important:</strong> All information displayed on this website, including but not limited to
+          service descriptions, pricing, packages, timelines, and specifications, is provided for{' '}
+          <strong>informational and marketing purposes only</strong>.
+        </p>
+
+        <div class="bg-muted p-6 border-l-4 border-primary my-6">
+          <p class="text-sm font-semibold mb-2">Key Disclaimers:</p>
+          <ul class="list-disc pl-6 text-sm text-muted-foreground space-y-2">
+            <li><strong>Pricing:</strong> All prices shown are indicative estimates and subject to change without notice. Final pricing will be confirmed during in-person consultation based on your specific vehicle and requirements.</li>
+            <li><strong>Services:</strong> Actual services provided may vary based on vehicle condition, paint type, size, and specific requirements. Service descriptions are general guidelines.</li>
+            <li><strong>Timelines:</strong> Service completion times are estimates and may vary depending on workload, vehicle condition, and complexity.</li>
+            <li><strong>Availability:</strong> Service availability, packages, and offerings may change. Current availability must be confirmed by contacting us directly.</li>
+          </ul>
+        </div>
+
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>You must contact WRP Detailing Solutions directly</strong> to verify current pricing, service availability, and
+          specific details before making any decisions. Do not rely solely on website information for final
+          purchasing decisions.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">3. No Online Transactions</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          This website does not process payments or bookings online. All service appointments require:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Personal consultation (in-person, phone, or email)</li>
+          <li>Vehicle inspection and assessment</li>
+          <li>Written quotation and approval</li>
+          <li>Confirmation of appointment and deposit (if required)</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">4. Content Accuracy</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          While we make reasonable efforts to ensure information on this website is accurate and up-to-date:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>We do not guarantee the accuracy, completeness, or currentness of any information</li>
+          <li>Content may be updated, modified, or removed without prior notice</li>
+          <li>Product specifications, service details, and pricing may change over time</li>
+          <li>Images and descriptions are for illustrative purposes and may not reflect exact results</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">5. Service Results Disclaimer</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>Results May Vary:</strong> The results of our services depend on many factors including original
+          paint condition, vehicle age, previous damage, maintenance history, and environmental factors. Images
+          and descriptions shown on this website are examples and do not guarantee identical results for your
+          vehicle.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">6. Intellectual Property</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          All content on this website, including text, images, logos, and design, is the property of WRP Detailing Solutions and
+          protected by applicable copyright and trademark laws. Unauthorized use is prohibited.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">7. Limitation of Liability</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          WRP Detailing Solutions shall not be liable for any damages arising from:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Use or inability to use this website</li>
+          <li>Reliance on information provided on the website</li>
+          <li>Errors, inaccuracies, or omissions in website content</li>
+          <li>Interruptions or delays in website access</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">8. External Links</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          This website may contain links to external websites (such as social media profiles). We are not
+          responsible for the content, privacy practices, or terms of third-party websites.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">9. Governing Law & Jurisdiction</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          These Terms of Service are governed by and construed in accordance with the laws of the United Arab
+          Emirates and the Emirate of Dubai. Any disputes arising from these terms shall be subject to the
+          exclusive jurisdiction of the courts of Dubai, UAE.
+        </p>
+
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          This website complies with:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Federal Law No. 15 of 2020 on Consumer Protection</li>
+          <li>Federal Law No. 1 of 2006 on Electronic Commerce and Transactions</li>
+          <li>Dubai Law No. 2 of 2002 on Electronic Transactions and Commerce</li>
+        </ul>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">10. Contact for Service Confirmation</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          <strong>Before proceeding with any service</strong>, please contact us to:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>Verify current pricing and package details</li>
+          <li>Confirm service availability for your vehicle</li>
+          <li>Schedule an inspection and consultation</li>
+          <li>Receive a written quotation</li>
+        </ul>
+
+        <div class="bg-muted p-6 my-8">
+          <h3 class="font-semibold mb-3">Contact Information:</h3>
+          <ul class="list-none text-muted-foreground space-y-2">
+            <li><strong>Phone:</strong> <a href="tel:+971547173000" class="hover:text-foreground transition-colors">+971 54 717 3000</a></li>
+            <li><strong>Email:</strong> <a href="mailto:wrpdetailing@gmail.com" class="hover:text-foreground transition-colors">wrpdetailing@gmail.com</a></li>
+            <li><strong>Address:</strong> Al Qusais Industrial Area 1, Dubai, UAE</li>
+            <li><strong>Hours:</strong> Sunday-Thursday: 9:00 AM - 7:00 PM</li>
+          </ul>
+        </div>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">11. Changes to Terms</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          We reserve the right to modify these Terms of Service at any time. Changes will be effective
+          immediately upon posting to this website. Your continued use of the website after changes constitutes
+          acceptance of the modified terms.
+        </p>
+
+        <h2 class="font-serif text-2xl font-bold mt-12 mb-4">12. Acknowledgment</h2>
+        <p class="text-muted-foreground leading-relaxed mb-6">
+          By using this website and our services, you acknowledge that:
+        </p>
+        <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+          <li>You have read and understood these Terms of Service</li>
+          <li>You will verify all information before making decisions</li>
+          <li>You will contact us directly for accurate, current information</li>
+          <li>Website content is for marketing and informational purposes</li>
+          <li>Final service details must be confirmed in writing</li>
+        </ul>
+
+        <div class="mt-12 p-6 bg-primary/5 border border-primary/20">
+          <p class="text-sm text-muted-foreground">
+            <strong>Important Notice:</strong> This website is designed primarily for search engine visibility
+            and general information. All service details, pricing, and availability must be confirmed through
+            direct contact with WRP Detailing Solutions. We cannot be held liable for decisions made based solely on website
+            content without personal verification.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
