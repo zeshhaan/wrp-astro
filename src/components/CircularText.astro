@@ -1,0 +1,76 @@
+---
+interface Props {
+  text: string;
+  size?: number; // Size in rem
+  className?: string;
+}
+
+const { text, size = 6, className = '' } = Astro.props;
+
+// Split text into individual characters
+const chars = text.split('');
+const charCount = chars.length;
+const innerAngle = 360 / charCount;
+---
+
+<div class={`circular-text ${className}`} style={`--font-size: ${size}; --char-count: ${charCount}; --inner-angle: ${innerAngle}deg;`}>
+  <span class="sr-only">{text}</span>
+  {chars.map((char, index) => (
+    <span aria-hidden="true" class="char" style={`--char-index: ${index};`}>
+      {char}
+    </span>
+  ))}
+</div>
+
+<style>
+  .circular-text {
+    --character-width: 1;
+    --radius: calc((var(--character-width) / sin(var(--inner-angle))) * -1ch);
+
+    position: relative;
+    width: calc(var(--font-size) * 8rem);
+    height: calc(var(--font-size) * 8rem);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: calc(var(--font-size) * 1rem);
+    letter-spacing: 0.1em;
+    mix-blend-mode: difference;
+    color: white;
+  }
+
+  .circular-text .char {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform:
+      translate(-50%, -50%)
+      rotate(calc(var(--inner-angle) * var(--char-index)))
+      translateY(var(--radius));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .circular-text {
+      animation: spin 10s infinite linear;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      rotate: -360deg;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>
