@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. The project was migrated from Next.js 16 to Astro 5 and is deployed on Cloudflare Pages with server-side rendering.
+This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. The project was migrated from Next.js 16 to Astro 5 and is deployed on Cloudflare Workers with server-side rendering.
 
 **Migration Source**: This project was migrated from `/src/ameen/v0-wrp-landing-page-4q/`
 
@@ -20,7 +20,7 @@ bun build
 # Preview build locally with Wrangler
 bun preview
 
-# Deploy to Cloudflare Pages
+# Deploy to Cloudflare Workers
 bun deploy
 
 # Generate Cloudflare types
@@ -43,7 +43,7 @@ bun astro ...
 - **Fonts**: Playfair Display (serif), Inter (sans), Montserrat (logo)
 - **Analytics**: Partytown for Google Analytics
 - **Package Manager**: bun
-- **Deployment**: Cloudflare Pages + D1 Database
+- **Deployment**: Cloudflare Workers + D1 Database
 
 ### Cloudflare Integration
 
@@ -54,9 +54,12 @@ bun astro ...
 - Access via `locals.runtime.env.DB` in API routes
 
 **Wrangler Configuration** (`wrangler.jsonc`):
+- Worker entry point: `./dist/_worker.js/index.js`
 - Compatibility date: 2025-10-29
 - Compatibility flags: `nodejs_compat`, `global_fetch_strictly_public`
 - Assets binding: `ASSETS` (serves static files from `./dist`)
+- Custom domains: `wrpdetailing.ae`, `www.wrpdetailing.ae`
+- Email service binding for contact form notifications
 - Observability enabled
 
 ### Project Structure
@@ -165,11 +168,13 @@ const db = locals.runtime.env.DB;
 
 ## Deployment
 
-- **Platform**: Cloudflare Pages
+- **Platform**: Cloudflare Workers
 - **Build Command**: `bun build` (generates `./dist`)
+- **Deploy Command**: `bun deploy` (uses Wrangler)
 - **Wrangler**: Used for local preview and deployment
 - **Database**: D1 database for form submissions
 - **Assets**: Served via Cloudflare's asset binding
+- **Domains**: wrpdetailing.ae, www.wrpdetailing.ae
 
 ## Content & Assets
 
@@ -186,13 +191,13 @@ const db = locals.runtime.env.DB;
 - Replaced Next.js Image component with Astro's image service (Cloudflare)
 - Converted "use client" components to Alpine.js where possible
 - Kept complex UI components (shadcn/ui) as React islands
-- Replaced Vercel deployment with Cloudflare Pages
+- Replaced Vercel deployment with Cloudflare Workers
 - Added D1 database for form persistence
 
 ## Important Files
 
 - `astro.config.mjs`: Astro configuration with Cloudflare adapter
-- `wrangler.jsonc`: Cloudflare Workers/Pages configuration
+- `wrangler.jsonc`: Cloudflare Workers configuration
 - `src/content.config.ts`: Content collection schemas
 - `src/env.d.ts`: Cloudflare runtime type definitions
 - `worker-configuration.d.ts`: D1 database bindings (referenced in tsconfig)
