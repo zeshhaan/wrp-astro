@@ -180,7 +180,7 @@ const db = locals.runtime.env.DB;
 
 - All images in `/public` directory
 - Images follow naming pattern: `luxury-*-black-and-white-*.jpg`
-- Contact info: +971 54 717 3000, wrpdetailing@gmail.com, @wrp_ae
+- Contact info: +971 54 717 3000, info@wrpdetailing.ae, @wrp_ae
 - Location: Al Qusais Industrial Area 1, Dubai, UAE
 
 ## Migration Notes
