@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 
+import { Image } from 'astro:assets';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SEO } from 'astro-seo';
@@ -98,7 +99,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
         <div class="container mx-auto px-6 py-4 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <a href="/" class="flex items-center">
-              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-10 w-auto" />
+              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-10 w-auto" loading="lazy">
             </a>
           </div>
           <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
@@ -231,6 +232,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
             height="1080"
             class="w-full h-full object-cover opacity-40"
             id="hero-image"
+            loading="eager"
           />
         </div>
         <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
@@ -901,62 +903,62 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
           <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-12 items-center justify-items-center opacity-60">
             <!-- Lamborghini -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/lamborghini-alt-svgrepo-com.svg" alt="Lamborghini" class="w-full h-full object-contain invert" />
+              <img src="/logos/lamborghini-alt-svgrepo-com.svg" alt="Lamborghini" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Porsche -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/porsche-svgrepo-com.svg" alt="Porsche" class="w-full h-full object-contain invert" />
+              <img src="/logos/porsche-svgrepo-com.svg" alt="Porsche" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Rolls-Royce -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/rolls-royce-svgrepo-com.svg" alt="Rolls-Royce" class="w-full h-full object-contain invert" />
+              <img src="/logos/rolls-royce-svgrepo-com.svg" alt="Rolls-Royce" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Lexus -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/lexus-svgrepo-com.svg" alt="Lexus" class="w-full h-full object-contain invert" />
+              <img src="/logos/lexus-svgrepo-com.svg" alt="Lexus" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Ferrari -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/ferrari-svgrepo-com.svg" alt="Ferrari" class="w-full h-full object-contain invert" />
+              <img src="/logos/ferrari-svgrepo-com.svg" alt="Ferrari" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Mercedes-Benz -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/mercedes-benz-svgrepo-com.svg" alt="Mercedes-Benz" class="w-full h-full object-contain invert" />
+              <img src="/logos/mercedes-benz-svgrepo-com.svg" alt="Mercedes-Benz" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Land Rover -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/land-rover-svgrepo-com.svg" alt="Land Rover" class="w-full h-full object-contain invert" />
+              <img src="/logos/land-rover-svgrepo-com.svg" alt="Land Rover" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Jaguar -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/jaguar-svgrepo-com.svg" alt="Jaguar" class="w-full h-full object-contain invert" />
+              <img src="/logos/jaguar-svgrepo-com.svg" alt="Jaguar" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- McLaren -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/mclaren-alt-svgrepo-com.svg" alt="McLaren" class="w-full h-full object-contain invert" />
+              <img src="/logos/mclaren-alt-svgrepo-com.svg" alt="McLaren" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Nissan -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/nissan-svgrepo-com.svg" alt="Nissan" class="w-full h-full object-contain invert" />
+              <img src="/logos/nissan-svgrepo-com.svg" alt="Nissan" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Aston Martin -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/aston-martin-svgrepo-com.svg" alt="Aston Martin" class="w-full h-full object-contain invert" />
+              <img src="/logos/aston-martin-svgrepo-com.svg" alt="Aston Martin" class="w-full h-full object-contain invert" loading="lazy">
             </div>
 
             <!-- Alfa Romeo -->
             <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/alfa-romeo-svgrepo-com.svg" alt="Alfa Romeo" class="w-full h-full object-contain invert" />
+              <img src="/logos/alfa-romeo-svgrepo-com.svg" alt="Alfa Romeo" class="w-full h-full object-contain invert" loading="lazy">
             </div>
           </div>
 
@@ -1103,8 +1105,9 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium mb-2">Service Interest</label>
+                  <label for="service-select" class="block text-sm font-medium mb-2">Service Interest</label>
                   <select
+                    id="service-select"
                     name="service"
                     class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
@@ -1162,7 +1165,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
         <div class="container mx-auto max-w-7xl">
           <div class="flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center">
-              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" />
+              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" loading="lazy">
             </div>
             <div class="flex gap-8 text-sm">
               <a href="#services" class="hover:text-white/70 transition-colors">
