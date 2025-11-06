@@ -109,7 +109,7 @@
     }
   ],
   "telephone": "+971547173000",
-  "email": "wrpdetailing@gmail.com",
+  "email": "info@wrpdetailing.ae",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Al Qusais Industrial Area 1",
@@ -254,7 +254,7 @@
       "@type": "ContactPoint",
       "telephone": "+971547173000",
       "contactType": "customer service",
-      "email": "wrpdetailing@gmail.com",
+      "email": "info@wrpdetailing.ae",
       "areaServed": "AE",
       "availableLanguage": "English"
     }
