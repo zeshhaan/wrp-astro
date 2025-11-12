@@ -15,6 +15,9 @@ import icon from 'astro-icon';
 export default defineConfig({
   site: 'https://wrpdetailing.ae',
   output: 'server',
+  redirects: {
+    '/about': '/more-about-wrp',
+  },
   vite: {
     plugins: [tailwindcss()],
   },
