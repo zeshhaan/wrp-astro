@@ -148,7 +148,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
             </a>
           </div>
           <ShimmerButton href="/contact-us" className="hidden md:flex">
-            BOOK APPOINTMENT
+            REQUEST ESTIMATE
           </ShimmerButton>
           <button
             class="md:hidden z-50"
@@ -216,7 +216,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
               CONTACT
             </a>
             <Button className="w-full" @click="mobileMenuOpen = false">
-              <a href="/contact-us" class="w-full">BOOK APPOINTMENT</a>
+              <a href="/contact-us" class="w-full">REQUEST ESTIMATE</a>
             </Button>
           </div>
         </div>
@@ -247,7 +247,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/contact-us">
               <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base tracking-wide">
-                BOOK CONSULTATION
+                GET A QUOTE
                 <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
               </Button>
             </a>
@@ -975,7 +975,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
           <div class="text-center mb-20">
             <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Get In Touch</h2>
             <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Schedule a consultation to discuss how we can elevate your vehicle
+              Our team will help you select the perfect service for your vehicle
             </p>
           </div>
 
@@ -1133,7 +1133,7 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                   ></textarea>
                 </div>
                 <Button size="lg" className="w-full" type="submit" :disabled="submitting">
-                  <span x-show="!submitting">SUBMIT INQUIRY</span>
+                  <span x-show="!submitting">GET MY ESTIMATE</span>
                   <span x-show="submitting" x-cloak>Sending...</span>
                   <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
                 </Button>
@@ -1145,8 +1145,8 @@ const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
                   x-transition
                   class="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
                 >
-                  <p class="font-bold">Message sent successfully!</p>
-                  <p class="text-sm mt-1">We'll get back to you within 24 hours.</p>
+                  <p class="font-bold">Thanks!</p>
+                  <p class="text-sm mt-1">Our team will reach out with your personalized estimate.</p>
                 </div>
 
                 <!-- Error Message -->

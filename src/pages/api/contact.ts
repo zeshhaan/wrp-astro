@@ -52,20 +52,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Send email notification
     try {
       // Create smart, descriptive subject line with fallbacks
-      let subjectLine = 'New Contact Form Inquiry';
+      let subjectLine = 'New Estimate Request';
 
       if (service && vehicle) {
         // Best case: has both service and vehicle
-        subjectLine = `Request for ${service} for ${vehicle} from ${name}`;
+        subjectLine = `Estimate Request: ${service} for ${vehicle} from ${name}`;
       } else if (service) {
         // Has service but no vehicle
-        subjectLine = `Request for ${service} from ${name}`;
+        subjectLine = `Estimate Request: ${service} from ${name}`;
       } else if (vehicle) {
         // Has vehicle but no service
-        subjectLine = `New Inquiry: ${vehicle} - ${name}`;
+        subjectLine = `Estimate Request: ${vehicle} - ${name}`;
       } else {
         // Minimal info
-        subjectLine = `New Contact from ${name}`;
+        subjectLine = `Estimate Request from ${name}`;
       }
 
       const msg = createMimeMessage();
@@ -94,7 +94,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0;">🚗 New Contact Inquiry</h1>
+                <h1 style="margin: 0;">🚗 New Estimate Request</h1>
               </div>
               <div class="content">
                 <table>
@@ -152,7 +152,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Thank you for your message! We will contact you shortly.'
+        message: 'Thanks! Our team will reach out with your personalized estimate.'
       }),
       {
         status: 200,
