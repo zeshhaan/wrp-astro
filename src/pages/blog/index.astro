@@ -44,13 +44,39 @@ const categoryHasPosts: Record<string, boolean> = {};
 for (const cat of categories) {
 	categoryHasPosts[cat] = cat === 'all' ? allPosts.length > 0 : categoriesWithPosts.has(cat);
 }
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+
+// CollectionPage + ItemList schema for blog index
+const blogListSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'WRP Dubai Blog',
+	description: 'Expert guides on ceramic coating, paint protection film, and car care in Dubai.',
+	url: `${siteUrl}/blog/`,
+	inLanguage: 'en',
+	isPartOf: { '@type': 'WebSite', name: 'WRP Dubai', url: `${siteUrl}/` },
+	mainEntity: {
+		'@type': 'ItemList',
+		numberOfItems: allPosts.length,
+		itemListElement: allPosts.map((post, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			url: `${siteUrl}/blog/${post.id}/`,
+			name: post.data.title,
+		})),
+	},
+};
 ---
 
 <BaseLayout
 	title="Blog | WRP Dubai - Car Care Insights & Guides"
 	description="Expert guides on ceramic coating, paint protection film, and car care in Dubai. Tips from WRP's detailing professionals."
 >
-	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+	<!-- CollectionPage + ItemList JSON-LD -->
+	<script type="application/ld+json" set:html={JSON.stringify(blogListSchema)} />
 
 	<!-- Hero Section -->
 	<section class="relative py-20 px-6 bg-black text-white">
@@ -216,12 +242,10 @@ for (const cat of categories) {
 			<p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
 				Have questions about protecting your vehicle? Our team is ready to help you choose the right service for your car and Dubai's demanding climate.
 			</p>
-			<a href="/contact-us/">
-				<Button size="lg" className="bg-white text-black hover:bg-white/90">
-					GET IN TOUCH
-					<Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-				</Button>
-			</a>
+			<Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+				GET IN TOUCH
+				<Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+			</Button>
 		</div>
 	</section>
 </BaseLayout>

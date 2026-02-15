@@ -2,6 +2,8 @@
 import Navigation from '../components/Navigation.astro';
 import WRPFooter from '../components/WRPFooter.astro';
 import Schema from '../components/Schema.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
@@ -163,5 +165,12 @@ const extendMeta = [
     <slot />
 
     {showFooter && <WRPFooter />}
+
+    <div transition:persist="google-review-badge">
+      <GoogleReviewBadge />
+    </div>
+    <div transition:persist="whatsapp-button">
+      <WhatsAppButton />
+    </div>
   </body>
 </html>

@@ -59,7 +59,7 @@ const faqSchema = {
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-32 px-6">
@@ -264,14 +264,12 @@ const faqSchema = {
     <div class="container mx-auto max-w-4xl text-center relative z-10">
       <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Reinforce Your Investment</h2>
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-        Protect your vehicle with our advanced protection systems. Schedule a consultation today.
+        Protect your vehicle with our advanced protection systems. Our team will help you choose the right protection.
       </p>
-          <a href="/contact-us/">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          BOOK CONSULTATION
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>

@@ -51,7 +51,7 @@ const faqSchema = {
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-32 px-6">
@@ -152,12 +152,10 @@ const faqSchema = {
             Deep cleaning, leather conditioning, and restoration for all interior surfaces. Steam cleaning,
             stain removal, and odor elimination. Premium products safe for luxury materials.
           </p>
-          <a href="/contact-us/">
-            <Button variant="outline" className="w-full">
-              GET QUOTE
-              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-            </Button>
-          </a>
+          <Button variant="outline" className="w-full cursor-pointer" data-contact-modal>
+            GET QUOTE
+            <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+          </Button>
         </Card>
       </div>
     </div>
@@ -249,14 +247,12 @@ const faqSchema = {
     <div class="container mx-auto max-w-4xl text-center relative z-10">
       <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">Maintain Your Perfection</h2>
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-        Regular professional care keeps your vehicle looking its absolute best. Start your protection program today.
+        Regular professional care keeps your vehicle looking its absolute best. Speak with our team about a protection plan.
       </p>
-          <a href="/contact-us/">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          BOOK CONSULTATION
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>

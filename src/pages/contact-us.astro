@@ -36,7 +36,7 @@ const contactPageSchema = {
   description="Contact WRP Dubai - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- ContactPage Schema -->
   <script type="application/ld+json" set:html={JSON.stringify(contactPageSchema)} />
@@ -62,9 +62,9 @@ const contactPageSchema = {
             </svg>
           </div>
 
-          <h2 class="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Get in touch</h2>
+          <h2 class="font-serif text-4xl font-bold tracking-tight text-foreground sm:text-5xl">Request an Estimate</h2>
           <p class="mt-6 text-lg leading-8 text-muted-foreground">
-            Ready to elevate your vehicle to perfection? Contact our Dubai studio for premium ceramic coating, PPF, and detailing services.
+            Share your vehicle details and our team will follow up with a personalized quote.
           </p>
 
           <dl class="mt-10 space-y-4 text-base leading-7 text-foreground">
@@ -144,7 +144,7 @@ const contactPageSchema = {
           }
         }"
         @submit="submitForm($event)"
-        class="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-48"
+        class="px-6 pb-24 pt-28 sm:pb-32 lg:px-8 lg:py-48"
       >
         <div class="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
           <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
@@ -244,7 +244,7 @@ const contactPageSchema = {
           <!-- Submit Button -->
           <div class="mt-8 flex justify-end">
             <Button type="submit" size="lg" className="w-full sm:w-auto" :disabled="submitting">
-              <span x-show="!submitting">SEND MESSAGE</span>
+              <span x-show="!submitting">GET MY ESTIMATE</span>
               <span x-show="submitting" x-cloak>Sending...</span>
               <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
             </Button>
@@ -257,8 +257,8 @@ const contactPageSchema = {
             x-transition
             class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
           >
-            <p class="font-bold">Message sent successfully!</p>
-            <p class="text-sm mt-1">We'll get back to you within 24 hours.</p>
+            <p class="font-bold">Thanks!</p>
+            <p class="text-sm mt-1">Our team will reach out with your personalized estimate.</p>
           </div>
 
           <!-- Error Message -->

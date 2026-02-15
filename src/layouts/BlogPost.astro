@@ -26,16 +26,20 @@ const blogPostingJsonLd = {
   '@type': 'BlogPosting',
   headline: title,
   description: description,
+  url: canonicalURL,
   image: ogImageURL,
+  inLanguage: 'en',
   datePublished: new Date(pubDate).toISOString(),
   ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
-  mainEntityOfPage: canonicalURL,
-  author: { '@type': 'Organization', name: author || 'WRP Dubai' },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+  author: { '@type': 'Organization', name: author || 'WRP Dubai', url: Astro.site?.toString() },
   publisher: {
     '@type': 'Organization',
     name: 'WRP Dubai',
+    url: Astro.site?.toString(),
     logo: { '@type': 'ImageObject', url: new URL('/wrp-logo.svg', Astro.site).toString() },
   },
+  ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {}),
   ...(category ? { articleSection: categoryLabels[category] || category } : {}),
   ...(tags && tags.length ? { keywords: tags.join(', ') } : {}),
 };
@@ -60,7 +64,7 @@ const breadcrumbs = [
 >
 	<!-- BlogPosting JSON-LD -->
 	<script type="application/ld+json" set:html={JSON.stringify(blogPostingJsonLd)} />
-	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 	<article class="pb-16">
 		{heroImage && (
 			<div class="w-full mb-10">

@@ -67,7 +67,7 @@ const breadcrumbs = [
   ogImage={ogImage}
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Service Schema -->
   <ServiceSchema
@@ -92,12 +92,10 @@ const breadcrumbs = [
       <div class="text-sm tracking-widest mb-4 text-white/70">{subtitle}</div>
       <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">{title}</h1>
       <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">{description}</p>
-      <a href="/contact-us/">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          BOOK CONSULTATION
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 
@@ -177,11 +175,9 @@ const breadcrumbs = [
                 </li>
               ))}
             </ul>
-            <a href="/contact-us/">
-              <Button variant={pkg.badge ? 'default' : 'outline'} className={pkg.badge ? 'w-full' : 'w-full bg-transparent'}>
-                BOOK NOW
-              </Button>
-            </a>
+            <Button variant={pkg.badge ? 'default' : 'outline'} className={`${pkg.badge ? 'w-full' : 'w-full bg-transparent'} cursor-pointer`} data-contact-modal>
+              GET STARTED
+            </Button>
           </Card>
             );
           })}
@@ -202,12 +198,10 @@ const breadcrumbs = [
           Every vehicle is unique. Contact us for a personalized assessment and detailed quote tailored to your car.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/contact-us/">
-            <Button size="lg">
-              GET YOUR QUOTE
-              <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-            </Button>
-          </a>
+          <Button size="lg" className="cursor-pointer" data-contact-modal>
+            GET YOUR QUOTE
+            <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+          </Button>
           <a href="https://dub.sh/wrp-phone" target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="outline">
               <Icon name="lucide:phone" class="mr-2 h-5 w-5" />
@@ -346,14 +340,12 @@ const breadcrumbs = [
     <div class="container mx-auto max-w-4xl text-center relative z-10">
       <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6">{ctaHeading || `Experience ${title}`}</h2>
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-        {ctaDescription || 'Contact us today for a free consultation and quote'}
+        {ctaDescription || 'Our team will help you find the perfect solution'}
       </p>
-      <a href="/contact-us/">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          BOOK CONSULTATION
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>
