@@ -15,8 +15,25 @@ type Props = CollectionEntry<'blog'>;
 
 const post = Astro.props;
 const { Content } = await render(post);
+
+// Auto-detect services mentioned in the post body and merge with frontmatter
+const services = await getCollection('services');
+const body = post.body || '';
+const mentionedServiceIds = services
+  .filter((s) => {
+    const slug = s.id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const patterns = [
+      new RegExp(`/services/${slug}/?`, 'i'),
+      new RegExp(`https?://[^\\s\"']+/services/${slug}/?`, 'i'),
+    ];
+    return patterns.some((rx) => rx.test(body));
+  })
+  .map((s) => s.id);
+
+const relatedFromFrontmatter = post.data.relatedServices ?? [];
+const relatedServices = Array.from(new Set([...relatedFromFrontmatter, ...mentionedServiceIds]));
 ---
 
-<BlogPost {...post.data}>
+<BlogPost {...post.data} relatedServices={relatedServices}>
 	<Content />
 </BlogPost>

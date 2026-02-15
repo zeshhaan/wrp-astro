@@ -38,12 +38,12 @@ const categoryLabels: Record<string, string> = {
 
 		<div class={`grid gap-8 ${related.length === 1 ? 'max-w-lg mx-auto' : related.length === 2 ? 'md:grid-cols-2 max-w-4xl mx-auto' : 'md:grid-cols-3'}`}>
 			{related.map((post) => (
-				<a href={`/blog/${post.id}`} class="group block">
+				<a href={`/blog/${post.id}/`} class="group block">
 					<Card className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 p-0">
 						{post.data.heroImage && (
-							<div class="relative h-48 overflow-hidden">
+							<div class="relative aspect-[16/9] overflow-hidden">
 								<img
-									src={post.data.heroImage.src}
+									src={post.data.heroImage}
 									alt={post.data.title}
 									class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
 									loading="lazy"

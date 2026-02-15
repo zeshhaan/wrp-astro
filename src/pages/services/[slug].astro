@@ -32,6 +32,8 @@ const {
   mainDescription2,
   mainImage,
   iconFeatures,
+  startingPrice,
+  showPackages,
   packagesHeading,
   packagesSubheading,
   packages,
@@ -47,15 +49,15 @@ const {
 
 const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
 
-// Calculate price range from packages for Service schema
-const lowPrice = packages && packages.length > 0 ? Math.min(...packages.map(p => p.price)) : 500;
-const highPrice = packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : 15000;
+// Calculate price range for Service schema (structured data)
+const lowPrice = startingPrice || (packages && packages.length > 0 ? Math.min(...packages.map(p => p.price)) : 500);
+const highPrice = packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice * 4;
 
 // Breadcrumbs
 const breadcrumbs = [
   { name: 'Home', url: 'https://wrpdetailing.ae/' },
   { name: 'Services', url: 'https://wrpdetailing.ae/#services' },
-  { name: title, url: `https://wrpdetailing.ae/services/${service.id}` },
+  { name: title, url: `https://wrpdetailing.ae/services/${service.id}/` },
 ];
 ---
 
@@ -90,7 +92,7 @@ const breadcrumbs = [
       <div class="text-sm tracking-widest mb-4 text-white/70">{subtitle}</div>
       <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">{title}</h1>
       <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">{description}</p>
-      <a href="/contact-us">
+      <a href="/contact-us/">
         <Button size="lg" className="bg-white text-black hover:bg-white/90">
           BOOK CONSULTATION
           <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
@@ -142,8 +144,8 @@ const breadcrumbs = [
     </section>
   )}
 
-  <!-- Packages Section (Hidden for now) -->
-  {false && packages && packages.length > 0 && (
+  <!-- Packages Section (shown for services like car wash) -->
+  {showPackages && packages && packages.length > 0 && (
     <section class="py-32 px-6 bg-muted/30">
       <div class="container mx-auto max-w-7xl">
         <div class="text-center mb-16">
@@ -154,7 +156,7 @@ const breadcrumbs = [
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-          {packages.map((pkg, index) => {
+          {packages.map((pkg) => {
             const cardClass = `p-8 hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`;
             return (
           <Card className={cardClass}>
@@ -165,7 +167,7 @@ const breadcrumbs = [
             )}
             <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
             <div class="text-3xl font-bold mb-6">
-              From AED {pkg.price.toLocaleString()}<span class="text-base font-normal text-muted-foreground">/vehicle</span>
+              AED {pkg.price.toLocaleString()}
             </div>
             <ul class="space-y-3 mb-8">
               {pkg.features.map((feature) => (
@@ -175,12 +177,43 @@ const breadcrumbs = [
                 </li>
               ))}
             </ul>
-            <Button variant={pkg.badge ? 'default' : 'outline'} className={pkg.badge ? 'w-full' : 'w-full bg-transparent'}>
-              SELECT PACKAGE
-            </Button>
+            <a href="/contact-us/">
+              <Button variant={pkg.badge ? 'default' : 'outline'} className={pkg.badge ? 'w-full' : 'w-full bg-transparent'}>
+                BOOK NOW
+              </Button>
+            </a>
           </Card>
             );
           })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Starting Price Section (services without full package display) -->
+  {!showPackages && startingPrice && (
+    <section class="py-20 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-3xl text-center">
+        <p class="text-sm tracking-widest text-muted-foreground mb-3">PRICING</p>
+        <div class="font-serif text-4xl md:text-5xl font-bold mb-4">
+          Starting from AED {startingPrice.toLocaleString()}
+        </div>
+        <p class="text-muted-foreground mb-8 max-w-xl mx-auto">
+          Every vehicle is unique. Contact us for a personalized assessment and detailed quote tailored to your car.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/contact-us/">
+            <Button size="lg">
+              GET YOUR QUOTE
+              <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+            </Button>
+          </a>
+          <a href="https://dub.sh/wrp-phone" target="_blank" rel="noopener noreferrer">
+            <Button size="lg" variant="outline">
+              <Icon name="lucide:phone" class="mr-2 h-5 w-5" />
+              CALL US
+            </Button>
+          </a>
         </div>
       </div>
     </section>
@@ -271,7 +304,7 @@ const breadcrumbs = [
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
         <p class="mt-6 text-base text-muted-foreground">
-          Have a different question? <a href="/contact-us" class="font-semibold hover:underline">Contact us</a> and we'll get back to you as soon as possible.
+          Have a different question? <a href="/contact-us/" class="font-semibold hover:underline">Contact us</a> and we'll get back to you as soon as possible.
         </p>
       </div>
       <div class="mt-20">
@@ -315,7 +348,7 @@ const breadcrumbs = [
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         {ctaDescription || 'Contact us today for a free consultation and quote'}
       </p>
-      <a href="/contact-us">
+      <a href="/contact-us/">
         <Button size="lg" className="bg-white text-black hover:bg-white/90">
           BOOK CONSULTATION
           <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />

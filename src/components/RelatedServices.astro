@@ -25,7 +25,7 @@ if (related.length === 0) return;
 
 	<div class={`grid gap-6 ${related.length === 1 ? 'max-w-md' : related.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
 		{related.map((service) => (
-			<a href={`/services/${service.id}`} class="group block">
+			<a href={`/services/${service.id}/`} class="group block">
 				<Card className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 p-0">
 					<div class="relative h-48 overflow-hidden">
 						<img

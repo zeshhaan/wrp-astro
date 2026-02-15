@@ -6,7 +6,7 @@ import { NAV_PAGES } from '../consts';
 import { getCollection } from 'astro:content';
 
 const services = await getCollection('services');
-const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}` }));
+const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}/` }));
 ---
 
 <nav
@@ -53,7 +53,7 @@ const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services
         </a>
       ))}
     </div>
-    <ShimmerButton href="/contact-us" className="hidden md:flex">
+    <ShimmerButton href="/contact-us/" className="hidden md:flex">
       BOOK APPOINTMENT
     </ShimmerButton>
     <button
@@ -105,7 +105,7 @@ const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services
         </a>
       ))}
       <Button className="w-full" @click="mobileMenuOpen = false">
-        <a href="/contact-us" class="w-full">BOOK APPOINTMENT</a>
+        <a href="/contact-us/" class="w-full">BOOK APPOINTMENT</a>
       </Button>
     </div>
   </div>

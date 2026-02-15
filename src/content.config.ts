@@ -4,13 +4,12 @@ import { glob } from 'astro/loaders';
 // WRP Blog collection
 const blog = defineCollection({
 	loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-	schema: ({ image }) =>
-		z.object({
+	schema: z.object({
 			title: z.string(),
 			description: z.string(),
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
-			heroImage: image().optional(),
+			heroImage: z.string().optional(),
 			category: z.enum(['guide', 'news', 'update', 'event', 'listicle']).default('guide'),
 			tags: z.array(z.string()).default([]),
 			author: z.string().default('WRP Dubai'),
@@ -49,6 +48,9 @@ const services = defineCollection({
 			title: z.string(),
 			description: z.string(),
 		})).optional(),
+		// Pricing display
+		startingPrice: z.number().optional(), // "Starting from" price shown on page
+		showPackages: z.boolean().default(false), // Show full package breakdown (e.g. car wash)
 		// Packages with badges
 		packagesHeading: z.string().optional(),
 		packagesSubheading: z.string().optional(),
