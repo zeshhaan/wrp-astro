@@ -2,14 +2,7 @@
 import { Button } from "@/components/ui/button";
 import ShimmerButton from './ShimmerButton.astro';
 import { Icon } from 'astro-icon/components';
-
-const services = [
-  { name: "Ceramic Coating", href: "/services/ceramic-coating" },
-  { name: "Paint Protection Film", href: "/services/paint-protection-film" },
-  { name: "Paint Correction & Polish", href: "/services/polish" },
-  { name: "Window Film", href: "/services/window-film" },
-  { name: "Premium Car Wash", href: "/services/premium-car-wash" },
-];
+import { NAV_SERVICES, NAV_PAGES } from '../consts';
 ---
 
 <nav
@@ -39,7 +32,7 @@ const services = [
             x-transition
             class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
           >
-            {services.map((service) => (
+            {NAV_SERVICES.map((service) => (
               <a
                 href={service.href}
                 class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
@@ -50,15 +43,11 @@ const services = [
           </div>
         </div>
       </div>
-      <a href="/portfolio" class="hover:text-muted-foreground transition-colors">
-        PORTFOLIO
-      </a>
-      <a href="/more-about-wrp" class="hover:text-muted-foreground transition-colors">
-        ABOUT
-      </a>
-      <a href="/contact-us" class="hover:text-muted-foreground transition-colors">
-        CONTACT
-      </a>
+      {NAV_PAGES.map((page) => (
+        <a href={page.href} class="hover:text-muted-foreground transition-colors">
+          {page.name.toUpperCase()}
+        </a>
+      ))}
     </div>
     <ShimmerButton href="/contact-us" className="hidden md:flex">
       BOOK APPOINTMENT
@@ -89,7 +78,7 @@ const services = [
       <!-- Services Section -->
       <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
       <div class="ml-4 flex flex-col gap-4">
-        {services.map((service) => (
+        {NAV_SERVICES.map((service) => (
           <a
             href={service.href}
             class="text-base hover:text-muted-foreground transition-colors"
@@ -102,27 +91,15 @@ const services = [
 
       <div class="border-t border-border pt-4"></div>
 
-      <a
-        href="/portfolio"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        PORTFOLIO
-      </a>
-      <a
-        href="/more-about-wrp"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        ABOUT
-      </a>
-      <a
-        href="/contact-us"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        CONTACT
-      </a>
+      {NAV_PAGES.map((page) => (
+        <a
+          href={page.href}
+          class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
+          @click="mobileMenuOpen = false"
+        >
+          {page.name.toUpperCase()}
+        </a>
+      ))}
       <Button className="w-full" @click="mobileMenuOpen = false">
         <a href="/contact-us" class="w-full">BOOK APPOINTMENT</a>
       </Button>

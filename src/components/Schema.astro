@@ -1,9 +1,12 @@
 ---
+import { NAV_SERVICES, NAV_PAGES } from '../consts';
+
 interface Props {
   type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement';
 }
 
 const { type = 'LocalBusiness' } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 
 const localBusinessSchema = {
   '@context': 'https://schema.org',
@@ -11,17 +14,17 @@ const localBusinessSchema = {
   name: 'WRP Dubai',
   alternateName: 'Wrap, Reinforce, Protect',
   description: 'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
-  url: 'https://wrpdetailing.ae',
+  url: siteUrl,
   logo: {
     '@type': 'ImageObject',
-    url: 'https://wrpdetailing.ae/wrp-logo.svg',
+    url: `${siteUrl}/wrp-logo.svg`,
     width: 200,
     height: 60,
   },
   image: [
     {
       '@type': 'ImageObject',
-      url: 'https://wrpdetailing.ae/og-image.jpg',
+      url: `${siteUrl}/og-image.jpg`,
       width: 1200,
       height: 630,
       caption: 'WRP Dubai luxury car detailing studio showroom',
@@ -136,62 +139,19 @@ const webSiteSchema = {
   '@type': 'WebSite',
   name: 'WRP Dubai',
   alternateName: 'WRP',
-  url: 'https://wrpdetailing.ae/',
+  url: `${siteUrl}/`,
 };
 
+const navItems = [...NAV_SERVICES, ...NAV_PAGES];
 const siteNavigationSchema = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  itemListElement: [
-    {
-      '@type': 'SiteNavigationElement',
-      position: 1,
-      name: 'Ceramic Coating',
-      url: 'https://wrpdetailing.ae/services/ceramic-coating/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 2,
-      name: 'Paint Protection Film',
-      url: 'https://wrpdetailing.ae/services/paint-protection-film/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 3,
-      name: 'Paint Correction & Polish',
-      url: 'https://wrpdetailing.ae/services/polish/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 4,
-      name: 'Window Film',
-      url: 'https://wrpdetailing.ae/services/window-film/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 5,
-      name: 'Premium Car Wash',
-      url: 'https://wrpdetailing.ae/services/premium-car-wash/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 6,
-      name: 'Portfolio',
-      url: 'https://wrpdetailing.ae/portfolio/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 7,
-      name: 'About',
-      url: 'https://wrpdetailing.ae/more-about-wrp/',
-    },
-    {
-      '@type': 'SiteNavigationElement',
-      position: 8,
-      name: 'Contact',
-      url: 'https://wrpdetailing.ae/contact-us/',
-    },
-  ],
+  itemListElement: navItems.map((item, index) => ({
+    '@type': 'SiteNavigationElement',
+    position: index + 1,
+    name: item.name,
+    url: `${siteUrl}${item.href}/`,
+  })),
 };
 
 const schemas = {
