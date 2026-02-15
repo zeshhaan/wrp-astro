@@ -86,6 +86,7 @@ const ogImageURL = new URL(ogImage, Astro.site).toString();
     />
 
     {includeSchema && <Schema />}
+    <Schema type="SiteNavigationElement" />
 
     <!-- View Transitions Fallback for browsers without native support -->
     <ClientRouter />

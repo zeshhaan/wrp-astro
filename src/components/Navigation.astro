@@ -2,7 +2,11 @@
 import { Button } from "@/components/ui/button";
 import ShimmerButton from './ShimmerButton.astro';
 import { Icon } from 'astro-icon/components';
-import { NAV_SERVICES, NAV_PAGES } from '../consts';
+import { NAV_PAGES } from '../consts';
+import { getCollection } from 'astro:content';
+
+const services = await getCollection('services');
+const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}` }));
 ---
 
 <nav
