@@ -7,6 +7,28 @@ import { getCollection } from 'astro:content';
 
 const services = await getCollection('services');
 const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}/` }));
+
+// Shorter display names for desktop nav (full names are too wide)
+const desktopServiceNames: Record<string, string> = {
+  'Ceramic Coating': 'CERAMIC COATING',
+  'Paint Protection Film': 'PPF',
+  'Premium Car Wash': 'PREMIUM CAR WASH',
+  'Window Film': 'WINDOW FILM',
+  'Polish': 'POLISH',
+};
+
+// Move Premium Car Wash to the end
+const serviceOrder = (name: string) => name === 'Premium Car Wash' ? 1 : 0;
+const DESKTOP_SERVICES = NAV_SERVICES
+  .slice()
+  .sort((a, b) => serviceOrder(a.name) - serviceOrder(b.name))
+  .map((s) => ({
+    ...s,
+    shortName: desktopServiceNames[s.name] || s.name.toUpperCase(),
+  }));
+
+// Same order for mobile
+const MOBILE_SERVICES = NAV_SERVICES.slice().sort((a, b) => serviceOrder(a.name) - serviceOrder(b.name));
 ---
 
 <div class="fixed top-0 left-0 right-0 z-50" x-data="{ trustBarVisible: true, lastScroll: 0 }" @scroll.window="
@@ -59,7 +81,7 @@ const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services
 
   <!-- Main Nav -->
   <nav
-    x-data="{ mobileMenuOpen: false, servicesOpen: false }"
+    x-data="{ mobileMenuOpen: false }"
     class="bg-background/80 backdrop-blur-md border-b border-border"
   >
   <div class="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -68,37 +90,10 @@ const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services
         <img src="/wrp-logo.svg" alt="WRP Logo" class="h-10 w-auto" />
       </a>
     </div>
-    <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-      <!-- Services Dropdown - Fixed hover behavior -->
-      <div class="relative">
-        <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-          <button
-            class="hover:text-muted-foreground transition-colors flex items-center gap-1"
-            @click="open = !open"
-          >
-            SERVICES
-            <Icon name="lucide:chevron-down" class="h-4 w-4" />
-          </button>
-          <div
-            x-show="open"
-            x-cloak
-            x-transition
-            class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
-          >
-            {NAV_SERVICES.map((service) => (
-              <a
-                href={service.href}
-                class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
-              >
-                {service.name}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-      {NAV_PAGES.map((page) => (
-        <a href={page.href} class="hover:text-muted-foreground transition-colors">
-          {page.name.toUpperCase()}
+    <div class="hidden md:flex items-center gap-6 text-sm tracking-wide">
+      {DESKTOP_SERVICES.map((service) => (
+        <a href={service.href} class="hover:text-muted-foreground transition-colors whitespace-nowrap">
+          {service.shortName}
         </a>
       ))}
     </div>
@@ -133,7 +128,7 @@ const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services
       <!-- Services Section -->
       <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
       <div class="ml-4 flex flex-col gap-4">
-        {NAV_SERVICES.map((service) => (
+        {MOBILE_SERVICES.map((service) => (
           <a
             href={service.href}
             class="text-base hover:text-muted-foreground transition-colors"

@@ -584,6 +584,15 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
             </div>
           </div>
         </div>
+
+        <div class="text-center mt-16">
+          <a href="/portfolio/">
+            <Button size="lg" variant="outline" className="text-base tracking-wide">
+              VIEW FULL PORTFOLIO
+              <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+            </Button>
+          </a>
+        </div>
       </div>
     </section>
 
@@ -680,14 +689,10 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
               <br />& Precision
             </h2>
             <p class="text-lg text-muted-foreground leading-relaxed mb-6">
-              Founded in Dubai's prestigious automotive district, WRP. represents the pinnacle of vehicle care and
-              protection. Our team of master craftsmen brings decades of combined experience working with the world's
-              most exclusive automobiles.
+              Founded in Dubai's automotive district, WRP. brings decades of combined experience working with the region's most exclusive automobiles. Every vehicle that enters our studio receives treatment worthy of its pedigree. <a href="/more-about-wrp/" class="text-foreground font-medium hover:underline underline-offset-4 transition-all">Learn more about our story</a>.
             </p>
             <p class="text-lg text-muted-foreground leading-relaxed mb-8">
-              We use only the finest materials and cutting-edge technology to ensure your vehicle receives treatment
-              worthy of its pedigree. From rare hypercars to bespoke luxury sedans, every vehicle that enters our
-              studio leaves transformed.
+              From rare hypercars to daily-driven luxury sedans, we use only the finest materials and cutting-edge technology to deliver flawless results. Ready to see what we can do for your vehicle? <a href="#contact" class="text-foreground font-medium hover:underline underline-offset-4 transition-all">Get in touch</a>.
             </p>
             <div class="grid grid-cols-3 gap-8">
               <div>
@@ -983,33 +988,41 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
 
   <script>
     // Parallax effect on hero image
-    let ticking = false;
+    // Uses astro:page-load so it re-initializes after View Transition navigations
+    let scrollHandler: ((e: Event) => void) | null = null;
 
-    function updateParallax() {
+    document.addEventListener('astro:page-load', () => {
+      // Clean up previous listener if any
+      if (scrollHandler) {
+        window.removeEventListener('scroll', scrollHandler);
+        scrollHandler = null;
+      }
+
       const heroImage = document.getElementById('hero-image');
       if (!heroImage) return;
 
-      const scrolled = window.pageYOffset;
-      const heroHeight = window.innerHeight;
+      let ticking = false;
 
-      if (scrolled < heroHeight) {
-        // Move image slower than scroll (0.5 = half speed for subtle effect)
-        heroImage.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
+      function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const heroHeight = window.innerHeight;
+
+        if (scrolled < heroHeight) {
+          heroImage!.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
+        }
+
+        ticking = false;
       }
 
-      ticking = false;
-    }
+      scrollHandler = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      };
 
-    function requestTick() {
-      if (!ticking) {
-        window.requestAnimationFrame(updateParallax);
-        ticking = true;
-      }
-    }
-
-    window.addEventListener('scroll', requestTick, { passive: true });
-
-    // Initial call
-    updateParallax();
+      window.addEventListener('scroll', scrollHandler, { passive: true });
+      updateParallax();
+    });
   </script>
 </BaseLayout>
