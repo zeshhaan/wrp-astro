@@ -16,7 +16,7 @@ const blog = defineCollection({
 			author: z.string().default('WRP Dubai'),
 			readingTime: z.number().optional(),
 			featured: z.boolean().default(false),
-			relatedService: z.enum([
+			relatedServices: z.array(z.enum([
 				'ceramic-coating',
 				'paint-protection-film',
 				'polish',
@@ -25,7 +25,7 @@ const blog = defineCollection({
 				'leather-upholstery',
 				'car-mats',
 				'graphene-coating',
-			]).optional(),
+			])).default([]),
 		}),
 });
 

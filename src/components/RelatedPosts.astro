@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import { Card } from "@/components/ui/card";
+import { Icon } from 'astro-icon/components';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	serviceId: string;
+}
+
+const { serviceId } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const related = allPosts
+	.filter((post) => post.data.relatedServices.includes(serviceId as any))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+
+if (related.length === 0) return;
+
+const categoryLabels: Record<string, string> = {
+	guide: 'Guide',
+	news: 'News',
+	update: 'Update',
+	event: 'Event',
+	listicle: 'Listicle',
+};
+---
+
+<section class="py-24 px-6">
+	<div class="container mx-auto max-w-7xl">
+		<div class="text-center mb-12">
+			<h2 class="font-serif text-3xl md:text-4xl font-bold mb-3">From Our Blog</h2>
+			<p class="text-muted-foreground max-w-2xl mx-auto">
+				Helpful guides and insights related to this service
+			</p>
+		</div>
+
+		<div class={`grid gap-8 ${related.length === 1 ? 'max-w-lg mx-auto' : related.length === 2 ? 'md:grid-cols-2 max-w-4xl mx-auto' : 'md:grid-cols-3'}`}>
+			{related.map((post) => (
+				<a href={`/blog/${post.id}`} class="group block">
+					<Card className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 p-0">
+						{post.data.heroImage && (
+							<div class="relative h-48 overflow-hidden">
+								<img
+									src={post.data.heroImage.src}
+									alt={post.data.title}
+									class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+									loading="lazy"
+								/>
+							</div>
+						)}
+						<div class="p-5">
+							<div class="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+								{post.data.category && (
+									<span class="uppercase tracking-wider font-medium text-foreground">
+										{categoryLabels[post.data.category] || post.data.category}
+									</span>
+								)}
+								{post.data.category && <span class="text-border">·</span>}
+								<FormattedDate date={post.data.pubDate} />
+								{post.data.readingTime && (
+									<>
+										<span class="text-border">·</span>
+										<span>{post.data.readingTime} min</span>
+									</>
+								)}
+							</div>
+							<h3 class="font-serif text-lg font-bold mb-2 group-hover:underline underline-offset-4 leading-snug">
+								{post.data.title}
+							</h3>
+							<p class="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+								{post.data.description}
+							</p>
+							<span class="inline-flex items-center text-sm font-medium mt-4 group-hover:underline underline-offset-4">
+								Read article
+								<Icon name="lucide:arrow-right" class="ml-1 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+							</span>
+						</div>
+					</Card>
+				</a>
+			))}
+		</div>
+	</div>
+</section>

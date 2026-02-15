@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import OtherServices from '@/components/OtherServices.astro';
+import RelatedPosts from '@/components/RelatedPosts.astro';
 import GridPattern from '@/components/GridPattern.astro';
 import ServiceSchema from '@/components/ServiceSchema.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
@@ -299,6 +300,9 @@ const breadcrumbs = [
       })),
     })} />
   </section>
+
+  <!-- Related Blog Posts -->
+  <RelatedPosts serviceId={service.id} />
 
   <!-- Other Services Section -->
   <OtherServices currentService={service.id} />

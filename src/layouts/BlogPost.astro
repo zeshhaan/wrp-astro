@@ -2,10 +2,11 @@
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import RelatedServices from '../components/RelatedServices.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags, relatedServices } = Astro.props;
 
 const categoryLabels: Record<string, string> = {
 	guide: 'Guide',
@@ -81,6 +82,7 @@ const categoryLabels: Record<string, string> = {
 					</div>
 				</div>
 			)}
+			<RelatedServices serviceIds={relatedServices} />
 		</div>
 	</article>
 </BaseLayout>
