@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type?: 'LocalBusiness' | 'WebSite';
+  type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement';
 }
 
 const { type = 'LocalBusiness' } = Astro.props;
@@ -139,7 +139,67 @@ const webSiteSchema = {
   url: 'https://wrpdetailing.ae/',
 };
 
-const schema = type === 'WebSite' ? webSiteSchema : localBusinessSchema;
+const siteNavigationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: [
+    {
+      '@type': 'SiteNavigationElement',
+      position: 1,
+      name: 'Ceramic Coating',
+      url: 'https://wrpdetailing.ae/services/ceramic-coating/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 2,
+      name: 'Paint Protection Film',
+      url: 'https://wrpdetailing.ae/services/paint-protection-film/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 3,
+      name: 'Paint Correction & Polish',
+      url: 'https://wrpdetailing.ae/services/polish/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 4,
+      name: 'Window Film',
+      url: 'https://wrpdetailing.ae/services/window-film/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 5,
+      name: 'Premium Car Wash',
+      url: 'https://wrpdetailing.ae/services/premium-car-wash/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 6,
+      name: 'Portfolio',
+      url: 'https://wrpdetailing.ae/portfolio/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 7,
+      name: 'About',
+      url: 'https://wrpdetailing.ae/more-about-wrp/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 8,
+      name: 'Contact',
+      url: 'https://wrpdetailing.ae/contact-us/',
+    },
+  ],
+};
+
+const schemas = {
+  LocalBusiness: localBusinessSchema,
+  WebSite: webSiteSchema,
+  SiteNavigationElement: siteNavigationSchema,
+};
+const schema = schemas[type];
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />

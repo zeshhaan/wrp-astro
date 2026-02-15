@@ -77,6 +77,10 @@ const ogImageURL = new URL(ogImage, Astro.site).toString();
         meta: [
           { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
           { name: 'theme-color', content: '#000000' },
+          { name: 'geo.region', content: 'AE-DU' },
+          { name: 'geo.placename', content: 'Dubai' },
+          { name: 'geo.position', content: '25.2854;55.3781' },
+          { name: 'ICBM', content: '25.2854, 55.3781' },
         ],
       }}
     />
