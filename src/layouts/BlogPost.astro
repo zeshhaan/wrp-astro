@@ -1,86 +1,298 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
+import RelatedServices from '../components/RelatedServices.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags, relatedServices } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImageURL = heroImage ? new URL(heroImage, Astro.site).toString() : new URL('/og-image.jpg', Astro.site).toString();
+
+const categoryLabels: Record<string, string> = {
+  guide: 'Guide',
+  news: 'News',
+  update: 'Update',
+  event: 'Event',
+  listicle: 'Listicle',
+};
+
+// BlogPosting JSON-LD for Google
+const blogPostingJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: description,
+  url: canonicalURL,
+  image: ogImageURL,
+  inLanguage: 'en',
+  datePublished: new Date(pubDate).toISOString(),
+  ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+  author: { '@type': 'Organization', name: author || 'WRP Dubai', url: Astro.site?.toString() },
+  publisher: {
+    '@type': 'Organization',
+    name: 'WRP Dubai',
+    url: Astro.site?.toString(),
+    logo: { '@type': 'ImageObject', url: new URL('/wrp-logo.svg', Astro.site).toString() },
+  },
+  ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {}),
+  ...(category ? { articleSection: categoryLabels[category] || category } : {}),
+  ...(tags && tags.length ? { keywords: tags.join(', ') } : {}),
+};
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Blog', url: 'https://wrpdetailing.ae/blog/' },
+  { name: title, url: canonicalURL },
+];
 ---
 
-<html lang="en">
-	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
-	</head>
-
-	<body>
-		<Header />
-		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+<BaseLayout
+  title={`${title} | WRP Blog`}
+  description={description}
+  ogType="article"
+  ogImage={heroImage ? heroImage : '/og-image.jpg'}
+  publishedTime={pubDate}
+  modifiedTime={updatedDate || pubDate}
+  author={author}
+  tags={tags}
+  articleSection={category ? (categoryLabels[category] || category) : undefined}
+>
+	<!-- BlogPosting JSON-LD -->
+	<script type="application/ld+json" set:html={JSON.stringify(blogPostingJsonLd)} />
+	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+	<article class="pb-16">
+		{heroImage && (
+			<div class="w-full mb-10">
+				<div
+					class="relative h-[55vh] min-h-[300px] max-h-[550px] overflow-hidden"
+					style={`background-image: url(${heroImage}); background-size: cover; background-position: center; background-attachment: fixed;`}
+					role="img"
+					aria-label={title}
+				>
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
+			</div>
+		)}
+		<div class="max-w-3xl mx-auto px-6">
+			<div class="mb-8">
+				<div class="flex items-center gap-3 text-sm text-muted-foreground mb-5">
+					{category && (
+						<span class="uppercase tracking-[0.15em] font-bold text-background bg-foreground px-3 py-1 text-[0.65rem]">
+							{categoryLabels[category] || category}
+						</span>
+					)}
+					<FormattedDate date={pubDate} />
+					{readingTime && (
+						<>
+							<span class="text-border">|</span>
+							<span>{readingTime} min read</span>
+						</>
+					)}
+				</div>
+				<h1 class="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight">{title}</h1>
+				<p class="text-lg text-muted-foreground leading-[1.45]">{description}</p>
+				{author && (
+					<p class="text-sm text-muted-foreground mt-4">By <span class="font-medium text-foreground">{author}</span></p>
+				)}
+				{updatedDate && (
+					<p class="text-sm text-muted-foreground mt-2 italic">
+						Updated <FormattedDate date={updatedDate} />
+					</p>
+				)}
+			</div>
+			<div class="flex items-center gap-4 mb-10">
+				<div class="w-12 h-[2px] bg-foreground"></div>
+				<div class="flex-1 h-px bg-border"></div>
+			</div>
+			<div class="blog-content prose prose-lg max-w-none
+				prose-headings:font-serif prose-headings:font-bold
+				prose-h2:text-[1.65rem] prose-h2:mt-10 prose-h2:mb-4
+				prose-h3:text-[1.35rem] prose-h3:mt-8 prose-h3:mb-3
+				prose-p:text-muted-foreground prose-p:leading-[1.42] prose-p:text-[1.1rem]
+				prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-muted-foreground
+				prose-strong:text-foreground prose-strong:font-semibold
+				prose-li:text-muted-foreground prose-li:leading-[1.42] prose-li:text-[1.1rem]
+				prose-img:shadow-md
+			">
+				<slot />
+			</div>
+			{tags && tags.length > 0 && (
+				<div class="mt-12 pt-8 border-t border-border">
+					<div class="flex flex-wrap gap-2">
+						{tags.map((tag) => (
+							<span class="px-3 py-1 text-xs tracking-wider uppercase border border-border text-muted-foreground">
+								{tag}
+							</span>
+						))}
 					</div>
-					<slot />
 				</div>
-			</article>
-		</main>
-		<Footer />
-	</body>
-</html>
+			)}
+			<RelatedServices serviceIds={relatedServices} />
+		</div>
+	</article>
+
+	<style is:global>
+		/*
+		 * Blog typography — guided by Butterick's Practical Typography:
+		 * - Body: ~17.6px, line-height 1.42 (142%)
+		 * - Line length: max-w-3xl ≈ 75 chars
+		 * - Headings: modest size increase, bold, space above/below
+		 * - Paragraph spacing: handled by prose defaults
+		 *
+		 * Color notes: CSS variables (--foreground, --border, etc.) are
+		 * defined as full oklch() values in global.css, so use var() directly.
+		 * For opacity variants, use color-mix(in oklch, ...).
+		 */
+
+		/* Blockquotes as visual callout boxes */
+		.blog-content blockquote {
+			border-left: 3px solid var(--foreground);
+			background: color-mix(in oklch, var(--muted) 30%, transparent);
+			padding: 1.25rem 1.5rem;
+			margin: 1.75rem 0;
+			border-radius: 0;
+			font-style: normal;
+		}
+		.blog-content blockquote p {
+			color: var(--foreground);
+			font-weight: 500;
+			line-height: 1.42;
+			margin: 0;
+		}
+
+		/* Tables — dark header, sharp edges, proper cell line-height */
+		.blog-content table {
+			width: 100%;
+			border-collapse: separate;
+			border-spacing: 0;
+			margin: 1.75rem 0;
+			border-radius: 0;
+			border: 1px solid var(--border);
+		}
+		.blog-content thead {
+			background: var(--foreground);
+		}
+		.blog-content thead th {
+			color: var(--background);
+			font-family: 'Playfair Display', serif;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.08em; /* Butterick: 5-12% for caps */
+			font-size: 0.8rem;
+			line-height: 1.3;
+			padding: 0.875rem 1rem;
+			border: none;
+		}
+		.blog-content tbody td {
+			padding: 0.75rem 1rem;
+			border-bottom: 1px solid var(--border);
+			font-size: 0.925rem;
+			line-height: 1.4;
+		}
+		.blog-content tbody tr:last-child td {
+			border-bottom: none;
+		}
+		.blog-content tbody tr:nth-child(even) {
+			background: color-mix(in oklch, var(--muted) 20%, transparent);
+		}
+
+		/* Horizontal rules as decorative section dividers */
+		.blog-content hr {
+			border: none;
+			height: 1px;
+			background: linear-gradient(
+				to right,
+				transparent,
+				var(--border),
+				color-mix(in oklch, var(--foreground) 30%, transparent),
+				var(--border),
+				transparent
+			);
+			margin: 2.5rem 0;
+		}
+
+		/* Unordered lists — square bullet */
+		.blog-content ul {
+			list-style: none;
+			padding-left: 0;
+		}
+		.blog-content ul > li {
+			position: relative;
+			padding-left: 1.75rem;
+		}
+		.blog-content ul > li::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 0.55em;
+			width: 5px;
+			height: 5px;
+			background: var(--foreground);
+			border-radius: 1px;
+		}
+
+		/* H2 with decorative underline accent */
+		.blog-content h2 {
+			padding-bottom: 0.6rem;
+			border-bottom: 2px solid var(--border);
+			line-height: 1.25;
+		}
+
+		/* H3 — bold, no extra decoration per Butterick */
+		.blog-content h3 {
+			line-height: 1.3;
+		}
+
+		/* Ordered lists — numbered circles */
+		.blog-content ol {
+			list-style: none;
+			padding-left: 0;
+			counter-reset: blog-counter;
+		}
+		.blog-content ol > li {
+			position: relative;
+			padding-left: 2.25rem;
+			counter-increment: blog-counter;
+		}
+		.blog-content ol > li::before {
+			content: counter(blog-counter);
+			position: absolute;
+			left: 0;
+			top: 0.15em;
+			width: 1.5rem;
+			height: 1.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.75rem;
+			font-weight: 700;
+			background: var(--foreground);
+			color: var(--background);
+			border-radius: 50%;
+		}
+
+		/* Links — underline only, subtle transition */
+		.blog-content a {
+			transition: color 0.15s ease, opacity 0.15s ease;
+		}
+		.blog-content a:hover {
+			opacity: 0.7;
+		}
+
+		/* Bold text within blockquotes — callout title */
+		.blog-content blockquote strong {
+			display: inline;
+			font-weight: 700;
+		}
+
+		/* Strong emphasis — semibold, tight tracking */
+		.blog-content p strong {
+			font-weight: 600;
+			letter-spacing: -0.01em;
+		}
+	</style>
+</BaseLayout>

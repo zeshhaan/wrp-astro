@@ -10,7 +10,7 @@ export const prerender = true;
 
 const breadcrumbs = [
   { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Wrap', url: 'https://wrpdetailing.ae/wrap' },
+  { name: 'Wrap', url: 'https://wrpdetailing.ae/wrap/' },
 ];
 
 const faqSchema = {
@@ -51,7 +51,7 @@ const faqSchema = {
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-32 px-6">
@@ -121,44 +121,26 @@ const faqSchema = {
       <div class="grid md:grid-cols-3 gap-8">
         <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
           <h3 class="font-serif text-2xl font-bold mb-4">Full Color Change</h3>
-          <p class="text-muted-foreground mb-6">
+          <p class="text-muted-foreground">
             Complete vehicle transformation with premium vinyl. Choose from matte, gloss, satin, or metallic finishes.
             Perfect for creating a unique look while protecting your factory paint.
           </p>
-          <a href="/services/paint-protection-film">
-            <Button variant="outline" className="w-full">
-              LEARN MORE
-              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-            </Button>
-          </a>
         </Card>
 
         <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2 border-primary">
           <h3 class="font-serif text-2xl font-bold mb-4">Custom Design</h3>
-          <p class="text-muted-foreground mb-6">
+          <p class="text-muted-foreground">
             Bespoke graphics, racing stripes, and personalized designs. Our designers work with you to create
             one-of-a-kind aesthetics that reflect your personality.
           </p>
-          <a href="/contact-us">
-            <Button className="w-full">
-              GET A QUOTE
-              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-            </Button>
-          </a>
         </Card>
 
         <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
           <h3 class="font-serif text-2xl font-bold mb-4">Chrome Delete & Accents</h3>
-          <p class="text-muted-foreground mb-6">
+          <p class="text-muted-foreground">
             Transform chrome trim, window surrounds, and badges with satin or gloss black vinyl. Subtle yet
             impactful modifications for a modern, aggressive look.
           </p>
-          <a href="/contact-us">
-            <Button variant="outline" className="w-full">
-              GET STARTED
-              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-            </Button>
-          </a>
         </Card>
       </div>
     </div>
@@ -182,7 +164,7 @@ const faqSchema = {
             Advanced protection systems that strengthen your vehicle's defense. Paint Protection Film and ceramic
             coating technologies engineered for Dubai's extreme climate.
           </p>
-          <a href="/reinforce">
+          <a href="/reinforce/">
             <Button variant="outline" className="w-full">
               EXPLORE REINFORCE
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -197,7 +179,7 @@ const faqSchema = {
             Meticulous care and maintenance programs that preserve your vehicle's perfection. Premium wash, paint
             correction, and detailing services that maintain showroom condition.
           </p>
-          <a href="/protect">
+          <a href="/protect/">
             <Button variant="outline" className="w-full">
               EXPLORE PROTECT
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -252,12 +234,10 @@ const faqSchema = {
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         Explore endless possibilities with premium vehicle wrapping. Our team will help bring your vision to life.
       </p>
-      <a href="/contact-us">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          GET A QUOTE
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>

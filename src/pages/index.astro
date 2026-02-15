@@ -1,1228 +1,1015 @@
 ---
 export const prerender = true;
 
-import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { SEO } from 'astro-seo';
 import Schema from '../components/Schema.astro';
-import GridPattern from '../components/GridPattern.astro';
-import ShimmerButton from '../components/ShimmerButton.astro';
-import CircularText from '../components/CircularText.astro';
-import { ClientRouter } from 'astro:transitions';
 import { Icon } from 'astro-icon/components';
-import '../styles/global.css';
+import LatestPosts from '../components/LatestPosts.astro';
 
 const title = 'WRP Dubai | PPF, Ceramic Coating & Paint Protection Experts';
 const description = "Dubai's paint protection experts. PPF, ceramic coating & detailing with 10-year warranty. Precision installation for luxury vehicles. Get a free quote today.";
-const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImageURL = new URL('/og-image.jpg', Astro.site).toString();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <SEO
-      title={title}
-      description={description}
-      canonical={canonicalURL}
-      openGraph={{
-        basic: {
-          title: title,
-          type: 'website',
-          image: ogImageURL,
-          url: canonicalURL,
-        },
-        optional: {
-          description: description,
-          siteName: 'WRP Dubai',
-          locale: 'en_AE',
-        },
-        image: {
-          alt: 'WRP Premium Car Detailing Dubai',
-          width: 1200,
-          height: 630,
-          type: 'image/png',
-        },
-      }}
-      twitter={{
-        card: 'summary_large_image',
-        site: '@wrp_ae',
-        creator: '@wrp_ae',
-        title: title,
-        description: description,
-        image: ogImageURL,
-        imageAlt: 'WRP Premium Car Detailing Dubai',
-      }}
-      extend={{
-        link: [
-          { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
-          { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-          { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon-96x96.png' },
-          { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
-          { rel: 'manifest', href: '/site.webmanifest' },
-        ],
-        meta: [
-          { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
-          { name: 'theme-color', content: '#000000' },
-        ],
-      }}
-    />
+<BaseLayout title={title} description={description}>
+  <Schema type="WebSite" />
 
-    <Schema />
-    <Schema type="WebSite" />
-
-    <!-- View Transitions Fallback for browsers without native support -->
-    <ClientRouter />
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@1,900&display=swap" rel="stylesheet" />
-
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <style>
-      [x-cloak] {
-        display: none !important;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="min-h-screen bg-background">
-      <!-- Navigation -->
-      <nav
-        x-data="{ mobileMenuOpen: false }"
-        class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border"
-      >
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <a href="/" class="flex items-center">
-              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-10 w-auto" loading="lazy">
-            </a>
-          </div>
-          <div class="hidden md:flex items-center gap-8 text-sm tracking-wide">
-            <!-- Services Dropdown - Fixed hover behavior -->
-            <div class="relative">
-              <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
-                <button
-                  class="hover:text-muted-foreground transition-colors flex items-center gap-1"
-                  @click="open = !open"
-                >
-                  SERVICES
-                  <Icon name="lucide:chevron-down" class="h-4 w-4" />
-                </button>
-                <div
-                  x-show="open"
-                  x-cloak
-                  x-transition
-                  class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
-                >
-                  <a href="/services/ceramic-coating" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                    Ceramic Coating
-                  </a>
-                  <a href="/services/paint-protection-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                    Paint Protection Film
-                  </a>
-                  <a href="/services/polish" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                    Paint Correction & Polish
-                  </a>
-                  <a href="/services/window-film" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                    Window Film
-                  </a>
-                  <a href="/services/premium-car-wash" class="block px-4 py-3 hover:bg-muted transition-colors text-sm">
-                    Premium Car Wash
-                  </a>
-                </div>
-              </div>
-            </div>
-            <a href="/portfolio" class="hover:text-muted-foreground transition-colors">
-              PORTFOLIO
-            </a>
-            <a href="/more-about-wrp" class="hover:text-muted-foreground transition-colors">
-              ABOUT
-            </a>
-            <a href="/contact-us" class="hover:text-muted-foreground transition-colors">
-              CONTACT
-            </a>
-          </div>
-          <ShimmerButton href="/contact-us" className="hidden md:flex">
-            REQUEST ESTIMATE
-          </ShimmerButton>
-          <button
-            class="md:hidden z-50"
-            @click="mobileMenuOpen = !mobileMenuOpen"
-            aria-label="Toggle menu"
-          >
-            <Icon name="lucide:menu" class="h-6 w-6" x-show="!mobileMenuOpen" />
-            <Icon name="lucide:x" class="h-6 w-6" x-show="mobileMenuOpen" x-cloak />
-          </button>
-        </div>
-
-        <div
-          x-show="mobileMenuOpen"
-          x-cloak
-          x-transition:enter="transition ease-out duration-300"
-          x-transition:enter-start="opacity-0 max-h-0"
-          x-transition:enter-end="opacity-100 max-h-screen"
-          x-transition:leave="transition ease-in duration-200"
-          x-transition:leave-start="opacity-100 max-h-screen"
-          x-transition:leave-end="opacity-0 max-h-0"
-          class="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border overflow-hidden"
-        >
-          <div class="container mx-auto px-6 py-6 flex flex-col gap-6">
-            <!-- Services Section -->
-            <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
-            <div class="ml-4 flex flex-col gap-4">
-              <a href="/services/ceramic-coating" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
-                Ceramic Coating
-              </a>
-              <a href="/services/paint-protection-film" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
-                Paint Protection Film
-              </a>
-              <a href="/services/polish" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
-                Paint Correction & Polish
-              </a>
-              <a href="/services/window-film" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
-                Window Film
-              </a>
-              <a href="/services/premium-car-wash" class="text-base hover:text-muted-foreground transition-colors" @click="mobileMenuOpen = false">
-                Premium Car Wash
-              </a>
-            </div>
-
-            <div class="border-t border-border pt-4"></div>
-
-            <a
-              href="#portfolio"
-              class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-              @click="mobileMenuOpen = false"
+  <div class="min-h-screen bg-background">
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 bg-black" id="hero-bg">
+        <img
+          src="/luxury-supercar-close-up-detail-black-and-white.jpg"
+          alt="Luxury supercar receiving premium ceramic coating and paint protection at WRP Dubai detailing studio"
+          width="1920"
+          height="1080"
+          class="w-full h-full object-cover opacity-40"
+          id="hero-image"
+          loading="eager"
+        />
+      </div>
+      <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 text-white tracking-tight">
+          Dubai's Paint
+          <br />
+          Protection Experts
+        </h1>
+        <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto tracking-wide leading-relaxed">
+          10-Year Warranty. Precision Installation. Flawless Results.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base tracking-wide cursor-pointer" data-contact-modal>
+            GET A QUOTE
+            <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+          </Button>
+          <a href="/portfolio/">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-black text-base tracking-wide bg-transparent"
             >
-              PORTFOLIO
-            </a>
-            <a
-              href="/more-about-wrp"
-              class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-              @click="mobileMenuOpen = false"
-            >
-              ABOUT
-            </a>
-            <a
-              href="/contact-us"
-              class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-              @click="mobileMenuOpen = false"
-            >
-              CONTACT
-            </a>
-            <Button className="w-full" @click="mobileMenuOpen = false">
-              <a href="/contact-us" class="w-full">REQUEST ESTIMATE</a>
+              VIEW PORTFOLIO
             </Button>
-          </div>
+          </a>
         </div>
-      </nav>
 
-      <!-- Hero Section -->
-      <section class="relative h-screen flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 bg-black" id="hero-bg">
-          <img
-            src="/luxury-supercar-close-up-detail-black-and-white.jpg"
-            alt="Luxury supercar receiving premium ceramic coating and paint protection at WRP Dubai detailing studio"
-            width="1920"
-            height="1080"
-            class="w-full h-full object-cover opacity-40"
-            id="hero-image"
-            loading="eager"
-          />
-        </div>
-        <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 text-white tracking-tight">
-            Dubai's Paint
-            <br />
-            Protection Experts
-          </h1>
-          <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto tracking-wide leading-relaxed">
-            10-Year Warranty. Precision Installation. Flawless Results.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/contact-us">
-              <Button size="lg" className="bg-white text-black hover:bg-white/90 text-base tracking-wide">
-                GET A QUOTE
-                <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-              </Button>
-            </a>
-            <a href="/portfolio">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-black text-base tracking-wide bg-transparent"
-              >
-                VIEW PORTFOLIO
-              </Button>
-            </a>
+        <!-- Google Reviews Trust Signal -->
+        <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 mt-8 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors">
+          <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <div class="flex gap-0.5">
+            {[1,2,3,4,5].map(() => (
+              <svg class="w-3.5 h-3.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            ))}
           </div>
-        </div>
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <Icon name="lucide:chevron-down" class="h-8 w-8 text-white/60" />
-        </div>
-      </section>
+          <span class="text-sm text-white">
+            <span class="font-bold">5.0</span>
+            <span class="text-white/70">from</span>
+            <span class="font-bold">60+</span>
+            <span class="text-white/70">reviews</span>
+          </span>
+        </a>
+      </div>
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <Icon name="lucide:chevron-down" class="h-8 w-8 text-white/60" />
+      </div>
+    </section>
 
-      <!-- Philosophy Section -->
-      <section class="py-32 px-6">
-        <div class="container mx-auto max-w-6xl">
-          <div class="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                Automotive
-                <br />
-                Excellence
-              </h2>
-              <p class="text-lg text-muted-foreground leading-relaxed mb-6">
-                At WRP., we don't just detail vehicles—we elevate them to works of art. Every surface, every curve,
-                every detail receives the meticulous attention it deserves.
-              </p>
-              <p class="text-lg text-muted-foreground leading-relaxed">
-                Our studio in the heart of Dubai serves the region's most discerning automotive enthusiasts, offering
-                bespoke protection and enhancement services that set new standards in luxury vehicle care. <a href="/more-about-wrp" class="text-foreground font-medium hover:underline underline-offset-4 transition-all">Discover our story</a> and the passion that drives every detail.
-              </p>
-            </div>
-            <div class="relative h-[600px]">
-              <img
-                src="/luxury-car-detailing-studio-interior-minimal-black.jpg"
-                alt="WRP Dubai premium car detailing studio interior with professional equipment and climate-controlled environment"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover"
-              />
-              <!-- Circular Rotating Text Badge - DISABLED: causes horizontal overflow on mobile
-              <div class="absolute -top-16 -right-16 text-black z-10">
-                <CircularText text="WRP DUBAI • LUXURY DETAILING • " size={0.8} />
-              </div>
-              -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Services Section -->
-      <section id="services" class="py-32 px-6 bg-muted/30">
-        <div class="container mx-auto max-w-7xl">
-          <div class="text-center mb-20">
-            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">The WRP Philosophy</h2>
-            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Three pillars of automotive excellence: Wrap, Reinforce, Protect
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
-              <div class="mb-6">
-                <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
-                  W
-                </div>
-                <h3 class="font-serif text-3xl font-bold mb-3">Wrap</h3>
-                <p class="text-muted-foreground leading-relaxed">
-                  Premium vinyl wrapping and color transformation. From subtle elegance to bold statements, we bring
-                  your vision to life with precision application.
-                </p>
-              </div>
-              <ul class="space-y-2 text-sm mb-6">
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Full vehicle color change</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Custom design wraps</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Chrome delete & accents</span>
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full bg-transparent">
-                <a href="/wrap">LEARN MORE</a>
-              </Button>
-            </Card>
-
-            <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
-              <div class="mb-6">
-                <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
-                  R
-                </div>
-                <h3 class="font-serif text-3xl font-bold mb-3">Reinforce</h3>
-                <p class="text-muted-foreground leading-relaxed">
-                  Advanced paint protection film and ceramic coating systems. Military-grade protection that preserves
-                  your investment for years to come.
-                </p>
-              </div>
-              <ul class="space-y-2 text-sm mb-6">
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Paint protection film (PPF)</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Ceramic coating systems</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Nano-technology treatments</span>
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full bg-transparent">
-                <a href="/reinforce">LEARN MORE</a>
-              </Button>
-            </Card>
-
-            <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
-              <div class="mb-6">
-                <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
-                  P
-                </div>
-                <h3 class="font-serif text-3xl font-bold mb-3">Protect</h3>
-                <p class="text-muted-foreground leading-relaxed">
-                  Comprehensive detailing and maintenance programs. Meticulous care that maintains showroom perfection,
-                  inside and out.
-                </p>
-              </div>
-              <ul class="space-y-2 text-sm mb-6">
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Exterior & interior detailing</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Paint correction & polishing</span>
-                </li>
-                <li class="flex items-start gap-2">
-                  <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                  <span>Maintenance programs</span>
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full bg-transparent">
-                <a href="/protect">LEARN MORE</a>
-              </Button>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <!-- Our Services Section -->
-      <section class="py-24 sm:py-32">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-          <div class="mx-auto max-w-2xl text-center mb-20">
-            <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Our Services</h2>
-            <p class="text-lg text-muted-foreground">
-              Premium automotive care solutions for Dubai's luxury vehicles
-            </p>
-          </div>
-
-          <!-- Service 1: Ceramic Coating - Photo RIGHT -->
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24">
-            <div class="lg:pt-4 lg:pr-8">
-              <div class="lg:max-w-lg">
-                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Ceramic Coating</h3>
-                <p class="text-lg text-muted-foreground mb-8">
-                  Nano-ceramic technology that creates a permanent hydrophobic shield. Delivers unmatched gloss, chemical resistance, and UV protection for years.
-                </p>
-                <dl class="space-y-6 text-base text-muted-foreground">
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:shield" class="absolute top-1 left-1 h-5 w-5" />
-                      9H Hardness Protection.
-                    </dt>
-                    <dd class="inline">Scratch and swirl resistance with nano-ceramic shield technology</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:droplets" class="absolute top-1 left-1 h-5 w-5" />
-                      Hydrophobic Properties.
-                    </dt>
-                    <dd class="inline">Water beads and rolls off instantly, making washing effortless</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:clock" class="absolute top-1 left-1 h-5 w-5" />
-                      2-7 Year Warranty.
-                    </dt>
-                    <dd class="inline">Long-lasting protection engineered for Dubai's extreme climate</dd>
-                  </div>
-                </dl>
-                <div class="mt-8">
-                  <a href="/services/ceramic-coating">
-                    <Button size="lg">
-                      EXPLORE SERVICE
-                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-                    </Button>
-                  </a>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="overflow-hidden">
-              <img
-                src="/portfolio/team-detailing-black-lexus-hood.webp"
-                alt="WRP Dubai technician applying professional ceramic coating on Lexus luxury vehicle hood"
-                width="1200"
-                height="800"
-                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-          </div>
-
-          <!-- Service 2: Paint Protection Film - Photo LEFT -->
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30">
-            <div class="flex items-start justify-end lg:order-first overflow-hidden">
-              <img
-                src="/portfolio/porsche-boxster-spyder-gray.webp"
-                alt="Porsche Boxster Spyder with paint protection film installation at WRP Dubai showroom"
-                width="1200"
-                height="800"
-                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            <div class="lg:ml-auto lg:pt-4 lg:pl-8">
-              <div class="lg:max-w-lg">
-                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Protection Film</h3>
-                <p class="text-lg text-muted-foreground mb-8">
-                  Military-grade transparent film that shields your paint from rock chips, scratches, and environmental damage. Self-healing technology repairs minor scratches.
-                </p>
-                <dl class="space-y-6 text-base text-muted-foreground">
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:shield-check" class="absolute top-1 left-1 h-5 w-5" />
-                      Impact Protection.
-                    </dt>
-                    <dd class="inline">Guards against rock chips, road debris, and minor collisions</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:rotate-cw" class="absolute top-1 left-1 h-5 w-5" />
-                      Self-Healing Technology.
-                    </dt>
-                    <dd class="inline">Minor scratches disappear with heat exposure from sun or water</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
-                      UV Resistance.
-                    </dt>
-                    <dd class="inline">Prevents paint fading and oxidation from Dubai's intense sunlight</dd>
-                  </div>
-                </dl>
-                <div class="mt-8">
-                  <a href="/services/paint-protection-film">
-                    <Button size="lg">
-                      EXPLORE SERVICE
-                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-                    </Button>
-                  </a>
-                  
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service 3: Paint Correction - Photo RIGHT with Testimonial -->
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start mb-24">
-            <div class="lg:pt-4 lg:pr-8">
-              <div class="lg:max-w-lg">
-                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Correction & Polish</h3>
-                <p class="text-lg text-muted-foreground mb-8">
-                  Multi-stage machine polishing that removes swirl marks, scratches, and oxidation. Restore your paint's original depth and mirror-like clarity.
-                </p>
-                <dl class="space-y-6 text-base text-muted-foreground">
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
-                      Mirror Finish.
-                    </dt>
-                    <dd class="inline">Deep, reflective gloss that makes paint look better than new</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:eraser" class="absolute top-1 left-1 h-5 w-5" />
-                      Defect Removal.
-                    </dt>
-                    <dd class="inline">Eliminates 85-95% of swirls, scratches, and water spots</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:gauge" class="absolute top-1 left-1 h-5 w-5" />
-                      Paint Depth Measurement.
-                    </dt>
-                    <dd class="inline">Safe correction using precision gauges and professional compounds</dd>
-                  </div>
-                </dl>
-                <div class="mt-8">
-                  <a href="/services/polish">
-                    <Button size="lg">
-                      EXPLORE SERVICE
-                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-                    </Button>
-                  </a>
-                  
-                </div>
-                <figure class="mt-12 border-l-2 border-border pl-8">
-                  <blockquote class="text-base text-muted-foreground italic">
-                    <p>"Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless."</p>
-                  </blockquote>
-                  <figcaption class="mt-4 flex gap-x-4 text-sm">
-                    <div><span class="font-semibold">Ahmed Al-Maktoum</span> – <span class="text-muted-foreground">Porsche 911 GT3 RS Owner</span></div>
-                  </figcaption>
-                </figure>
-              </div>
-            </div>
-            <div class="overflow-hidden">
-              <img
-                src="/portfolio/green-porsche-911-showroom-event.webp"
-                alt="Green Porsche 911 showcasing mirror-finish paint correction and ceramic coating at WRP Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-          </div>
-
-          <!-- Service 4: Window Film - Photo LEFT -->
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30">
-            <div class="flex items-start justify-end lg:order-first overflow-hidden">
-              <img
-                src="/portfolio/black-lexus-lx-570-showroom.webp"
-                alt="Lexus LX 570 with professional window tinting and ceramic coating completed at WRP Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-            <div class="lg:ml-auto lg:pt-4 lg:pl-8">
-              <div class="lg:max-w-lg">
-                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Window Film</h3>
-                <p class="text-lg text-muted-foreground mb-8">
-                  Advanced ceramic technology that blocks 99% UV rays and up to 80% heat. Enhanced privacy and comfort for Dubai's intense climate.
-                </p>
-                <dl class="space-y-6 text-base text-muted-foreground">
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
-                      Heat Rejection.
-                    </dt>
-                    <dd class="inline">Block up to 80% of solar heat for cooler cabin temperature</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:eye-off" class="absolute top-1 left-1 h-5 w-5" />
-                      Enhanced Privacy.
-                    </dt>
-                    <dd class="inline">Discreet tinting while maintaining crystal-clear visibility</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:signal" class="absolute top-1 left-1 h-5 w-5" />
-                      Signal Safe.
-                    </dt>
-                    <dd class="inline">Ceramic films won't interfere with GPS, radio, or mobile signals</dd>
-                  </div>
-                </dl>
-                <div class="mt-8">
-                  <a href="/services/window-film">
-                    <Button size="lg">
-                      EXPLORE SERVICE
-                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-                    </Button>
-                  </a>
-                  
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service 5: Premium Car Wash - Photo RIGHT -->
-          <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-            <div class="lg:pt-4 lg:pr-8">
-              <div class="lg:max-w-lg">
-                <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Premium Car Wash</h3>
-                <p class="text-lg text-muted-foreground mb-8">
-                  Meticulous hand-wash service using pH-neutral products, microfiber techniques, and premium wax polish. Professional care that delivers a showroom-shiny finish.
-                </p>
-                <dl class="space-y-6 text-base text-muted-foreground">
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:hand" class="absolute top-1 left-1 h-5 w-5" />
-                      Hand Wash Only.
-                    </dt>
-                    <dd class="inline">No harsh brushes or automated systems that damage paint</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
-                      Premium Wax Polish.
-                    </dt>
-                    <dd class="inline">Showroom-shiny finish with protective wax layer application</dd>
-                  </div>
-                  <div class="relative pl-9">
-                    <dt class="inline font-semibold text-foreground">
-                      <Icon name="lucide:droplet" class="absolute top-1 left-1 h-5 w-5" />
-                      Spot-Free Finish.
-                    </dt>
-                    <dd class="inline">Filtered water rinse prevents water spots in Dubai's hard water</dd>
-                  </div>
-                </dl>
-                <div class="mt-8">
-                  <a href="/services/premium-car-wash">
-                    <Button size="lg">
-                      EXPLORE SERVICE
-                      <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-                    </Button>
-                  </a>
-                  
-                </div>
-              </div>
-            </div>
-            <div class="overflow-hidden">
-              <img
-                src="/portfolio/team-washing-subaru-sti-foam.webp"
-                alt="WRP Dubai team performing premium hand car wash with foam treatment on Subaru WRX STI"
-                width="1200"
-                height="800"
-                class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Portfolio Section -->
-      <section id="portfolio" class="py-32 px-6">
-        <div class="container mx-auto max-w-7xl">
-          <div class="text-center mb-20">
-            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Portfolio</h2>
-            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A showcase of our finest work with the world's most prestigious automobiles
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-8">
-            <div class="relative h-[500px] group overflow-hidden">
-              <img
-                src="/luxury-sports-car-detail-black-and-white-dramatic.jpg"
-                alt="Lamborghini Aventador with full body paint protection film and ceramic coating completed at WRP Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div class="absolute bottom-8 left-8 text-white">
-                  <h3 class="font-serif text-2xl font-bold mb-2">Lamborghini Aventador</h3>
-                  <p class="text-sm">Full PPF + Ceramic Coating</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="relative h-[500px] group overflow-hidden">
-              <img
-                src="/luxury-sedan-close-up-black-and-white-elegant.jpg"
-                alt="Rolls-Royce Phantom premium detailing and paint correction service Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div class="absolute bottom-8 left-8 text-white">
-                  <h3 class="font-serif text-2xl font-bold mb-2">Rolls-Royce Phantom</h3>
-                  <p class="text-sm">Premium Detailing Package</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="relative h-[500px] group overflow-hidden">
-              <img
-                src="/supercar-wheel-detail-black-and-white-luxury.jpg"
-                alt="Ferrari SF90 supercar custom vinyl wrap and paint protection installation Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div class="absolute bottom-8 left-8 text-white">
-                  <h3 class="font-serif text-2xl font-bold mb-2">Ferrari SF90</h3>
-                  <p class="text-sm">Custom Wrap + Protection</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="relative h-[500px] group overflow-hidden">
-              <img
-                src="/luxury-suv-black-and-white-premium-detail.jpg"
-                alt="Bentley Bentayga interior restoration and leather conditioning service Dubai"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div class="absolute bottom-8 left-8 text-white">
-                  <h3 class="font-serif text-2xl font-bold mb-2">Bentley Bentayga</h3>
-                  <p class="text-sm">Interior Restoration</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Testimonials -->
-      <section class="py-32 px-6 bg-black text-white">
-        <div class="container mx-auto max-w-6xl">
-          <div class="text-center mb-20">
-            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Client Testimonials</h2>
-            <p class="text-lg text-white/70 max-w-2xl mx-auto">
-              Trusted by Dubai's most discerning automotive collectors
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-8">
-            <Card className="p-8 bg-white/5 border-white/10 text-white">
-              <div class="mb-6">
-                <div class="flex gap-1 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                </div>
-                <p class="text-white/90 leading-relaxed italic">
-                  "Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating
-                  is flawless."
-                </p>
-              </div>
-              <div>
-                <p class="font-bold">Ahmed Al-Maktoum</p>
-                <p class="text-sm text-white/60">Porsche 911 GT3 RS Owner</p>
-              </div>
-            </Card>
-
-            <Card className="p-8 bg-white/5 border-white/10 text-white">
-              <div class="mb-6">
-                <div class="flex gap-1 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                </div>
-                <p class="text-white/90 leading-relaxed italic">
-                  "WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched
-                  in Dubai."
-                </p>
-              </div>
-              <div>
-                <p class="font-bold">Marcus Chen</p>
-                <p class="text-sm text-white/60">McLaren 720S Owner</p>
-              </div>
-            </Card>
-
-            <Card className="p-8 bg-white/5 border-white/10 text-white">
-              <div class="mb-6">
-                <div class="flex gap-1 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                </div>
-                <p class="text-white/90 leading-relaxed italic">
-                  "The only studio I trust with my collection. Professional, meticulous, and truly understand luxury
-                  vehicles."
-                </p>
-              </div>
-              <div>
-                <p class="font-bold">Sophia Petrov</p>
-                <p class="text-sm text-white/60">Bentley Continental GT Owner</p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <!-- About Section -->
-      <section id="about" class="py-32 px-6">
-        <div class="container mx-auto max-w-6xl">
-          <div class="grid md:grid-cols-2 gap-16 items-center">
-            <div class="relative h-[600px]">
-              <img
-                src="/luxury-car-detailing-craftsman-working-black-and-w.jpg"
-                alt="WRP Dubai master technician performing meticulous paint correction and ceramic coating application on luxury vehicle"
-                width="1200"
-                height="800"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                Craftsmanship
-                <br />& Precision
-              </h2>
-              <p class="text-lg text-muted-foreground leading-relaxed mb-6">
-                Founded in Dubai's prestigious automotive district, WRP. represents the pinnacle of vehicle care and
-                protection. Our team of master craftsmen brings decades of combined experience working with the world's
-                most exclusive automobiles.
-              </p>
-              <p class="text-lg text-muted-foreground leading-relaxed mb-8">
-                We use only the finest materials and cutting-edge technology to ensure your vehicle receives treatment
-                worthy of its pedigree. From rare hypercars to bespoke luxury sedans, every vehicle that enters our
-                studio leaves transformed.
-              </p>
-              <div class="grid grid-cols-3 gap-8">
-                <div>
-                  <div class="text-4xl font-bold mb-2">500+</div>
-                  <div class="text-sm text-muted-foreground">Vehicles Protected</div>
-                </div>
-                <div>
-                  <div class="text-4xl font-bold mb-2">15+</div>
-                  <div class="text-sm text-muted-foreground">Years Experience</div>
-                </div>
-                <div>
-                  <div class="text-4xl font-bold mb-2">100%</div>
-                  <div class="text-sm text-muted-foreground">Satisfaction Rate</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Brand Logos Section -->
-      <section class="py-32 px-6 bg-black text-white">
-        <div class="container mx-auto max-w-7xl">
-          <div class="max-w-2xl mx-auto text-center mb-20">
-            <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              Signature Fleet
+    <!-- Philosophy Section -->
+    <section class="py-32 px-6">
+      <div class="container mx-auto max-w-6xl">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Automotive
+              <br />
+              Excellence
             </h2>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-12 items-center justify-items-center opacity-60">
-            <!-- Lamborghini -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/lamborghini-alt-svgrepo-com.svg" alt="Lamborghini" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Porsche -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/porsche-svgrepo-com.svg" alt="Porsche" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Rolls-Royce -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/rolls-royce-svgrepo-com.svg" alt="Rolls-Royce" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Lexus -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/lexus-svgrepo-com.svg" alt="Lexus" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Ferrari -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/ferrari-svgrepo-com.svg" alt="Ferrari" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Mercedes-Benz -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/mercedes-benz-svgrepo-com.svg" alt="Mercedes-Benz" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Land Rover -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/land-rover-svgrepo-com.svg" alt="Land Rover" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Jaguar -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/jaguar-svgrepo-com.svg" alt="Jaguar" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- McLaren -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/mclaren-alt-svgrepo-com.svg" alt="McLaren" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Nissan -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/nissan-svgrepo-com.svg" alt="Nissan" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Aston Martin -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/aston-martin-svgrepo-com.svg" alt="Aston Martin" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-
-            <!-- Alfa Romeo -->
-            <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
-              <img src="/logos/alfa-romeo-svgrepo-com.svg" alt="Alfa Romeo" class="w-full h-full object-contain invert" loading="lazy">
-            </div>
-          </div>
-
-          <div class="text-center mt-16">
-            <p class="text-xs text-white/40 tracking-wider">* Logos for illustrative purposes</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Contact Section -->
-      <section id="contact" class="py-32 px-6 bg-muted/30">
-        <div class="container mx-auto max-w-7xl">
-          <div class="text-center mb-20">
-            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Get In Touch</h2>
-            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our team will help you select the perfect service for your vehicle
+            <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+              At WRP., we don't just detail vehicles—we elevate them to works of art. Every surface, every curve,
+              every detail receives the meticulous attention it deserves.
+            </p>
+            <p class="text-lg text-muted-foreground leading-relaxed">
+              Our studio in the heart of Dubai serves the region's most discerning automotive enthusiasts, offering
+              bespoke protection and enhancement services that set new standards in luxury vehicle care. <a href="/more-about-wrp/" class="text-foreground font-medium hover:underline underline-offset-4 transition-all">Discover our story</a> and the passion that drives every detail.
             </p>
           </div>
+          <div class="relative h-[600px]">
+            <img
+              src="/luxury-car-detailing-studio-interior-minimal-black.jpg"
+              alt="WRP Dubai premium car detailing studio interior with professional equipment and climate-controlled environment"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <div class="grid md:grid-cols-2 gap-16">
+    <!-- Services Section -->
+    <section id="services" class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center mb-20">
+          <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">The WRP Philosophy</h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Three pillars of automotive excellence: Wrap, Reinforce, Protect
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
+            <div class="mb-6">
+              <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
+                W
+              </div>
+              <h3 class="font-serif text-3xl font-bold mb-3">Wrap</h3>
+              <p class="text-muted-foreground leading-relaxed">
+                Premium vinyl wrapping and color transformation. From subtle elegance to bold statements, we bring
+                your vision to life with precision application.
+              </p>
+            </div>
+            <ul class="space-y-2 text-sm mb-6">
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Full vehicle color change</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Custom design wraps</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Chrome delete & accents</span>
+              </li>
+            </ul>
+            <a href="/wrap/">
+              <Button variant="outline" className="w-full bg-transparent">
+                LEARN MORE
+              </Button>
+            </a>
+          </Card>
+
+          <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
+            <div class="mb-6">
+              <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
+                R
+              </div>
+              <h3 class="font-serif text-3xl font-bold mb-3">Reinforce</h3>
+              <p class="text-muted-foreground leading-relaxed">
+                Advanced paint protection film and ceramic coating systems. Military-grade protection that preserves
+                your investment for years to come.
+              </p>
+            </div>
+            <ul class="space-y-2 text-sm mb-6">
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Paint protection film (PPF)</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Ceramic coating systems</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Nano-technology treatments</span>
+              </li>
+            </ul>
+            <a href="/reinforce/">
+              <Button variant="outline" className="w-full bg-transparent">
+                LEARN MORE
+              </Button>
+            </a>
+          </Card>
+
+          <Card className="p-8 hover:shadow-2xl transition-shadow duration-300 border-2">
+            <div class="mb-6">
+              <div class="w-16 h-16 bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mb-4">
+                P
+              </div>
+              <h3 class="font-serif text-3xl font-bold mb-3">Protect</h3>
+              <p class="text-muted-foreground leading-relaxed">
+                Comprehensive detailing and maintenance programs. Meticulous care that maintains showroom perfection,
+                inside and out.
+              </p>
+            </div>
+            <ul class="space-y-2 text-sm mb-6">
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Exterior & interior detailing</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Paint correction & polishing</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                <span>Maintenance programs</span>
+              </li>
+            </ul>
+            <a href="/protect/">
+              <Button variant="outline" className="w-full bg-transparent">
+                LEARN MORE
+              </Button>
+            </a>
+          </Card>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Services Section -->
+    <section class="py-24 sm:py-32">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center mb-20">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Our Services</h2>
+          <p class="text-lg text-muted-foreground">
+            Premium automotive care solutions for Dubai's luxury vehicles
+          </p>
+        </div>
+
+        <!-- Service 1: Ceramic Coating - Photo RIGHT -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24">
+          <div class="lg:pt-4 lg:pr-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Ceramic Coating</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Nano-ceramic technology that creates a permanent hydrophobic shield. Delivers unmatched gloss, chemical resistance, and UV protection for years.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:shield" class="absolute top-1 left-1 h-5 w-5" />
+                    9H Hardness Protection.
+                  </dt>
+                  <dd class="inline">Scratch and swirl resistance with nano-ceramic shield technology</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:droplets" class="absolute top-1 left-1 h-5 w-5" />
+                    Hydrophobic Properties.
+                  </dt>
+                  <dd class="inline">Water beads and rolls off instantly, making washing effortless</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:clock" class="absolute top-1 left-1 h-5 w-5" />
+                    2-7 Year Warranty.
+                  </dt>
+                  <dd class="inline">Long-lasting protection engineered for Dubai's extreme climate</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/ceramic-coating/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+
+              </div>
+            </div>
+          </div>
+          <div class="overflow-hidden">
+            <img
+              src="/portfolio/team-detailing-black-lexus-hood.webp"
+              alt="WRP Dubai technician applying professional ceramic coating on Lexus luxury vehicle hood"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+        </div>
+
+        <!-- Service 2: Paint Protection Film - Photo LEFT -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30">
+          <div class="flex items-start justify-end lg:order-first overflow-hidden">
+            <img
+              src="/portfolio/porsche-boxster-spyder-gray.webp"
+              alt="Porsche Boxster Spyder with paint protection film installation at WRP Dubai showroom"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+          <div class="lg:ml-auto lg:pt-4 lg:pl-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Protection Film</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Military-grade transparent film that shields your paint from rock chips, scratches, and environmental damage. Self-healing technology repairs minor scratches.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:shield-check" class="absolute top-1 left-1 h-5 w-5" />
+                    Impact Protection.
+                  </dt>
+                  <dd class="inline">Guards against rock chips, road debris, and minor collisions</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:rotate-cw" class="absolute top-1 left-1 h-5 w-5" />
+                    Self-Healing Technology.
+                  </dt>
+                  <dd class="inline">Minor scratches disappear with heat exposure from sun or water</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
+                    UV Resistance.
+                  </dt>
+                  <dd class="inline">Prevents paint fading and oxidation from Dubai's intense sunlight</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/paint-protection-film/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 3: Paint Correction - Photo RIGHT with Testimonial -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start mb-24">
+          <div class="lg:pt-4 lg:pr-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Correction & Polish</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Multi-stage machine polishing that removes swirl marks, scratches, and oxidation. Restore your paint's original depth and mirror-like clarity.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
+                    Mirror Finish.
+                  </dt>
+                  <dd class="inline">Deep, reflective gloss that makes paint look better than new</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:eraser" class="absolute top-1 left-1 h-5 w-5" />
+                    Defect Removal.
+                  </dt>
+                  <dd class="inline">Eliminates 85-95% of swirls, scratches, and water spots</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:gauge" class="absolute top-1 left-1 h-5 w-5" />
+                    Paint Depth Measurement.
+                  </dt>
+                  <dd class="inline">Safe correction using precision gauges and professional compounds</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/polish/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+
+              </div>
+              <figure class="mt-12 border-l-2 border-border pl-8">
+                <blockquote class="text-base text-muted-foreground italic">
+                  <p>"Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless."</p>
+                </blockquote>
+                <figcaption class="mt-4 flex gap-x-4 text-sm">
+                  <div><span class="font-semibold">Ahmed Al-Maktoum</span> – <span class="text-muted-foreground">Porsche 911 GT3 RS Owner</span></div>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="overflow-hidden">
+            <img
+              src="/portfolio/green-porsche-911-showroom-event.webp"
+              alt="Green Porsche 911 showcasing mirror-finish paint correction and ceramic coating at WRP Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+        </div>
+
+        <!-- Service 4: Window Film - Photo LEFT -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mb-24 bg-muted/30">
+          <div class="flex items-start justify-end lg:order-first overflow-hidden">
+            <img
+              src="/portfolio/black-lexus-lx-570-showroom.webp"
+              alt="Lexus LX 570 with professional window tinting and ceramic coating completed at WRP Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+          <div class="lg:ml-auto lg:pt-4 lg:pl-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Window Film</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Advanced ceramic technology that blocks 99% UV rays and up to 80% heat. Enhanced privacy and comfort for Dubai's intense climate.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
+                    Heat Rejection.
+                  </dt>
+                  <dd class="inline">Block up to 80% of solar heat for cooler cabin temperature</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:eye-off" class="absolute top-1 left-1 h-5 w-5" />
+                    Enhanced Privacy.
+                  </dt>
+                  <dd class="inline">Discreet tinting while maintaining crystal-clear visibility</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:signal" class="absolute top-1 left-1 h-5 w-5" />
+                    Signal Safe.
+                  </dt>
+                  <dd class="inline">Ceramic films won't interfere with GPS, radio, or mobile signals</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/window-film/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service 5: Premium Car Wash - Photo RIGHT -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+          <div class="lg:pt-4 lg:pr-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Premium Car Wash</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Meticulous hand-wash service using pH-neutral products, microfiber techniques, and premium wax polish. Professional care that delivers a showroom-shiny finish.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:hand" class="absolute top-1 left-1 h-5 w-5" />
+                    Hand Wash Only.
+                  </dt>
+                  <dd class="inline">No harsh brushes or automated systems that damage paint</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
+                    Premium Wax Polish.
+                  </dt>
+                  <dd class="inline">Showroom-shiny finish with protective wax layer application</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:droplet" class="absolute top-1 left-1 h-5 w-5" />
+                    Spot-Free Finish.
+                  </dt>
+                  <dd class="inline">Filtered water rinse prevents water spots in Dubai's hard water</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/premium-car-wash/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+
+              </div>
+            </div>
+          </div>
+          <div class="overflow-hidden">
+            <img
+              src="/portfolio/team-washing-subaru-sti-foam.webp"
+              alt="WRP Dubai team performing premium hand car wash with foam treatment on Subaru WRX STI"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-32 px-6">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center mb-20">
+          <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Portfolio</h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            A showcase of our finest work with the world's most prestigious automobiles
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="relative h-[500px] group overflow-hidden">
+            <img
+              src="/luxury-sports-car-detail-black-and-white-dramatic.jpg"
+              alt="Lamborghini Aventador with full body paint protection film and ceramic coating completed at WRP Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="absolute bottom-8 left-8 text-white">
+                <h3 class="font-serif text-2xl font-bold mb-2">Lamborghini Aventador</h3>
+                <p class="text-sm">Full PPF + Ceramic Coating</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative h-[500px] group overflow-hidden">
+            <img
+              src="/luxury-sedan-close-up-black-and-white-elegant.jpg"
+              alt="Rolls-Royce Phantom premium detailing and paint correction service Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="absolute bottom-8 left-8 text-white">
+                <h3 class="font-serif text-2xl font-bold mb-2">Rolls-Royce Phantom</h3>
+                <p class="text-sm">Premium Detailing Package</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative h-[500px] group overflow-hidden">
+            <img
+              src="/supercar-wheel-detail-black-and-white-luxury.jpg"
+              alt="Ferrari SF90 supercar custom vinyl wrap and paint protection installation Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="absolute bottom-8 left-8 text-white">
+                <h3 class="font-serif text-2xl font-bold mb-2">Ferrari SF90</h3>
+                <p class="text-sm">Custom Wrap + Protection</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative h-[500px] group overflow-hidden">
+            <img
+              src="/luxury-suv-black-and-white-premium-detail.jpg"
+              alt="Bentley Bentayga interior restoration and leather conditioning service Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div class="absolute bottom-8 left-8 text-white">
+                <h3 class="font-serif text-2xl font-bold mb-2">Bentley Bentayga</h3>
+                <p class="text-sm">Interior Restoration</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-32 px-6 bg-black text-white">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-20">
+          <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Client Testimonials</h2>
+          <p class="text-lg text-white/70 max-w-2xl mx-auto">
+            Trusted by Dubai's most discerning automotive collectors
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <Card className="p-8 bg-white/5 border-white/10 text-white">
+            <div class="mb-6">
+              <div class="flex gap-1 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+              </div>
+              <p class="text-white/90 leading-relaxed italic">
+                "Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating
+                is flawless."
+              </p>
+            </div>
             <div>
-              <h3 class="font-serif text-3xl font-bold mb-8">Contact Information</h3>
-              <div class="space-y-6">
-                <div class="flex items-start gap-4">
-                  <Icon name="lucide:map-pin" class="h-6 w-6 mt-1 flex-shrink-0" />
-                  <div>
-                    <p class="font-bold mb-1">Studio Location</p>
-                    <p class="text-muted-foreground">
-                      Al Qusais Industrial Area 1<br />
-                      Dubai, United Arab Emirates
-                    </p>
-                    <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener" class="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mt-1">
-                      View on Google Maps →
-                    </a>
-                  </div>
-                </div>
-                <div class="flex items-start gap-4">
-                  <Icon name="lucide:phone" class="h-6 w-6 mt-1 flex-shrink-0" />
-                  <div>
-                    <p class="font-bold mb-1">Phone</p>
-                    <a href="https://dub.sh/wrp-phone" class="text-muted-foreground hover:text-foreground transition-colors">
-                      +971 54 717 3000
-                    </a>
-                  </div>
-                </div>
-                <div class="flex items-start gap-4">
-                  <Icon name="lucide:mail" class="h-6 w-6 mt-1 flex-shrink-0" />
-                  <div>
-                    <p class="font-bold mb-1">Email</p>
-                    <a href="https://dub.sh/wrp-email" class="text-muted-foreground hover:text-foreground transition-colors">
-                      info@wrpdetailing.ae
-                    </a>
-                  </div>
-                </div>
-                <div class="flex items-start gap-4">
-                  <Icon name="lucide:instagram" class="h-6 w-6 mt-1 flex-shrink-0" />
-                  <div>
-                    <p class="font-bold mb-1">Follow Us</p>
-                    <a href="https://dub.sh/wrp_ig" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground transition-colors">
-                      @wrp_ae
-                    </a>
-                  </div>
+              <p class="font-bold">Ahmed Al-Maktoum</p>
+              <p class="text-sm text-white/60">Porsche 911 GT3 RS Owner</p>
+            </div>
+          </Card>
+
+          <Card className="p-8 bg-white/5 border-white/10 text-white">
+            <div class="mb-6">
+              <div class="flex gap-1 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+              </div>
+              <p class="text-white/90 leading-relaxed italic">
+                "WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched
+                in Dubai."
+              </p>
+            </div>
+            <div>
+              <p class="font-bold">Marcus Chen</p>
+              <p class="text-sm text-white/60">McLaren 720S Owner</p>
+            </div>
+          </Card>
+
+          <Card className="p-8 bg-white/5 border-white/10 text-white">
+            <div class="mb-6">
+              <div class="flex gap-1 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
+              </div>
+              <p class="text-white/90 leading-relaxed italic">
+                "The only studio I trust with my collection. Professional, meticulous, and truly understand luxury
+                vehicles."
+              </p>
+            </div>
+            <div>
+              <p class="font-bold">Sophia Petrov</p>
+              <p class="text-sm text-white/60">Bentley Continental GT Owner</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-6">
+      <div class="container mx-auto max-w-6xl">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+          <div class="relative h-[600px]">
+            <img
+              src="/luxury-car-detailing-craftsman-working-black-and-w.jpg"
+              alt="WRP Dubai master technician performing meticulous paint correction and ceramic coating application on luxury vehicle"
+              width="1200"
+              height="800"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Craftsmanship
+              <br />& Precision
+            </h2>
+            <p class="text-lg text-muted-foreground leading-relaxed mb-6">
+              Founded in Dubai's prestigious automotive district, WRP. represents the pinnacle of vehicle care and
+              protection. Our team of master craftsmen brings decades of combined experience working with the world's
+              most exclusive automobiles.
+            </p>
+            <p class="text-lg text-muted-foreground leading-relaxed mb-8">
+              We use only the finest materials and cutting-edge technology to ensure your vehicle receives treatment
+              worthy of its pedigree. From rare hypercars to bespoke luxury sedans, every vehicle that enters our
+              studio leaves transformed.
+            </p>
+            <div class="grid grid-cols-3 gap-8">
+              <div>
+                <div class="text-4xl font-bold mb-2">500+</div>
+                <div class="text-sm text-muted-foreground">Vehicles Protected</div>
+              </div>
+              <div>
+                <div class="text-4xl font-bold mb-2">15+</div>
+                <div class="text-sm text-muted-foreground">Years Experience</div>
+              </div>
+              <div>
+                <div class="text-4xl font-bold mb-2">100%</div>
+                <div class="text-sm text-muted-foreground">Satisfaction Rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Logos Section -->
+    <section class="py-32 px-6 bg-black text-white">
+      <div class="container mx-auto max-w-7xl">
+        <div class="max-w-2xl mx-auto text-center mb-20">
+          <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+            Signature Fleet
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-12 items-center justify-items-center opacity-60">
+          <!-- Lamborghini -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/lamborghini-alt-svgrepo-com.svg" alt="Lamborghini" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Porsche -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/porsche-svgrepo-com.svg" alt="Porsche" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Rolls-Royce -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/rolls-royce-svgrepo-com.svg" alt="Rolls-Royce" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Lexus -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/lexus-svgrepo-com.svg" alt="Lexus" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Ferrari -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/ferrari-svgrepo-com.svg" alt="Ferrari" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Mercedes-Benz -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/mercedes-benz-svgrepo-com.svg" alt="Mercedes-Benz" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Land Rover -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/land-rover-svgrepo-com.svg" alt="Land Rover" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Jaguar -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/jaguar-svgrepo-com.svg" alt="Jaguar" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- McLaren -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/mclaren-alt-svgrepo-com.svg" alt="McLaren" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Nissan -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/nissan-svgrepo-com.svg" alt="Nissan" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Aston Martin -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/aston-martin-svgrepo-com.svg" alt="Aston Martin" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+
+          <!-- Alfa Romeo -->
+          <div class="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center hover:opacity-100 transition-opacity duration-300">
+            <img src="/logos/alfa-romeo-svgrepo-com.svg" alt="Alfa Romeo" class="w-full h-full object-contain invert" loading="lazy">
+          </div>
+        </div>
+
+        <div class="text-center mt-16">
+          <p class="text-xs text-white/40 tracking-wider">* Logos for illustrative purposes</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Blog Posts -->
+    <LatestPosts />
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center mb-20">
+          <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Get In Touch</h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Our team will help you select the perfect service for your vehicle
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-16">
+          <div>
+            <h3 class="font-serif text-3xl font-bold mb-8">Contact Information</h3>
+            <div class="space-y-6">
+              <div class="flex items-start gap-4">
+                <Icon name="lucide:map-pin" class="h-6 w-6 mt-1 flex-shrink-0" />
+                <div>
+                  <p class="font-bold mb-1">Studio Location</p>
+                  <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground transition-colors">
+                    Al Qusais Industrial Area 1<br />
+                    Dubai, United Arab Emirates
+                  </a>
                 </div>
               </div>
-
-              <div class="mt-12">
-                <h4 class="font-bold mb-4">Studio Hours</h4>
-                <div class="space-y-2 text-muted-foreground">
-                  <p>Saturday - Thursday: 9:00 AM - 9:30 PM</p>
-                  <p>Friday: 4:00 PM - 11:00 PM</p>
+              <div class="flex items-start gap-4">
+                <Icon name="lucide:phone" class="h-6 w-6 mt-1 flex-shrink-0" />
+                <div>
+                  <p class="font-bold mb-1">Phone</p>
+                  <a href="https://dub.sh/wrp-phone" class="text-muted-foreground hover:text-foreground transition-colors">
+                    +971 54 717 3000
+                  </a>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <Icon name="lucide:mail" class="h-6 w-6 mt-1 flex-shrink-0" />
+                <div>
+                  <p class="font-bold mb-1">Email</p>
+                  <a href="https://dub.sh/wrp-email" class="text-muted-foreground hover:text-foreground transition-colors">
+                    info@wrpdetailing.ae
+                  </a>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <Icon name="lucide:instagram" class="h-6 w-6 mt-1 flex-shrink-0" />
+                <div>
+                  <p class="font-bold mb-1">Follow Us</p>
+                  <a href="https://dub.sh/wrp_ig" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground transition-colors">
+                    @wrp_ae
+                  </a>
                 </div>
               </div>
             </div>
 
-            <div>
-              <form
-                x-data="{
-                  submitting: false,
-                  success: false,
-                  error: '',
-                  async submitForm(event) {
-                    event.preventDefault();
-                    this.submitting = true;
-                    this.error = '';
+            <div class="mt-12">
+              <h4 class="font-bold mb-4">Studio Hours</h4>
+              <div class="space-y-2 text-muted-foreground">
+                <p>Sat – Thu: 9:00 AM – 9:30 PM</p>
+                <p>Friday: Closed</p>
+              </div>
+            </div>
+          </div>
 
-                    try {
-                      const formData = new FormData(event.target);
-                      const response = await fetch('/api/contact', {
-                        method: 'POST',
-                        body: formData
-                      });
+          <div>
+            <form
+              x-data="{
+                submitting: false,
+                success: false,
+                error: '',
+                async submitForm(event) {
+                  event.preventDefault();
+                  this.submitting = true;
+                  this.error = '';
 
-                      const result = await response.json();
+                  try {
+                    const formData = new FormData(event.target);
+                    const response = await fetch('/api/contact', {
+                      method: 'POST',
+                      body: formData
+                    });
 
-                      if (result.success) {
-                        this.success = true;
-                        event.target.reset();
-                      } else {
-                        this.error = result.error || 'Something went wrong';
-                      }
-                    } catch (err) {
-                      this.error = 'Network error. Please try again or call us directly.';
-                    } finally {
-                      this.submitting = false;
+                    const result = await response.json();
+
+                    if (result.success) {
+                      this.success = true;
+                      event.target.reset();
+                    } else {
+                      this.error = result.error || 'Something went wrong';
                     }
+                  } catch (err) {
+                    this.error = 'Network error. Please try again or call us directly.';
+                  } finally {
+                    this.submitting = false;
                   }
-                }"
-                @submit="submitForm($event)"
-                class="space-y-6"
+                }
+              }"
+              @submit="submitForm($event)"
+              class="space-y-6"
+            >
+              <div>
+                <label class="block text-sm font-medium mb-2">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Your name"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="your@email.com"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Phone</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="+971 XX XXX XXXX"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Vehicle</label>
+                <input
+                  type="text"
+                  name="vehicle"
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Make & Model"
+                />
+              </div>
+              <div>
+                <label for="service-select" class="block text-sm font-medium mb-2">Service Interest</label>
+                <select
+                  id="service-select"
+                  name="service"
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option>Select a service</option>
+                  <option>Wrap</option>
+                  <option>Reinforce (PPF/Ceramic)</option>
+                  <option>Protect (Detailing)</option>
+                  <option>Full Package</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-2">Message</label>
+                <textarea
+                  name="message"
+                  required
+                  rows="4"
+                  class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Tell us about your requirements..."
+                ></textarea>
+              </div>
+              <Button size="lg" className="w-full" type="submit" :disabled="submitting">
+                <span x-show="!submitting">SUBMIT INQUIRY</span>
+                <span x-show="submitting" x-cloak>Sending...</span>
+                <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
+              </Button>
+
+              <!-- Success Message -->
+              <div
+                x-show="success"
+                x-cloak
+                x-transition
+                class="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
               >
-                <div>
-                  <label class="block text-sm font-medium mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-2">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="your@email.com"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-2">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="+971 XX XXX XXXX"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-2">Vehicle</label>
-                  <input
-                    type="text"
-                    name="vehicle"
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Make & Model"
-                  />
-                </div>
-                <div>
-                  <label for="service-select" class="block text-sm font-medium mb-2">Service Interest</label>
-                  <select
-                    id="service-select"
-                    name="service"
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <option>Select a service</option>
-                    <option>Wrap</option>
-                    <option>Reinforce (PPF/Ceramic)</option>
-                    <option>Protect (Detailing)</option>
-                    <option>Full Package</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium mb-2">Message</label>
-                  <textarea
-                    name="message"
-                    required
-                    rows="4"
-                    class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Tell us about your requirements..."
-                  ></textarea>
-                </div>
-                <Button size="lg" className="w-full" type="submit" :disabled="submitting">
-                  <span x-show="!submitting">GET MY ESTIMATE</span>
-                  <span x-show="submitting" x-cloak>Sending...</span>
-                  <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
-                </Button>
+                <p class="font-bold">Message sent successfully!</p>
+                <p class="text-sm mt-1">We'll get back to you within 24 hours.</p>
+              </div>
 
-                <!-- Success Message -->
-                <div
-                  x-show="success"
-                  x-cloak
-                  x-transition
-                  class="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800"
-                >
-                  <p class="font-bold">Thanks!</p>
-                  <p class="text-sm mt-1">Our team will reach out with your personalized estimate.</p>
-                </div>
-
-                <!-- Error Message -->
-                <div
-                  x-show="error"
-                  x-cloak
-                  x-transition
-                  class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800"
-                  x-text="error"
-                >
-                </div>
-              </form>
-            </div>
+              <!-- Error Message -->
+              <div
+                x-show="error"
+                x-cloak
+                x-transition
+                class="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800"
+                x-text="error"
+              >
+              </div>
+            </form>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  </div>
 
-      <!-- Footer -->
-      <footer class="bg-black text-white py-12 px-6">
-        <div class="container mx-auto max-w-7xl">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center">
-              <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" loading="lazy">
-            </div>
-            <div class="flex gap-8 text-sm">
-              <a href="#services" class="hover:text-white/70 transition-colors">
-                Services
-              </a>
-              <a href="/portfolio" class="hover:text-white/70 transition-colors">
-                Portfolio
-              </a>
-              <a href="/more-about-wrp" class="hover:text-white/70 transition-colors">
-                About
-              </a>
-              <a href="/contact-us" class="hover:text-white/70 transition-colors">
-                Contact
-              </a>
-            </div>
-          </div>
-          <div class="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-            <p>&copy; 2025 WRP. All rights reserved. <a href="/privacy" class="hover:text-white/80 transition-colors">Privacy</a> &middot; <a href="/terms" class="hover:text-white/80 transition-colors">Terms</a></p>
-          </div>
-        </div>
-      </footer>
-    </div>
+  <script>
+    // Parallax effect on hero image
+    let ticking = false;
 
-    <script>
-      // Parallax effect on hero image
-      let ticking = false;
+    function updateParallax() {
+      const heroImage = document.getElementById('hero-image');
+      if (!heroImage) return;
 
-      function updateParallax() {
-        const heroImage = document.getElementById('hero-image');
-        if (!heroImage) return;
+      const scrolled = window.pageYOffset;
+      const heroHeight = window.innerHeight;
 
-        const scrolled = window.pageYOffset;
-        const heroHeight = window.innerHeight;
-
-        if (scrolled < heroHeight) {
-          // Move image slower than scroll (0.5 = half speed for subtle effect)
-          heroImage.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
-        }
-
-        ticking = false;
+      if (scrolled < heroHeight) {
+        // Move image slower than scroll (0.5 = half speed for subtle effect)
+        heroImage.style.transform = 'translateY(' + (scrolled * 0.5) + 'px)';
       }
 
-      function requestTick() {
-        if (!ticking) {
-          window.requestAnimationFrame(updateParallax);
-          ticking = true;
-        }
+      ticking = false;
+    }
+
+    function requestTick() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateParallax);
+        ticking = true;
       }
+    }
 
-      window.addEventListener('scroll', requestTick, { passive: true });
+    window.addEventListener('scroll', requestTick, { passive: true });
 
-      // Initial call
-      updateParallax();
-    </script>
-  </body>
-</html>
+    // Initial call
+    updateParallax();
+  </script>
+</BaseLayout>

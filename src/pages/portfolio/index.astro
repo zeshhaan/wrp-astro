@@ -36,7 +36,7 @@ const lightboxData = sortedItems.map(item => ({
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-20 px-6 bg-black text-white">
@@ -76,12 +76,10 @@ const lightboxData = sortedItems.map(item => ({
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         Join our portfolio of satisfied clients. Experience the WRP difference with our premium detailing services.
       </p>
-      <a href="/contact-us">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          BOOK CONSULTATION
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 
@@ -108,4 +106,3 @@ const lightboxData = sortedItems.map(item => ({
     }
   }
 </style>
-

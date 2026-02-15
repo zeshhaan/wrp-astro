@@ -15,6 +15,7 @@ import icon from 'astro-icon';
 export default defineConfig({
   site: 'https://wrpdetailing.ae',
   output: 'server',
+  trailingSlash: 'always',
   redirects: {
     '/about': '/more-about-wrp',
   },

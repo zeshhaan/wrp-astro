@@ -2,20 +2,66 @@
 import { Button } from "@/components/ui/button";
 import ShimmerButton from './ShimmerButton.astro';
 import { Icon } from 'astro-icon/components';
+import { NAV_PAGES } from '../consts';
+import { getCollection } from 'astro:content';
 
-const services = [
-  { name: "Ceramic Coating", href: "/services/ceramic-coating" },
-  { name: "Paint Protection Film", href: "/services/paint-protection-film" },
-  { name: "Paint Correction & Polish", href: "/services/polish" },
-  { name: "Window Film", href: "/services/window-film" },
-  { name: "Premium Car Wash", href: "/services/premium-car-wash" },
-];
+const services = await getCollection('services');
+const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}/` }));
 ---
 
-<nav
-  x-data="{ mobileMenuOpen: false, servicesOpen: false }"
-  class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border"
->
+<div class="fixed top-0 left-0 right-0 z-50" x-data="{ trustBarVisible: true, lastScroll: 0 }" @scroll.window="
+  let current = window.scrollY;
+  trustBarVisible = current < 50 || current < lastScroll;
+  lastScroll = current;
+">
+  <!-- Trust Bar -->
+  <div
+    class="bg-black text-white border-b border-white/10 transition-all duration-300 overflow-hidden"
+    :class="trustBarVisible ? 'max-h-10 opacity-100' : 'max-h-0 opacity-0 border-b-0'"
+  >
+    <div class="container mx-auto px-6 py-1.5 flex items-center justify-center gap-6 text-xs tracking-wide">
+      <!-- Google Reviews -->
+      <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener noreferrer" class="hidden sm:flex items-center gap-1.5 hover:text-white/80 transition-colors">
+        <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        <div class="flex gap-0.5">
+          {[1,2,3,4,5].map(() => (
+            <svg class="w-2.5 h-2.5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          ))}
+        </div>
+        <span class="font-semibold">5.0</span>
+      </a>
+      <span class="hidden sm:inline text-white/30">|</span>
+      <!-- Phone -->
+      <a href="https://dub.sh/wrp-phone" class="flex items-center gap-1.5 hover:text-white/80 transition-colors">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        <span>+971 54 717 3000</span>
+      </a>
+      <span class="hidden sm:inline text-white/30">|</span>
+      <!-- Hours -->
+      <span class="hidden sm:flex items-center gap-1.5">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Sat–Thu 9 AM – 9:30 PM</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Main Nav -->
+  <nav
+    x-data="{ mobileMenuOpen: false, servicesOpen: false }"
+    class="bg-background/80 backdrop-blur-md border-b border-border"
+  >
   <div class="container mx-auto px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-2">
       <a href="/" class="flex items-center">
@@ -39,7 +85,7 @@ const services = [
             x-transition
             class="absolute top-full left-0 mt-2 w-64 bg-background border border-border shadow-lg py-2"
           >
-            {services.map((service) => (
+            {NAV_SERVICES.map((service) => (
               <a
                 href={service.href}
                 class="block px-4 py-3 hover:bg-muted transition-colors text-sm"
@@ -50,19 +96,17 @@ const services = [
           </div>
         </div>
       </div>
-      <a href="/portfolio" class="hover:text-muted-foreground transition-colors">
-        PORTFOLIO
-      </a>
-      <a href="/more-about-wrp" class="hover:text-muted-foreground transition-colors">
-        ABOUT
-      </a>
-      <a href="/contact-us" class="hover:text-muted-foreground transition-colors">
-        CONTACT
-      </a>
+      {NAV_PAGES.map((page) => (
+        <a href={page.href} class="hover:text-muted-foreground transition-colors">
+          {page.name.toUpperCase()}
+        </a>
+      ))}
     </div>
-    <ShimmerButton href="/contact-us" className="hidden md:flex">
-      REQUEST ESTIMATE
-    </ShimmerButton>
+    <div data-contact-modal class="hidden md:flex cursor-pointer">
+      <ShimmerButton>
+        REQUEST ESTIMATE
+      </ShimmerButton>
+    </div>
     <button
       class="md:hidden z-50"
       @click="mobileMenuOpen = !mobileMenuOpen"
@@ -89,7 +133,7 @@ const services = [
       <!-- Services Section -->
       <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
       <div class="ml-4 flex flex-col gap-4">
-        {services.map((service) => (
+        {NAV_SERVICES.map((service) => (
           <a
             href={service.href}
             class="text-base hover:text-muted-foreground transition-colors"
@@ -102,30 +146,19 @@ const services = [
 
       <div class="border-t border-border pt-4"></div>
 
-      <a
-        href="/portfolio"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        PORTFOLIO
-      </a>
-      <a
-        href="/more-about-wrp"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        ABOUT
-      </a>
-      <a
-        href="/contact-us"
-        class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
-        @click="mobileMenuOpen = false"
-      >
-        CONTACT
-      </a>
-      <Button className="w-full" @click="mobileMenuOpen = false">
-        <a href="/contact-us" class="w-full">REQUEST ESTIMATE</a>
+      {NAV_PAGES.map((page) => (
+        <a
+          href={page.href}
+          class="text-lg tracking-wide hover:text-muted-foreground transition-colors"
+          @click="mobileMenuOpen = false"
+        >
+          {page.name.toUpperCase()}
+        </a>
+      ))}
+      <Button className="w-full" data-contact-modal @click="mobileMenuOpen = false">
+        REQUEST ESTIMATE
       </Button>
     </div>
   </div>
 </nav>
+</div>

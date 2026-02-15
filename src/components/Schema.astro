@@ -1,27 +1,35 @@
 ---
+import { NAV_PAGES } from '../consts';
+import { getCollection } from 'astro:content';
+
+const services = await getCollection('services');
+const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}` }));
+
 interface Props {
-  type?: 'LocalBusiness' | 'WebSite';
+  type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement';
 }
 
 const { type = 'LocalBusiness' } = Astro.props;
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': ['LocalBusiness', 'AutomotiveBusiness'],
   name: 'WRP Dubai',
   alternateName: 'Wrap, Reinforce, Protect',
-  description: 'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
-  url: 'https://wrpdetailing.ae',
+  description:
+    'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
+  url: siteUrl,
   logo: {
     '@type': 'ImageObject',
-    url: 'https://wrpdetailing.ae/wrp-logo.svg',
+    url: `${siteUrl}/wrp-logo.svg`,
     width: 200,
     height: 60,
   },
   image: [
     {
       '@type': 'ImageObject',
-      url: 'https://wrpdetailing.ae/og-image.jpg',
+      url: `${siteUrl}/og-image.jpg`,
       width: 1200,
       height: 630,
       caption: 'WRP Dubai luxury car detailing studio showroom',
@@ -44,89 +52,60 @@ const localBusinessSchema = {
   openingHoursSpecification: [
     {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+      dayOfWeek: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday'],
       opens: '09:00',
       closes: '21:30',
     },
     {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Friday'],
-      opens: '16:00',
-      closes: '23:00',
+      opens: '00:00',
+      closes: '00:00',
     },
   ],
-  priceRange: 'AED 500 - AED 15000',
+  priceRange: 'AED 100 - AED 25000',
   areaServed: [
-    {
-      '@type': 'City',
-      name: 'Dubai',
-    },
-    {
-      '@type': 'City',
-      name: 'Sharjah',
-    },
-    {
-      '@type': 'City',
-      name: 'Ajman',
-    },
-    {
-      '@type': 'City',
-      name: 'Abu Dhabi',
-    },
+    { '@type': 'City', name: 'Dubai' },
+    { '@type': 'City', name: 'Sharjah' },
+    { '@type': 'City', name: 'Ajman' },
+    { '@type': 'City', name: 'Abu Dhabi' },
   ],
   sameAs: [
     'https://dub.sh/wrp_ig',
     'https://dub.sh/wrp-map',
+    'https://ggl.link/wrp-review',
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: '5',
-    reviewCount: '3',
+    reviewCount: '60',
     bestRating: '5',
     worstRating: '1',
   },
   review: [
     {
       '@type': 'Review',
-      author: {
-        '@type': 'Person',
-        name: 'Ahmed Al-Maktoum',
-      },
+      author: { '@type': 'Person', name: 'Ahmed Al-Maktoum' },
       datePublished: '2025-01-15',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: '5',
-        bestRating: '5',
-      },
-      reviewBody: 'Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless.',
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody:
+        'Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless.',
     },
     {
       '@type': 'Review',
-      author: {
-        '@type': 'Person',
-        name: 'Marcus Chen',
-      },
+      author: { '@type': 'Person', name: 'Marcus Chen' },
       datePublished: '2025-01-10',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: '5',
-        bestRating: '5',
-      },
-      reviewBody: 'WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched in Dubai.',
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody:
+        'WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched in Dubai.',
     },
     {
       '@type': 'Review',
-      author: {
-        '@type': 'Person',
-        name: 'Sophia Petrov',
-      },
+      author: { '@type': 'Person', name: 'Sophia Petrov' },
       datePublished: '2025-01-05',
-      reviewRating: {
-        '@type': 'Rating',
-        ratingValue: '5',
-        bestRating: '5',
-      },
-      reviewBody: 'The only studio I trust with my collection. Professional, meticulous, and truly understand luxury vehicles.',
+      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
+      reviewBody:
+        'The only studio I trust with my collection. Professional, meticulous, and truly understand luxury vehicles.',
     },
   ],
 };
@@ -136,10 +115,27 @@ const webSiteSchema = {
   '@type': 'WebSite',
   name: 'WRP Dubai',
   alternateName: 'WRP',
-  url: 'https://wrpdetailing.ae/',
+  url: `${siteUrl}/`,
 };
 
-const schema = type === 'WebSite' ? webSiteSchema : localBusinessSchema;
+const navItems = [...NAV_SERVICES, ...NAV_PAGES];
+const siteNavigationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: navItems.map((item, index) => ({
+    '@type': 'SiteNavigationElement',
+    position: index + 1,
+    name: item.name,
+    url: `${siteUrl}${item.href.endsWith('/') ? item.href : item.href + '/'}`,
+  })),
+};
+
+const schemas = {
+  LocalBusiness: localBusinessSchema,
+  WebSite: webSiteSchema,
+  SiteNavigationElement: siteNavigationSchema,
+};
+const schema = schemas[type];
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(schema)} />

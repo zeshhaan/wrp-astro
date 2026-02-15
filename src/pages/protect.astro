@@ -10,7 +10,7 @@ export const prerender = true;
 
 const breadcrumbs = [
   { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Protect', url: 'https://wrpdetailing.ae/protect' },
+  { name: 'Protect', url: 'https://wrpdetailing.ae/protect/' },
 ];
 
 const faqSchema = {
@@ -51,7 +51,7 @@ const faqSchema = {
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-32 px-6">
@@ -124,7 +124,7 @@ const faqSchema = {
             Meticulous hand washing using luxury-grade products and proper techniques. Two-bucket method,
             microfiber materials, spot-free filtered water, and premium wax polish for showroom-shiny finish.
           </p>
-          <a href="/services/premium-car-wash">
+          <a href="/services/premium-car-wash/">
             <Button variant="outline" className="w-full">
               LEARN MORE
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -138,7 +138,7 @@ const faqSchema = {
             Multi-stage polishing that removes swirl marks, scratches, and oxidation. Restores your paint's
             original depth and clarity. Essential before applying any protective coatings.
           </p>
-          <a href="/services/polish">
+          <a href="/services/polish/">
             <Button className="w-full">
               EXPLORE SERVICE
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -152,12 +152,10 @@ const faqSchema = {
             Deep cleaning, leather conditioning, and restoration for all interior surfaces. Steam cleaning,
             stain removal, and odor elimination. Premium products safe for luxury materials.
           </p>
-          <a href="/contact-us">
-            <Button variant="outline" className="w-full">
-              GET QUOTE
-              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
-            </Button>
-          </a>
+          <Button variant="outline" className="w-full cursor-pointer" data-contact-modal>
+            GET QUOTE
+            <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+          </Button>
         </Card>
       </div>
     </div>
@@ -181,7 +179,7 @@ const faqSchema = {
             Transform your vehicle's appearance with premium vinyl wrapping. Complete color changes, custom designs,
             and chrome delete services that express your personality while protecting factory paint.
           </p>
-          <a href="/wrap">
+          <a href="/wrap/">
             <Button variant="outline" className="w-full">
               EXPLORE WRAP
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -196,7 +194,7 @@ const faqSchema = {
             Advanced protection systems that strengthen your vehicle's defense. Paint Protection Film and ceramic
             coating technologies engineered for Dubai's extreme climate.
           </p>
-          <a href="/reinforce">
+          <a href="/reinforce/">
             <Button variant="outline" className="w-full">
               EXPLORE REINFORCE
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -251,12 +249,10 @@ const faqSchema = {
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         Regular professional care keeps your vehicle looking its absolute best. Speak with our team about a protection plan.
       </p>
-      <a href="/contact-us">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          GET A QUOTE
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>

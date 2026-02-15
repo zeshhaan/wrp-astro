@@ -10,7 +10,7 @@ export const prerender = true;
 
 const breadcrumbs = [
   { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Reinforce', url: 'https://wrpdetailing.ae/reinforce' },
+  { name: 'Reinforce', url: 'https://wrpdetailing.ae/reinforce/' },
 ];
 
 const faqSchema = {
@@ -22,7 +22,7 @@ const faqSchema = {
       name: 'What does "Reinforce" mean at WRP?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Reinforce represents our paint protection philosophy - strengthening your vehicle\'s defense against environmental damage through PPF and ceramic coating technologies.',
+        text: 'Reinforce represents our protection philosophy - strengthening your vehicle\'s defense against environmental damage through PPF, ceramic coating, and window film technologies.',
       },
     },
     {
@@ -30,7 +30,7 @@ const faqSchema = {
       name: 'Should I get PPF or ceramic coating?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Both serve different purposes. PPF protects against physical damage (rock chips, scratches), while ceramic coating provides chemical resistance and easier maintenance. For ultimate protection in Dubai, we recommend both.',
+        text: 'They serve different purposes. PPF protects against physical damage (rock chips, scratches), while ceramic coating provides chemical resistance and easier maintenance. For ultimate protection in Dubai, we recommend both.',
       },
     },
     {
@@ -38,7 +38,15 @@ const faqSchema = {
       name: 'Can PPF and ceramic coating be combined?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Absolutely! Applying ceramic coating over PPF is our most popular protection package. It combines physical impact protection with chemical resistance and enhanced gloss.',
+        text: 'Yes, and we recommend it. Applying ceramic coating over PPF is our most popular protection package. It combines physical impact protection with chemical resistance and enhanced gloss.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Why add window film in Dubai?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Ceramic window film rejects up to 98% of infrared heat and 99%+ of UV rays. In Dubai\'s extreme temperatures, this significantly reduces cabin heat, protects interiors from fading, and reduces AC load—improving both comfort and fuel efficiency.',
       },
     },
   ],
@@ -51,7 +59,7 @@ const faqSchema = {
   ogImage="/og-image.jpg"
 >
   <!-- Breadcrumbs -->
-  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-20" />
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
 
   <!-- Hero Section -->
   <section class="relative py-32 px-6">
@@ -116,14 +124,14 @@ const faqSchema = {
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-8">
+      <div class="grid md:grid-cols-3 gap-8">
         <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
           <h3 class="font-serif text-3xl font-bold mb-4">Paint Protection Film</h3>
           <p class="text-muted-foreground leading-relaxed mb-6">
             Transparent thermoplastic urethane film that absorbs impacts from rocks, debris, and scratches.
             Self-healing technology repairs minor damage with heat. The ultimate physical barrier for your paint.
           </p>
-          <a href="/services/paint-protection-film">
+          <a href="/services/paint-protection-film/">
             <Button variant="outline" className="w-full">
               EXPLORE PPF
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -134,12 +142,26 @@ const faqSchema = {
         <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
           <h3 class="font-serif text-3xl font-bold mb-4">Ceramic Coating</h3>
           <p class="text-muted-foreground leading-relaxed mb-6">
-            Liquid polymer that chemically bonds with paint, creating a permanent nano-ceramic layer. Provides
-            9H hardness, hydrophobic properties, and chemical resistance. Essential for Dubai's environment.
+            Liquid polymer that chemically bonds with paint, creating a durable nano-ceramic layer. Provides
+            hydrophobic properties, chemical resistance, and scratch resistance. Essential for Dubai's environment.
           </p>
-          <a href="/services/ceramic-coating">
+          <a href="/services/ceramic-coating/">
             <Button variant="outline" className="w-full">
               EXPLORE CERAMIC
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 hover:shadow-2xl transition-shadow duration-300">
+          <h3 class="font-serif text-3xl font-bold mb-4">Window Film</h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            Advanced ceramic window film with up to 98% IR rejection and 99%+ UV block. Multiple shades available,
+            anti-yellowing, and glare reduction. Transforms your driving comfort in Dubai's heat.
+          </p>
+          <a href="/services/window-film/">
+            <Button variant="outline" className="w-full">
+              EXPLORE WINDOW FILM
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
             </Button>
           </a>
@@ -166,7 +188,7 @@ const faqSchema = {
             Transform your vehicle's appearance with premium vinyl wrapping. Complete color changes, custom designs,
             and chrome delete services that express your personality while protecting factory paint.
           </p>
-          <a href="/wrap">
+          <a href="/wrap/">
             <Button variant="outline" className="w-full">
               EXPLORE WRAP
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -181,7 +203,7 @@ const faqSchema = {
             Meticulous care and maintenance programs that preserve your vehicle's perfection. Premium wash, paint
             correction, and detailing services that maintain showroom condition.
           </p>
-          <a href="/protect">
+          <a href="/protect/">
             <Button variant="outline" className="w-full">
               EXPLORE PROTECT
               <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
@@ -202,14 +224,14 @@ const faqSchema = {
         <div>
           <dt class="text-base font-semibold mb-2">What does "Reinforce" mean at WRP?</dt>
           <dd class="text-base text-muted-foreground leading-relaxed">
-            Reinforce represents our paint protection philosophy - strengthening your vehicle's defense against
-            environmental damage through PPF and ceramic coating technologies.
+            Reinforce represents our protection philosophy — strengthening your vehicle's defense against
+            environmental damage through PPF, ceramic coating, and window film technologies.
           </dd>
         </div>
         <div>
           <dt class="text-base font-semibold mb-2">Should I get PPF or ceramic coating?</dt>
           <dd class="text-base text-muted-foreground leading-relaxed">
-            Both serve different purposes. PPF protects against physical damage (rock chips, scratches), while
+            They serve different purposes. PPF protects against physical damage (rock chips, scratches), while
             ceramic coating provides chemical resistance and easier maintenance. For ultimate protection in Dubai,
             we recommend both.
           </dd>
@@ -217,8 +239,16 @@ const faqSchema = {
         <div>
           <dt class="text-base font-semibold mb-2">Can PPF and ceramic coating be combined?</dt>
           <dd class="text-base text-muted-foreground leading-relaxed">
-            Absolutely! Applying ceramic coating over PPF is our most popular protection package. It combines
+            Yes, and we recommend it. Applying ceramic coating over PPF is our most popular protection package. It combines
             physical impact protection with chemical resistance and enhanced gloss.
+          </dd>
+        </div>
+        <div>
+          <dt class="text-base font-semibold mb-2">Why add window film in Dubai?</dt>
+          <dd class="text-base text-muted-foreground leading-relaxed">
+            Ceramic window film rejects up to 98% of infrared heat and 99%+ of UV rays. In Dubai's extreme
+            temperatures, this significantly reduces cabin heat, protects interiors from fading, and reduces
+            AC load — improving both comfort and fuel efficiency.
           </dd>
         </div>
       </dl>
@@ -236,12 +266,10 @@ const faqSchema = {
       <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
         Protect your vehicle with our advanced protection systems. Our team will help you choose the right protection.
       </p>
-      <a href="/contact-us">
-        <Button size="lg" className="bg-white text-black hover:bg-white/90">
-          GET A QUOTE
-          <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
-        </Button>
-      </a>
+      <Button size="lg" className="bg-white text-black hover:bg-white/90 cursor-pointer" data-contact-modal>
+        GET A QUOTE
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
     </div>
   </section>
 </BaseLayout>

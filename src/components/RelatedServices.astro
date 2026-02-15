@@ -1,0 +1,55 @@
+---
+import { getCollection } from 'astro:content';
+import { Card } from "@/components/ui/card";
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	serviceIds: string[];
+}
+
+const { serviceIds } = Astro.props;
+
+if (serviceIds.length === 0) return;
+
+const allServices = await getCollection('services');
+const related = allServices
+	.filter((s) => serviceIds.includes(s.id))
+	.slice(0, 3);
+
+if (related.length === 0) return;
+---
+
+<aside class="mt-16 pt-12 border-t border-border">
+	<h2 class="font-serif text-2xl md:text-3xl font-bold mb-2">Services Mentioned in This Article</h2>
+	<p class="text-muted-foreground mb-8">Learn more about the services discussed above</p>
+
+	<div class={`grid gap-6 ${related.length === 1 ? 'max-w-md' : related.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
+		{related.map((service) => (
+			<a href={`/services/${service.id}/`} class="group block">
+				<Card className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 p-0">
+					<div class="relative h-48 overflow-hidden">
+						<img
+							src={service.data.heroImage}
+							alt={service.data.title}
+							class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+							loading="lazy"
+						/>
+						<div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+						<h3 class="absolute bottom-3 left-4 font-serif text-lg font-bold text-white">
+							{service.data.title}
+						</h3>
+					</div>
+					<div class="p-4">
+						<p class="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+							{service.data.description}
+						</p>
+						<span class="inline-flex items-center text-sm font-medium mt-3 group-hover:underline underline-offset-4">
+							Learn more
+							<Icon name="lucide:arrow-right" class="ml-1 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+						</span>
+					</div>
+				</Card>
+			</a>
+		))}
+	</div>
+</aside>
