@@ -12,13 +12,14 @@ const {
 } = Astro.props;
 ---
 
-<!-- Mobile-only floating Google review badge -->
+<!-- Mobile-only floating Google review badge (hidden until user scrolls past hero) -->
 <a
+  id="floating-review-badge"
   href={googleReviewUrl}
   target="_blank"
   rel="noopener noreferrer"
   aria-label={`${rating} stars on Google Reviews`}
-  class="fixed bottom-6 left-6 z-50 lg:hidden flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/15 px-3 py-2 rounded-full shadow-lg hover:shadow-xl hover:bg-black/70 hover:scale-105 transition-all duration-300"
+  class="fixed bottom-6 left-6 z-50 lg:hidden flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/15 px-3 py-2 rounded-full shadow-lg hover:shadow-xl hover:bg-black/70 hover:scale-105 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
 >
   <!-- Google G Logo -->
   <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
@@ -40,3 +41,39 @@ const {
   <!-- Review count -->
   <span class="font-bold text-sm text-white">{reviewCount} reviews</span>
 </a>
+
+<script>
+  // Show floating badge only after scrolling past the hero section
+  let badgeScrollHandler: ((e: Event) => void) | null = null;
+
+  document.addEventListener('astro:page-load', () => {
+    if (badgeScrollHandler) {
+      window.removeEventListener('scroll', badgeScrollHandler);
+      badgeScrollHandler = null;
+    }
+
+    const badge = document.getElementById('floating-review-badge');
+    if (!badge) return;
+
+    const heroBg = document.getElementById('hero-bg');
+
+    // If no hero on this page, show badge immediately
+    if (!heroBg) {
+      badge.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+      return;
+    }
+
+    badgeScrollHandler = () => {
+      const heroBottom = heroBg.getBoundingClientRect().bottom;
+      if (heroBottom < 0) {
+        badge.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+      } else {
+        badge.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      }
+    };
+
+    window.addEventListener('scroll', badgeScrollHandler, { passive: true });
+    // Check initial state
+    badgeScrollHandler(new Event('scroll'));
+  });
+</script>
