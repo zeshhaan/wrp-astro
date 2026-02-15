@@ -1,86 +1,86 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
+import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags } = Astro.props;
+
+const categoryLabels: Record<string, string> = {
+	guide: 'Guide',
+	news: 'News',
+	update: 'Update',
+	event: 'Event',
+	listicle: 'Listicle',
+};
 ---
 
-<html lang="en">
-	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
-	</head>
-
-	<body>
-		<Header />
-		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+<BaseLayout title={`${title} | WRP Blog`} description={description}>
+	<article class="pt-24 pb-16">
+		{heroImage && (
+			<div class="w-full max-w-4xl mx-auto px-6 mb-8">
+				<img
+					src={heroImage.src}
+					alt={title}
+					width={1020}
+					height={510}
+					class="w-full h-auto object-cover"
+				/>
+			</div>
+		)}
+		<div class="max-w-3xl mx-auto px-6">
+			<div class="mb-8">
+				<div class="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+					{category && (
+						<span class="uppercase tracking-wider font-medium text-foreground">
+							{categoryLabels[category] || category}
+						</span>
+					)}
+					{category && <span class="text-border">|</span>}
+					<FormattedDate date={pubDate} />
+					{readingTime && (
+						<>
+							<span class="text-border">|</span>
+							<span>{readingTime} min read</span>
+						</>
+					)}
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
+				<h1 class="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight">{title}</h1>
+				<p class="text-lg text-muted-foreground">{description}</p>
+				{author && (
+					<p class="text-sm text-muted-foreground mt-4">By <span class="font-medium text-foreground">{author}</span></p>
+				)}
+				{updatedDate && (
+					<p class="text-sm text-muted-foreground mt-2 italic">
+						Updated <FormattedDate date={updatedDate} />
+					</p>
+				)}
+			</div>
+			<hr class="border-border mb-8" />
+			<div class="prose prose-lg max-w-none
+				prose-headings:font-serif prose-headings:font-bold
+				prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-4
+				prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
+				prose-p:text-muted-foreground prose-p:leading-relaxed
+				prose-a:text-foreground prose-a:underline prose-a:underline-offset-4
+				prose-strong:text-foreground
+				prose-li:text-muted-foreground
+				prose-blockquote:border-l-2 prose-blockquote:border-border prose-blockquote:pl-6 prose-blockquote:italic
+			">
+				<slot />
+			</div>
+			{tags && tags.length > 0 && (
+				<div class="mt-12 pt-8 border-t border-border">
+					<div class="flex flex-wrap gap-2">
+						{tags.map((tag) => (
+							<span class="px-3 py-1 text-xs tracking-wider uppercase border border-border text-muted-foreground">
+								{tag}
+							</span>
+						))}
 					</div>
-					<slot />
 				</div>
-			</article>
-		</main>
-		<Footer />
-	</body>
-</html>
+			)}
+		</div>
+	</article>
+</BaseLayout>

@@ -1,19 +1,31 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// Keep blog collection for reference/future use
+// WRP Blog collection
 const blog = defineCollection({
-	// Load Markdown and MDX files in the `src/content/blog/` directory.
 	loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
-	// Type-check frontmatter using a schema
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
 			description: z.string(),
-			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
+			category: z.enum(['guide', 'news', 'update', 'event', 'listicle']).default('guide'),
+			tags: z.array(z.string()).default([]),
+			author: z.string().default('WRP Dubai'),
+			readingTime: z.number().optional(),
+			featured: z.boolean().default(false),
+			relatedService: z.enum([
+				'ceramic-coating',
+				'paint-protection-film',
+				'polish',
+				'window-film',
+				'premium-car-wash',
+				'leather-upholstery',
+				'car-mats',
+				'graphene-coating',
+			]).optional(),
 		}),
 });
 
