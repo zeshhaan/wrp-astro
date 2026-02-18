@@ -24,7 +24,12 @@ export default defineConfig({
   },
   integrations: [
     mdx(),
-    sitemap(),
+    sitemap({
+      customPages: [
+        'https://wrpdetailing.ae/llms.txt',
+        'https://wrpdetailing.ae/llms-full.txt',
+      ],
+    }),
     partytown({
       config: {
         forward: ['dataLayer.push', 'gtag'],
