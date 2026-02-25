@@ -200,7 +200,7 @@ const llmsLines = [
   `> ${SITE.description}`,
   '',
   'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, paint polishing, window tinting, and premium car wash services.',
+  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, leather upholstery care, and premium car wash services.',
   '',
   '## Services',
   '',
@@ -244,7 +244,7 @@ const fullSections = [
   `> ${SITE.description}`,
   '',
   'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, paint polishing, window tinting, and premium car wash services.',
+  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, leather upholstery care, and premium car wash services.',
 ];
 
 if (services.length) {

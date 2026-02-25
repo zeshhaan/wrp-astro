@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import partytown from '@astrojs/partytown';
 import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import robotsTxt from 'astro-robots-txt';
@@ -54,5 +54,36 @@ export default defineConfig({
     service: {
       entrypoint: 'astro/assets/services/cloudflare',
     },
+  },
+  experimental: {
+    fonts: [
+      {
+        name: 'Playfair Display',
+        cssVariable: '--font-playfair',
+        provider: fontProviders.google(),
+        weights: [400, 700, 900],
+        styles: ['normal'],
+        subsets: ['latin'],
+        fallbacks: ['Georgia', 'serif'],
+      },
+      {
+        name: 'Inter',
+        cssVariable: '--font-inter',
+        provider: fontProviders.google(),
+        weights: [400, 500, 600, 700],
+        styles: ['normal'],
+        subsets: ['latin'],
+        fallbacks: ['system-ui', 'sans-serif'],
+      },
+      {
+        name: 'Montserrat',
+        cssVariable: '--font-montserrat',
+        provider: fontProviders.google(),
+        weights: [900],
+        styles: ['italic'],
+        subsets: ['latin'],
+        fallbacks: ['system-ui', 'sans-serif'],
+      },
+    ],
   },
 });

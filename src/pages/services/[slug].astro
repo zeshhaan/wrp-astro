@@ -7,6 +7,8 @@ import RelatedPosts from '@/components/RelatedPosts.astro';
 import GridPattern from '@/components/GridPattern.astro';
 import ServiceSchema from '@/components/ServiceSchema.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import ReviewBlade from '@/components/reviews/ReviewBlade.astro';
+import ServiceReviews from '@/components/reviews/ServiceReviews.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
@@ -31,6 +33,7 @@ const {
   mainDescription1,
   mainDescription2,
   mainImage,
+  mainImageAlt,
   iconFeatures,
   startingPrice,
   showPackages,
@@ -49,9 +52,10 @@ const {
 
 const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
 
-// Calculate price range for Service schema (structured data)
-const lowPrice = startingPrice || (packages && packages.length > 0 ? Math.min(...packages.map(p => p.price)) : 500);
-const highPrice = packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice * 4;
+// Calculate price range for Service schema (only when real prices exist)
+const hasRealPricing = startingPrice || (packages && packages.length > 0);
+const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;
+const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
 
 // Breadcrumbs
 const breadcrumbs = [
@@ -76,6 +80,7 @@ const breadcrumbs = [
     description={description}
     lowPrice={lowPrice}
     highPrice={highPrice}
+    serviceUrl={`https://wrpdetailing.ae/services/${service.id}/`}
   />
   <!-- Hero Section -->
   <section class="relative h-[70vh] flex items-center justify-center overflow-hidden">
@@ -133,7 +138,7 @@ const breadcrumbs = [
           <div class="relative h-[600px]">
             <img
               src={mainImage || heroImage}
-              alt={`${title} Detail`}
+              alt={mainImageAlt || `${title} Detail`}
               class="w-full h-full object-cover"
             />
           </div>
@@ -226,16 +231,30 @@ const breadcrumbs = [
 
         <div class="grid md:grid-cols-2 gap-8">
           {additionalSection.cards.map((card) => (
-            <Card className="p-8">
-              <h3 class="font-bold text-xl mb-4">{card.title}</h3>
-              <p class="text-muted-foreground leading-relaxed mb-4">
-                {card.description}
-              </p>
-              {card.solution && (
-                <p class="text-sm text-muted-foreground italic">
-                  Solution: {card.solution}
-                </p>
+            <Card className={card.image ? 'overflow-hidden p-0' : 'p-8'}>
+              {card.image && (
+                <div class="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={card.image}
+                    alt={card.imageAlt || card.title}
+                    width="800"
+                    height="500"
+                    loading="lazy"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
               )}
+              <div class={card.image ? 'p-8' : ''}>
+                <h3 class="font-bold text-xl mb-4">{card.title}</h3>
+                <p class="text-muted-foreground leading-relaxed mb-4">
+                  {card.description}
+                </p>
+                {card.solution && (
+                  <p class="text-sm text-muted-foreground italic">
+                    Solution: {card.solution}
+                  </p>
+                )}
+              </div>
             </Card>
           ))}
         </div>
@@ -327,6 +346,12 @@ const breadcrumbs = [
       })),
     })} />
   </section>
+
+  <!-- Customer Review Blade -->
+  <ReviewBlade serviceSlug={service.id} variant="dark" />
+
+  <!-- Service-Specific Reviews -->
+  <ServiceReviews serviceSlug={service.id} heading={`What Clients Say About ${title}`} />
 
   <!-- Related Blog Posts -->
   <RelatedPosts serviceId={service.id} />

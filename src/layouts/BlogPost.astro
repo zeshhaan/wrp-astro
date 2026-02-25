@@ -4,6 +4,7 @@ import BaseLayout from './BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import RelatedServices from '../components/RelatedServices.astro';
+import ReviewBlade from '../components/reviews/ReviewBlade.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -135,6 +136,11 @@ const breadcrumbs = [
 		</div>
 	</article>
 
+	{/* Review blade for blog posts with related services */}
+	{relatedServices && relatedServices.length > 0 && (
+		<ReviewBlade serviceSlug={relatedServices[0]} variant="dark" />
+	)}
+
 	<style is:global>
 		/*
 		 * Blog typography — guided by Butterick's Practical Typography:
@@ -178,7 +184,7 @@ const breadcrumbs = [
 		}
 		.blog-content thead th {
 			color: var(--background);
-			font-family: 'Playfair Display', serif;
+			font-family: var(--font-serif);
 			font-weight: 700;
 			text-transform: uppercase;
 			letter-spacing: 0.08em; /* Butterick: 5-12% for caps */

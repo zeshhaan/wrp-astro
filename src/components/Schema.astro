@@ -1,24 +1,44 @@
 ---
 import { NAV_PAGES } from '../consts';
 import { getCollection } from 'astro:content';
+import { getBusiness, getSchemaReviews } from '@/lib/reviews';
 
 const services = await getCollection('services');
+const business = getBusiness();
+const topReviews = getSchemaReviews(10);
 const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}` }));
 
 interface Props {
-  type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement';
+  type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement' | 'ServiceCatalog';
 }
 
 const { type = 'LocalBusiness' } = Astro.props;
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const localBusinessId = `${siteUrl}/#localbusiness`;
+const websiteId = `${siteUrl}/#website`;
+
+const serviceCatalogItems = services.map((service, index) => ({
+  '@type': 'ListItem',
+  position: index + 1,
+  name: service.data.title,
+  url: `${siteUrl}/services/${service.id}/`,
+  item: {
+    '@type': 'Service',
+    name: service.data.title,
+    serviceType: service.data.title,
+    description: service.data.description,
+    url: `${siteUrl}/services/${service.id}/`,
+  },
+}));
 
 const localBusinessSchema = {
   '@context': 'https://schema.org',
+  '@id': localBusinessId,
   '@type': ['LocalBusiness', 'AutomotiveBusiness'],
   name: 'WRP Dubai',
   alternateName: 'Wrap, Reinforce, Protect',
   description:
-    'Premium car detailing studio in Dubai specializing in ceramic coating, paint protection film, and luxury vehicle care',
+    'Premium car detailing studio in Dubai specializing in Paint Protection Film (PPF), ceramic coating, window tinting and window film, car polish and paint correction, leather and upholstery care, and luxury vehicle maintenance',
   url: siteUrl,
   logo: {
     '@type': 'ImageObject',
@@ -70,6 +90,11 @@ const localBusinessSchema = {
     { '@type': 'City', name: 'Ajman' },
     { '@type': 'City', name: 'Abu Dhabi' },
   ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'WRP Vehicle Protection and Detailing Services',
+    itemListElement: serviceCatalogItems,
+  },
   sameAs: [
     'https://dub.sh/wrp_ig',
     'https://dub.sh/wrp-map',
@@ -77,45 +102,29 @@ const localBusinessSchema = {
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '5',
-    reviewCount: '60',
+    ratingValue: business.rating.toString(),
+    reviewCount: business.totalReviews.toString(),
     bestRating: '5',
     worstRating: '1',
   },
-  review: [
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Ahmed Al-Maktoum' },
-      datePublished: '2025-01-15',
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody:
-        'Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless.',
-    },
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Marcus Chen' },
-      datePublished: '2025-01-10',
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody:
-        'WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched in Dubai.',
-    },
-    {
-      '@type': 'Review',
-      author: { '@type': 'Person', name: 'Sophia Petrov' },
-      datePublished: '2025-01-05',
-      reviewRating: { '@type': 'Rating', ratingValue: '5', bestRating: '5' },
-      reviewBody:
-        'The only studio I trust with my collection. Professional, meticulous, and truly understand luxury vehicles.',
-    },
-  ],
+  review: topReviews.map(r => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.reviewerName },
+    reviewRating: { '@type': 'Rating', ratingValue: r.stars.toString(), bestRating: '5' },
+    reviewBody: r.text.slice(0, 500),
+  })),
 };
 
 const webSiteSchema = {
   '@context': 'https://schema.org',
+  '@id': websiteId,
   '@type': 'WebSite',
   name: 'WRP Dubai',
   alternateName: 'WRP',
+  description:
+    'Dubai vehicle protection and detailing studio for PPF, window tinting, ceramic coating, car polish, and upholstery care.',
   url: `${siteUrl}/`,
+  publisher: { '@id': localBusinessId },
 };
 
 const navItems = [...NAV_SERVICES, ...NAV_PAGES];
@@ -130,10 +139,20 @@ const siteNavigationSchema = {
   })),
 };
 
+const serviceCatalogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'WRP Service Catalog',
+  itemListOrder: 'https://schema.org/ItemListOrderAscending',
+  numberOfItems: serviceCatalogItems.length,
+  itemListElement: serviceCatalogItems,
+};
+
 const schemas = {
   LocalBusiness: localBusinessSchema,
   WebSite: webSiteSchema,
   SiteNavigationElement: siteNavigationSchema,
+  ServiceCatalog: serviceCatalogSchema,
 };
 const schema = schemas[type];
 ---

@@ -1,4 +1,6 @@
 ---
+import { getDisplayCount } from '@/lib/reviews';
+
 interface Props {
   whatsappLink?: string;
   phoneNumber?: string;
@@ -8,6 +10,7 @@ const {
   whatsappLink = 'https://dub.sh/wrp-wa',
   phoneNumber = '+971547173000'
 } = Astro.props;
+const displayCount = getDisplayCount();
 ---
 
 <!-- Floating WhatsApp Button -->
@@ -111,7 +114,7 @@ const {
       <span class="text-sm text-foreground">
         <span class="font-bold">5.0</span>
         <span class="text-muted-foreground">from</span>
-        <span class="font-bold">60+</span>
+        <span class="font-bold">{displayCount}</span>
         <span class="text-muted-foreground">Google reviews</span>
       </span>
     </div>

@@ -1,0 +1,44 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Schema from '../components/Schema.astro';
+import TestimonialWall from '../components/reviews/TestimonialWall.astro';
+import { getBusiness, getSchemaReviews, getDisplayCount } from '@/lib/reviews';
+
+const business = getBusiness();
+const displayCount = getDisplayCount();
+const title = `Client Reviews | WRP Dubai – ${business.rating.toFixed(1)} Stars, ${displayCount} Google Reviews`;
+const description = `Read ${displayCount} verified Google reviews from WRP Dubai clients. ${business.rating.toFixed(1)}-star rated car detailing, PPF, ceramic coating, and window tinting in Dubai.`;
+
+// AggregateRating + individual Review schema for SEO
+const schemaReviews = getSchemaReviews(10);
+const reviewPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': 'https://wrpdetailing.ae/#localbusiness',
+  name: 'WRP Dubai',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: business.rating.toString(),
+    reviewCount: business.totalReviews.toString(),
+    bestRating: '5',
+    worstRating: '1',
+  },
+  review: schemaReviews.map(r => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.reviewerName },
+    reviewRating: { '@type': 'Rating', ratingValue: r.stars.toString(), bestRating: '5' },
+    reviewBody: r.text.slice(0, 500),
+    datePublished: new Date().toISOString().split('T')[0], // approximate
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} showNav={true} showFooter={true}>
+  <Schema type="SiteNavigationElement" />
+  <script type="application/ld+json" set:html={JSON.stringify(reviewPageSchema)} />
+  <div class="pt-20">
+    <TestimonialWall />
+  </div>
+</BaseLayout>

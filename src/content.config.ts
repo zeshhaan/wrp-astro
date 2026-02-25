@@ -42,6 +42,7 @@ const services = defineCollection({
 		mainDescription1: z.string().optional(),
 		mainDescription2: z.string().optional(),
 		mainImage: z.string().optional(),
+		mainImageAlt: z.string().optional(),
 		// Icon features (4 features with icons)
 		iconFeatures: z.array(z.object({
 			icon: z.string(), // lucide icon name
@@ -68,6 +69,8 @@ const services = defineCollection({
 				title: z.string(),
 				description: z.string(),
 				solution: z.string().optional(),
+				image: z.string().optional(),
+				imageAlt: z.string().optional(),
 			})),
 		}).optional(),
 		// Process steps

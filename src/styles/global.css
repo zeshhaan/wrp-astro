@@ -77,11 +77,10 @@
 }
 
 @theme inline {
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
-  --font-sans: "Playfair Display", "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
-  /* Added Montserrat font variable for logo */
-  --font-logo: "Montserrat", sans-serif;
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-logo: var(--font-montserrat);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -163,4 +162,64 @@
   from {
     opacity: 0;
   }
+}
+
+/* ── Review Marquee ──────────────────────────── */
+@keyframes marquee-scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee-scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.marquee-container {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+.marquee-row {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+}
+.marquee-left {
+  animation: marquee-scroll-left 80s linear infinite;
+}
+.marquee-right {
+  animation: marquee-scroll-right 80s linear infinite;
+}
+.marquee-row:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-left,
+  .marquee-right {
+    animation: none;
+  }
+}
+
+/* ── Review Masonry ──────────────────────────── */
+.review-masonry {
+  columns: 1;
+  column-gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .review-masonry { columns: 2; }
+}
+@media (min-width: 1024px) {
+  .review-masonry { columns: 3; }
+}
+.review-masonry > * {
+  break-inside: avoid;
+}
+
+/* ── Review Highlight <mark> ─────────────────── */
+.review-mark {
+  background: linear-gradient(120deg, oklch(0.88 0.06 85) 0%, oklch(0.93 0.03 85) 100%);
+  color: var(--foreground);
+  padding: 0.05em 0.2em;
+  border-radius: 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }

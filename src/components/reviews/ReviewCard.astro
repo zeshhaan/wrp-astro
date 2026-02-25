@@ -1,0 +1,178 @@
+---
+import type { Review } from '@/lib/reviews';
+import { getReviewImageAlt } from '@/lib/reviews';
+import StarRating from './StarRating.astro';
+
+interface Props {
+  review: Review;
+  variant?: 'default' | 'featured' | 'compact' | 'dark';
+  showImages?: boolean;
+  highlightWords?: string[];
+  maxTextLength?: number;
+}
+
+const {
+  review,
+  variant = 'default',
+  showImages = true,
+  highlightWords = [],
+  maxTextLength = 0,
+} = Astro.props;
+
+const hasImages = showImages && review.localImages && review.localImages.length > 0;
+
+// Apply <mark> highlights to text
+function highlightText(text: string, words: string[]): string {
+  if (!words.length) return text;
+  const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+  return text.replace(regex, '<mark class="review-mark">$1</mark>');
+}
+
+let displayText = review.text;
+if (maxTextLength && displayText.length > maxTextLength) {
+  displayText = displayText.substring(0, maxTextLength).replace(/\s+\S*$/, '') + '…';
+}
+const processedText = highlightText(displayText, highlightWords);
+
+const cardClasses: Record<string, string> = {
+  default: 'bg-card border border-border p-6',
+  featured: 'bg-card border border-border p-6 border-t-2 border-t-yellow-500/60',
+  compact: 'bg-card border border-border p-4',
+  dark: 'bg-white/5 border border-white/10 p-6 text-white',
+};
+
+const textClasses: Record<string, string> = {
+  default: 'text-muted-foreground',
+  featured: 'text-muted-foreground',
+  compact: 'text-muted-foreground text-sm',
+  dark: 'text-white/85',
+};
+
+const nameClasses: Record<string, string> = {
+  default: 'text-foreground',
+  featured: 'text-foreground',
+  compact: 'text-foreground',
+  dark: 'text-white',
+};
+
+const subClasses: Record<string, string> = {
+  default: 'text-muted-foreground',
+  featured: 'text-muted-foreground',
+  compact: 'text-muted-foreground',
+  dark: 'text-white/50',
+};
+
+// Avatar: prefer local file, fall back to Google CDN, then initials
+const avatarSrc = review.localAvatar ? `/${review.localAvatar}` : review.profilePhoto;
+const initials = review.reviewerName
+  .split(' ')
+  .map(n => n[0])
+  .join('')
+  .toUpperCase()
+  .slice(0, 2);
+---
+
+<div class:list={[cardClasses[variant], 'flex flex-col']}>
+  {/* Image carousel */}
+  {hasImages && (
+    <div
+      class="relative -mx-6 -mt-6 mb-4 aspect-[4/3] overflow-hidden"
+      x-data={`{ current: 0, total: ${review.localImages.length}, interval: null }`}
+      x-init="interval = setInterval(() => { current = (current + 1) % total }, 4500)"
+      x-on:mouseenter="clearInterval(interval)"
+      x-on:mouseleave="interval = setInterval(() => { current = (current + 1) % total }, 4500)"
+    >
+      {review.localImages.map((img, i) => (
+        <img
+          src={`/${img}`}
+          alt={getReviewImageAlt(review, i)}
+          width="600"
+          height="450"
+          loading="lazy"
+          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+          x-show={`current === ${i}`}
+          x-transition:enter="transition-opacity duration-500"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          style={i === 0 ? '' : 'display: none;'}
+        />
+      ))}
+      {/* Dot indicators */}
+      {review.localImages.length > 1 && (
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+          {review.localImages.map((_, i) => (
+            <button
+              class="w-1.5 h-1.5 rounded-full transition-all duration-300"
+              x-on:click={`current = ${i}`}
+              x-bind:class={`current === ${i} ? 'bg-white w-4' : 'bg-white/50'`}
+              aria-label={`View photo ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Stars + date */}
+  <div class="flex items-center justify-between mb-3">
+    <StarRating rating={review.stars} size={variant === 'compact' ? 'sm' : 'md'} />
+    <span class:list={['text-xs', subClasses[variant]]}>{review.date}</span>
+  </div>
+
+  {/* Review text */}
+  {review.text && (
+    <div class:list={['leading-relaxed mb-4 flex-1', textClasses[variant]]}>
+      {maxTextLength && review.text.length > maxTextLength ? (
+        <div x-data="{ expanded: false }">
+          <p x-show="!expanded" set:html={`"${processedText}"`} />
+          <p x-show="expanded" x-cloak set:html={`"${highlightText(review.text, highlightWords)}"`} />
+          <button
+            x-on:click="expanded = !expanded"
+            class="text-xs font-medium mt-1 underline underline-offset-2 opacity-70 hover:opacity-100 transition-opacity"
+            x-text="expanded ? 'Show less' : 'Read more'"
+          >Read more</button>
+        </div>
+      ) : (
+        <p set:html={`"${processedText}"`} />
+      )}
+    </div>
+  )}
+
+  {/* Reviewer info */}
+  <div class="flex items-center gap-3 mt-auto">
+    <div class="relative w-9 h-9 rounded-full overflow-hidden bg-muted flex-shrink-0"
+      x-data="{ failed: false }">
+      <img
+        src={avatarSrc}
+        alt={review.reviewerName}
+        width="36"
+        height="36"
+        class="w-full h-full object-cover"
+        loading="lazy"
+        x-show="!failed"
+        x-on:error="failed = true"
+      />
+      <div
+        x-show="failed"
+        x-cloak
+        class="w-full h-full flex items-center justify-center text-xs font-bold bg-foreground text-background"
+      >{initials}</div>
+    </div>
+    <div>
+      <p class:list={['font-semibold text-sm', nameClasses[variant]]}>{review.reviewerName}</p>
+      {review.reviewerInfo && (
+        <p class:list={['text-xs', subClasses[variant]]}>{review.reviewerInfo}</p>
+      )}
+    </div>
+    {review.likes > 0 && (
+      <span class:list={['ml-auto text-xs flex items-center gap-1', subClasses[variant]]}>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+        </svg>
+        {review.likes}
+      </span>
+    )}
+  </div>
+
+</div>

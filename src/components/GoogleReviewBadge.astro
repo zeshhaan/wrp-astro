@@ -1,13 +1,16 @@
 ---
+import { getBusiness, getDisplayCount } from '@/lib/reviews';
+
 interface Props {
   rating?: string;
   reviewCount?: string;
   googleReviewUrl?: string;
 }
 
+const business = getBusiness();
 const {
-  rating = '5.0',
-  reviewCount = '60+',
+  rating = business.rating.toFixed(1),
+  reviewCount = getDisplayCount(),
   googleReviewUrl = 'https://dub.sh/wrp-map'
 } = Astro.props;
 ---

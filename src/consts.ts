@@ -7,6 +7,7 @@ export const SITE_DESCRIPTION = 'Dubai\'s premium automotive detailing studio. W
 export const NAV_PAGES = [
   { name: 'Blog', href: '/blog/' },
   { name: 'Portfolio', href: '/portfolio/' },
+  { name: 'Reviews', href: '/reviews/' },
   { name: 'About', href: '/more-about-wrp/' },
   { name: 'Contact', href: '/contact-us/' },
 ];

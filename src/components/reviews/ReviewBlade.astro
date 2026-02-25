@@ -1,0 +1,120 @@
+---
+/**
+ * Full-width review "blade" for inserting between content sections.
+ * Used in service pages and blog posts as social proof breaks.
+ */
+import type { Review } from '@/lib/reviews';
+import { getBestReviewForService, getReviewImageAlt } from '@/lib/reviews';
+import StarRating from './StarRating.astro';
+
+interface Props {
+  review?: Review;
+  serviceSlug?: string;
+  variant?: 'light' | 'dark';
+}
+
+const { review: propReview, serviceSlug, variant = 'dark' } = Astro.props;
+const review = propReview || (serviceSlug ? getBestReviewForService(serviceSlug) : undefined);
+
+if (!review) return;
+
+const hasImage = review.localImages && review.localImages.length > 0;
+const isDark = variant === 'dark';
+
+// Pick a short excerpt or the highlight quote
+const quote = review.highlightQuote || review.text.split('.').slice(0, 2).join('.') + '.';
+---
+
+<section class:list={[
+  'py-20 px-6 overflow-hidden relative',
+  isDark ? 'bg-black text-white' : 'bg-muted/30 text-foreground',
+]}>
+  {/* Decorative quote mark */}
+  <div class:list={[
+    'absolute top-8 left-8 font-serif text-[12rem] leading-none pointer-events-none select-none',
+    isDark ? 'text-white/[0.04]' : 'text-foreground/[0.04]',
+  ]} aria-hidden="true">"</div>
+
+  <div class="container mx-auto max-w-6xl relative z-10">
+    <div class:list={[
+      'grid items-center gap-12',
+      hasImage ? 'md:grid-cols-5' : 'md:grid-cols-1 max-w-3xl mx-auto text-center',
+    ]}>
+      {/* Image side */}
+      {hasImage && (
+        <div class="md:col-span-2 relative"
+          x-data={`{ current: 0, total: ${review.localImages.length} }`}
+          x-init={review.localImages.length > 1 ? "setInterval(() => { current = (current + 1) % total }, 5000)" : ""}
+        >
+          <div class="aspect-[4/3] overflow-hidden">
+            {review.localImages.map((img, i) => (
+              <img
+                src={`/${img}`}
+                alt={getReviewImageAlt(review, i)}
+                width="600"
+                height="450"
+                loading="lazy"
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+                x-show={`current === ${i}`}
+                style={i === 0 ? '' : 'display: none;'}
+              />
+            ))}
+          </div>
+          {review.localImages.length > 1 && (
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+              {review.localImages.map((_, i) => (
+                <button
+                  class="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  x-on:click={`current = ${i}`}
+                  x-bind:class={`current === ${i} ? 'bg-white w-4' : 'bg-white/50'`}
+                  aria-label={`Photo ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Quote side */}
+      <div class:list={[hasImage ? 'md:col-span-3' : '']}>
+        <StarRating rating={review.stars} size="md" class:list={['mb-4', !hasImage && 'justify-center']} />
+        <blockquote>
+          <p class:list={[
+            'font-serif text-2xl md:text-3xl font-medium leading-snug mb-6',
+            isDark ? 'text-white' : 'text-foreground',
+          ]}>
+            "{quote}"
+          </p>
+        </blockquote>
+        <div class:list={['flex items-center gap-3', !hasImage && 'justify-center']}>
+          <div class="w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0"
+            x-data="{ failed: false }">
+            <img
+              src={review.localAvatar ? `/${review.localAvatar}` : review.profilePhoto}
+              alt={review.reviewerName}
+              width="40"
+              height="40"
+              class="w-full h-full object-cover"
+              loading="lazy"
+              x-show="!failed"
+              x-on:error="failed = true"
+            />
+            <div
+              x-show="failed"
+              x-cloak
+              class="w-full h-full flex items-center justify-center text-xs font-bold bg-white text-black"
+            >{review.reviewerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}</div>
+          </div>
+          <div class:list={[!hasImage && 'text-left']}>
+            <p class:list={['font-semibold text-sm', isDark ? 'text-white' : 'text-foreground']}>
+              {review.reviewerName}
+            </p>
+            <p class:list={['text-xs', isDark ? 'text-white/50' : 'text-muted-foreground']}>
+              Verified Google Review · {review.date}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

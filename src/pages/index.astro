@@ -7,13 +7,21 @@ import { Card } from "@/components/ui/card";
 import Schema from '../components/Schema.astro';
 import { Icon } from 'astro-icon/components';
 import LatestPosts from '../components/LatestPosts.astro';
+import HeroTestimonials from '../components/reviews/HeroTestimonials.astro';
+import { getReviewsForService, getDisplayCount } from '@/lib/reviews';
 
-const title = 'WRP Dubai | PPF, Ceramic Coating & Paint Protection Experts';
-const description = "Dubai's paint protection experts. PPF, ceramic coating & detailing with 10-year warranty. Precision installation for luxury vehicles. Get a free quote today.";
+// Get a real review for the inline polish testimonial
+const polishReviews = getReviewsForService('polish');
+const inlineReview = polishReviews.find(r => r.highlightQuote) || polishReviews[0];
+const displayCount = getDisplayCount();
+
+const title = 'WRP Dubai | Paint Protection Film (PPF), Ceramic Coating & Detailing';
+const description = "Dubai's paint protection experts for Paint Protection Film (PPF), ceramic coating, window tinting, car polish, and upholstery care. Precision installation with up to 10-year warranty.";
 ---
 
 <BaseLayout title={title} description={description}>
   <Schema type="WebSite" />
+  <Schema type="ServiceCatalog" />
 
   <div class="min-h-screen bg-background">
     <!-- Hero Section -->
@@ -72,7 +80,7 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
           <span class="text-sm text-white">
             <span class="font-bold">5.0</span>
             <span class="text-white/70">from</span>
-            <span class="font-bold">60+</span>
+            <span class="font-bold">{displayCount}</span>
             <span class="text-white/70">reviews</span>
           </span>
         </a>
@@ -171,7 +179,7 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
             <ul class="space-y-2 text-sm mb-6">
               <li class="flex items-start gap-2">
                 <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                <span>Paint protection film (PPF)</span>
+                <span>Paint Protection Film (PPF)</span>
               </li>
               <li class="flex items-start gap-2">
                 <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
@@ -207,7 +215,7 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
               </li>
               <li class="flex items-start gap-2">
                 <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                <span>Paint correction & polishing</span>
+                <span>Car polish & paint correction</span>
               </li>
               <li class="flex items-start gap-2">
                 <Icon name="lucide:check" class="h-4 w-4 text-primary mt-1 flex-shrink-0" />
@@ -300,7 +308,7 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
           </div>
           <div class="lg:ml-auto lg:pt-4 lg:pl-8">
             <div class="lg:max-w-lg">
-              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Protection Film</h3>
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Protection Film (PPF)</h3>
               <p class="text-lg text-muted-foreground mb-8">
                 Military-grade transparent film that shields your paint from rock chips, scratches, and environmental damage. Self-healing technology repairs minor scratches.
               </p>
@@ -344,9 +352,9 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
         <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:items-start mb-24">
           <div class="lg:pt-4 lg:pr-8">
             <div class="lg:max-w-lg">
-              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Paint Correction & Polish</h3>
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Car Polish & Paint Correction</h3>
               <p class="text-lg text-muted-foreground mb-8">
-                Multi-stage machine polishing that removes swirl marks, scratches, and oxidation. Restore your paint's original depth and mirror-like clarity.
+                Multi-stage car polish and paint correction that removes swirl marks, scratches, and oxidation. Restore your paint's original depth and mirror-like clarity.
               </p>
               <dl class="space-y-6 text-base text-muted-foreground">
                 <div class="relative pl-9">
@@ -380,14 +388,19 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
                 </a>
 
               </div>
-              <figure class="mt-12 border-l-2 border-border pl-8">
-                <blockquote class="text-base text-muted-foreground italic">
-                  <p>"Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating is flawless."</p>
-                </blockquote>
-                <figcaption class="mt-4 flex gap-x-4 text-sm">
-                  <div><span class="font-semibold">Ahmed Al-Maktoum</span> – <span class="text-muted-foreground">Porsche 911 GT3 RS Owner</span></div>
-                </figcaption>
-              </figure>
+              {inlineReview && (
+                <figure class="mt-12 border-l-2 border-border pl-8">
+                  <blockquote class="text-base text-muted-foreground italic">
+                    <p>"{inlineReview.highlightQuote || inlineReview.text.split('.').slice(0, 2).join('.') + '.'}"</p>
+                  </blockquote>
+                  <figcaption class="mt-4 flex gap-x-4 text-sm">
+                    <div>
+                      <span class="font-semibold">{inlineReview.reviewerName}</span>
+                      <span class="text-muted-foreground"> – Verified Google Review</span>
+                    </div>
+                  </figcaption>
+                </figure>
+              )}
             </div>
           </div>
           <div class="overflow-hidden">
@@ -414,9 +427,9 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
           </div>
           <div class="lg:ml-auto lg:pt-4 lg:pl-8">
             <div class="lg:max-w-lg">
-              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Window Film</h3>
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Window Tinting & Window Film</h3>
               <p class="text-lg text-muted-foreground mb-8">
-                Advanced ceramic technology that blocks 99% UV rays and up to 80% heat. Enhanced privacy and comfort for Dubai's intense climate.
+                Advanced window tinting and ceramic window film technology that blocks 99% UV rays and up to 80% heat. Enhanced privacy and comfort for Dubai's intense climate.
               </p>
               <dl class="space-y-6 text-base text-muted-foreground">
                 <div class="relative pl-9">
@@ -504,6 +517,58 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
               height="800"
               class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
             />
+          </div>
+        </div>
+
+        <!-- Service 6: Leather & Upholstery Care - Photo LEFT -->
+        <div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 mt-24 bg-muted/30">
+          <div class="flex items-start justify-end lg:order-first overflow-hidden">
+            <img
+              src="/luxury-suv-black-and-white-premium-detail.jpg"
+              alt="Luxury vehicle leather upholstery restoration and interior detailing completed at WRP Dubai"
+              width="1200"
+              height="800"
+              class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+            />
+          </div>
+          <div class="lg:ml-auto lg:pt-4 lg:pl-8">
+            <div class="lg:max-w-lg">
+              <h3 class="font-serif text-3xl md:text-4xl font-bold mb-4">Leather & Upholstery Care</h3>
+              <p class="text-lg text-muted-foreground mb-8">
+                Professional leather and upholstery cleaning, conditioning, and protection for luxury cabins. Restore comfort, finish, and freshness while protecting interior materials from Dubai's heat.
+              </p>
+              <dl class="space-y-6 text-base text-muted-foreground">
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:shield-check" class="absolute top-1 left-1 h-5 w-5" />
+                    Leather Conditioning.
+                  </dt>
+                  <dd class="inline">Restore softness and help prevent cracking and dryness</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sparkles" class="absolute top-1 left-1 h-5 w-5" />
+                    Deep Upholstery Cleaning.
+                  </dt>
+                  <dd class="inline">Lift stains, oils, and embedded dirt from seats and carpets</dd>
+                </div>
+                <div class="relative pl-9">
+                  <dt class="inline font-semibold text-foreground">
+                    <Icon name="lucide:sun" class="absolute top-1 left-1 h-5 w-5" />
+                    UV Interior Protection.
+                  </dt>
+                  <dd class="inline">Protect cabin materials from fading under intense sunlight</dd>
+                </div>
+              </dl>
+              <div class="mt-8">
+                <a href="/services/leather-upholstery/">
+                  <Button size="lg">
+                    EXPLORE SERVICE
+                    <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+                  </Button>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -597,78 +662,7 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
     </section>
 
     <!-- Testimonials -->
-    <section class="py-32 px-6 bg-black text-white">
-      <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-20">
-          <h2 class="font-serif text-5xl md:text-6xl font-bold mb-6">Client Testimonials</h2>
-          <p class="text-lg text-white/70 max-w-2xl mx-auto">
-            Trusted by Dubai's most discerning automotive collectors
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-          <Card className="p-8 bg-white/5 border-white/10 text-white">
-            <div class="mb-6">
-              <div class="flex gap-1 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-              </div>
-              <p class="text-white/90 leading-relaxed italic">
-                "Exceptional attention to detail. My Porsche 911 GT3 RS has never looked better. The ceramic coating
-                is flawless."
-              </p>
-            </div>
-            <div>
-              <p class="font-bold">Ahmed Al-Maktoum</p>
-              <p class="text-sm text-white/60">Porsche 911 GT3 RS Owner</p>
-            </div>
-          </Card>
-
-          <Card className="p-8 bg-white/5 border-white/10 text-white">
-            <div class="mb-6">
-              <div class="flex gap-1 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-              </div>
-              <p class="text-white/90 leading-relaxed italic">
-                "WRP transformed my McLaren 720S with a stunning custom wrap. The quality and precision are unmatched
-                in Dubai."
-              </p>
-            </div>
-            <div>
-              <p class="font-bold">Marcus Chen</p>
-              <p class="text-sm text-white/60">McLaren 720S Owner</p>
-            </div>
-          </Card>
-
-          <Card className="p-8 bg-white/5 border-white/10 text-white">
-            <div class="mb-6">
-              <div class="flex gap-1 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-5 w-5 text-yellow-400"><path fill-rule="evenodd" d="M8 1.75a.75.75 0 0 1 .692.462l1.41 3.393 3.664.293a.75.75 0 0 1 .428 1.317l-2.791 2.39.853 3.575a.75.75 0 0 1-1.12.814L7.998 12.08l-3.135 1.915a.75.75 0 0 1-1.12-.814l.852-3.574-2.79-2.39a.75.75 0 0 1 .427-1.318l3.663-.293 1.41-3.393A.75.75 0 0 1 8 1.75Z" clip-rule="evenodd" /></svg>
-              </div>
-              <p class="text-white/90 leading-relaxed italic">
-                "The only studio I trust with my collection. Professional, meticulous, and truly understand luxury
-                vehicles."
-              </p>
-            </div>
-            <div>
-              <p class="font-bold">Sophia Petrov</p>
-              <p class="text-sm text-white/60">Bentley Continental GT Owner</p>
-            </div>
-          </Card>
-        </div>
-      </div>
-    </section>
+    <HeroTestimonials />
 
     <!-- About Section -->
     <section id="about" class="py-32 px-6">
@@ -938,8 +932,11 @@ const description = "Dubai's paint protection experts. PPF, ceramic coating & de
                 >
                   <option>Select a service</option>
                   <option>Wrap</option>
-                  <option>Reinforce (PPF/Ceramic)</option>
-                  <option>Protect (Detailing)</option>
+                  <option>Reinforce (Paint Protection Film (PPF) / Ceramic)</option>
+                  <option>Car Polish & Paint Correction</option>
+                  <option>Window Tinting & Window Film</option>
+                  <option>Leather & Upholstery Care</option>
+                  <option>Protect (Detailing & Maintenance)</option>
                   <option>Full Package</option>
                 </select>
               </div>

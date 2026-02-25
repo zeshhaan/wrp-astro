@@ -6,6 +6,7 @@ import WhatsAppButton from '../components/WhatsAppButton.astro';
 import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
+import { Font } from 'astro:assets';
 import '../styles/global.css';
 
 interface Props {
@@ -136,10 +137,10 @@ const extendMeta = [
     <!-- View Transitions Fallback for browsers without native support -->
     <ClientRouter />
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@400;500;600;700&family=Montserrat:ital,wght@1,900&display=swap" rel="stylesheet" />
+    <!-- Astro Experimental Fonts -->
+    <Font cssVariable="--font-playfair" preload />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-montserrat" />
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
