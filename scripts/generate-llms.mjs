@@ -121,6 +121,23 @@ function serviceToMarkdown(fm) {
     }
   }
 
+  // Additional section (product offerings, etc.)
+  const addSectionMatch = fm.match(/^additionalSection:\s*$/m);
+  if (addSectionMatch) {
+    const addHeading = fm.match(/^\s{2}heading:\s*['"]?(.*?)['"]?\s*$/m);
+    if (addHeading) {
+      parts.push('', `### ${addHeading[1]}`, '');
+      // Extract cards: title starts with "    - title:", description at "      description:"
+      const cardTitles = [...fm.matchAll(/^\s{4}-\s+title:\s*['"]?(.*?)['"]?\s*$/gm)];
+      const cardDescs = [...fm.matchAll(/^\s{6}description:\s*['"]?(.*?)['"]?\s*$/gm)];
+      for (let i = 0; i < cardTitles.length; i++) {
+        parts.push(`**${cardTitles[i][1]}**`);
+        if (cardDescs[i]) parts.push(cardDescs[i][1]);
+        parts.push('');
+      }
+    }
+  }
+
   // Process steps
   const process = extractYamlArray(fm, 'process');
   if (process.length) {
@@ -200,7 +217,8 @@ const llmsLines = [
   `> ${SITE.description}`,
   '',
   'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, leather upholstery care, and premium car wash services.',
+  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, custom seat covers, premium floor mats (2D/5D/7D), full seat upholstery, and premium car wash services.',
+  'Visit our showroom to see and feel materials in person — we have ready samples for most popular models including Nissan Patrol, Toyota Land Cruiser, and nearly every brand on the road.',
   '',
   '## Services',
   '',
@@ -244,7 +262,8 @@ const fullSections = [
   `> ${SITE.description}`,
   '',
   'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, leather upholstery care, and premium car wash services.',
+  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, custom seat covers, premium floor mats (2D/5D/7D), full seat upholstery, and premium car wash services.',
+  'Visit our showroom to see and feel materials in person — we have ready samples for most popular models including Nissan Patrol, Toyota Land Cruiser, and nearly every brand on the road.',
 ];
 
 if (services.length) {
