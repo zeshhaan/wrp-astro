@@ -78,10 +78,10 @@ const initials = review.reviewerName
   {hasImages && (
     <div
       class="relative -mx-6 -mt-6 mb-4 aspect-[4/3] overflow-hidden"
-      x-data={`{ current: 0, total: ${review.localImages.length}, interval: null }`}
-      x-init="interval = setInterval(() => { current = (current + 1) % total }, 4500)"
+      x-data={`{ current: 0, total: ${review.localImages.length}, interval: null, start() { this.interval = setInterval(() => { this.current = (this.current + 1) % this.total }, 4500) }, destroy() { clearInterval(this.interval) } }`}
+      x-init="start()"
       x-on:mouseenter="clearInterval(interval)"
-      x-on:mouseleave="interval = setInterval(() => { current = (current + 1) % total }, 4500)"
+      x-on:mouseleave="start()"
     >
       {review.localImages.map((img, i) => (
         <img

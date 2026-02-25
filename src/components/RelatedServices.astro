@@ -9,16 +9,13 @@ interface Props {
 
 const { serviceIds } = Astro.props;
 
-if (serviceIds.length === 0) return;
-
 const allServices = await getCollection('services');
 const related = allServices
 	.filter((s) => serviceIds.includes(s.id))
 	.slice(0, 3);
-
-if (related.length === 0) return;
 ---
 
+{serviceIds.length > 0 && related.length > 0 && (
 <aside class="mt-16 pt-12 border-t border-border">
 	<h2 class="font-serif text-2xl md:text-3xl font-bold mb-2">Services Mentioned in This Article</h2>
 	<p class="text-muted-foreground mb-8">Learn more about the services discussed above</p>
@@ -53,3 +50,4 @@ if (related.length === 0) return;
 		))}
 	</div>
 </aside>
+)}

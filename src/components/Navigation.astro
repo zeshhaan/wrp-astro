@@ -33,6 +33,9 @@ const DESKTOP_SERVICES = NAV_SERVICES
 
 // Same order for mobile
 const MOBILE_SERVICES = NAV_SERVICES.slice().sort((a, b) => serviceOrder(a.name) - serviceOrder(b.name));
+
+// Current page detection for active nav state
+const currentPath = Astro.url.pathname;
 ---
 
 <div class="fixed top-0 left-0 right-0 z-50" x-data="{ trustBarVisible: true, lastScroll: 0 }" @scroll.window="
@@ -95,11 +98,21 @@ const MOBILE_SERVICES = NAV_SERVICES.slice().sort((a, b) => serviceOrder(a.name)
       </a>
     </div>
     <div class="hidden md:flex items-center gap-6 text-sm tracking-wide">
-      {DESKTOP_SERVICES.map((service) => (
-        <a href={service.href} class="hover:text-muted-foreground transition-colors whitespace-nowrap">
-          {service.shortName}
-        </a>
-      ))}
+      {DESKTOP_SERVICES.map((service) => {
+        const isActive = currentPath === service.href || currentPath === service.href.replace(/\/$/, '');
+        return (
+          <a
+            href={service.href}
+            class:list={[
+              'transition-colors whitespace-nowrap',
+              isActive ? 'text-foreground font-semibold border-b-2 border-foreground pb-0.5' : 'text-muted-foreground hover:text-foreground',
+            ]}
+            aria-current={isActive ? 'page' : undefined}
+          >
+            {service.shortName}
+          </a>
+        );
+      })}
     </div>
     <div data-contact-modal class="hidden md:flex cursor-pointer">
       <ShimmerButton>
@@ -132,15 +145,22 @@ const MOBILE_SERVICES = NAV_SERVICES.slice().sort((a, b) => serviceOrder(a.name)
       <!-- Services Section -->
       <div class="text-xs text-muted-foreground uppercase tracking-wider mb-2">Services</div>
       <div class="ml-4 flex flex-col gap-4">
-        {MOBILE_SERVICES.map((service) => (
-          <a
-            href={service.href}
-            class="text-base hover:text-muted-foreground transition-colors"
-            @click="mobileMenuOpen = false"
-          >
-            {service.name}
-          </a>
-        ))}
+        {MOBILE_SERVICES.map((service) => {
+          const isActive = currentPath === service.href || currentPath === service.href.replace(/\/$/, '');
+          return (
+            <a
+              href={service.href}
+              class:list={[
+                'text-base transition-colors',
+                isActive ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground',
+              ]}
+              aria-current={isActive ? 'page' : undefined}
+              @click="mobileMenuOpen = false"
+            >
+              {service.name}
+            </a>
+          );
+        })}
       </div>
 
       <div class="border-t border-border pt-4"></div>

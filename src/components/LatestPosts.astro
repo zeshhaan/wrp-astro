@@ -22,8 +22,6 @@ const posts = allPosts
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 	.slice(0, count);
 
-if (posts.length === 0) return;
-
 const categoryLabels: Record<string, string> = {
 	guide: 'Guide',
 	news: 'News',
@@ -33,6 +31,7 @@ const categoryLabels: Record<string, string> = {
 };
 ---
 
+{posts.length > 0 && (
 <section class="py-24 px-6">
 	<div class="container mx-auto max-w-7xl">
 		<div class="text-center mb-12">
@@ -96,3 +95,4 @@ const categoryLabels: Record<string, string> = {
 		</div>
 	</div>
 </section>
+)}

@@ -16,10 +16,9 @@ const { serviceSlug, limit = 4, heading } = Astro.props;
 const reviews = getReviewsForService(serviceSlug).slice(0, limit);
 const business = getBusiness();
 const displayCount = getDisplayCount();
-
-if (reviews.length === 0) return;
 ---
 
+{reviews.length > 0 && (
 <section class="py-24 px-6">
   <div class="container mx-auto max-w-6xl">
     <div class="text-center mb-16">
@@ -74,3 +73,4 @@ if (reviews.length === 0) return;
     </div>
   </div>
 </section>
+)}

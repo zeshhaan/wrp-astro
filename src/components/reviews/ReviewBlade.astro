@@ -15,16 +15,14 @@ interface Props {
 
 const { review: propReview, serviceSlug, variant = 'dark' } = Astro.props;
 const review = propReview || (serviceSlug ? getBestReviewForService(serviceSlug) : undefined);
-
-if (!review) return;
-
-const hasImage = review.localImages && review.localImages.length > 0;
+const hasImage = !!(review?.localImages && review.localImages.length > 0);
 const isDark = variant === 'dark';
 
 // Pick a short excerpt or the highlight quote
-const quote = review.highlightQuote || review.text.split('.').slice(0, 2).join('.') + '.';
+const quote = review ? review.highlightQuote || review.text.split('.').slice(0, 2).join('.') + '.' : '';
 ---
 
+{review && (
 <section class:list={[
   'py-20 px-6 overflow-hidden relative',
   isDark ? 'bg-black text-white' : 'bg-muted/30 text-foreground',
@@ -43,8 +41,8 @@ const quote = review.highlightQuote || review.text.split('.').slice(0, 2).join('
       {/* Image side */}
       {hasImage && (
         <div class="md:col-span-2 relative"
-          x-data={`{ current: 0, total: ${review.localImages.length} }`}
-          x-init={review.localImages.length > 1 ? "setInterval(() => { current = (current + 1) % total }, 5000)" : ""}
+          x-data={`{ current: 0, total: ${review.localImages.length}, interval: null, destroy() { clearInterval(this.interval) } }`}
+          x-init={review.localImages.length > 1 ? "interval = setInterval(() => { current = (current + 1) % total }, 5000)" : ""}
         >
           <div class="aspect-[4/3] overflow-hidden">
             {review.localImages.map((img, i) => (
@@ -118,3 +116,4 @@ const quote = review.highlightQuote || review.text.split('.').slice(0, 2).join('
     </div>
   </div>
 </section>
+)}
