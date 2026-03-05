@@ -985,10 +985,10 @@ const description = "Dubai's paint protection experts for Paint Protection Film 
 
   <script>
     // Parallax effect on hero image
-    // Uses astro:page-load so it re-initializes after View Transition navigations
+    // Re-initializes after View Transition navigations
     let scrollHandler: ((e: Event) => void) | null = null;
 
-    document.addEventListener('astro:page-load', () => {
+    function initParallax() {
       // Clean up previous listener if any
       if (scrollHandler) {
         window.removeEventListener('scroll', scrollHandler);
@@ -1020,6 +1020,10 @@ const description = "Dubai's paint protection experts for Paint Protection Film 
 
       window.addEventListener('scroll', scrollHandler, { passive: true });
       updateParallax();
-    });
+    }
+
+    // Astro v6: astro:page-load no longer fires on initial load
+    initParallax();
+    document.addEventListener('astro:page-load', initParallax);
   </script>
 </BaseLayout>

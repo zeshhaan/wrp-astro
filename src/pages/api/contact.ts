@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext';
+import { createMimeMessage } from 'mimetext/browser';
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
     const name = formData.get('name')?.toString();
@@ -42,7 +43,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Save to D1 database
-    const db = locals.runtime.env.DB;
+    const db = env.DB;
 
     await db.prepare(`
       INSERT INTO contact_submissions (name, email, phone, vehicle, service_interest, message)
@@ -143,7 +144,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         msg.asRaw()
       );
 
-      await locals.runtime.env.EMAIL.send(emailMessage);
+      await env.EMAIL.send(emailMessage);
     } catch (emailError) {
       // Log email error but don't fail the request
       console.error('Failed to send email notification:', emailError);

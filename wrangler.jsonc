@@ -6,10 +6,10 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "wrp-astro",
 	"account_id": "fa7eb70f2bedd4013dba6420fd975f92",
-	"main": "./dist/_worker.js/index.js",
-	"compatibility_date": "2025-10-29",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2026-02-25",
 	"compatibility_flags": [
-		"nodejs_compat",
+		"nodejs_compat_v2",
 		"global_fetch_strictly_public"
 	],
 	"assets": {

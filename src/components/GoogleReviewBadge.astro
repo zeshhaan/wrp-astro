@@ -49,7 +49,7 @@ const {
   // Show floating badge only after scrolling past the hero section
   let badgeScrollHandler: ((e: Event) => void) | null = null;
 
-  document.addEventListener('astro:page-load', () => {
+  function initBadge() {
     if (badgeScrollHandler) {
       window.removeEventListener('scroll', badgeScrollHandler);
       badgeScrollHandler = null;
@@ -78,5 +78,9 @@ const {
     window.addEventListener('scroll', badgeScrollHandler, { passive: true });
     // Check initial state
     badgeScrollHandler(new Event('scroll'));
-  });
+  }
+
+  // Astro v6: astro:page-load no longer fires on initial load
+  initBadge();
+  document.addEventListener('astro:page-load', initBadge);
 </script>

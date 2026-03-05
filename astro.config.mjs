@@ -45,45 +45,35 @@ export default defineConfig({
     icon(),
   ],
   adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-    },
     imageService: 'cloudflare',
   }),
-  image: {
-    service: {
-      entrypoint: 'astro/assets/services/cloudflare',
+  fonts: [
+    {
+      name: 'Playfair Display',
+      cssVariable: '--font-playfair',
+      provider: fontProviders.google(),
+      weights: [400, 700, 900],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
     },
-  },
-  experimental: {
-    fonts: [
-      {
-        name: 'Playfair Display',
-        cssVariable: '--font-playfair',
-        provider: fontProviders.google(),
-        weights: [400, 700, 900],
-        styles: ['normal'],
-        subsets: ['latin'],
-        fallbacks: ['Georgia', 'serif'],
-      },
-      {
-        name: 'Inter',
-        cssVariable: '--font-inter',
-        provider: fontProviders.google(),
-        weights: [400, 500, 600, 700],
-        styles: ['normal'],
-        subsets: ['latin'],
-        fallbacks: ['system-ui', 'sans-serif'],
-      },
-      {
-        name: 'Montserrat',
-        cssVariable: '--font-montserrat',
-        provider: fontProviders.google(),
-        weights: [900],
-        styles: ['italic'],
-        subsets: ['latin'],
-        fallbacks: ['system-ui', 'sans-serif'],
-      },
-    ],
-  },
+    {
+      name: 'Inter',
+      cssVariable: '--font-inter',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Montserrat',
+      cssVariable: '--font-montserrat',
+      provider: fontProviders.google(),
+      weights: [900],
+      styles: ['italic'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+  ],
 });
