@@ -1,0 +1,27 @@
+---
+/**
+ * Language toggle between English and Arabic.
+ * Sets wrp-lang cookie and navigates to the alternate URL.
+ * Uses data-astro-reload to force full page load (RTL dir change needs full DOM rebuild).
+ */
+import { getLocale, getAlternateUrl } from '../i18n/utils';
+import { t } from '../i18n/translations';
+
+interface Props {
+  locale?: string;
+  class?: string;
+}
+
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
+const alternateUrl = getAlternateUrl(Astro.url.pathname, locale);
+const label = locale === 'ar' ? t(locale, 'lang.switchToEnglish') : t(locale, 'lang.switchToArabic');
+---
+
+<a
+  href={alternateUrl}
+  data-astro-reload
+  class:list={['text-xs font-medium hover:opacity-80 transition-opacity', Astro.props.class]}
+  aria-label={`Switch to ${locale === 'ar' ? 'English' : 'Arabic'}`}
+>
+  {label}
+</a>

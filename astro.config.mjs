@@ -16,8 +16,16 @@ export default defineConfig({
   site: 'https://wrpdetailing.ae',
   output: 'server',
   trailingSlash: 'always',
-  redirects: {
-    '/about': '/more-about-wrp',
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ar'],
+    routing: {
+      prefixDefaultLocale: false,
+      fallbackType: 'rewrite',
+    },
+    fallback: {
+      ar: 'en',
+    },
   },
   vite: {
     plugins: [tailwindcss()],
@@ -29,6 +37,13 @@ export default defineConfig({
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',
       ],
+      i18n: {
+        defaultLocale: 'en',
+        locales: {
+          en: 'en-AE',
+          ar: 'ar-AE',
+        },
+      },
     }),
     partytown({
       config: {
@@ -73,6 +88,24 @@ export default defineConfig({
       weights: [900],
       styles: ['italic'],
       subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Noto Naskh Arabic',
+      cssVariable: '--font-noto-naskh',
+      provider: fontProviders.google(),
+      weights: [400, 700],
+      styles: ['normal'],
+      subsets: ['arabic'],
+      fallbacks: ['serif'],
+    },
+    {
+      name: 'IBM Plex Sans Arabic',
+      cssVariable: '--font-ibm-plex-arabic',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['arabic'],
       fallbacks: ['system-ui', 'sans-serif'],
     },
   ],

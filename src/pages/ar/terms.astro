@@ -1,0 +1,183 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: 'الشروط', url: `${siteBase}${localizeUrl('/terms/', locale)}` },
+];
+---
+
+<BaseLayout
+  title="شروط الاستخدام | WRP Detailing Studio"
+  description="الشروط والأحكام الخاصة باستخدام موقع WRP Detailing Studio وخدماته"
+  noindex={false}
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="mb-6 font-serif text-4xl font-bold md:text-5xl">شروط الاستخدام</h1>
+      <p class="mb-12 text-sm text-muted-foreground">آخر تحديث: ٦ مارس ٢٠٢٦</p>
+
+      <div class="prose prose-lg max-w-none">
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">1. الموافقة على الشروط</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          باستخدامك لموقع WRP Detailing Studio على النطاق `wrpdetailing.ae` فإنك توافق على الالتزام بهذه الشروط والأحكام
+          وبالقوانين والأنظمة المعمول بها في دولة الإمارات العربية المتحدة. إذا كنت لا توافق على أي جزء من هذه الشروط،
+          فيجب عليك التوقف عن استخدام الموقع.
+        </p>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">2. إخلاء مسؤولية حول معلومات الخدمات</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>مهم:</strong> جميع المعلومات المعروضة على هذا الموقع، بما في ذلك أوصاف الخدمات والأسعار والباقات والمدة
+          الزمنية والمواصفات، مقدمة <strong>لأغراض تعريفية وتسويقية فقط</strong>.
+        </p>
+
+        <div class="my-6 border-s-4 border-primary bg-muted p-6">
+          <p class="mb-2 text-sm font-semibold">تنبيهات أساسية:</p>
+          <ul class="list-disc space-y-2 ps-6 text-sm text-muted-foreground">
+            <li><strong>الأسعار:</strong> جميع الأسعار المذكورة تقديرية وقابلة للتغيير دون إشعار مسبق. يتم تأكيد السعر النهائي بعد المعاينة المباشرة للسيارة ومتطلبات الخدمة.</li>
+            <li><strong>الخدمات:</strong> قد تختلف الخدمة الفعلية بحسب حالة السيارة ونوع الطلاء والحجم والمتطلبات الخاصة. الأوصاف الواردة على الموقع هي إرشادات عامة.</li>
+            <li><strong>المدة الزمنية:</strong> مدد التنفيذ المذكورة تقديرية وقد تختلف بحسب ضغط العمل وحالة السيارة وتعقيد التنفيذ.</li>
+            <li><strong>التوفر:</strong> قد تتغير الباقات والخدمات والخامات المتاحة. يجب تأكيد التوفر الحالي بالتواصل المباشر معنا.</li>
+          </ul>
+        </div>
+
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>يجب عليك التواصل مع WRP Detailing Studio مباشرة</strong> للتحقق من الأسعار الحالية وتوفر الخدمات والتفاصيل
+          الخاصة بسيارتك قبل اتخاذ أي قرار. لا تعتمد على المعلومات المنشورة على الموقع وحدها كأساس نهائي للشراء أو الحجز.
+        </p>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">3. لا توجد معاملات إلكترونية عبر الموقع</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          هذا الموقع لا يعالج الدفعات أو الحجوزات إلكترونياً. أي موعد خدمة يتطلب عادة:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>استشارة شخصية عبر الحضور أو الهاتف أو البريد الإلكتروني</li>
+          <li>فحص السيارة وتقييم حالتها</li>
+          <li>عرض سعر مكتوب وموافقة من العميل</li>
+          <li>تأكيد الموعد والعربون إذا لزم الأمر</li>
+        </ul>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">4. دقة المحتوى</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          رغم أننا نبذل جهداً معقولاً للحفاظ على دقة المعلومات وتحديثها، إلا أننا لا نضمن بشكل مطلق:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>اكتمال أو دقة أو حداثة جميع المعلومات المنشورة</li>
+          <li>عدم تعديل أو حذف أو تحديث المحتوى دون إشعار مسبق</li>
+          <li>ثبات المواصفات أو الأسعار أو تفاصيل الخدمات مع مرور الوقت</li>
+          <li>أن الصور والأوصاف المنشورة تمثل بالضرورة نفس النتيجة لكل سيارة</li>
+        </ul>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">5. إخلاء مسؤولية عن نتائج الخدمة</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>النتائج قد تختلف:</strong> نتيجة أي خدمة تعتمد على عوامل عديدة، منها حالة الطلاء الأصلية، وعمر السيارة، والأضرار السابقة،
+          وسجل الصيانة، والعوامل البيئية. الصور والأوصاف المنشورة على الموقع أمثلة توضيحية وليست ضماناً لنتيجة مطابقة لكل سيارة.
+        </p>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">6. الملكية الفكرية</h2>
+
+        <h3 class="mb-3 mt-6 text-xl font-semibold">المحتوى الخاص بنا</h3>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          جميع المواد الأصلية على هذا الموقع، بما في ذلك النصوص والصور والرسومات والعناصر التصميمية، هي ملك لـ WRP Detailing Studio
+          ومحمية بموجب قوانين الملكية الفكرية والعلامات التجارية المعمول بها. أي استخدام غير مصرح به ممنوع.
+        </p>
+
+        <h3 class="mb-3 mt-6 text-xl font-semibold">العلامات التجارية للغير</h3>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>شعارات العلامات التجارية للسيارات:</strong> الشعارات والعلامات التجارية الخاصة بمصنعي السيارات الظاهرة على الموقع
+          مثل فيراري ولامبورغيني وبورشه ورولز-رويس ومرسيدس-بنز وبي إم دبليو وماكلارين وأستون مارتن وغيرها، تُستخدم
+          <strong>لأغراض توضيحية فقط</strong> للدلالة على أنواع السيارات التي نقدم لها الخدمة.
+        </p>
+        <div class="my-6 border-s-4 border-primary bg-muted p-6">
+          <p class="text-sm text-muted-foreground">
+            <strong>مهم:</strong> هذه الشعارات مملوكة لمالكيها ومصنعيها. WRP Detailing Studio استوديو مستقل للعناية بالسيارات
+            وليس تابعاً أو معتمداً أو مدعوماً من أي مصنع سيارات. استخدام هذه الشعارات لا يعني وجود شراكة أو علاقة رسمية أو اعتماد من تلك العلامات.
+          </p>
+        </div>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">7. تحديد المسؤولية</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          لا تتحمل WRP Detailing Studio المسؤولية عن أي أضرار أو خسائر تنتج عن:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>استخدام الموقع أو عدم القدرة على استخدامه</li>
+          <li>الاعتماد على المعلومات المنشورة على الموقع</li>
+          <li>الأخطاء أو السهو أو عدم الدقة في المحتوى</li>
+          <li>الانقطاعات أو التأخير في الوصول إلى الموقع</li>
+        </ul>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">8. الروابط الخارجية</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          قد يحتوي الموقع على روابط لمواقع خارجية مثل حسابات التواصل الاجتماعي أو الخرائط. لا نتحمل مسؤولية محتوى هذه المواقع أو ممارسات الخصوصية أو الشروط الخاصة بها.
+        </p>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">9. القانون الواجب التطبيق والاختصاص القضائي</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          تخضع هذه الشروط وتفسر وفقاً لقوانين دولة الإمارات العربية المتحدة وإمارة دبي، وتكون محاكم دبي صاحبة الاختصاص الحصري في أي نزاع ينشأ عنها.
+        </p>
+
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          يتوافق هذا الموقع مع الأطر القانونية التالية:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>القانون الاتحادي رقم 15 لسنة 2020 بشأن حماية المستهلك</li>
+          <li>القانون الاتحادي رقم 1 لسنة 2006 بشأن المعاملات والتجارة الإلكترونية</li>
+          <li>قانون دبي رقم 2 لسنة 2002 بشأن المعاملات والتجارة الإلكترونية</li>
+        </ul>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">10. التواصل لتأكيد الخدمة</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>قبل المضي في أي خدمة</strong> يرجى التواصل معنا من أجل:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>التحقق من الأسعار الحالية وتفاصيل الباقات</li>
+          <li>تأكيد توفر الخدمة لسيارتك</li>
+          <li>تحديد موعد للفحص والاستشارة</li>
+          <li>استلام عرض سعر مكتوب</li>
+        </ul>
+
+        <div class="my-8 bg-muted p-6">
+          <h3 class="mb-3 font-semibold">معلومات التواصل:</h3>
+          <ul class="list-none space-y-2 text-muted-foreground">
+            <li><strong>الهاتف:</strong> <a href="https://dub.sh/wrp-phone" class="transition-colors hover:text-foreground">+971 54 717 3000</a></li>
+            <li><strong>البريد الإلكتروني:</strong> <a href="https://dub.sh/wrp-email" class="transition-colors hover:text-foreground">info@wrpdetailing.ae</a></li>
+            <li><strong>العنوان:</strong> القصيص الصناعية 1، دبي، الإمارات العربية المتحدة - <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener" class="transition-colors hover:text-foreground">عرض على الخرائط</a></li>
+            <li><strong>ساعات العمل:</strong> السبت - الخميس: ٩:٠٠ ص - ٩:٣٠ م | الجمعة: مغلق</li>
+          </ul>
+        </div>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">11. تعديل الشروط</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          نحتفظ بالحق في تعديل هذه الشروط في أي وقت. تصبح التعديلات نافذة فور نشرها على الموقع. استمرارك في استخدام الموقع بعد نشر التعديلات يعني موافقتك على النسخة المحدثة من الشروط.
+        </p>
+
+        <h2 class="mb-4 mt-12 font-serif text-2xl font-bold">12. الإقرار</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          باستخدامك لهذا الموقع وخدماتنا، فإنك تقر بما يلي:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>أنك قرأت هذه الشروط وفهمتها</li>
+          <li>أنك ستتحقق من جميع المعلومات قبل اتخاذ أي قرار</li>
+          <li>أنك ستتواصل معنا مباشرة للحصول على معلومات دقيقة ومحدثة</li>
+          <li>أن محتوى الموقع لأغراض تعريفية وتسويقية</li>
+          <li>أن تفاصيل الخدمة النهائية يجب تأكيدها كتابياً</li>
+        </ul>
+
+        <div class="mt-12 border border-primary/20 bg-primary/5 p-6">
+          <p class="text-sm text-muted-foreground">
+            <strong>تنبيه مهم:</strong> هذا الموقع صُمم أساساً للتعريف بالخدمات وتعزيز الظهور في محركات البحث. جميع تفاصيل الخدمات والأسعار والتوفر يجب تأكيدها عبر التواصل المباشر مع WRP Detailing Studio. لا نتحمل مسؤولية القرارات التي تُتخذ بالاعتماد على محتوى الموقع فقط دون تحقق مباشر.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

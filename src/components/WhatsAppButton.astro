@@ -1,23 +1,28 @@
 ---
 import { getDisplayCount } from '@/lib/reviews';
+import { getLocale, toLocalNum as _toLocalNum } from '../i18n/utils';
+import { t } from '../i18n/translations';
 
 interface Props {
   whatsappLink?: string;
   phoneNumber?: string;
+  locale?: string;
 }
 
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 const {
   whatsappLink = 'https://dub.sh/wrp-wa',
   phoneNumber = '+971547173000'
 } = Astro.props;
 const displayCount = getDisplayCount();
+const toLocalNum = (n: string | number) => _toLocalNum(n, locale);
 ---
 
 <!-- Floating WhatsApp Button -->
 <button
   id="contact-fab"
   type="button"
-  aria-label="Contact us"
+  aria-label={t(locale, 'contact.chatWithUs')}
   class="whatsapp-button group fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
 >
   <!-- WhatsApp Icon -->
@@ -36,7 +41,7 @@ const displayCount = getDisplayCount();
   <span
     class="absolute right-full mr-3 px-3 py-2 bg-foreground text-background text-sm font-medium whitespace-nowrap rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
   >
-    Chat with us
+    {t(locale, 'contact.chatWithUs')}
   </span>
 </button>
 
@@ -57,7 +62,7 @@ const displayCount = getDisplayCount();
     <button
       id="modal-close"
       class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors z-10"
-      aria-label="Close modal"
+      aria-label={locale === 'ar' ? 'إغلاق النافذة' : 'Close modal'}
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -80,10 +85,10 @@ const displayCount = getDisplayCount();
         </div>
       </div>
       <h2 id="modal-title" class="font-serif text-2xl font-bold text-foreground">
-        Get in Touch
+        {t(locale, 'contact.getInTouch')}
       </h2>
       <p class="mt-2 text-muted-foreground text-sm">
-        Our team is ready to assist you
+        {t(locale, 'contact.teamReady')}
       </p>
     </div>
 
@@ -91,7 +96,7 @@ const displayCount = getDisplayCount();
     <div class="border-b border-border px-6 py-3 bg-primary/5">
       <p class="text-center text-sm font-medium text-foreground">
         <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-        Available Now — Typical reply in under 2 minutes
+        {t(locale, 'contact.availableNow')}
       </p>
     </div>
 
@@ -112,10 +117,10 @@ const displayCount = getDisplayCount();
         ))}
       </div>
       <span class="text-sm text-foreground">
-        <span class="font-bold">5.0</span>
-        <span class="text-muted-foreground">from</span>
-        <span class="font-bold">{displayCount}</span>
-        <span class="text-muted-foreground">Google reviews</span>
+        <span class="font-bold">{toLocalNum('5.0')}</span>
+        <span class="text-muted-foreground">{t(locale, 'contact.from')}</span>
+        <span class="font-bold">{toLocalNum(displayCount)}</span>
+        <span class="text-muted-foreground">{t(locale, 'contact.googleReviews')}</span>
       </span>
     </div>
 
@@ -134,10 +139,10 @@ const displayCount = getDisplayCount();
           </svg>
         </div>
         <div class="flex-1 text-left">
-          <span class="block text-lg font-bold tracking-wide">Message on WhatsApp</span>
-          <span class="block text-sm text-white/80">Chat with our team instantly</span>
+          <span class="block text-lg font-bold tracking-wide">{t(locale, 'contact.messageWhatsapp')}</span>
+          <span class="block text-sm text-white/80">{t(locale, 'contact.chatInstantly')}</span>
         </div>
-        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform chevron-rtl" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
@@ -152,11 +157,11 @@ const displayCount = getDisplayCount();
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>
         </div>
-        <div class="flex-1 text-left">
-          <span class="block text-lg font-bold tracking-wide">Call Now</span>
-          <span class="block text-sm text-muted-foreground">+971 54 717 3000</span>
+        <div class="flex-1 text-start">
+          <span class="block text-lg font-bold tracking-wide">{t(locale, 'contact.callNow')}</span>
+          <span class="block text-sm text-muted-foreground">{toLocalNum(phoneNumber)}</span>
         </div>
-        <svg class="w-5 h-5 text-muted-foreground group-hover:text-foreground transform group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-muted-foreground group-hover:text-foreground transform group-hover:translate-x-1 transition-all chevron-rtl" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
@@ -165,7 +170,7 @@ const displayCount = getDisplayCount();
     <!-- Footer -->
     <div class="px-6 pb-6">
       <p class="text-center text-xs text-muted-foreground">
-        Open daily 9 AM – 9:30 PM (Closed Friday)
+        {t(locale, 'contact.openHours')}
       </p>
     </div>
   </div>

@@ -1,0 +1,245 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import GridPattern from '@/components/GridPattern.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: 'احمِ', url: `${siteBase}${localizeUrl('/protect/', locale)}` },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'ماذا تعني ركيزة احمِ في WRP؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'تعني ركيزة احمِ في فلسفتنا العناية المستمرة بالسيارة، من الغسيل الاحترافي إلى تصحيح الطلاء والعناية الداخلية وبرامج الصيانة الدورية التي تحافظ على مستوى السيارة طوال الوقت.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'كم مرة يجب أن أخضع سيارتي للتفصيل في دبي؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'بالنسبة للسيارات المستخدمة يومياً في دبي، نوصي بالعناية الاحترافية المنتظمة بحسب أسلوب الاستخدام والبيئة المحيطة. الغبار والحرارة والرمال تجعل الصيانة الدورية أكثر أهمية من كثير من المدن الأخرى.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'ماذا تشمل خدمة غسيل السيارات الفاخر؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'تشمل عادة الغسيل اليدوي بمنتجات متعادلة الحموضة، وتنظيف الجنوط والإطارات، وتجفيفاً آمناً، وتنظيفاً أساسياً للمقصورة، مع لمسات نهائية تحافظ على المظهر وتمنح السيارة نظافة واضحة دون الإضرار بالطلاء.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="P تعني احمِ | عناية وصيانة سيارات فاخرة في دبي | WRP"
+  description="اكتشف فلسفة WRP في العناية المستمرة بالسيارات: غسيل سيارات فاخر، تلميع وتصحيح طلاء، عناية داخلية، وبرامج صيانة تحافظ على قيمة سيارتك ومظهرها."
+  ogImage="/og-image.jpg"
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="relative px-6 py-32">
+    <div class="container mx-auto max-w-4xl text-center">
+      <div class="mb-4 text-sm tracking-widest text-muted-foreground">الركيزة الثالثة</div>
+      <h1 class="mb-6 font-serif text-6xl font-bold md:text-8xl">P تعني احمِ</h1>
+      <p class="mx-auto max-w-2xl text-xl leading-relaxed text-muted-foreground">
+        عناية وصيانة دقيقة تحافظ على مستوى صالة العرض، من الخارج والداخل، وتمنع تراجع المظهر مع مرور الوقت.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-6xl">
+      <div class="grid items-center gap-16 md:grid-cols-2">
+        <div>
+          <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">تميّز مستمر لا يتوقف</h2>
+          <p class="mb-6 text-lg leading-relaxed text-muted-foreground">
+            في WRP، الحماية لا تعني فقط تركيب طبقة أو تنفيذ خدمة مرة واحدة. تعني ركيزة احمِ وضع روتين عناية يحافظ على السيارة
+            في أفضل حالة ممكنة، بصرياً وعملياً، ويمنع تراكم العيوب الصغيرة حتى لا تتحول إلى مشاكل أكبر.
+          </p>
+          <p class="mb-8 text-lg leading-relaxed text-muted-foreground">
+            بيئة دبي قاسية على السيارات. الغبار والرمال والحرارة والأشعة فوق البنفسجية تؤثر يومياً على المظهر الخارجي والمقصورة.
+            خدماتنا في هذه الركيزة صممت لتبقي السيارة نظيفة، متألقة، ومحافظة على قيمتها على المدى الطويل.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <Card className="p-6">
+            <Icon name="lucide:droplets" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">غسيل يدوي آمن</h3>
+            <p class="text-sm text-muted-foreground">منتجات مناسبة للطلاء وتقنيات تمنع الخدوش والعلامات غير المرغوبة</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:sparkles" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">تصحيح الطلاء</h3>
+            <p class="text-sm text-muted-foreground">استعادة اللمعان وإزالة كثير من العيوب البصرية الناتجة عن الاستخدام</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:shield" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">عناية داخلية</h3>
+            <p class="text-sm text-muted-foreground">تنظيف وترطيب وحماية للجلد والتنجيد والمواد الداخلية</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:calendar" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">خطط صيانة</h3>
+            <p class="text-sm text-muted-foreground">برامج دورية للعناية المنتظمة حسب طبيعة استخدام السيارة</p>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">خدمات العناية المستمرة</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          خدمات مصممة للحفاظ على مستوى السيارة بصرياً وعملياً بين الحماية الأساسية والاستخدام اليومي.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-3">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">غسيل سيارات فاخر</h3>
+          <p class="mb-6 text-muted-foreground">
+            غسيل يدوي دقيق باستخدام منتجات ممتازة وتقنيات صحيحة للحفاظ على الطلاء والجنوط والتفاصيل الخارجية دون تعريضها لخدوش أو تآكل مبكر.
+          </p>
+          <a href={localizeUrl('/services/premium-car-wash/', locale)}>
+            <Button variant="outline" className="w-full">
+              اعرف المزيد
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="border-2 border-primary p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">تلميع وتصحيح الطلاء</h3>
+          <p class="mb-6 text-muted-foreground">
+            معالجة متعددة المراحل لإزالة علامات الدوامات والخدوش الخفيفة والأكسدة، واستعادة عمق الطلاء ولمعانه قبل أي خطوة حماية لاحقة أو كخدمة مستقلة.
+          </p>
+          <a href={localizeUrl('/services/polish/', locale)}>
+            <Button className="w-full">
+              استكشف الخدمة
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">العناية بالجلد والتنجيد</h3>
+          <p class="mb-6 text-muted-foreground">
+            تنظيف احترافي وترطيب وحماية للمقصورات الفاخرة، مع معالجة البقع والروائح والعناية بالمواد الداخلية بما يحافظ على الراحة والمظهر والقيمة.
+          </p>
+          <a href={localizeUrl('/services/leather-upholstery/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف الخدمة
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">ركائز WRP الثلاث</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          تعرف على كيف تبدأ التجربة من المظهر، ثم الحماية، ثم الحفاظ على النتيجة على المدى الطويل.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">W</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">غلّف</h3>
+          <p class="mb-6 text-muted-foreground">
+            غيّر حضور السيارة بصرياً بتغليف فاخر، ألوان مخصصة، وتفاصيل تمنحها شخصية مختلفة مع الحفاظ على الطلاء الأصلي.
+          </p>
+          <a href={localizeUrl('/wrap/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف غلّف
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">R</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">عزّز</h3>
+          <p class="mb-6 text-muted-foreground">
+            طبقات حماية متقدمة مثل PPF وطلاء السيراميك وأفلام الزجاج لحماية السيارة من البيئة القاسية والاستخدام اليومي.
+          </p>
+          <a href={localizeUrl('/reinforce/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف عزّز
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-4xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold">الأسئلة الشائعة</h2>
+      </div>
+      <dl class="space-y-8">
+        <div>
+          <dt class="mb-2 text-base font-semibold">ماذا تعني ركيزة احمِ في WRP؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            تعني أن السيارة تحتاج إلى عناية مستمرة ومنهجية، لا مجرد خدمة متفرقة، حتى يبقى شكلها ومستواها العام في أفضل حالة ممكنة.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">كم مرة يجب أن أخضع سيارتي للتفصيل في دبي؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            يعتمد ذلك على الاستخدام اليومي والتخزين ونوع القيادة، لكن الصيانة المنتظمة في دبي ضرورية بسبب الغبار والحرارة والرمال.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">ماذا تشمل خدمة غسيل السيارات الفاخر؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            تشمل غسيلاً يدوياً آمناً، وتجفيفاً مناسباً، وتنظيفاً للتفاصيل الأساسية، ولمسات نهائية تحافظ على نظافة السيارة ومظهرها دون الإضرار بالطلاء.
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </section>
+
+  <section class="relative overflow-hidden bg-black px-6 py-32 text-white">
+    <GridPattern />
+    <div class="container relative z-10 mx-auto max-w-4xl text-center">
+      <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">حافظ على تألق سيارتك</h2>
+      <p class="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+        العناية المنتظمة هي ما يصنع الفرق الحقيقي مع الوقت. تحدث مع فريقنا لوضع خطة مناسبة لطبيعة سيارتك واستخدامك اليومي.
+      </p>
+      <Button size="lg" className="cursor-pointer bg-white text-black hover:bg-white/90" data-contact-modal>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

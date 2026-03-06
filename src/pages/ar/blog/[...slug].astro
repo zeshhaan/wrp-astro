@@ -1,0 +1,64 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BlogPost from '../../../layouts/BlogPost.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog');
+	// Arabic posts (IDs prefixed with 'ar/') — strip the prefix for the URL slug
+	const arPosts = posts.filter(p => p.id.startsWith('ar/'));
+	// Also include English posts as fallback (if no Arabic version exists)
+	const enPosts = posts.filter(p => !p.id.startsWith('ar/'));
+	const arSlugs = new Set(arPosts.map(p => p.id.replace('ar/', '')));
+
+	const paths = [
+		...arPosts.map((post) => ({
+			params: { slug: post.id.replace('ar/', '') },
+			props: post,
+		})),
+		// English fallback for posts without Arabic translation
+		...enPosts.filter(p => !arSlugs.has(p.id)).map((post) => ({
+			params: { slug: post.id },
+			props: post,
+		})),
+	];
+	return paths;
+}
+type Props = CollectionEntry<'blog'>;
+type RelatedServiceId = CollectionEntry<'blog'>['data']['relatedServices'][number];
+
+const post = Astro.props;
+const { Content } = await render(post);
+const validServiceIds = new Set<RelatedServiceId>([
+  'ceramic-coating',
+  'paint-protection-film',
+  'polish',
+  'window-film',
+  'premium-car-wash',
+  'leather-upholstery',
+  'car-mats',
+  'graphene-coating',
+]);
+
+const services = await getCollection('services');
+const body = post.body || '';
+const mentionedServiceIds = services
+  .filter((s) => {
+    const slug = s.id.replace(/^ar\//, '').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const patterns = [
+      new RegExp(`/services/${slug}/?`, 'i'),
+    ];
+    return patterns.some((rx) => rx.test(body));
+  })
+  .map((s) => s.id.replace(/^ar\//, ''));
+
+const relatedFromFrontmatter = post.data.relatedServices ?? [];
+const relatedServices: RelatedServiceId[] = Array.from(
+  new Set([...relatedFromFrontmatter, ...mentionedServiceIds])
+).filter((id): id is RelatedServiceId => validServiceIds.has(id as RelatedServiceId));
+---
+
+<BlogPost {...post.data} relatedServices={relatedServices}>
+	<Content />
+</BlogPost>

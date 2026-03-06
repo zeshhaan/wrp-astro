@@ -1,0 +1,231 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import GridPattern from '@/components/GridPattern.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: 'غلّف', url: `${siteBase}${localizeUrl('/wrap/', locale)}` },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'ما هو تغليف السيارة؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'تغليف السيارة هو تطبيق طبقة فينيل عالية الجودة فوق الطلاء الأصلي للسيارة. يتيح تغيير اللون بالكامل أو إضافة تفاصيل مخصصة مع حماية الطلاء الأصلي، ويمكن إزالته لاحقاً بشكل آمن عند التنفيذ الصحيح.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'كم يدوم تغليف السيارة في دبي؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'التغليف عالي الجودة يدوم عادة من 3 إلى 5 سنوات في مناخ دبي مع العناية المناسبة، وقد تصل بعض الخامات الممتازة إلى مدة أطول. طريقة الاستخدام، والغسيل، والتخزين، وجودة التطبيق تؤثر مباشرة على عمر التغليف.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'هل يمكن إزالة التغليف دون إتلاف الطلاء؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'نعم. عند استخدام خامات احترافية وتطبيقها وإزالتها بالطريقة الصحيحة، يمكن إزالة التغليف دون الإضرار بطلاء المصنع. بل إن التغليف يساعد أيضاً في حماية الطلاء الأصلي والحفاظ على قيمة السيارة.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="W تعني غلّف | تغليف سيارات فاخر في دبي | WRP"
+  description="اكتشف خدمات تغليف السيارات لدى WRP في دبي. تغيير لون كامل، تصاميم مخصصة، وحماية إضافية للطلاء بخامات فينيل عالية الجودة."
+  ogImage="/og-image.jpg"
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="relative px-6 py-32">
+    <div class="container mx-auto max-w-4xl text-center">
+      <div class="mb-4 text-sm tracking-widest text-muted-foreground">الركيزة الأولى</div>
+      <h1 class="mb-6 font-serif text-6xl font-bold md:text-8xl">W تعني غلّف</h1>
+      <p class="mx-auto max-w-2xl text-xl leading-relaxed text-muted-foreground">
+        غيّر شخصية سيارتك بتغليف فينيل فاخر. من الأناقة الهادئة إلى المظهر الجريء، ننفّذ رؤيتك بدقة تليق بالسيارات المميزة.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-6xl">
+      <div class="grid items-center gap-16 md:grid-cols-2">
+        <div>
+          <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">تحوّل بصري كامل</h2>
+          <p class="mb-6 text-lg leading-relaxed text-muted-foreground">
+            تغليف السيارة هو فن استخدام طبقات فينيل احترافية لتغيير اللون أو إضافة تفاصيل مخصصة فوق الطلاء الأصلي. يمنحك
+            حرية كبيرة في التصميم مع الحفاظ على طبقة الطلاء الأساسية تحتها.
+          </p>
+          <p class="mb-8 text-lg leading-relaxed text-muted-foreground">
+            في WRP نعتمد على خامات ممتازة وتقنيات تركيب دقيقة للحصول على نتيجة نظيفة ومتجانسة. يتم قص كل جزء بدقة، وتجهيز
+            السطح بعناية، وتنفيذ التركيب داخل بيئة مناسبة للوصول إلى نتيجة نهائية تليق بمستوى السيارة.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <Card className="p-6">
+            <Icon name="lucide:palette" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">ألوان بلا حدود</h3>
+            <p class="text-sm text-muted-foreground">خيارات واسعة من الألوان واللمسات النهائية بين اللامع والمطفي والساتان والمعدني</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:shield" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">حماية إضافية للطلاء</h3>
+            <p class="text-sm text-muted-foreground">يساعد على تقليل أثر الخدوش الخفيفة والعوامل اليومية على الطلاء الأصلي</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:rotate-ccw" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">قابل للإزالة</h3>
+            <p class="text-sm text-muted-foreground">يمكن العودة إلى الطلاء الأصلي لاحقاً عند الحاجة مع إزالة احترافية صحيحة</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:trending-up" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">الحفاظ على القيمة</h3>
+            <p class="text-sm text-muted-foreground">يحافظ على مظهر السيارة ويضيف طبقة حماية تساعد في صون قيمة إعادة البيع</p>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">خدمات التغليف</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          حلول تغليف متكاملة تناسب من يريد تغييراً كاملاً أو لمسات محددة ومدروسة.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-3">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">تغيير اللون بالكامل</h3>
+          <p class="text-muted-foreground">
+            تحويل كامل لشكل السيارة باستخدام فينيل فاخر. اختر بين اللامع أو المطفي أو الساتان أو التشطيبات الخاصة لتحصل على
+            مظهر مختلف بالكامل مع الحفاظ على الطلاء الأصلي تحت التغليف.
+          </p>
+        </Card>
+
+        <Card className="border-2 border-primary p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">تصميم مخصص</h3>
+          <p class="text-muted-foreground">
+            خطوط، رسومات، تفاصيل سباق، أو هوية بصرية خاصة بك. نعمل معك على تصميم مظهر فريد يعكس ذوقك ويجعل السيارة أكثر
+            تميزاً على الطريق.
+          </p>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-2xl font-bold">إزالة الكروم والتفاصيل</h3>
+          <p class="text-muted-foreground">
+            تعديل أنيق للتفاصيل الخارجية مثل الكروم وإطارات النوافذ والشعارات باستخدام فينيل أسود أو تشطيبات أخرى تمنح السيارة
+            مظهراً أكثر حداثة وحضوراً.
+          </p>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">ركائز WRP الثلاث</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          اكتشف كيف تتكامل فلسفة WRP بين التغليف والحماية والعناية المستمرة للوصول إلى نتيجة متكاملة.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">R</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">عزّز</h3>
+          <p class="mb-6 text-muted-foreground">
+            أنظمة حماية متقدمة مثل فيلم حماية الطلاء وطلاء السيراميك صُممت لتقوية دفاع السيارة أمام مناخ دبي القاسي والعوامل اليومية.
+          </p>
+          <a href={localizeUrl('/reinforce/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف عزّز
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">P</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">احمِ</h3>
+          <p class="mb-6 text-muted-foreground">
+            برامج عناية وصيانة دقيقة تحافظ على مستوى السيارة بصرياً وعملياً من الداخل والخارج، وتمنع تراجع المظهر مع الوقت.
+          </p>
+          <a href={localizeUrl('/protect/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف احمِ
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-4xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">الأسئلة الشائعة</h2>
+        <p class="text-muted-foreground">أكثر الأسئلة التي تصلنا حول تغليف السيارات في دبي</p>
+      </div>
+      <dl class="space-y-8">
+        <div>
+          <dt class="mb-2 text-base font-semibold">ما هو تغليف السيارة؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            هو تطبيق طبقة فينيل فوق الطلاء الأصلي بهدف تغيير اللون أو إضافة تصميم مخصص مع توفير حماية إضافية للسطح.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">كم يدوم التغليف في دبي؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            يعتمد ذلك على نوع الخامة وطريقة الاستخدام والعناية، لكن التغليف الاحترافي بخامات جيدة يدوم عادة عدة سنوات مع العناية المناسبة.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">هل يمكن إزالة التغليف دون إتلاف الطلاء؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            نعم، عند استخدام خامات أصلية وتنفيذ إزالة صحيحة. وفي كثير من الحالات يساعد التغليف في حماية الطلاء الأصلي خلال فترة الاستخدام.
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </section>
+
+  <section class="relative overflow-hidden bg-black px-6 py-32 text-white">
+    <GridPattern />
+    <div class="container relative z-10 mx-auto max-w-4xl text-center">
+      <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">جاهز لتغيير شخصية سيارتك؟</h2>
+      <p class="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+        اكتشف ما يمكن أن يقدمه التغليف الاحترافي لسيارتك، ودع فريقنا يساعدك في اختيار اللون أو التصميم والخامة المناسبة.
+      </p>
+      <Button size="lg" className="cursor-pointer bg-white text-black hover:bg-white/90" data-contact-modal>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

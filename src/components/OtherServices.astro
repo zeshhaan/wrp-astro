@@ -2,56 +2,35 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '../i18n/utils';
+import { getBaseSlug, getLocalizedServices } from '../i18n/content';
+import { t } from '../i18n/translations';
 
 interface Props {
   currentService: string;
+  locale?: string;
 }
 
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 const { currentService } = Astro.props;
-
-const allServices = [
-  {
-    name: "Paint Protection Film",
-    slug: "paint-protection-film",
-    description: "Military-grade invisible armor that shields your vehicle's paint from rock chips, scratches, and harsh UV rays. Self-healing technology keeps your car looking pristine.",
-    imageSrc: "/luxury-sports-car-detail-black-and-white-dramatic.jpg",
-  },
-  {
-    name: "Window Film",
-    slug: "window-film",
-    description: "Premium tinting solutions that block 99% of UV rays, reduce heat by up to 60%, and enhance privacy while maintaining crystal-clear visibility and elegant aesthetics.",
-    imageSrc: "/luxury-sedan-close-up-black-and-white-elegant.jpg",
-  },
-  {
-    name: "Ceramic Coating",
-    slug: "ceramic-coating",
-    description: "Nano-ceramic technology creates a permanent hydrophobic layer that repels water, dirt, and contaminants. Delivers unmatched gloss and protection for years.",
-    imageSrc: "/luxury-supercar-close-up-detail-black-and-white.jpg",
-  },
-  {
-    name: "Paint Correction & Polish",
-    slug: "polish",
-    description: "Multi-stage paint correction that removes swirl marks, scratches, and oxidation. Restores your vehicle's original depth and clarity with mirror-like perfection.",
-    imageSrc: "/supercar-wheel-detail-black-and-white-luxury.jpg",
-  },
-  {
-    name: "Premium Car Wash",
-    slug: "premium-car-wash",
-    description: "Meticulous hand-wash service using pH-neutral products, microfiber techniques, and premium wax polish. Includes wheel detailing, tire dressing, and interior refresh for showroom-shiny finish.",
-    imageSrc: "/luxury-suv-black-and-white-premium-detail.jpg",
-  },
-];
-
-// Filter out current service and show 3 others
-const otherServices = allServices.filter((service) => service.slug !== currentService).slice(0, 3);
+const localeServices = await getLocalizedServices(locale);
+const otherServices = localeServices
+  .filter((service) => getBaseSlug(service.id) !== currentService)
+  .slice(0, 3)
+  .map((service) => ({
+    name: service.data.title,
+    slug: getBaseSlug(service.id),
+    description: service.data.description,
+    imageSrc: service.data.heroImage,
+  }));
 ---
 
 <section class="py-32 px-6 bg-muted/20">
   <div class="container mx-auto max-w-7xl">
     <div class="text-center mb-16">
-      <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Explore Our Other Services</h2>
+      <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{t(locale, 'services.otherServices')}</h2>
       <p class="text-muted-foreground max-w-2xl mx-auto">
-        Discover our complete range of premium automotive care solutions designed for Dubai's luxury vehicle owners
+        {t(locale, 'services.otherSubtitle')}
       </p>
     </div>
 
@@ -69,9 +48,9 @@ const otherServices = allServices.filter((service) => service.slug !== currentSe
           </div>
           <div class="p-6">
             <p class="text-muted-foreground leading-relaxed mb-6">{service.description}</p>
-            <a href={`/services/${service.slug}/`}>
+            <a href={localizeUrl(`/services/${service.slug}/`, locale)}>
               <Button variant="outline" className="w-full group/btn bg-transparent">
-                LEARN MORE
+                {t(locale, 'common.learnMore').toUpperCase()}
                 <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
               </Button>
             </a>
