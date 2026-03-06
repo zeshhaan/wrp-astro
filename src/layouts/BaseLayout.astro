@@ -48,6 +48,7 @@ const {
 const locale = getLocale(Astro.currentLocale);
 const dir = getDir(locale);
 const ogLocale = getOgLocale(locale);
+const alternateOgLocale = getOgLocale(locale === 'ar' ? 'en' : 'ar');
 const isArabic = locale === 'ar';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
@@ -83,6 +84,7 @@ const extendMeta = [
   { name: 'geo.placename', content: 'Dubai' },
   { name: 'geo.position', content: '25.2854;55.3781' },
   { name: 'ICBM', content: '25.2854, 55.3781' },
+  { property: 'og:locale:alternate', content: alternateOgLocale },
   ...articleMeta,
   // Twitter does not have direct article:* equivalents; use labels
   ...(ogType === 'article' && articleSection
