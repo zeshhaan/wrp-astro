@@ -1,0 +1,259 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import GridPattern from '@/components/GridPattern.astro';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: 'عزّز', url: `${siteBase}${localizeUrl('/reinforce/', locale)}` },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'ماذا تعني ركيزة عزّز في WRP؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'تعني ركيزة عزّز في فلسفة WRP تقوية دفاعات السيارة بطبقات حماية متقدمة مثل فيلم حماية الطلاء وطلاء السيراميك وأفلام الزجاج، بحيث تعمل هذه الحلول معاً لمواجهة ظروف دبي القاسية.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'هل أختار PPF أم طلاء السيراميك؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'لكل حل وظيفة مختلفة. PPF يحمي من الأثر المادي مثل الحصى والخدوش، بينما يمنح طلاء السيراميك مقاومة كيميائية ولمعاناً وصيانة أسهل. وفي كثير من الحالات يكون الجمع بينهما هو الخيار الأقوى.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'هل يمكن الجمع بين PPF وطلاء السيراميك؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'نعم، وهذا من أكثر الحلول طلباً. عند تطبيق السيراميك فوق PPF تحصل على حماية من الصدمات السطحية مع مقاومة أفضل للعوامل الخارجية ولمعان أسهل في الصيانة.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'لماذا يهم تظليل النوافذ في دبي؟',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'أفلام الزجاج السيراميكية تقلل انتقال الحرارة وتحد من الأشعة فوق البنفسجية بشكل كبير، ما يرفع راحة القيادة ويحمي المقصورة ويخفف الحمل على التكييف في حرارة دبي المرتفعة.',
+      },
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="R تعني عزّز | حماية طلاء متقدمة في دبي | WRP"
+  description="اكتشف فلسفة WRP في تعزيز حماية السيارة عبر فيلم حماية الطلاء وطلاء السيراميك وتظليل النوافذ وأفلام الزجاج، لحماية تدوم في ظروف دبي القاسية."
+  ogImage="/og-image.jpg"
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="relative px-6 py-32">
+    <div class="container mx-auto max-w-4xl text-center">
+      <div class="mb-4 text-sm tracking-widest text-muted-foreground">الركيزة الثانية</div>
+      <h1 class="mb-6 font-serif text-6xl font-bold md:text-8xl">R تعني عزّز</h1>
+      <p class="mx-auto max-w-2xl text-xl leading-relaxed text-muted-foreground">
+        أنظمة حماية متقدمة تقوّي دفاع السيارة أمام حرارة دبي العالية والرمال والعوامل اليومية التي تؤثر على الطلاء والزجاج والمقصورة.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-6xl">
+      <div class="grid items-center gap-16 md:grid-cols-2">
+        <div>
+          <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">طبقات حماية تعمل معاً</h2>
+          <p class="mb-6 text-lg leading-relaxed text-muted-foreground">
+            في دبي، السيارة لا تواجه مجرد استخدام يومي، بل تواجه حرارة شديدة، ورمالاً دقيقة، وأشعة شمس قاسية، ومخاطر الطريق.
+            لذلك لا يكفي حل واحد في كثير من الحالات. تعني ركيزة عزّز بناء منظومة حماية متكاملة حسب طبيعة السيارة وطريقة استخدامها.
+          </p>
+          <p class="mb-8 text-lg leading-relaxed text-muted-foreground">
+            نعتمد في هذه الركيزة على حلول مثل فيلم حماية الطلاء وطلاء السيراميك وأفلام الزجاج السيراميكية، بحيث تؤدي كل طبقة دورها
+            في تقليل التآكل البصري والحفاظ على اللمعان والقيمة وسهولة الصيانة.
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <Card className="p-6">
+            <Icon name="lucide:shield-check" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">حماية PPF</h3>
+            <p class="text-sm text-muted-foreground">طبقة مخصصة للتعامل مع الحصى والخدوش والأثر اليومي على الطلاء</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:droplets" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">درع سيراميكي</h3>
+            <p class="text-sm text-muted-foreground">مقاومة أفضل للعوامل الكيميائية وسهولة أعلى في التنظيف ولمعان يدوم</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:layers" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">حماية متعددة الطبقات</h3>
+            <p class="text-sm text-muted-foreground">حلول تكمل بعضها للحصول على دفاع أذكى وأكثر استقراراً</p>
+          </Card>
+          <Card className="p-6">
+            <Icon name="lucide:clock" class="mb-3 h-8 w-8" />
+            <h3 class="mb-2 font-bold">قيمة أطول مدى</h3>
+            <p class="text-sm text-muted-foreground">تقليل التآكل البصري والحفاظ على المظهر العام بمرور الوقت</p>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">حلول التعزيز والحماية</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          أنظمة حماية فاخرة تم اختيارها لتناسب بيئة دبي الصعبة وتحافظ على السيارة بصرياً ووظيفياً.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-3">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-3xl font-bold">فيلم حماية الطلاء (PPF)</h3>
+          <p class="mb-6 leading-relaxed text-muted-foreground">
+            طبقة شفافة عالية الأداء تمتص كثيراً من أثر الحصى والخدوش والعوامل اليومية. خيار أساسي لمن يريد حماية فعلية للطلاء مع مظهر شبه غير مرئي.
+          </p>
+          <a href={localizeUrl('/services/paint-protection-film/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف PPF
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-3xl font-bold">طلاء السيراميك</h3>
+          <p class="mb-6 leading-relaxed text-muted-foreground">
+            طبقة نانوية ترتبط بالسطح لتوفر طرداً للماء، ومقاومة للعوامل الكيميائية، ولمعاناً ثابتاً، وصيانة أسهل للسيارة في الاستخدام اليومي.
+          </p>
+          <a href={localizeUrl('/services/ceramic-coating/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف السيراميك
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <h3 class="mb-4 font-serif text-3xl font-bold">تظليل النوافذ وأفلام الزجاج</h3>
+          <p class="mb-6 leading-relaxed text-muted-foreground">
+            أفلام زجاج متقدمة تقلل انتقال الحرارة والوهج وتحمي المقصورة من الأشعة، مع خيارات درجات متعددة ترفع الراحة والخصوصية داخل السيارة.
+          </p>
+          <a href={localizeUrl('/services/window-film/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف أفلام الزجاج
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-muted/30 px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold md:text-5xl">ركائز WRP الثلاث</h2>
+        <p class="mx-auto max-w-2xl text-muted-foreground">
+          ابدأ بالمظهر، عزّز الحماية، ثم حافظ على النتيجة بعناية مستمرة ضمن فلسفة متكاملة واحدة.
+        </p>
+      </div>
+
+      <div class="grid gap-8 md:grid-cols-2">
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">W</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">غلّف</h3>
+          <p class="mb-6 text-muted-foreground">
+            غيّر شكل السيارة بهوية بصرية جديدة باستخدام تغليف فاخر يحافظ في الوقت نفسه على طبقة الطلاء الأصلية تحتها.
+          </p>
+          <a href={localizeUrl('/wrap/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف غلّف
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+
+        <Card className="p-8 transition-shadow duration-300 hover:shadow-2xl">
+          <div class="mb-3 text-4xl font-bold">P</div>
+          <h3 class="mb-4 font-serif text-2xl font-bold">احمِ</h3>
+          <p class="mb-6 text-muted-foreground">
+            برامج عناية وصيانة تحافظ على النتيجة بعد الحماية، وتمنع فقدان اللمعان أو تراكم العيوب بمرور الوقت.
+          </p>
+          <a href={localizeUrl('/protect/', locale)}>
+            <Button variant="outline" className="w-full">
+              استكشف احمِ
+              <Icon name="lucide:arrow-right" class="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-4xl">
+      <div class="mb-16 text-center">
+        <h2 class="mb-4 font-serif text-4xl font-bold">الأسئلة الشائعة</h2>
+      </div>
+      <dl class="space-y-8">
+        <div>
+          <dt class="mb-2 text-base font-semibold">ماذا تعني ركيزة عزّز في WRP؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            تعني بناء نظام حماية متكامل للسيارة باستخدام حلول متقدمة تقلل أثر العوامل اليومية والبيئية على المظهر والسطح.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">هل أختار PPF أم طلاء السيراميك؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            يعتمد ذلك على أولويتك. إن كنت تبحث عن حماية مادية من أثر الطريق فـ PPF مهم، وإن أردت سهولة تنظيف ولمعاناً ومقاومة كيميائية فالسيراميك أساسي، وغالباً يكون الجمع بينهما أفضل حل.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">هل يمكن الجمع بين PPF وطلاء السيراميك؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            نعم، وهذا من أكثر الخيارات فعالية لمن يريد مستوى حماية أعلى ومظهراً أسهل في الصيانة على المدى الطويل.
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-2 text-base font-semibold">لماذا يهم تظليل النوافذ في دبي؟</dt>
+          <dd class="text-base leading-relaxed text-muted-foreground">
+            لأنه يرفع الراحة داخل المقصورة، ويقلل انتقال الحرارة، ويساعد في حماية المواد الداخلية من تأثير الشمس المباشر.
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </section>
+
+  <section class="relative overflow-hidden bg-black px-6 py-32 text-white">
+    <GridPattern />
+    <div class="container relative z-10 mx-auto max-w-4xl text-center">
+      <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">عزّز حماية استثمارك</h2>
+      <p class="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+        احمِ سيارتك بحلول متقدمة مصممة لظروف دبي، وسنساعدك في اختيار النظام الأنسب حسب الاستخدام اليومي ومستوى الحماية المطلوب.
+      </p>
+      <Button size="lg" className="cursor-pointer bg-white text-black hover:bg-white/90" data-contact-modal>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
+    </div>
+  </section>
+</BaseLayout>

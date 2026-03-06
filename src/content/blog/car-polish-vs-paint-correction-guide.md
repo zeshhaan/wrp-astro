@@ -9,7 +9,7 @@ tags:
   - detailing
   - dubai
   - paint care
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 8
 featured: false
 heroImage: /luxury-car-detailing-craftsman-working-black-and-w.jpg

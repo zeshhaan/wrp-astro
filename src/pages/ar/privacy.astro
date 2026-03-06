@@ -1,0 +1,147 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'nav.privacy'), url: `${siteBase}${localizeUrl('/privacy/', locale)}` },
+];
+---
+
+<BaseLayout
+  title="سياسة الخصوصية | WRP Detailing Studio"
+  description="سياسة خصوصية WRP Detailing Studio وشرح كيفية جمع البيانات واستخدامها وحمايتها عند زيارة الموقع أو إرسال طلب خدمة."
+  noindex={false}
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="mb-6 font-serif text-4xl font-bold md:text-5xl">سياسة الخصوصية</h1>
+      <p class="mb-12 text-sm text-muted-foreground">آخر تحديث: ٦ مارس ٢٠٢٦</p>
+
+      <div class="prose prose-lg max-w-none">
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">مقدمة</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          في WRP Detailing Studio نحترم خصوصيتك ونلتزم بحماية معلوماتك الشخصية. توضح هذه السياسة أنواع البيانات التي نجمعها،
+          وكيف نستخدمها، والخطوات التي نتخذها لحمايتها عند زيارتك لموقعنا أو عند تواصلك معنا بخصوص خدماتنا.
+        </p>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">ما المعلومات التي نجمعها</h2>
+
+        <h3 class="mt-8 mb-3 text-xl font-semibold">معلومات التواصل</h3>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          عند إرسال نموذج تواصل أو طلب استشارة، قد نجمع المعلومات التالية:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>الاسم</li>
+          <li>البريد الإلكتروني</li>
+          <li>رقم الهاتف</li>
+          <li>بيانات السيارة مثل الشركة والموديل</li>
+          <li>الخدمة التي تهتم بها</li>
+          <li>تفاصيل رسالتك أو استفسارك</li>
+        </ul>
+
+        <h3 class="mt-8 mb-3 text-xl font-semibold">بيانات الاستخدام والتحليلات</h3>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          نستخدم <strong>Microsoft Clarity</strong> لفهم طريقة تفاعل الزوار مع الموقع بشكل أفضل. تساعدنا التسجيلات الحرارية
+          وتسجيلات الجلسات على معرفة ما يحتاج إلى تحسين وتقديم تجربة استخدام أوضح وأسهل.
+        </p>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>قد تتضمن هذه البيانات:</strong>
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>الصفحات التي تمت زيارتها ومسارات التنقل داخل الموقع</li>
+          <li>حركة المؤشر والنقرات وسلوك التمرير</li>
+          <li>نوع الجهاز والمتصفح ودقة الشاشة</li>
+          <li>مدة الجلسة وتوقيتات التفاعل</li>
+        </ul>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          <strong>حماية الخصوصية:</strong> يستخدم Clarity إعداد <em>Balanced Masking</em> بشكل افتراضي، ما يعني أن المحتوى
+          الحساس مثل عناوين البريد الإلكتروني وأرقام الهواتف وبيانات الدفع يتم إخفاؤه تلقائياً ولا يتم تسجيله.
+          كما يتم إخفاء مدخلات النماذج لحماية خصوصيتك.
+        </p>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          لمزيد من المعلومات حول كيفية تعامل Microsoft مع البيانات، يمكنك مراجعة
+          <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer" class="font-semibold text-foreground hover:underline">
+            بيان خصوصية Microsoft
+          </a>.
+        </p>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">كيف نستخدم معلوماتك</h2>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li><strong>الرد على الطلبات:</strong> للتواصل معك بخصوص الاستفسارات والحجوزات والخدمات المطلوبة</li>
+          <li><strong>التحديثات والتنبيهات:</strong> لإرسال تأكيدات المواعيد أو تحديثات مرتبطة بطلبك</li>
+          <li><strong>تحسين الموقع:</strong> لفهم سلوك المستخدمين وتحسين الأداء وتجربة التصفح</li>
+          <li><strong>تطوير الخدمات:</strong> لفهم احتياجات العملاء وتحسين عروضنا وخدماتنا</li>
+        </ul>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">تخزين البيانات وحمايتها</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          يتم تخزين بيانات نماذج التواصل بشكل آمن داخل قاعدة بياناتنا المستضافة على بنية Cloudflare. كما نطبق
+          إجراءات أمنية متعارفاً عليها في القطاع للحد من الوصول غير المصرح به أو التعديل أو الإفصاح غير المشروع عن البيانات.
+        </p>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">ملفات تعريف الارتباط وتقنيات التتبع</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          نستخدم ملفات تعريف الارتباط وتقنيات مشابهة لتحسين تجربة التصفح وقياس استخدام الموقع. وقد تشمل:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li><strong>ملفات أساسية:</strong> مطلوبة لتشغيل الموقع ووظائفه الأساسية</li>
+          <li><strong>ملفات تحليلية:</strong> تستخدم مع Microsoft Clarity لقياس الاستخدام وتحسين التجربة</li>
+          <li><strong>ملفات تفضيلات اللغة:</strong> لتذكر تفضيلك بين العربية والإنجليزية عند العودة للموقع</li>
+        </ul>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">حقوقك</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          يحق لك، وفقاً لما ينطبق من أنظمة وقوانين، أن تطلب:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li>الوصول إلى بياناتك الشخصية</li>
+          <li>تصحيح البيانات غير الدقيقة أو غير المكتملة</li>
+          <li>حذف بياناتك عندما يكون ذلك مناسباً قانونياً وتشغيلياً</li>
+          <li>إيقاف التحليلات أو طلب عدم استخدام بياناتك لهذا الغرض عبر التواصل معنا</li>
+        </ul>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">الخدمات الخارجية</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          قد نعتمد على مزوّدين خارجيين لتشغيل الموقع أو تحسين الخدمة، ومن ذلك:
+        </p>
+        <ul class="mb-6 list-disc space-y-2 ps-6 text-muted-foreground">
+          <li><strong>Microsoft Clarity:</strong> تحليلات سلوكية وتسجيلات الجلسات</li>
+          <li><strong>Cloudflare:</strong> استضافة الموقع والحماية والبنية الأساسية</li>
+          <li><strong>Google Fonts:</strong> تحميل الخطوط المعروضة على الموقع</li>
+        </ul>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">التواصل معنا</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          إذا كانت لديك أسئلة حول هذه السياسة أو حول بياناتك، يمكنك التواصل معنا عبر:
+        </p>
+        <ul class="mb-6 list-none space-y-2 text-muted-foreground">
+          <li><strong>البريد الإلكتروني:</strong> <a href="https://dub.sh/wrp-email" class="transition-colors hover:text-foreground">info@wrpdetailing.ae</a></li>
+          <li><strong>الهاتف:</strong> <a href="https://dub.sh/wrp-phone" class="transition-colors hover:text-foreground">+971 54 717 3000</a></li>
+          <li><strong>العنوان:</strong> القصيص الصناعية 1، دبي، الإمارات العربية المتحدة · <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener" class="transition-colors hover:text-foreground">عرض على الخريطة</a></li>
+        </ul>
+
+        <h2 class="mt-12 mb-4 font-serif text-2xl font-bold">التغييرات على هذه السياسة</h2>
+        <p class="mb-6 leading-relaxed text-muted-foreground">
+          قد نقوم بتحديث سياسة الخصوصية من وقت إلى آخر عند تغير الموقع أو خدماتنا أو متطلباتنا القانونية. سيتم
+          توضيح تاريخ آخر تحديث أعلى الصفحة، وننصحك بمراجعة هذه السياسة بشكل دوري.
+        </p>
+
+        <div class="mt-12 border-s-4 border-primary bg-muted p-6">
+          <p class="text-sm text-muted-foreground">
+            <strong>إفصاح تحليلي:</strong> نستخدم Microsoft Clarity لفهم طريقة تفاعلك مع الموقع. تساعدنا هذه المعلومات
+            على تحسين التجربة والخدمات. وقد تقوم WRP وMicrosoft بجمع هذه البيانات واستخدامها لأغراض تحسين الموقع والخدمة.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

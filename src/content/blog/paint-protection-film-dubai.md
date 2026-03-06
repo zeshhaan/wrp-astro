@@ -8,7 +8,7 @@ tags:
   - dubai
   - paint protection
   - investment
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 7
 featured: false
 heroImage: /luxury-supercar-close-up-detail-black-and-white.jpg

@@ -6,6 +6,8 @@
 import type { Review } from '@/lib/reviews';
 import { getBestReviewForService, getReviewImageAlt } from '@/lib/reviews';
 import StarRating from './StarRating.astro';
+import { getLocale } from '../../i18n/utils';
+import { t } from '../../i18n/translations';
 
 interface Props {
   review?: Review;
@@ -13,6 +15,7 @@ interface Props {
   variant?: 'light' | 'dark';
 }
 
+const locale = getLocale(Astro.currentLocale);
 const { review: propReview, serviceSlug, variant = 'dark' } = Astro.props;
 const review = propReview || (serviceSlug ? getBestReviewForService(serviceSlug) : undefined);
 const hasImage = !!(review?.localImages && review.localImages.length > 0);
@@ -65,7 +68,7 @@ const quote = review ? review.highlightQuote || review.text.split('.').slice(0, 
                   class="w-1.5 h-1.5 rounded-full transition-all duration-300"
                   x-on:click={`current = ${i}`}
                   x-bind:class={`current === ${i} ? 'bg-white w-4' : 'bg-white/50'`}
-                  aria-label={`Photo ${i + 1}`}
+                  aria-label={locale === 'ar' ? `صورة ${i + 1}` : `Photo ${i + 1}`}
                 />
               ))}
             </div>
@@ -108,7 +111,7 @@ const quote = review ? review.highlightQuote || review.text.split('.').slice(0, 
               {review.reviewerName}
             </p>
             <p class:list={['text-xs', isDark ? 'text-white/50' : 'text-muted-foreground']}>
-              Verified Google Review · {review.date}
+              {t(locale, 'reviews.verified')} · {review.date}
             </p>
           </div>
         </div>

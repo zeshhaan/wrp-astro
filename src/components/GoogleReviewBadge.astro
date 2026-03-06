@@ -1,18 +1,26 @@
 ---
 import { getBusiness, getDisplayCount } from '@/lib/reviews';
+import { getLocale, toLocalNum as _toLocalNum } from '../i18n/utils';
+import { t } from '../i18n/translations';
 
 interface Props {
   rating?: string;
   reviewCount?: string;
   googleReviewUrl?: string;
+  locale?: string;
 }
 
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
+const toLocalNum = (n: string | number) => _toLocalNum(n, locale);
 const business = getBusiness();
 const {
   rating = business.rating.toFixed(1),
   reviewCount = getDisplayCount(),
   googleReviewUrl = 'https://dub.sh/wrp-map'
 } = Astro.props;
+const ariaLabel = locale === 'ar'
+  ? `${toLocalNum(rating)} نجوم على تقييمات جوجل`
+  : `${rating} stars on Google Reviews`;
 ---
 
 <!-- Mobile-only floating Google review badge (hidden until user scrolls past hero) -->
@@ -21,7 +29,7 @@ const {
   href={googleReviewUrl}
   target="_blank"
   rel="noopener noreferrer"
-  aria-label={`${rating} stars on Google Reviews`}
+  aria-label={ariaLabel}
   class="fixed bottom-6 left-6 z-50 lg:hidden flex items-center gap-2 bg-black/60 backdrop-blur-sm border border-white/15 px-3 py-2 rounded-full shadow-lg hover:shadow-xl hover:bg-black/70 hover:scale-105 transition-all duration-300 opacity-0 translate-y-4 pointer-events-none"
 >
   <!-- Google G Logo -->
@@ -42,7 +50,7 @@ const {
   </div>
 
   <!-- Review count -->
-  <span class="font-bold text-sm text-white">{reviewCount} reviews</span>
+  <span class="font-bold text-sm text-white">{toLocalNum(reviewCount)} {t(locale, 'reviews.reviews')}</span>
 </a>
 
 <script>

@@ -8,7 +8,7 @@ tags:
   - ceramic coating
   - comparison
   - paint protection
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 7
 featured: false
 heroImage: /luxury-sedan-close-up-black-and-white-elegant.jpg

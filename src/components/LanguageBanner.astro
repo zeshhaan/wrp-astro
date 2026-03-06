@@ -1,0 +1,93 @@
+---
+/**
+ * Dismissible language banner for Arabic browser users.
+ * Shows "هل تفضل العربية؟" only when:
+ * - No wrp-lang cookie exists (first visit)
+ * - Browser Accept-Language includes Arabic
+ * - Current page is NOT already Arabic
+ *
+ * Dismissed by clicking either CTA or X. Sets wrp-lang cookie to prevent reappearing.
+ */
+import type { Locale } from '../i18n/translations';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+// Only render on English pages — Arabic pages don't need a banner
+const showBanner = locale !== 'ar';
+---
+
+{showBanner && (
+  <div
+    id="lang-banner"
+    class="hidden fixed top-0 left-0 right-0 z-[60] bg-black text-white py-3 px-4 text-center text-sm"
+    role="banner"
+    dir="rtl"
+  >
+    <div class="container mx-auto flex items-center justify-center gap-4">
+      <span class="font-medium">هل تفضل العربية؟</span>
+      <a
+        href="/ar/"
+        data-astro-reload
+        class="bg-white text-black px-3 py-1 text-xs font-bold tracking-wide hover:bg-white/90 transition-colors"
+        id="lang-banner-switch"
+      >
+        التبديل إلى العربية
+      </a>
+      <button
+        id="lang-banner-dismiss"
+        class="text-white/60 hover:text-white transition-colors ml-2"
+        aria-label="Dismiss"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
+
+<script>
+  function initLangBanner() {
+    const banner = document.getElementById('lang-banner');
+    if (!banner) return;
+    const bannerEl = banner;
+
+    // Check if wrp-lang cookie exists
+    const cookies = document.cookie.split(';').reduce((acc, c) => {
+      const [key, val] = c.trim().split('=');
+      if (key) acc[key] = val || '';
+      return acc;
+    }, {} as Record<string, string>);
+
+    if (cookies['wrp-lang']) return; // Already has preference, don't show
+
+    // Check if browser language includes Arabic
+    const isArabicBrowser = navigator.languages?.some(l => l.startsWith('ar')) ||
+                            navigator.language?.startsWith('ar');
+
+    if (!isArabicBrowser) return;
+
+    // Show the banner
+    banner.classList.remove('hidden');
+
+    // Set cookie on dismiss or switch
+    function dismiss() {
+      document.cookie = 'wrp-lang=en; path=/; max-age=31536000; samesite=lax';
+      bannerEl.classList.add('hidden');
+    }
+
+    document.getElementById('lang-banner-dismiss')?.addEventListener('click', dismiss);
+
+    // Switch button sets Arabic cookie and navigates
+    document.getElementById('lang-banner-switch')?.addEventListener('click', () => {
+      document.cookie = 'wrp-lang=ar; path=/; max-age=31536000; samesite=lax';
+    });
+  }
+
+  initLangBanner();
+  document.addEventListener('astro:page-load', initLangBanner);
+</script>

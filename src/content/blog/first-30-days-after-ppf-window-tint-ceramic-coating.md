@@ -9,7 +9,7 @@ tags:
   - ceramic coating
   - aftercare
   - dubai
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 7
 featured: false
 heroImage: /luxury-sports-car-detail-black-and-white-dramatic.jpg

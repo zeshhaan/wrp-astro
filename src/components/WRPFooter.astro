@@ -1,33 +1,43 @@
 ---
-// Footer component for service and contact pages
+import { getLocale, localizeUrl } from '../i18n/utils';
+import { t } from '../i18n/translations';
+import type { Locale } from '../i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 ---
 
 <footer class="bg-black text-white py-12 px-6">
   <div class="container mx-auto max-w-7xl">
     <div class="flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="flex items-center">
-        <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" loading="lazy">
+        <a href={localizeUrl('/', locale)}>
+          <img src="/wrp-logo.svg" alt="WRP Logo" class="h-12 w-auto brightness-0 invert" loading="lazy">
+        </a>
       </div>
       <div class="flex gap-8 text-sm">
-        <a href="/#services" class="hover:text-white/70 transition-colors">
-          Services
+        <a href={localizeUrl('/#services', locale)} class="hover:text-white/70 transition-colors">
+          {t(locale, 'nav.services')}
         </a>
-        <a href="/blog/" class="hover:text-white/70 transition-colors">
-          Blog
+        <a href={localizeUrl('/blog/', locale)} class="hover:text-white/70 transition-colors">
+          {t(locale, 'nav.blog')}
         </a>
-        <a href="/portfolio/" class="hover:text-white/70 transition-colors">
-          Portfolio
+        <a href={localizeUrl('/portfolio/', locale)} class="hover:text-white/70 transition-colors">
+          {t(locale, 'nav.portfolio')}
         </a>
-        <a href="/more-about-wrp/" class="hover:text-white/70 transition-colors">
-          About
+        <a href={localizeUrl('/more-about-wrp/', locale)} class="hover:text-white/70 transition-colors">
+          {t(locale, 'nav.about')}
         </a>
-        <a href="/contact-us/" class="hover:text-white/70 transition-colors">
-          Contact
+        <a href={localizeUrl('/contact-us/', locale)} class="hover:text-white/70 transition-colors">
+          {t(locale, 'nav.contact')}
         </a>
       </div>
     </div>
     <div class="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-      <p>&copy; {new Date().getFullYear()} WRP. All rights reserved. <a href="/privacy/" class="hover:text-white/80 transition-colors">Privacy</a> &middot; <a href="/terms/" class="hover:text-white/80 transition-colors">Terms</a></p>
+      <p>&copy; {new Date().getFullYear()} WRP. {t(locale, 'footer.rights')} <a href={localizeUrl('/privacy/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.privacy')}</a> &middot; <a href={localizeUrl('/terms/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.terms')}</a></p>
     </div>
   </div>
 </footer>

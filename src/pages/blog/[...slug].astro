@@ -6,15 +6,27 @@ export const prerender = true;
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
-	return posts.map((post) => ({
+	// Only English posts for this route (Arabic gets /ar/blog/)
+	return posts.filter(p => !p.id.startsWith('ar/')).map((post) => ({
 		params: { slug: post.id },
 		props: post,
 	}));
 }
 type Props = CollectionEntry<'blog'>;
+type RelatedServiceId = CollectionEntry<'blog'>['data']['relatedServices'][number];
 
 const post = Astro.props;
 const { Content } = await render(post);
+const validServiceIds = new Set<RelatedServiceId>([
+  'ceramic-coating',
+  'paint-protection-film',
+  'polish',
+  'window-film',
+  'premium-car-wash',
+  'leather-upholstery',
+  'car-mats',
+  'graphene-coating',
+]);
 
 // Auto-detect services mentioned in the post body and merge with frontmatter
 const services = await getCollection('services');
@@ -31,7 +43,9 @@ const mentionedServiceIds = services
   .map((s) => s.id);
 
 const relatedFromFrontmatter = post.data.relatedServices ?? [];
-const relatedServices = Array.from(new Set([...relatedFromFrontmatter, ...mentionedServiceIds]));
+const relatedServices: RelatedServiceId[] = Array.from(
+  new Set([...relatedFromFrontmatter, ...mentionedServiceIds])
+).filter((id): id is RelatedServiceId => validServiceIds.has(id as RelatedServiceId));
 ---
 
 <BlogPost {...post.data} relatedServices={relatedServices}>

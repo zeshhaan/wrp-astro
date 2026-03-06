@@ -8,8 +8,8 @@ import { getBusiness, getSchemaReviews, getDisplayCount } from '@/lib/reviews';
 
 const business = getBusiness();
 const displayCount = getDisplayCount();
-const title = `Client Reviews | WRP Dubai – ${business.rating.toFixed(1)} Stars, ${displayCount} Google Reviews`;
-const description = `Read ${displayCount} verified Google reviews from WRP Dubai clients. ${business.rating.toFixed(1)}-star rated car detailing, PPF, ceramic coating, and window tinting in Dubai.`;
+const title = `Client Reviews | WRP Detailing Studio – ${business.rating.toFixed(1)} Stars, ${displayCount} Google Reviews`;
+const description = `Read ${displayCount} verified Google reviews from WRP Detailing Studio clients. ${business.rating.toFixed(1)}-star rated car detailing, PPF, ceramic coating, and window tinting in Dubai.`;
 
 // AggregateRating + individual Review schema for SEO
 const schemaReviews = getSchemaReviews(10);
@@ -17,7 +17,7 @@ const reviewPageSchema = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
   '@id': 'https://wrpdetailing.ae/#localbusiness',
-  name: 'WRP Dubai',
+  name: 'WRP Detailing Studio',
   aggregateRating: {
     '@type': 'AggregateRating',
     ratingValue: business.rating.toString(),

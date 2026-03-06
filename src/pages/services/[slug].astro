@@ -12,17 +12,21 @@ import ServiceReviews from '@/components/reviews/ServiceReviews.astro';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
 
 export const prerender = true;
 
 export const getStaticPaths = (async () => {
   const services = await getCollection('services');
-  return services.map((service) => ({
+  // Only English services for this route (Arabic gets /ar/services/)
+  return services.filter(s => !s.id.startsWith('ar/')).map((service) => ({
     params: { slug: service.id },
     props: { service },
   }));
 }) satisfies GetStaticPaths;
 
+const locale = getLocale(Astro.currentLocale);
 const { service } = Astro.props;
 const {
   title,
@@ -58,15 +62,16 @@ const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p 
 const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
 
 // Breadcrumbs
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
-  { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Services', url: 'https://wrpdetailing.ae/#services' },
-  { name: title, url: `https://wrpdetailing.ae/services/${service.id}/` },
+  { name: t(locale, 'common.home'), url: `${siteUrl}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'nav.services'), url: `${siteUrl}${localizeUrl('/#services', locale)}` },
+  { name: title, url: `${siteUrl}${localizeUrl(`/services/${service.id}/`, locale)}` },
 ];
 ---
 
 <BaseLayout
-  title={`${title} | WRP Dubai`}
+  title={`${title} | WRP Detailing Studio`}
   description={description}
   ogImage={ogImage}
 >
@@ -87,7 +92,7 @@ const breadcrumbs = [
     <div class="absolute inset-0 bg-black">
       <img
         src={heroImage}
-        alt={`${title} service - Professional automotive ${subtitle.toLowerCase()} at WRP Dubai luxury car detailing studio`}
+        alt={`${title} service - Professional automotive ${subtitle.toLowerCase()} at WRP Detailing Studio luxury car detailing studio`}
         width="1920"
         height="1080"
         class="w-full h-full object-cover opacity-30"
@@ -315,9 +320,9 @@ const breadcrumbs = [
   <section class="py-32 px-6">
     <div class="container mx-auto max-w-7xl">
       <div class="mx-auto max-w-2xl text-center">
-        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
+        <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{t(locale, 'services.faqs')}</h2>
         <p class="mt-6 text-base text-muted-foreground">
-          Have a different question? <a href="/contact-us/" class="font-semibold hover:underline">Contact us</a> and we'll get back to you as soon as possible.
+          <a href={localizeUrl('/contact-us/', locale)} class="font-semibold hover:underline">{t(locale, 'nav.contact')}</a>
         </p>
       </div>
       <div class="mt-20">

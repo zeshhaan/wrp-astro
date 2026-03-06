@@ -93,7 +93,7 @@ export function getReviewImageAlt(review: Review, photoIndex: number): string {
     ?.map(tag => serviceNameMap[tag] || tag.replace(/-/g, ' '))
     .join(' and ') || 'car detailing';
   const total = review.localImages?.length || 1;
-  return `${review.reviewerName}'s vehicle after ${services} at WRP Dubai — verified customer review photo ${photoIndex + 1} of ${total}`;
+  return `${review.reviewerName}'s vehicle after ${services} at WRP Detailing Studio — verified customer review photo ${photoIndex + 1} of ${total}`;
 }
 
 /** Get reviews suitable for marquee display (compact, with text) */

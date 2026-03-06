@@ -7,19 +7,24 @@ import GridPattern from '@/components/GridPattern.astro';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+import { getLocalizedBlogPosts } from '@/i18n/content';
 
 export const prerender = true;
 
-const posts = (await getCollection('blog')).sort(
+const locale = getLocale(Astro.currentLocale);
+const posts = (await getLocalizedBlogPosts(locale)).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 
 const featuredPost = posts.find((post) => post.data.featured);
 const allPosts = posts;
 
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
-  { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Blog', url: 'https://wrpdetailing.ae/blog/' },
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'blog.title'), url: `${siteBase}${localizeUrl('/blog/', locale)}` },
 ];
 
 const categoryLabels: Record<string, string> = {
@@ -51,11 +56,11 @@ const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetaili
 const blogListSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'CollectionPage',
-	name: 'WRP Dubai Blog',
+	name: 'WRP Detailing Studio Blog',
 	description: 'Expert guides on ceramic coating, paint protection film, and car care in Dubai.',
 	url: `${siteUrl}/blog/`,
-	inLanguage: 'en',
-	isPartOf: { '@type': 'WebSite', name: 'WRP Dubai', url: `${siteUrl}/` },
+	inLanguage: locale,
+	isPartOf: { '@type': 'WebSite', name: 'WRP Detailing Studio', url: `${siteUrl}/` },
 	mainEntity: {
 		'@type': 'ItemList',
 		numberOfItems: allPosts.length,
@@ -70,7 +75,7 @@ const blogListSchema = {
 ---
 
 <BaseLayout
-	title="Blog | WRP Dubai - Car Care Insights & Guides"
+	title="Blog | WRP Detailing Studio - Car Care Insights & Guides"
 	description="Expert guides on ceramic coating, paint protection film, and car care in Dubai. Tips from WRP's detailing professionals."
 >
 	<Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
@@ -98,7 +103,7 @@ const blogListSchema = {
 					<div class="h-px flex-1 bg-border"></div>
 				</div>
 
-				<a href={`/blog/${featuredPost.id}/`} class="group block">
+				<a href={localizeUrl(`/blog/${featuredPost.id.replace(/^ar\//, '')}/`, locale)} class="group block">
 					<div class="grid md:grid-cols-2 gap-8 items-center">
 						{featuredPost.data.heroImage && (
 							<div class="relative aspect-[16/9] overflow-hidden rounded-lg">
@@ -130,7 +135,7 @@ const blogListSchema = {
 								{featuredPost.data.description}
 							</p>
 							<span class="inline-flex items-center text-sm font-medium group-hover:underline underline-offset-4">
-								Read article
+								{t(locale, 'blog.readMore')}
 								<Icon name="lucide:arrow-right" class="ml-1 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
 							</span>
 						</div>
@@ -160,7 +165,7 @@ const blogListSchema = {
 			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 				{allPosts.map((post) => (
 					<a
-						href={`/blog/${post.id}/`}
+						href={localizeUrl(`/blog/${post.id.replace(/^ar\//, '')}/`, locale)}
 						class="group block"
 						x-show={`category === 'all' || category === '${post.data.category}'`}
 						x-cloak
@@ -199,7 +204,7 @@ const blogListSchema = {
 									{post.data.description}
 								</p>
 								<span class="inline-flex items-center text-sm font-medium mt-4 group-hover:underline underline-offset-4">
-									Read article
+									{t(locale, 'blog.readMore')}
 									<Icon name="lucide:arrow-right" class="ml-1 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
 								</span>
 							</div>

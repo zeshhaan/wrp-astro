@@ -2,6 +2,9 @@
 import type { Review } from '@/lib/reviews';
 import { getReviewImageAlt } from '@/lib/reviews';
 import StarRating from './StarRating.astro';
+import { getLocale } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+import type { Locale } from '@/i18n/translations';
 
 interface Props {
   review: Review;
@@ -9,6 +12,7 @@ interface Props {
   showImages?: boolean;
   highlightWords?: string[];
   maxTextLength?: number;
+  locale?: Locale;
 }
 
 const {
@@ -18,6 +22,7 @@ const {
   highlightWords = [],
   maxTextLength = 0,
 } = Astro.props;
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 
 const hasImages = showImages && review.localImages && review.localImages.length > 0;
 
@@ -106,7 +111,7 @@ const initials = review.reviewerName
               class="w-1.5 h-1.5 rounded-full transition-all duration-300"
               x-on:click={`current = ${i}`}
               x-bind:class={`current === ${i} ? 'bg-white w-4' : 'bg-white/50'`}
-              aria-label={`View photo ${i + 1}`}
+              aria-label={locale === 'ar' ? `عرض الصورة ${i + 1}` : `View photo ${i + 1}`}
             />
           ))}
         </div>
@@ -130,8 +135,8 @@ const initials = review.reviewerName
           <button
             x-on:click="expanded = !expanded"
             class="text-xs font-medium mt-1 underline underline-offset-2 opacity-70 hover:opacity-100 transition-opacity"
-            x-text="expanded ? 'Show less' : 'Read more'"
-          >Read more</button>
+            x-text={`expanded ? '${t(locale, 'reviews.showLess')}' : '${t(locale, 'reviews.readMore')}'`}
+          >{t(locale, 'reviews.readMore')}</button>
         </div>
       ) : (
         <p set:html={`"${processedText}"`} />

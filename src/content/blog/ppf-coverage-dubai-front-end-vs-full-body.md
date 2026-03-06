@@ -9,7 +9,7 @@ tags:
   - dubai
   - car care
   - resale value
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 8
 featured: false
 heroImage: /luxury-supercar-close-up-detail-black-and-white.jpg

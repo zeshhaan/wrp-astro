@@ -4,20 +4,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
 import FormattedDate from './FormattedDate.astro';
+import { getLocale, localizeUrl } from '../i18n/utils';
+import { t } from '../i18n/translations';
+import { getLocalizedBlogPosts } from '../i18n/content';
 
 interface Props {
 	count?: number;
 	heading?: string;
 	subheading?: string;
+	locale?: string;
 }
 
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 const {
 	count = 3,
-	heading = 'Latest from Our Blog',
-	subheading = 'Expert insights on car care, detailing tips, and protecting your investment in Dubai',
+	heading = t(locale, 'blog.latestPosts'),
+	subheading = t(locale, 'blog.latestSubtitle'),
 } = Astro.props;
 
-const allPosts = await getCollection('blog');
+const allPosts = await getLocalizedBlogPosts(locale);
 const posts = allPosts
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 	.slice(0, count);
@@ -41,7 +46,7 @@ const categoryLabels: Record<string, string> = {
 
 		<div class={`grid gap-8 ${posts.length === 1 ? 'max-w-lg mx-auto' : posts.length === 2 ? 'md:grid-cols-2 max-w-4xl mx-auto' : 'md:grid-cols-3'}`}>
 			{posts.map((post) => (
-				<a href={`/blog/${post.id}/`} class="group block">
+				<a href={localizeUrl(`/blog/${post.id.replace(/^ar\//, '')}/`, locale)} class="group block">
 					<Card className="overflow-hidden h-full hover:shadow-lg transition-all duration-300 p-0">
 						{post.data.heroImage && (
 							<div class="relative aspect-[16/9] overflow-hidden">
@@ -76,7 +81,7 @@ const categoryLabels: Record<string, string> = {
 								{post.data.description}
 							</p>
 							<span class="inline-flex items-center text-sm font-medium mt-4 group-hover:underline underline-offset-4">
-								Read article
+								{t(locale, 'blog.readMore')}
 								<Icon name="lucide:arrow-right" class="ml-1 h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
 							</span>
 						</div>
@@ -86,9 +91,9 @@ const categoryLabels: Record<string, string> = {
 		</div>
 
 		<div class="text-center mt-12">
-			<a href="/blog/">
+			<a href={localizeUrl('/blog/', locale)}>
 				<Button variant="outline" size="lg">
-					VIEW ALL ARTICLES
+					{t(locale, 'blog.viewAll').toUpperCase()}
 					<Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
 				</Button>
 			</a>

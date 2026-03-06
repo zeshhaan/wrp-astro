@@ -164,6 +164,75 @@
   }
 }
 
+/* ── RTL Overrides ──────────────────────────── */
+[dir="rtl"] {
+  --font-serif: var(--font-noto-naskh, var(--font-playfair));
+  --font-sans: var(--font-ibm-plex-arabic, var(--font-inter));
+}
+
+/* ── RTL: Flip arrow/chevron icons ──────────── */
+[dir="rtl"] [data-icon="lucide:arrow-right"],
+[dir="rtl"] [data-icon="lucide:chevron-right"],
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* RTL: Flip inline SVG chevrons (review CTAs, WhatsApp modal) */
+[dir="rtl"] .chevron-rtl {
+  transform: scaleX(-1);
+}
+
+/* RTL: Swap ml-* to mr-* on arrow icons */
+[dir="rtl"] [data-icon="lucide:arrow-right"] {
+  margin-left: 0;
+  margin-inline-start: 0.5rem;
+}
+
+/* RTL: Flip hover translate-x direction */
+[dir="rtl"] .group-hover\:translate-x-0\.5 {
+  --tw-translate-x: -0.125rem;
+}
+[dir="rtl"] .group-hover\/btn\:translate-x-1 {
+  --tw-translate-x: -0.25rem;
+}
+[dir="rtl"] .group-hover\:translate-x-1 {
+  --tw-translate-x: -0.25rem;
+}
+
+/* ── RTL: Blog content ─────────────────────── */
+/* Blockquote border on right side in RTL */
+[dir="rtl"] .blog-content blockquote {
+  border-left: none;
+  border-right: 3px solid var(--foreground);
+}
+
+/* List markers on right side in RTL */
+[dir="rtl"] .blog-content ul > li {
+  padding-left: 0;
+  padding-right: 1.75rem;
+}
+[dir="rtl"] .blog-content ul > li::before {
+  left: auto;
+  right: 0;
+}
+[dir="rtl"] .blog-content ol > li {
+  padding-left: 0;
+  padding-right: 2.25rem;
+}
+[dir="rtl"] .blog-content ol > li::before {
+  left: auto;
+  right: 0;
+  content: counter(blog-counter, arabic-indic);
+}
+
+/* Marquee direction swap in RTL */
+[dir="rtl"] .marquee-left {
+  animation-name: marquee-scroll-right;
+}
+[dir="rtl"] .marquee-right {
+  animation-name: marquee-scroll-left;
+}
+
 /* ── Review Marquee ──────────────────────────── */
 @keyframes marquee-scroll-left {
   0% { transform: translateX(0); }

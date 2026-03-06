@@ -4,6 +4,8 @@ import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
 
 export const POST: APIRoute = async ({ request }) => {
+  let locale = 'en';
+
   try {
     const formData = await request.formData();
     const name = formData.get('name')?.toString();
@@ -12,13 +14,18 @@ export const POST: APIRoute = async ({ request }) => {
     const vehicle = formData.get('vehicle')?.toString();
     const service = formData.get('service')?.toString();
     const message = formData.get('message')?.toString();
+    locale = formData.get('locale')?.toString() === 'ar' ? 'ar' : 'en';
+
+    const isArabic = locale === 'ar';
 
     // Validation
     if (!name || !email || !message) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Name, email, and message are required'
+          error: isArabic
+            ? 'الاسم والبريد الإلكتروني والرسالة مطلوبة'
+            : 'Name, email, and message are required'
         }),
         {
           status: 400,
@@ -33,7 +40,9 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Please provide a valid email address'
+          error: isArabic
+            ? 'يرجى إدخال بريد إلكتروني صحيح'
+            : 'Please provide a valid email address'
         }),
         {
           status: 400,
@@ -153,7 +162,9 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Thanks! Our team will reach out with your personalized estimate.'
+        message: isArabic
+          ? 'شكراً! سيتواصل فريقنا معك قريباً بعرض سعر مخصص.'
+          : 'Thanks! Our team will reach out with your personalized estimate.'
       }),
       {
         status: 200,
@@ -161,11 +172,14 @@ export const POST: APIRoute = async ({ request }) => {
       }
     );
   } catch (error) {
+    const isArabic = locale === 'ar';
     console.error('Contact form error:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'An error occurred. Please try again or call us directly.'
+        error: isArabic
+          ? 'حدث خطأ. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة.'
+          : 'An error occurred. Please try again or call us directly.'
       }),
       {
         status: 500,

@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PortfolioCard from '@/components/portfolio/PortfolioCard.astro';
+import { PortfolioLightbox } from '@/components/portfolio/PortfolioLightbox';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import GridPattern from '@/components/GridPattern.astro';
+import { Button } from '@/components/ui/button';
+import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+import { getLocalizedPortfolio } from '@/i18n/content';
+
+export const prerender = true;
+
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'portfolio.title'), url: `${siteBase}${localizeUrl('/portfolio/', locale)}` },
+];
+
+const portfolioItems = await getLocalizedPortfolio(locale);
+const sortedItems = portfolioItems.sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return b.data.completionDate.getTime() - a.data.completionDate.getTime();
+});
+
+const lightboxData = sortedItems.map(item => ({
+  title: item.data.title,
+  subtitle: item.data.subtitle,
+  gallery: item.data.gallery,
+}));
+---
+
+<BaseLayout
+  title="أعمالنا | WRP Detailing Studio"
+  description="استكشف مجموعة من مشاريع WRP Detailing Studio في تظليل النوافذ وطلاء السيراميك وفيلم حماية الطلاء والتفصيل الفاخر للسيارات."
+  ogImage="/og-image.jpg"
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="relative bg-black px-6 py-20 text-white">
+    <div class="container mx-auto max-w-7xl text-center">
+      <h1 class="mb-6 font-serif text-5xl font-bold md:text-7xl">أعمالنا</h1>
+      <p class="mx-auto max-w-2xl text-lg text-white/70 md:text-xl">
+        نماذج من الأعمال التي نفذناها لسيارات مميزة في دبي. كل مشروع يعكس دقتنا في التنفيذ والتزامنا بالنتيجة النهائية.
+      </p>
+    </div>
+  </section>
+
+  <section class="px-6 py-20">
+    <div class="container mx-auto max-w-7xl">
+      <div class="masonry-grid">
+        {sortedItems.map((item, index) => (
+          <div onclick={`window.openPortfolioLightbox(${index})`}>
+            <PortfolioCard
+              title={item.data.title}
+              subtitle={item.data.subtitle}
+              heroImage={item.data.heroImage}
+              index={index}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="relative overflow-hidden bg-black px-6 py-32 text-white">
+    <GridPattern />
+    <div class="container relative z-10 mx-auto max-w-4xl text-center">
+      <h2 class="mb-6 font-serif text-4xl font-bold md:text-5xl">جاهز لتجربة النتيجة على سيارتك؟</h2>
+      <p class="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+        انضم إلى عملائنا الذين اختاروا WRP للعناية الدقيقة بسياراتهم، ودعنا نضع الخطة المناسبة لسيارتك من أول زيارة.
+      </p>
+      <Button size="lg" className="cursor-pointer bg-white text-black hover:bg-white/90" data-contact-modal>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
+      </Button>
+    </div>
+  </section>
+
+  <PortfolioLightbox items={lightboxData} client:load />
+</BaseLayout>
+
+<style>
+  .masonry-grid {
+    column-count: 1;
+    column-gap: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .masonry-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .masonry-grid {
+      column-count: 3;
+    }
+  }
+</style>

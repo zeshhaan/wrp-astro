@@ -13,9 +13,10 @@ const blog = defineCollection({
 			heroImage: z.string().optional(),
 			category: z.enum(['guide', 'news', 'update', 'event', 'listicle']).default('guide'),
 			tags: z.array(z.string()).default([]),
-			author: z.string().default('WRP Dubai'),
+			author: z.string().default('WRP Detailing Studio'),
 			readingTime: z.number().optional(),
 			featured: z.boolean().default(false),
+			lang: z.enum(['en', 'ar']).default('en'),
 			relatedServices: z.array(z.enum([
 				'ceramic-coating',
 				'paint-protection-film',
@@ -38,6 +39,7 @@ const services = defineCollection({
 		description: z.string(),
 		heroImage: z.string(),
 		price: z.number().optional(),
+		lang: z.enum(['en', 'ar']).default('en'),
 		// Main description section
 		mainHeading: z.string().optional(),
 		mainDescription1: z.string().optional(),
@@ -104,6 +106,7 @@ const portfolio = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		subtitle: z.string(),
+		lang: z.enum(['en', 'ar']).default('en'),
 		vehicle: z.object({
 			make: z.string(),
 			model: z.string(),
