@@ -8,7 +8,7 @@ tags:
   - paint protection
   - dubai
   - car care
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 8
 featured: true
 heroImage: /luxury-sports-car-detail-black-and-white-dramatic.jpg

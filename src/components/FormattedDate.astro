@@ -1,17 +1,40 @@
 ---
+import { getLocale, getDateLocale } from '../i18n/utils';
+
 interface Props {
 	date: Date;
+	locale?: string;
+	showHijri?: boolean;
+	monthFormat?: 'short' | 'long';
 }
 
 const { date } = Astro.props;
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
+const dateLocale = getDateLocale(locale);
+const monthFormat = Astro.props.monthFormat ?? 'short';
+
+const gregorianDate = date.toLocaleDateString(dateLocale, {
+	year: 'numeric',
+	month: monthFormat,
+	day: 'numeric',
+});
+
+let hijriDate: string | null = null;
+
+if (locale === 'ar' && Astro.props.showHijri) {
+	try {
+		hijriDate = date.toLocaleDateString('ar-SA-u-ca-islamic-umalqura', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		});
+	} catch {
+		hijriDate = null;
+	}
+}
 ---
 
 <time datetime={date.toISOString()}>
-	{
-		date.toLocaleDateString('en-us', {
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		})
-	}
+	{gregorianDate}
+	{hijriDate && <><span aria-hidden="true"> / </span><span>{hijriDate}</span></>}
 </time>

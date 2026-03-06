@@ -3,37 +3,41 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { Button } from "@/components/ui/button";
 import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
 
 export const prerender = false; // Server-rendered for D1 access
 
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
-  { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Contact', url: 'https://wrpdetailing.ae/contact-us' },
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'nav.contact'), url: `${siteBase}${localizeUrl('/contact-us/', locale)}` },
 ];
 
 const contactPageSchema = {
   '@context': 'https://schema.org',
   '@type': 'ContactPage',
-  name: 'Contact WRP Dubai',
+  name: 'Contact WRP Detailing Studio',
   url: 'https://wrpdetailing.ae/contact-us',
   mainEntity: {
     '@type': 'LocalBusiness',
-    name: 'WRP Dubai',
+    name: 'WRP Detailing Studio',
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+971547173000',
       contactType: 'customer service',
       email: 'info@wrpdetailing.ae',
       areaServed: 'AE',
-      availableLanguage: 'English',
+      availableLanguage: ['English', 'Arabic'],
     },
   },
 };
 ---
 
 <BaseLayout
-  title="Contact Us | WRP Dubai - Premium Car Detailing"
-  description="Contact WRP Dubai - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000"
+  title="Contact Us | WRP Detailing Studio - Premium Car Detailing"
+  description="Contact WRP Detailing Studio - Premium car detailing studio in Al Qusais, Dubai. Call +971 54 717 3000"
 >
   <!-- Breadcrumbs -->
   <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
@@ -112,6 +116,8 @@ const contactPageSchema = {
 
       <!-- Right Side - Form -->
       <form
+        data-default-error="Something went wrong"
+        data-network-error={t(locale, 'home.contact.networkError')}
         x-data="{
           submitting: false,
           success: false,
@@ -120,9 +126,12 @@ const contactPageSchema = {
             event.preventDefault();
             this.submitting = true;
             this.error = '';
+            const form = event.target;
+            const defaultError = form.dataset.defaultError || 'Something went wrong';
+            const networkError = form.dataset.networkError || 'Network error. Please try again or call us directly.';
 
             try {
-              const formData = new FormData(event.target);
+              const formData = new FormData(form);
               const response = await fetch('/api/contact', {
                 method: 'POST',
                 body: formData
@@ -132,12 +141,12 @@ const contactPageSchema = {
 
               if (result.success) {
                 this.success = true;
-                event.target.reset();
+                form.reset();
               } else {
-                this.error = result.error || 'Something went wrong';
+                this.error = result.error || defaultError;
               }
             } catch (err) {
-              this.error = 'Network error. Please try again or call us directly.';
+              this.error = networkError;
             } finally {
               this.submitting = false;
             }
@@ -147,6 +156,7 @@ const contactPageSchema = {
         class="px-6 pb-24 pt-28 sm:pb-32 lg:px-8 lg:py-48"
       >
         <div class="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
+          <input type="hidden" name="locale" value={locale} />
           <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <!-- Full Name (combined field matching API) -->
             <div class="sm:col-span-2">

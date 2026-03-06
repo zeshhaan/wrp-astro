@@ -9,7 +9,7 @@ tags:
   - dubai
   - heat rejection
   - car comfort
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 8
 featured: false
 heroImage: /luxury-sedan-close-up-black-and-white-elegant.jpg

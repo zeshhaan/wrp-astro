@@ -1,41 +1,46 @@
 ---
-import { NAV_PAGES } from '../consts';
-import { getCollection } from 'astro:content';
 import { getBusiness, getSchemaReviews } from '@/lib/reviews';
-
-const services = await getCollection('services');
-const business = getBusiness();
-const topReviews = getSchemaReviews(10);
-const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: `/services/${s.id}` }));
+import { getBaseSlug, getLocalizedServices } from '@/i18n/content';
+import { getLocale, localizeUrl } from '../i18n/utils';
+import { t } from '../i18n/translations';
 
 interface Props {
   type?: 'LocalBusiness' | 'WebSite' | 'SiteNavigationElement' | 'ServiceCatalog';
 }
 
+const locale = getLocale(Astro.currentLocale);
 const { type = 'LocalBusiness' } = Astro.props;
+const services = await getLocalizedServices(locale);
+const business = getBusiness();
+const topReviews = getSchemaReviews(10);
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const localBusinessId = `${siteUrl}/#localbusiness`;
 const websiteId = `${siteUrl}/#website`;
+const getServicePath = (id: string) => localizeUrl(`/services/${getBaseSlug(id)}/`, locale);
+const NAV_SERVICES = services.map((s) => ({ name: s.data.title, href: getServicePath(s.id) }));
 
-const serviceCatalogItems = services.map((service, index) => ({
-  '@type': 'ListItem',
-  position: index + 1,
-  name: service.data.title,
-  url: `${siteUrl}/services/${service.id}/`,
-  item: {
-    '@type': 'Service',
+const serviceCatalogItems = services.map((service, index) => {
+  const url = `${siteUrl}${getServicePath(service.id)}`;
+  return {
+    '@type': 'ListItem',
+    position: index + 1,
     name: service.data.title,
-    serviceType: service.data.title,
-    description: service.data.description,
-    url: `${siteUrl}/services/${service.id}/`,
-  },
-}));
+    url,
+    item: {
+      '@type': 'Service',
+      name: service.data.title,
+      serviceType: service.data.title,
+      description: service.data.description,
+      url,
+    },
+  };
+});
 
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@id': localBusinessId,
   '@type': ['LocalBusiness', 'AutomotiveBusiness'],
-  name: 'WRP Dubai',
+  name: 'WRP Detailing Studio',
   alternateName: 'Wrap, Reinforce, Protect',
   description:
     'Premium car detailing studio in Dubai specializing in Paint Protection Film (PPF), ceramic coating, window tinting and window film, car polish and paint correction, leather and upholstery care, and luxury vehicle maintenance',
@@ -52,7 +57,7 @@ const localBusinessSchema = {
       url: `${siteUrl}/og-image.jpg`,
       width: 1200,
       height: 630,
-      caption: 'WRP Dubai luxury car detailing studio showroom',
+      caption: 'WRP Detailing Studio luxury car detailing studio showroom',
     },
   ],
   telephone: '+971547173000',
@@ -95,6 +100,7 @@ const localBusinessSchema = {
     name: 'WRP Vehicle Protection and Detailing Services',
     itemListElement: serviceCatalogItems,
   },
+  availableLanguage: ['English', 'Arabic'],
   sameAs: [
     'https://dub.sh/wrp_ig',
     'https://dub.sh/wrp-map',
@@ -119,7 +125,7 @@ const webSiteSchema = {
   '@context': 'https://schema.org',
   '@id': websiteId,
   '@type': 'WebSite',
-  name: 'WRP Dubai',
+  name: 'WRP Detailing Studio',
   alternateName: 'WRP',
   description:
     'Dubai vehicle protection and detailing studio for PPF, window tinting, ceramic coating, car polish, and upholstery care.',
@@ -127,6 +133,13 @@ const webSiteSchema = {
   publisher: { '@id': localBusinessId },
 };
 
+const NAV_PAGES = [
+  { name: t(locale, 'nav.blog'), href: localizeUrl('/blog/', locale) },
+  { name: t(locale, 'nav.portfolio'), href: localizeUrl('/portfolio/', locale) },
+  { name: t(locale, 'nav.reviews'), href: localizeUrl('/reviews/', locale) },
+  { name: t(locale, 'nav.about'), href: localizeUrl('/more-about-wrp/', locale) },
+  { name: t(locale, 'nav.contact'), href: localizeUrl('/contact-us/', locale) },
+];
 const navItems = [...NAV_SERVICES, ...NAV_PAGES];
 const siteNavigationSchema = {
   '@context': 'https://schema.org',

@@ -5,21 +5,24 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import RelatedServices from '../components/RelatedServices.astro';
 import ReviewBlade from '../components/reviews/ReviewBlade.astro';
+import { getLocale, toLocalNum as _toLocalNum } from '../i18n/utils';
+import { t } from '../i18n/translations';
 
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags, relatedServices } = Astro.props;
 
+const locale = getLocale(Astro.currentLocale);
+const toLocalNum = (n: string | number) => _toLocalNum(n, locale);
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImageURL = heroImage ? new URL(heroImage, Astro.site).toString() : new URL('/og-image.jpg', Astro.site).toString();
 
-const categoryLabels: Record<string, string> = {
-  guide: 'Guide',
-  news: 'News',
-  update: 'Update',
-  event: 'Event',
-  listicle: 'Listicle',
+const categoryLabels: Record<string, Record<string, string>> = {
+  en: { guide: 'Guide', news: 'News', update: 'Update', event: 'Event', listicle: 'Listicle' },
+  ar: { guide: 'دليل', news: 'أخبار', update: 'تحديث', event: 'فعالية', listicle: 'قائمة' },
 };
+const getCategoryLabel = (cat: string) => categoryLabels[locale]?.[cat] || cat;
 
 // BlogPosting JSON-LD for Google
 const blogPostingJsonLd = {
@@ -29,25 +32,27 @@ const blogPostingJsonLd = {
   description: description,
   url: canonicalURL,
   image: ogImageURL,
-  inLanguage: 'en',
+  inLanguage: locale === 'ar' ? 'ar' : 'en',
   datePublished: new Date(pubDate).toISOString(),
   ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
-  author: { '@type': 'Organization', name: author || 'WRP Dubai', url: Astro.site?.toString() },
+  author: { '@type': 'Organization', name: author || 'WRP Detailing Studio', url: Astro.site?.toString() },
   publisher: {
     '@type': 'Organization',
-    name: 'WRP Dubai',
+    name: 'WRP Detailing Studio',
     url: Astro.site?.toString(),
     logo: { '@type': 'ImageObject', url: new URL('/wrp-logo.svg', Astro.site).toString() },
   },
   ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {}),
-  ...(category ? { articleSection: categoryLabels[category] || category } : {}),
+  ...(category ? { articleSection: categoryLabels.en[category] || category } : {}),
   ...(tags && tags.length ? { keywords: tags.join(', ') } : {}),
 };
 
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
+const blogBase = locale === 'ar' ? `${siteUrl}/ar/blog/` : `${siteUrl}/blog/`;
 const breadcrumbs = [
-  { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Blog', url: 'https://wrpdetailing.ae/blog/' },
+  { name: t(locale, 'common.home'), url: locale === 'ar' ? `${siteUrl}/ar/` : `${siteUrl}/` },
+  { name: t(locale, 'blog.title'), url: blogBase },
   { name: title, url: canonicalURL },
 ];
 ---
@@ -61,7 +66,7 @@ const breadcrumbs = [
   modifiedTime={updatedDate || pubDate}
   author={author}
   tags={tags}
-  articleSection={category ? (categoryLabels[category] || category) : undefined}
+  articleSection={category ? (categoryLabels.en[category] || category) : undefined}
 >
 	<!-- BlogPosting JSON-LD -->
 	<script type="application/ld+json" set:html={JSON.stringify(blogPostingJsonLd)} />
@@ -83,25 +88,25 @@ const breadcrumbs = [
 				<div class="flex items-center gap-3 text-sm text-muted-foreground mb-5">
 					{category && (
 						<span class="uppercase tracking-[0.15em] font-bold text-background bg-foreground px-3 py-1 text-[0.65rem]">
-							{categoryLabels[category] || category}
+							{getCategoryLabel(category)}
 						</span>
 					)}
-					<FormattedDate date={pubDate} />
+					<FormattedDate date={pubDate} showHijri={locale === 'ar'} />
 					{readingTime && (
 						<>
 							<span class="text-border">|</span>
-							<span>{readingTime} min read</span>
+							<span>{toLocalNum(readingTime)} {t(locale, 'blog.minRead')}</span>
 						</>
 					)}
 				</div>
 				<h1 class="font-serif text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight">{title}</h1>
 				<p class="text-lg text-muted-foreground leading-[1.45]">{description}</p>
 				{author && (
-					<p class="text-sm text-muted-foreground mt-4">By <span class="font-medium text-foreground">{author}</span></p>
+					<p class="text-sm text-muted-foreground mt-4">{t(locale, 'blog.by')} <span class="font-medium text-foreground">{author}</span></p>
 				)}
 				{updatedDate && (
 					<p class="text-sm text-muted-foreground mt-2 italic">
-						Updated <FormattedDate date={updatedDate} />
+						{t(locale, 'blog.updated')} <FormattedDate date={updatedDate} showHijri={locale === 'ar'} />
 					</p>
 				)}
 			</div>
@@ -228,12 +233,12 @@ const breadcrumbs = [
 		}
 		.blog-content ul > li {
 			position: relative;
-			padding-left: 1.75rem;
+			padding-inline-start: 1.75rem;
 		}
 		.blog-content ul > li::before {
 			content: '';
 			position: absolute;
-			left: 0;
+			inset-inline-start: 0;
 			top: 0.55em;
 			width: 5px;
 			height: 5px;
@@ -261,13 +266,13 @@ const breadcrumbs = [
 		}
 		.blog-content ol > li {
 			position: relative;
-			padding-left: 2.25rem;
+			padding-inline-start: 2.25rem;
 			counter-increment: blog-counter;
 		}
 		.blog-content ol > li::before {
 			content: counter(blog-counter);
 			position: absolute;
-			left: 0;
+			inset-inline-start: 0;
 			top: 0.15em;
 			width: 1.5rem;
 			height: 1.5rem;
@@ -279,6 +284,17 @@ const breadcrumbs = [
 			background: var(--foreground);
 			color: var(--background);
 			border-radius: 50%;
+		}
+
+		/* RTL: Eastern Arabic numerals for ordered lists */
+		[dir="rtl"] .blog-content ol > li::before {
+			content: counter(blog-counter, arabic-indic);
+		}
+
+		/* RTL: blockquote border on right side */
+		[dir="rtl"] .blog-content blockquote {
+			border-left: none;
+			border-right: 3px solid var(--foreground);
 		}
 
 		/* Links — underline only, subtle transition */

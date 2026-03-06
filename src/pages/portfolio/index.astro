@@ -7,15 +7,20 @@ import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import GridPattern from '@/components/GridPattern.astro';
 import { Button } from '@/components/ui/button';
 import { Icon } from 'astro-icon/components';
+import { getLocale, localizeUrl } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+import { getLocalizedPortfolio } from '@/i18n/content';
 
 export const prerender = true;
 
+const locale = getLocale(Astro.currentLocale);
+const siteBase = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
-  { name: 'Home', url: 'https://wrpdetailing.ae/' },
-  { name: 'Portfolio', url: 'https://wrpdetailing.ae/portfolio' },
+  { name: t(locale, 'common.home'), url: `${siteBase}${localizeUrl('/', locale)}` },
+  { name: t(locale, 'portfolio.title'), url: `${siteBase}${localizeUrl('/portfolio/', locale)}` },
 ];
 
-const portfolioItems = await getCollection('portfolio');
+const portfolioItems = await getLocalizedPortfolio(locale);
 // Sort by completion date (newest first), then by featured
 const sortedItems = portfolioItems.sort((a, b) => {
   if (a.data.featured && !b.data.featured) return -1;
@@ -31,7 +36,7 @@ const lightboxData = sortedItems.map(item => ({
 ---
 
 <BaseLayout
-  title="Portfolio | WRP Dubai - Our Work"
+  title="Portfolio | WRP Detailing Studio - Our Work"
   description="Explore our portfolio of premium car detailing, ceramic coating, and paint protection projects in Dubai"
   ogImage="/og-image.jpg"
 >

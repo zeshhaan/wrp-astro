@@ -9,7 +9,7 @@ tags:
   - interior detailing
   - dubai
   - car care
-author: WRP Dubai
+author: WRP Detailing Studio
 readingTime: 8
 featured: false
 heroImage: /luxury-suv-black-and-white-premium-detail.jpg

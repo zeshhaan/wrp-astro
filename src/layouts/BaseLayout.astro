@@ -4,10 +4,12 @@ import WRPFooter from '../components/WRPFooter.astro';
 import Schema from '../components/Schema.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
+import LanguageBanner from '../components/LanguageBanner.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
 import '../styles/global.css';
+import { getLocale, getDir, getOgLocale, getAlternateUrl } from '../i18n/utils';
 
 interface Props {
   title: string;
@@ -40,24 +42,31 @@ const {
   author,
   tags = [],
   articleSection,
-  publisher = 'WRP Dubai',
+  publisher = 'WRP Detailing Studio',
 } = Astro.props;
+
+const locale = getLocale(Astro.currentLocale);
+const dir = getDir(locale);
+const ogLocale = getOgLocale(locale);
+const isArabic = locale === 'ar';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImageURL = new URL(ogImage, Astro.site).toString();
+const alternateUrl = new URL(getAlternateUrl(Astro.url.pathname, locale), Astro.site).toString();
 
 // Build Open Graph Article extension meta when applicable
 const publishedISO = publishedTime ? new Date(publishedTime).toISOString() : undefined;
 const modifiedISO = modifiedTime ? new Date(modifiedTime).toISOString() : undefined;
-const articleMeta = ogType === 'article'
-  ? [
-      publishedISO && { property: 'article:published_time', content: publishedISO },
-      modifiedISO && { property: 'article:modified_time', content: modifiedISO },
-      author && { property: 'article:author', content: String(author) },
-      articleSection && { property: 'article:section', content: String(articleSection) },
-      ...(Array.isArray(tags) ? tags.map((t) => ({ property: 'article:tag', content: String(t) })) : []),
-    ].filter(Boolean)
-  : [];
+const articleMeta: Array<{ property: string; content: string }> = [];
+if (ogType === 'article') {
+  if (publishedISO) articleMeta.push({ property: 'article:published_time', content: publishedISO });
+  if (modifiedISO) articleMeta.push({ property: 'article:modified_time', content: modifiedISO });
+  if (author) articleMeta.push({ property: 'article:author', content: String(author) });
+  if (articleSection) articleMeta.push({ property: 'article:section', content: String(articleSection) });
+  if (Array.isArray(tags)) {
+    articleMeta.push(...tags.map((tag) => ({ property: 'article:tag', content: String(tag) })));
+  }
+}
 
 const extendLinks = [
   { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
@@ -92,7 +101,7 @@ const extendMeta = [
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale} dir={dir}>
   <head>
     <meta charset="utf-8" />
     <SEO
@@ -109,8 +118,8 @@ const extendMeta = [
         },
         optional: {
           description: description,
-          siteName: 'WRP Dubai',
-          locale: 'en_AE',
+          siteName: 'WRP Detailing Studio',
+          locale: ogLocale,
         },
         image: {
           alt: title,
@@ -134,13 +143,24 @@ const extendMeta = [
     {includeSchema && <Schema />}
     <Schema type="SiteNavigationElement" />
 
+    <!-- hreflang tags for i18n -->
+    <link rel="alternate" hreflang="en-AE" href={isArabic ? alternateUrl : canonicalURL} />
+    <link rel="alternate" hreflang="ar-AE" href={isArabic ? canonicalURL : alternateUrl} />
+    <link rel="alternate" hreflang="x-default" href={isArabic ? alternateUrl : canonicalURL} />
+
     <!-- View Transitions Fallback for browsers without native support -->
     <ClientRouter />
 
-    <!-- Astro Experimental Fonts -->
+    <!-- Fonts — Arabic loaded conditionally -->
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-montserrat" />
+    {isArabic && (
+      <>
+        <Font cssVariable="--font-noto-naskh" preload />
+        <Font cssVariable="--font-ibm-plex-arabic" preload />
+      </>
+    )}
 
     <!-- Alpine.js loaded via @astrojs/alpinejs integration (no CDN needed) -->
 
@@ -163,21 +183,27 @@ const extendMeta = [
       // Clean up Alpine.js scopes before View Transitions swap to prevent detached DOM leaks.
       // Alpine's MutationObserver may not fire reliably during full-page swap.
       document.addEventListener('astro:before-swap', () => {
-        if (window.Alpine) {
+        const alpine = (window as Window & {
+          Alpine?: { destroyTree: (el: Element) => void };
+        }).Alpine;
+
+        if (alpine) {
           // Walk all Alpine-managed elements and trigger their destroy() lifecycle
           document.querySelectorAll('[x-data]').forEach((el) => {
-            window.Alpine.destroyTree(el);
+            alpine.destroyTree(el);
           });
         }
       });
     </script>
   </head>
   <body>
-    {showNav && <Navigation />}
+    {showNav && <Navigation locale={locale} />}
+
+    <LanguageBanner locale={locale} />
 
     <slot />
 
-    {showFooter && <WRPFooter />}
+    {showFooter && <WRPFooter locale={locale} />}
 
     <div transition:persist="google-review-badge">
       <GoogleReviewBadge />
