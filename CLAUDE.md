@@ -4,9 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. The project was migrated from Next.js 16 to Astro 5 and is deployed on Cloudflare Workers with server-side rendering.
-
-**Migration Source**: This project was migrated from `/src/ameen/v0-wrp-landing-page-4q/`
+This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. Deployed on Cloudflare Workers with server-side rendering.
 
 ## Development Commands
 
@@ -33,14 +31,14 @@ bun astro ...
 ## Architecture
 
 ### Tech Stack
-- **Framework**: Astro 5 with SSR (server output mode)
-- **Adapter**: Cloudflare with platformProxy enabled
-- **React**: v19.2.0 (for interactive components via @astrojs/react)
+- **Framework**: Astro 6 with SSR (server output mode), Vite 7
+- **Adapter**: Cloudflare (`@astrojs/cloudflare`)
+- **React**: v19 (for interactive components via @astrojs/react)
 - **Alpine.js**: v3.x (for lightweight client-side interactivity via @astrojs/alpinejs)
 - **TypeScript**: Strict mode with strictNullChecks enabled
 - **Styling**: Tailwind CSS v4 with @tailwindcss/vite
 - **UI Components**: shadcn/ui components (Radix UI primitives in React)
-- **Fonts**: Playfair Display (serif), Inter (sans), Montserrat (logo)
+- **Fonts**: Playfair Display (serif), Inter (sans), Montserrat (logo), Noto Naskh Arabic, IBM Plex Sans Arabic — via Astro built-in Fonts API
 - **Analytics**: Partytown for Google Analytics
 - **Package Manager**: bun
 - **Deployment**: Cloudflare Workers + D1 Database
@@ -51,7 +49,7 @@ bun astro ...
 - Database name: `wrp-contact-forms`
 - Binding: `DB`
 - Used for storing contact form submissions
-- Access via `locals.runtime.env.DB` in API routes
+- Access via `import { env } from 'cloudflare:workers'` then `env.DB`
 
 **Wrangler Configuration** (`wrangler.jsonc`):
 - Worker entry point: `./dist/_worker.js/index.js`
@@ -123,7 +121,7 @@ public/                         # Static assets (images, favicon)
 
 **BaseLayout.astro**:
 - Props: `title`, `description`, `showNav`, `showFooter`
-- Includes Google Fonts (Playfair Display, Inter, Montserrat)
+- Fonts loaded via Astro's built-in Fonts API (configured in `astro.config.mjs`)
 - Loads Alpine.js and Lucide icons from CDN
 - Initializes Lucide icons on DOM load and Alpine initialization
 - Uses `[x-cloak]` pattern for Alpine.js
@@ -136,10 +134,12 @@ public/                         # Static assets (images, favicon)
 ### Styling Conventions
 
 - **Tailwind CSS v4**: Uses Vite plugin (`@tailwindcss/vite`)
-- **Font Variables**: Applied via Google Fonts link
-  - `font-serif`: Playfair Display
-  - `font-sans`: Inter
-  - Logo uses Montserrat italic 900
+- **Font Variables**: Applied via Astro Fonts API (`astro.config.mjs`)
+  - `--font-playfair`: Playfair Display (serif headings)
+  - `--font-inter`: Inter (body sans-serif)
+  - `--font-montserrat`: Montserrat 900 italic (logo)
+  - `--font-noto-naskh`: Noto Naskh Arabic (Arabic serif)
+  - `--font-ibm-plex-arabic`: IBM Plex Sans Arabic (Arabic sans)
 - **Responsive Design**: Mobile-first approach
 - **Path Alias**: `@/*` maps to `./src/*` (configured in tsconfig.json)
 
@@ -150,12 +150,13 @@ public/                         # Static assets (images, favicon)
 - Validates name, email, message (required)
 - Email regex validation
 - Saves to D1 database (`contact_submissions` table)
+- Sends email notification via Cloudflare Email Workers
 - Returns JSON response with success/error
-- Access runtime via `locals.runtime.env.DB`
 
-**Runtime Access**:
+**Cloudflare Runtime Access**:
 ```typescript
-const db = locals.runtime.env.DB;
+import { env } from 'cloudflare:workers';
+const db = env.DB;
 ```
 
 ### Key Design Principles
@@ -182,17 +183,6 @@ const db = locals.runtime.env.DB;
 - Images follow naming pattern: `luxury-*-black-and-white-*.jpg`
 - Contact info: +971 54 717 3000, info@wrpdetailing.ae, @wrp_ae
 - Location: Al Qusais Industrial Area 1, Dubai, UAE
-
-## Migration Notes
-
-**From Next.js to Astro**:
-- Converted Next.js App Router pages to Astro pages
-- Migrated from Next.js API routes to Astro API routes
-- Replaced Next.js Image component with Astro's image service (Cloudflare)
-- Converted "use client" components to Alpine.js where possible
-- Kept complex UI components (shadcn/ui) as React islands
-- Replaced Vercel deployment with Cloudflare Workers
-- Added D1 database for form persistence
 
 ## Important Files
 
