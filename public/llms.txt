@@ -43,3 +43,45 @@ Visit our showroom to see and feel materials in person — we have ready samples
 - Email: info@wrpdetailing.ae
 - Instagram: @wrp_ae
 - Location: Al Qusais Industrial Area 1, Dubai, UAE
+
+## New Arabic locale URLs (sitemap additions)
+- https://wrpdetailing.ae/ar/
+- https://wrpdetailing.ae/ar/blog/
+- https://wrpdetailing.ae/ar/blog/car-polish-vs-paint-correction-guide
+- https://wrpdetailing.ae/ar/blog/ceramic-coating-dubai-guide
+- https://wrpdetailing.ae/ar/blog/first-30-days-after-ppf-window-tint-ceramic-coating
+- https://wrpdetailing.ae/ar/blog/leather-upholstery-care-dubai-guide
+- https://wrpdetailing.ae/ar/blog/paint-protection-film-dubai
+- https://wrpdetailing.ae/ar/blog/ppf-coverage-dubai-front-end-vs-full-body
+- https://wrpdetailing.ae/ar/blog/ppf-vs-ceramic-coating
+- https://wrpdetailing.ae/ar/blog/window-tinting-dubai-legal-heat-guide
+- https://wrpdetailing.ae/ar/contact-us
+- https://wrpdetailing.ae/ar/more-about-wrp
+- https://wrpdetailing.ae/ar/portfolio
+- https://wrpdetailing.ae/ar/privacy
+- https://wrpdetailing.ae/ar/protect
+- https://wrpdetailing.ae/ar/reinforce
+- https://wrpdetailing.ae/ar/reviews
+- https://wrpdetailing.ae/ar/services/ceramic-coating
+- https://wrpdetailing.ae/ar/services/leather-upholstery
+- https://wrpdetailing.ae/ar/services/paint-protection-film
+- https://wrpdetailing.ae/ar/services/polish
+- https://wrpdetailing.ae/ar/services/premium-car-wash
+- https://wrpdetailing.ae/ar/services/window-film
+- https://wrpdetailing.ae/ar/terms
+- https://wrpdetailing.ae/ar/wrap
+
+## English site checklist
+- https://wrpdetailing.ae/
+- https://wrpdetailing.ae/blog/
+- https://wrpdetailing.ae/contact-us/
+- https://wrpdetailing.ae/more-about-wrp
+- https://wrpdetailing.ae/portfolio
+- https://wrpdetailing.ae/privacy
+- https://wrpdetailing.ae/protect
+- https://wrpdetailing.ae/reinforce
+- https://wrpdetailing.ae/reviews
+- https://wrpdetailing.ae/terms
+- https://wrpdetailing.ae/wrap
+- https://wrpdetailing.ae/llms-full.txt
+- https://wrpdetailing.ae/llms.txt
