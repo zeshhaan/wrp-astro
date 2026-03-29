@@ -32,6 +32,7 @@ export const translations = {
 
     // Footer
     'footer.rights': 'All rights reserved.',
+    'footer.rss': 'RSS Feed',
 
     // WhatsApp / Contact modal
     'contact.getInTouch': 'Get in Touch',
@@ -307,6 +308,7 @@ export const translations = {
 
     // Footer
     'footer.rights': 'جميع الحقوق محفوظة.',
+    'footer.rss': 'خلاصة RSS',
 
     // WhatsApp / Contact modal
     'contact.getInTouch': 'تواصل معنا',

@@ -37,7 +37,7 @@ const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
       </div>
     </div>
     <div class="border-t border-white/10 mt-8 pt-8 text-center text-sm text-white/60">
-      <p>&copy; {new Date().getFullYear()} WRP. {t(locale, 'footer.rights')} <a href={localizeUrl('/privacy/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.privacy')}</a> &middot; <a href={localizeUrl('/terms/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.terms')}</a></p>
+      <p>&copy; {new Date().getFullYear()} WRP. {t(locale, 'footer.rights')} <a href={localizeUrl('/privacy/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.privacy')}</a> &middot; <a href={localizeUrl('/terms/', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'nav.terms')}</a> &middot; <a href={localizeUrl('/rss.xml', locale)} class="hover:text-white/80 transition-colors">{t(locale, 'footer.rss')}</a></p>
     </div>
   </div>
 </footer>
