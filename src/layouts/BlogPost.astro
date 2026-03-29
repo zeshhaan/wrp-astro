@@ -14,9 +14,18 @@ const { title, description, pubDate, updatedDate, heroImage, category, author, r
 
 const locale = getLocale(Astro.currentLocale);
 const toLocalNum = (n: string | number) => _toLocalNum(n, locale);
+const authorNote = locale === 'ar'
+  ? 'أُعد هذا الدليل بواسطة فريق WRP Detailing Studio استناداً إلى أعمال التركيب اليومية، وأسئلة العملاء المتكرّرة، وظروف القيادة الفعلية في دبي.'
+  : 'This guide was prepared by the WRP Detailing Studio team using day-to-day installation work, recurring client questions, and real Dubai driving conditions.';
+const freshnessNote = locale === 'ar'
+  ? 'نراجع أدلتنا عند تغيّر الممارسات، أو الباقات، أو تعليمات العناية، أو المعلومات المحلية ذات الصلة.'
+  : 'We review guides when service practices, package details, aftercare advice, or relevant local guidance materially changes.';
+const trustHeading = locale === 'ar' ? 'لماذا يمكن الوثوق بهذا الدليل' : 'Why trust this guide';
+const sourcesHeading = locale === 'ar' ? 'إشارات الموثوقية' : 'Trust signals';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImageURL = heroImage ? new URL(heroImage, Astro.site).toString() : new URL('/og-image.jpg', Astro.site).toString();
+const articleTopics = (tags || []).map((tag) => ({ '@type': 'Thing', name: tag }));
 
 const categoryLabels: Record<string, Record<string, string>> = {
   en: { guide: 'Guide', news: 'News', update: 'Update', event: 'Event', listicle: 'Listicle' },
@@ -33,6 +42,7 @@ const blogPostingJsonLd = {
   url: canonicalURL,
   image: ogImageURL,
   inLanguage: locale === 'ar' ? 'ar' : 'en',
+  isAccessibleForFree: true,
   datePublished: new Date(pubDate).toISOString(),
   ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
@@ -44,8 +54,9 @@ const blogPostingJsonLd = {
     logo: { '@type': 'ImageObject', url: new URL('/wrp-logo.svg', Astro.site).toString() },
   },
   ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {}),
-  ...(category ? { articleSection: categoryLabels.en[category] || category } : {}),
+  ...(category ? { articleSection: getCategoryLabel(category) } : {}),
   ...(tags && tags.length ? { keywords: tags.join(', ') } : {}),
+  ...(articleTopics.length ? { about: articleTopics } : {}),
 };
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
@@ -66,7 +77,7 @@ const breadcrumbs = [
   modifiedTime={updatedDate || pubDate}
   author={author}
   tags={tags}
-  articleSection={category ? (categoryLabels.en[category] || category) : undefined}
+  articleSection={category ? getCategoryLabel(category) : undefined}
 >
 	<!-- BlogPosting JSON-LD -->
 	<script type="application/ld+json" set:html={JSON.stringify(blogPostingJsonLd)} />
@@ -109,6 +120,20 @@ const breadcrumbs = [
 						{t(locale, 'blog.updated')} <FormattedDate date={updatedDate} showHijri={locale === 'ar'} />
 					</p>
 				)}
+			</div>
+			<div class="mb-10 border border-border bg-muted/30 p-6">
+				<p class="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">{trustHeading}</p>
+				<p class="text-sm text-foreground leading-relaxed mb-4">{authorNote}</p>
+				<div class="grid gap-3 md:grid-cols-2 text-sm text-muted-foreground">
+					<div>
+						<p class="font-medium text-foreground mb-1">{sourcesHeading}</p>
+						<p>{freshnessNote}</p>
+					</div>
+					<div>
+						<p class="font-medium text-foreground mb-1">{locale === 'ar' ? 'نطاق الخبرة' : 'Coverage'}</p>
+						<p>{locale === 'ar' ? 'PPF، طلاء السيراميك، التظليل، التلميع، والعناية الداخلية للسيارات في دبي.' : 'PPF, ceramic coating, window tinting, paint correction, and interior care for vehicles in Dubai.'}</p>
+					</div>
+				</div>
 			</div>
 			<div class="flex items-center gap-4 mb-10">
 				<div class="w-12 h-[2px] bg-foreground"></div>

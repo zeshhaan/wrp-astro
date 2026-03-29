@@ -2,6 +2,7 @@
 title: "PPF Coverage in Dubai: Front-End vs Full Body (Costs, Trade-Offs, and Real Advice)"
 description: "A practical guide to choosing front-end or full-body Paint Protection Film (PPF) in Dubai, including costs, driving patterns, and resale impact."
 pubDate: 2026-02-18
+updatedDate: 2026-03-16
 category: guide
 tags:
   - ppf

@@ -51,6 +51,8 @@ const ogImage = `/og-image.jpg`;
 const hasRealPricing = startingPrice || (packages && packages.length > 0);
 const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;
 const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
+const quickAnswerDescription = description ? description.replace(/\.$/, '') : title;
+const quickAnswer = `إجابة سريعة: خدمة ${title} في WRP Detailing Studio بدبي مناسبة لمن يريد ${quickAnswerDescription}.${startingPrice ? ` الأسعار تبدأ من ${toLocalNum(startingPrice.toLocaleString())} د.إ.` : ''}`;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
@@ -77,6 +79,15 @@ const breadcrumbs = [
         {t(locale, 'services.getQuote')}
         <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
       </Button>
+    </div>
+  </section>
+
+  <section class="px-6 -mt-10 relative z-20">
+    <div class="container mx-auto max-w-4xl">
+      <div class="border border-border bg-background shadow-sm p-6 md:p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">إجابة سريعة</p>
+        <p class="text-base md:text-lg leading-relaxed text-foreground">{quickAnswer}</p>
+      </div>
     </div>
   </section>
 

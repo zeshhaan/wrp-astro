@@ -2,6 +2,7 @@
 title: "Leather & Upholstery Care in Dubai: Practical Advice for Heat, Dust, and Daily Use"
 description: "A practical interior care guide for Dubai drivers covering leather, fabric, and upholstery maintenance, stain response, and when professional care is worth it."
 pubDate: 2026-02-14
+updatedDate: 2026-03-16
 category: guide
 tags:
   - upholstery care

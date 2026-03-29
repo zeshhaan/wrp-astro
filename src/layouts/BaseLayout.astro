@@ -84,6 +84,8 @@ const extendMeta = [
   { name: 'geo.placename', content: 'Dubai' },
   { name: 'geo.position', content: '25.2854;55.3781' },
   { name: 'ICBM', content: '25.2854, 55.3781' },
+  { name: 'googlebot', content: noindex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
+  { name: 'bingbot', content: noindex ? 'noindex, nofollow' : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
   { property: 'og:locale:alternate', content: alternateOgLocale },
   ...articleMeta,
   // Twitter does not have direct article:* equivalents; use labels

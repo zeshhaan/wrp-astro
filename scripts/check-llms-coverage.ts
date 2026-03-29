@@ -2,7 +2,10 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-const sitemapPath = resolve('dist', 'client', 'sitemap-0.xml');
+const sitemapCandidates = [
+  resolve('dist', 'sitemap-0.xml'),
+  resolve('dist', 'client', 'sitemap-0.xml'),
+];
 const llmsPaths = [resolve('public', 'llms.txt'), resolve('public', 'llms-full.txt')];
 
 async function exists(path: string) {
@@ -22,23 +25,29 @@ async function load(urlPath: string) {
   }
 }
 
+async function findSitemapPath() {
+  for (const path of sitemapCandidates) {
+    if (await exists(path)) return path;
+  }
+  return null;
+}
+
 (async () => {
-  if (!(await exists(sitemapPath))) {
+  const sitemapPath = await findSitemapPath();
+  if (!sitemapPath) {
     console.log('Missing sitemap-0.xml (run `bun run build`). Skipping LLMS coverage check.');
     return;
   }
 
   const sitemap = await readFile(sitemapPath, 'utf8');
   const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(/\/$/, ''));
-
-  const urlSet = new Set(urls);
   const llmsUrls = new Set<string>();
-  const llmsRegex = /https:\/\/wrpdetailing\.ae[^\s"']*/g;
+  const llmsRegex = /https:\/\/wrpdetailing\.ae[^\s"'`)\]]*/g;
 
   for (const path of llmsPaths) {
     const content = await load(path);
     for (const match of content.matchAll(llmsRegex)) {
-      llmsUrls.add(match[0].replace(/\/$/, ''));
+      llmsUrls.add(match[0].replace(/[),.:;!?]+$/, '').replace(/\/$/, ''));
     }
   }
 

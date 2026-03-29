@@ -2,6 +2,7 @@
 title: "Window Tinting in Dubai: Legal Limits, Shade Selection, and Real Heat Performance"
 description: "A practical guide to choosing automotive window tinting and window film in Dubai, with legal context, shade advice, and performance metrics that matter."
 pubDate: 2026-02-17
+updatedDate: 2026-03-16
 category: guide
 tags:
   - window tinting

@@ -2,6 +2,7 @@
 title: "First 30 Days After PPF, Window Tint, or Ceramic Coating: What to Do and Avoid"
 description: "A clear 30-day aftercare plan for Paint Protection Film (PPF), window tinting, and ceramic coating so your protection performs the way it should."
 pubDate: 2026-02-15
+updatedDate: 2026-03-16
 category: guide
 tags:
   - ppf

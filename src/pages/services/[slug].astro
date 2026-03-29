@@ -60,6 +60,8 @@ const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
 const hasRealPricing = startingPrice || (packages && packages.length > 0);
 const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;
 const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
+const quickAnswerDescription = description ? `${description.charAt(0).toLowerCase()}${description.slice(1).replace(/\.$/, '')}` : title;
+const quickAnswer = `Quick answer: ${title} at WRP Detailing Studio in Dubai is for owners who want ${quickAnswerDescription}.${startingPrice ? ` Pricing starts from AED ${startingPrice.toLocaleString()}.` : ''}`;
 
 // Breadcrumbs
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
@@ -106,6 +108,15 @@ const breadcrumbs = [
         GET A QUOTE
         <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" />
       </Button>
+    </div>
+  </section>
+
+  <section class="px-6 -mt-10 relative z-20">
+    <div class="container mx-auto max-w-4xl">
+      <div class="border border-border bg-background shadow-sm p-6 md:p-8">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">Quick answer</p>
+        <p class="text-base md:text-lg leading-relaxed text-foreground">{quickAnswer}</p>
+      </div>
     </div>
   </section>
 

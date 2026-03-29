@@ -1,17 +1,45 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
+import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE_URL = 'https://wrpdetailing.ae';
 
 const SITE = {
-  title: 'WRP Dubai - Premium Car Detailing',
+  title: 'WRP Detailing Studio - Premium Car Detailing in Dubai',
   description:
-    "Dubai's premium automotive detailing studio. Wrap, Reinforce, Protect.",
+    "WRP Detailing Studio is a premium automotive detailing studio in Al Qusais, Dubai for Paint Protection Film (PPF), ceramic coating, window tinting, paint correction, upholstery, and premium car wash services.",
 };
 
-// ── Frontmatter parsing ──────────────────────────────────────────────
+const STATIC_PAGES = [
+  { title: 'Homepage', url: `${SITE_URL}/`, description: 'Main landing page for WRP Detailing Studio in Dubai.' },
+  { title: 'Blog Index', url: `${SITE_URL}/blog/`, description: 'English blog index for guides on PPF, ceramic coating, tint, paint correction, and upholstery care.' },
+  { title: 'Contact', url: `${SITE_URL}/contact-us/`, description: 'Contact page with phone, email, and showroom directions.' },
+  { title: 'About', url: `${SITE_URL}/more-about-wrp/`, description: 'Brand story, philosophy, and studio positioning.' },
+  { title: 'Portfolio', url: `${SITE_URL}/portfolio/`, description: 'Selected detailing, PPF, and ceramic coating case studies.' },
+  { title: 'Reviews', url: `${SITE_URL}/reviews/`, description: 'Customer review and testimonial hub.' },
+  { title: 'Wrap', url: `${SITE_URL}/wrap/`, description: 'Wrap pillar page for color change and vinyl wrap positioning.' },
+  { title: 'Reinforce', url: `${SITE_URL}/reinforce/`, description: 'Reinforce pillar page for protection and enhancement positioning.' },
+  { title: 'Protect', url: `${SITE_URL}/protect/`, description: 'Protect pillar page for long-term vehicle protection positioning.' },
+  { title: 'Privacy Policy', url: `${SITE_URL}/privacy/`, description: 'Privacy policy.' },
+  { title: 'Terms and Conditions', url: `${SITE_URL}/terms/`, description: 'Terms and conditions.' },
+  { title: 'LLMS Short Context', url: `${SITE_URL}/llms.txt`, description: 'Machine-readable short context for AI systems and agents.' },
+  { title: 'LLMS Full Context', url: `${SITE_URL}/llms-full.txt`, description: 'Machine-readable expanded context for AI systems and agents.' },
+];
+
+const STATIC_AR_PAGES = [
+  { title: 'الصفحة الرئيسية العربية', url: `${SITE_URL}/ar/`, description: 'الواجهة العربية الرئيسية للموقع.' },
+  { title: 'فهرس المدونة العربية', url: `${SITE_URL}/ar/blog/`, description: 'فهرس المدونة العربية لأدلة PPF والسيراميك والتظليل والتلميع.' },
+  { title: 'اتصل بنا', url: `${SITE_URL}/ar/contact-us/`, description: 'صفحة التواصل العربية.' },
+  { title: 'عن WRP', url: `${SITE_URL}/ar/more-about-wrp/`, description: 'صفحة تعريفية عربية عن الاستوديو.' },
+  { title: 'معرض الأعمال', url: `${SITE_URL}/ar/portfolio/`, description: 'معرض الأعمال العربي.' },
+  { title: 'المراجعات', url: `${SITE_URL}/ar/reviews/`, description: 'مركز المراجعات والشهادات باللغة العربية.' },
+  { title: 'غلّف', url: `${SITE_URL}/ar/wrap/`, description: 'صفحة غلّف العربية.' },
+  { title: 'عزّز', url: `${SITE_URL}/ar/reinforce/`, description: 'صفحة عزّز العربية.' },
+  { title: 'احمِ', url: `${SITE_URL}/ar/protect/`, description: 'صفحة احمِ العربية.' },
+  { title: 'الخصوصية', url: `${SITE_URL}/ar/privacy/`, description: 'سياسة الخصوصية باللغة العربية.' },
+  { title: 'الشروط والأحكام', url: `${SITE_URL}/ar/terms/`, description: 'الشروط والأحكام باللغة العربية.' },
+];
 
 function stripFrontmatter(raw) {
   const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
@@ -25,165 +53,80 @@ function extractField(fm, field) {
   return m ? m[1] : null;
 }
 
-/**
- * Simple YAML array-of-objects parser for our frontmatter.
- * Handles the specific patterns used in our content files:
- * - packages (name, price, badge, features[])
- * - process (step, title, description)
- * - faqs (question, answer)
- * - benefits (title, description)
- */
 function extractYamlArray(fm, field) {
-  // Find the field and its array items
   const fieldRe = new RegExp(`^${field}:\\s*$`, 'm');
   const fieldMatch = fm.match(fieldRe);
   if (!fieldMatch) return [];
 
   const startIdx = fieldMatch.index + fieldMatch[0].length;
   const rest = fm.slice(startIdx);
-
-  // Collect lines until we hit a non-indented, non-empty line (next top-level field)
   const lines = rest.split('\n');
   const arrayLines = [];
+
   for (const line of lines) {
     if (line.match(/^\S/) && line.trim() !== '') break;
     arrayLines.push(line);
   }
 
-  // Parse array items (lines starting with "  - ")
   const items = [];
   let current = null;
 
   for (const line of arrayLines) {
-    // New item starts with "  - key: value"
     const itemStart = line.match(/^\s{2}-\s+(\w+):\s*['"]?(.*?)['"]?\s*$/);
     if (itemStart) {
       if (current) items.push(current);
       current = { [itemStart[1]]: itemStart[2] };
       continue;
     }
-    // Continuation key "    key: value"
+
     const contKey = line.match(/^\s{4}(\w+):\s*['"]?(.*?)['"]?\s*$/);
     if (contKey && current) {
       current[contKey[1]] = contKey[2];
       continue;
     }
-    // Sub-array item "      - value"
+
     const subItem = line.match(/^\s{6}-\s+['"]?(.*?)['"]?\s*$/);
     if (subItem && current) {
-      // Find the last array-type key, or create "items"
-      const lastKey = Object.keys(current).find(
-        (k) => Array.isArray(current[k]),
-      );
-      if (lastKey) {
-        current[lastKey].push(subItem[1]);
+      const lastArrayKey = Object.keys(current).find((key) => Array.isArray(current[key]));
+      if (lastArrayKey) {
+        current[lastArrayKey].push(subItem[1]);
       } else {
-        // Previous key must be the array name — find it
         const keys = Object.keys(current);
         const arrayKey = keys[keys.length - 1];
-        if (current[arrayKey] === '') {
-          current[arrayKey] = [subItem[1]];
-        }
+        if (current[arrayKey] === '') current[arrayKey] = [subItem[1]];
       }
-      continue;
     }
   }
-  if (current) items.push(current);
 
+  if (current) items.push(current);
   return items;
 }
 
-// ── Service → markdown conversion ────────────────────────────────────
+async function walkContentFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files = [];
 
-function serviceToMarkdown(fm) {
-  const parts = [];
-
-  const mainDesc1 = extractField(fm, 'mainDescription1');
-  const mainDesc2 = extractField(fm, 'mainDescription2');
-  if (mainDesc1) parts.push(mainDesc1);
-  if (mainDesc2) parts.push('', mainDesc2);
-
-  // Starting price
-  const startingPrice = extractField(fm, 'startingPrice');
-  if (startingPrice) parts.push('', `Starting from AED ${startingPrice}`);
-
-  // Packages
-  const packages = extractYamlArray(fm, 'packages');
-  if (packages.length) {
-    parts.push('', '### Packages', '');
-    for (const pkg of packages) {
-      const badge = pkg.badge ? ` (${pkg.badge})` : '';
-      parts.push(`**${pkg.name}**${badge} — AED ${pkg.price}`);
-      if (Array.isArray(pkg.features)) {
-        for (const f of pkg.features) parts.push(`- ${f}`);
-      }
-      parts.push('');
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await walkContentFiles(fullPath));
+    } else if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) {
+      files.push(fullPath);
     }
   }
 
-  // Additional section (product offerings, etc.)
-  const addSectionMatch = fm.match(/^additionalSection:\s*$/m);
-  if (addSectionMatch) {
-    const addHeading = fm.match(/^\s{2}heading:\s*['"]?(.*?)['"]?\s*$/m);
-    if (addHeading) {
-      parts.push('', `### ${addHeading[1]}`, '');
-      // Extract cards: title starts with "    - title:", description at "      description:"
-      const cardTitles = [...fm.matchAll(/^\s{4}-\s+title:\s*['"]?(.*?)['"]?\s*$/gm)];
-      const cardDescs = [...fm.matchAll(/^\s{6}description:\s*['"]?(.*?)['"]?\s*$/gm)];
-      for (let i = 0; i < cardTitles.length; i++) {
-        parts.push(`**${cardTitles[i][1]}**`);
-        if (cardDescs[i]) parts.push(cardDescs[i][1]);
-        parts.push('');
-      }
-    }
-  }
-
-  // Process steps
-  const process = extractYamlArray(fm, 'process');
-  if (process.length) {
-    parts.push('### Process', '');
-    for (const p of process) {
-      parts.push(`${p.step}. **${p.title}**: ${p.description}`);
-    }
-    parts.push('');
-  }
-
-  // Benefits
-  const benefits = extractYamlArray(fm, 'benefits');
-  if (benefits.length) {
-    parts.push('### Benefits', '');
-    for (const b of benefits) {
-      parts.push(`- **${b.title}**: ${b.description}`);
-    }
-    parts.push('');
-  }
-
-  // FAQs
-  const faqs = extractYamlArray(fm, 'faqs');
-  if (faqs.length) {
-    parts.push('### Frequently Asked Questions', '');
-    for (const f of faqs) {
-      parts.push(`**Q: ${f.question}**`);
-      parts.push(`A: ${f.answer}`, '');
-    }
-  }
-
-  return parts.join('\n').trim();
+  return files.sort();
 }
 
-// ── Collection reader ────────────────────────────────────────────────
-
 async function readCollection(dir) {
-  const files = await readdir(dir);
-  const mdFiles = files
-    .filter((f) => f.endsWith('.md') || f.endsWith('.mdx'))
-    .sort();
-
+  const files = await walkContentFiles(dir);
   const entries = [];
-  for (const file of mdFiles) {
-    const raw = await readFile(join(dir, file), 'utf-8');
+
+  for (const file of files) {
+    const raw = await readFile(file, 'utf-8');
     const { frontmatter, body } = stripFrontmatter(raw);
-    const slug = file.replace(/\.(md|mdx)$/, '');
+    const relativePath = relative(dir, file).replace(/\\/g, '/');
+    const slug = relativePath.replace(/\.(md|mdx)$/, '');
     const title = extractField(frontmatter, 'title') || slug;
     const description = extractField(frontmatter, 'description') || '';
     entries.push({
@@ -194,136 +137,234 @@ async function readCollection(dir) {
       body: body.trim(),
     });
   }
+
   return entries;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────
+function isArabicSlug(slug) {
+  return slug.startsWith('ar/');
+}
+
+function withoutLocalePrefix(slug) {
+  return isArabicSlug(slug) ? slug.slice(3) : slug;
+}
+
+function buildEntryUrl(section, slug) {
+  const localePrefix = isArabicSlug(slug) ? '/ar' : '';
+  const cleanSlug = withoutLocalePrefix(slug);
+  return `${SITE_URL}${localePrefix}/${section}/${cleanSlug}/`;
+}
+
+function entryLinkLine(entry, section) {
+  return `- [${entry.title}](${buildEntryUrl(section, entry.slug)}): ${entry.description}`;
+}
+
+function staticLinkLine(page) {
+  return `- [${page.title}](${page.url}): ${page.description}`;
+}
+
+function serviceToMarkdown(fm) {
+  const parts = [];
+
+  const mainDesc1 = extractField(fm, 'mainDescription1');
+  const mainDesc2 = extractField(fm, 'mainDescription2');
+  if (mainDesc1) parts.push(mainDesc1);
+  if (mainDesc2) parts.push('', mainDesc2);
+
+  const startingPrice = extractField(fm, 'startingPrice');
+  if (startingPrice) parts.push('', `Starting from AED ${startingPrice}`);
+
+  const packages = extractYamlArray(fm, 'packages');
+  if (packages.length) {
+    parts.push('', '### Packages', '');
+    for (const pkg of packages) {
+      const badge = pkg.badge ? ` (${pkg.badge})` : '';
+      parts.push(`**${pkg.name}**${badge} — AED ${pkg.price}`);
+      if (Array.isArray(pkg.features)) {
+        for (const feature of pkg.features) parts.push(`- ${feature}`);
+      }
+      parts.push('');
+    }
+  }
+
+  const addSectionMatch = fm.match(/^additionalSection:\s*$/m);
+  if (addSectionMatch) {
+    const addHeading = fm.match(/^\s{2}heading:\s*['"]?(.*?)['"]?\s*$/m);
+    if (addHeading) {
+      parts.push('', `### ${addHeading[1]}`, '');
+      const cardTitles = [...fm.matchAll(/^\s{4}-\s+title:\s*['"]?(.*?)['"]?\s*$/gm)];
+      const cardDescs = [...fm.matchAll(/^\s{6}description:\s*['"]?(.*?)['"]?\s*$/gm)];
+      for (let i = 0; i < cardTitles.length; i += 1) {
+        parts.push(`**${cardTitles[i][1]}**`);
+        if (cardDescs[i]) parts.push(cardDescs[i][1]);
+        parts.push('');
+      }
+    }
+  }
+
+  const process = extractYamlArray(fm, 'process');
+  if (process.length) {
+    parts.push('### Process', '');
+    for (const step of process) {
+      parts.push(`${step.step}. **${step.title}**: ${step.description}`);
+    }
+    parts.push('');
+  }
+
+  const benefits = extractYamlArray(fm, 'benefits');
+  if (benefits.length) {
+    parts.push('### Benefits', '');
+    for (const benefit of benefits) {
+      parts.push(`- **${benefit.title}**: ${benefit.description}`);
+    }
+    parts.push('');
+  }
+
+  const faqs = extractYamlArray(fm, 'faqs');
+  if (faqs.length) {
+    parts.push('### Frequently Asked Questions', '');
+    for (const faq of faqs) {
+      parts.push(`**Q: ${faq.question}**`);
+      parts.push(`A: ${faq.answer}`, '');
+    }
+  }
+
+  return parts.join('\n').trim();
+}
+
+function splitByLocale(entries) {
+  return {
+    en: entries.filter((entry) => !isArabicSlug(entry.slug)),
+    ar: entries.filter((entry) => isArabicSlug(entry.slug)),
+  };
+}
 
 const blogDir = join(ROOT, 'src', 'content', 'blog');
 const servicesDir = join(ROOT, 'src', 'content', 'services');
 const portfolioDir = join(ROOT, 'src', 'content', 'portfolio');
 
-const [blogPosts, services, portfolio] = await Promise.all([
+const [blogEntries, serviceEntries, portfolioEntries] = await Promise.all([
   readCollection(blogDir),
   readCollection(servicesDir),
   readCollection(portfolioDir),
 ]);
 
-// ── llms.txt (concise index with links) ──────────────────────────────
+const blog = splitByLocale(blogEntries);
+const services = splitByLocale(serviceEntries);
+const portfolio = splitByLocale(portfolioEntries);
 
 const llmsLines = [
   `# ${SITE.title}`,
   '',
   `> ${SITE.description}`,
   '',
-  'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, custom seat covers, premium floor mats (2D/5D/7D), full seat upholstery, and premium car wash services.',
-  'Visit our showroom to see and feel materials in person — we have ready samples for most popular models including Nissan Patrol, Toyota Land Cruiser, and nearly every brand on the road.',
+  '## Entity facts',
+  '',
+  '- Business: WRP Detailing Studio',
+  '- Category: Premium automotive detailing and paint protection studio',
+  '- Location: Al Qusais Industrial Area 1, Dubai, UAE',
+  '- Services: Paint Protection Film (PPF), ceramic coating, window tinting, car polish and paint correction, leather and upholstery work, custom seat covers, premium floor mats, premium car wash',
+  '- Languages: English and Arabic',
+  '- Contact: +971 54 717 3000, info@wrpdetailing.ae, @wrp_ae on Instagram',
+  '',
+  '## Core pages',
+  '',
+  ...STATIC_PAGES.map(staticLinkLine),
   '',
   '## Services',
   '',
-  ...services.map(
-    (s) => `- [${s.title}](${SITE_URL}/services/${s.slug}/): ${s.description}`,
-  ),
+  ...services.en.map((entry) => entryLinkLine(entry, 'services')),
   '',
   '## Blog',
   '',
-  ...blogPosts.map(
-    (p) => `- [${p.title}](${SITE_URL}/blog/${p.slug}/): ${p.description}`,
-  ),
+  ...blog.en.map((entry) => entryLinkLine(entry, 'blog')),
   '',
   '## Portfolio',
   '',
-  ...portfolio.map(
-    (p) => `- [${p.title}](${SITE_URL}/portfolio/${p.slug}/): ${p.description}`,
-  ),
+  ...portfolio.en.map((entry) => entryLinkLine(entry, 'portfolio')),
   '',
-  '## Contact',
+  '## Arabic pages',
   '',
-  '- Phone: +971 54 717 3000',
-  '- Email: info@wrpdetailing.ae',
-  '- Instagram: @wrp_ae',
-  '- Location: Al Qusais Industrial Area 1, Dubai, UAE',
+  ...STATIC_AR_PAGES.map(staticLinkLine),
+  ...services.ar.map((entry) => entryLinkLine(entry, 'services')),
+  ...blog.ar.map((entry) => entryLinkLine(entry, 'blog')),
+  ...portfolio.ar.map((entry) => entryLinkLine(entry, 'portfolio')),
   '',
 ];
 
-await writeFile(
-  join(ROOT, 'public', 'llms.txt'),
-  llmsLines.join('\n'),
-  'utf-8',
-);
+await writeFile(join(ROOT, 'public', 'llms.txt'), llmsLines.join('\n'), 'utf-8');
 console.log(`✓ public/llms.txt (${llmsLines.length} lines)`);
-
-// ── llms-full.txt (full markdown content) ────────────────────────────
 
 const fullSections = [
   `# ${SITE.title}`,
   '',
   `> ${SITE.description}`,
   '',
-  'WRP is a premium car detailing studio in Al Qusais Industrial Area 1, Dubai, UAE.',
-  'We specialize in Paint Protection Film (PPF), ceramic coating, car polish and paint correction, window tinting and window film, custom seat covers, premium floor mats (2D/5D/7D), full seat upholstery, and premium car wash services.',
-  'Visit our showroom to see and feel materials in person — we have ready samples for most popular models including Nissan Patrol, Toyota Land Cruiser, and nearly every brand on the road.',
+  '## Entity facts',
+  '',
+  '- WRP Detailing Studio is a Dubai-based automotive detailing and protection studio.',
+  '- The studio serves English and Arabic audiences.',
+  '- Primary commercial topics are PPF, ceramic coating, tint, paint correction, upholstery, and premium wash services.',
+  '- The site includes service pages, educational blog content, portfolio case studies, reviews, and bilingual core pages.',
+  '',
+  '## Core pages',
+  '',
+  ...STATIC_PAGES.map(staticLinkLine),
+  ...STATIC_AR_PAGES.map(staticLinkLine),
 ];
 
-if (services.length) {
+if (services.en.length || services.ar.length) {
   fullSections.push('', '---', '', '# Services');
-  for (const s of services) {
-    // Service files have all content in frontmatter — convert to markdown
-    const serviceContent = serviceToMarkdown(s.frontmatter);
+  for (const entry of [...services.en, ...services.ar]) {
     fullSections.push(
       '',
       '---',
       '',
-      `## ${s.title}`,
+      `## ${entry.title}`,
       '',
-      `> ${s.description}`,
-      `URL: ${SITE_URL}/services/${s.slug}/`,
+      `> ${entry.description}`,
+      `URL: ${buildEntryUrl('services', entry.slug)}`,
       '',
-      serviceContent || s.body,
+      serviceToMarkdown(entry.frontmatter) || entry.body,
     );
   }
 }
 
-if (blogPosts.length) {
+if (blog.en.length || blog.ar.length) {
   fullSections.push('', '---', '', '# Blog');
-  for (const p of blogPosts) {
+  for (const entry of [...blog.en, ...blog.ar]) {
     fullSections.push(
       '',
       '---',
       '',
-      `## ${p.title}`,
+      `## ${entry.title}`,
       '',
-      `> ${p.description}`,
-      `URL: ${SITE_URL}/blog/${p.slug}/`,
+      `> ${entry.description}`,
+      `URL: ${buildEntryUrl('blog', entry.slug)}`,
       '',
-      p.body,
+      entry.body,
     );
   }
 }
 
-if (portfolio.length) {
+if (portfolio.en.length || portfolio.ar.length) {
   fullSections.push('', '---', '', '# Portfolio');
-  for (const p of portfolio) {
+  for (const entry of [...portfolio.en, ...portfolio.ar]) {
     fullSections.push(
       '',
       '---',
       '',
-      `## ${p.title}`,
+      `## ${entry.title}`,
       '',
-      `> ${p.description}`,
-      `URL: ${SITE_URL}/portfolio/${p.slug}/`,
+      `> ${entry.description}`,
+      `URL: ${buildEntryUrl('portfolio', entry.slug)}`,
       '',
-      p.body,
+      entry.body,
     );
   }
 }
 
 fullSections.push('');
 
-await writeFile(
-  join(ROOT, 'public', 'llms-full.txt'),
-  fullSections.join('\n'),
-  'utf-8',
-);
-console.log(`✓ public/llms-full.txt`);
+await writeFile(join(ROOT, 'public', 'llms-full.txt'), fullSections.join('\n'), 'utf-8');
+console.log('✓ public/llms-full.txt');

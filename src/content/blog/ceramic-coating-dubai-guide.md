@@ -2,6 +2,7 @@
 title: "Ceramic Coating in Dubai: The Complete 2026 Guide"
 description: "Everything you need to know about ceramic coating in Dubai - how it works, what it costs, and why professional application matters in the UAE climate."
 pubDate: 2026-02-10
+updatedDate: 2026-03-16
 category: guide
 tags:
   - ceramic coating
