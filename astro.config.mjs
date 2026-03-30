@@ -73,7 +73,7 @@ export default defineConfig({
     icon(),
   ],
   adapter: cloudflare({
-    imageService: 'cloudflare',
+    imageService: 'cloudflare-binding',
   }),
   fonts: [
     {

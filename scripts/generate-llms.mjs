@@ -23,6 +23,8 @@ const STATIC_PAGES = [
   { title: 'Protect', url: `${SITE_URL}/protect/`, description: 'Protect pillar page for long-term vehicle protection positioning.' },
   { title: 'Privacy Policy', url: `${SITE_URL}/privacy/`, description: 'Privacy policy.' },
   { title: 'Terms and Conditions', url: `${SITE_URL}/terms/`, description: 'Terms and conditions.' },
+  { title: 'RSS Feed (English)', url: `${SITE_URL}/rss.xml`, description: 'RSS feed for English blog posts.' },
+  { title: 'RSS Feed (Arabic)', url: `${SITE_URL}/ar/rss.xml`, description: 'RSS feed for Arabic blog posts.' },
   { title: 'LLMS Short Context', url: `${SITE_URL}/llms.txt`, description: 'Machine-readable short context for AI systems and agents.' },
   { title: 'LLMS Full Context', url: `${SITE_URL}/llms-full.txt`, description: 'Machine-readable expanded context for AI systems and agents.' },
 ];

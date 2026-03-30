@@ -22,6 +22,8 @@
 - [Protect](https://wrpdetailing.ae/protect/): Protect pillar page for long-term vehicle protection positioning.
 - [Privacy Policy](https://wrpdetailing.ae/privacy/): Privacy policy.
 - [Terms and Conditions](https://wrpdetailing.ae/terms/): Terms and conditions.
+- [RSS Feed (English)](https://wrpdetailing.ae/rss.xml): RSS feed for English blog posts.
+- [RSS Feed (Arabic)](https://wrpdetailing.ae/ar/rss.xml): RSS feed for Arabic blog posts.
 - [LLMS Short Context](https://wrpdetailing.ae/llms.txt): Machine-readable short context for AI systems and agents.
 - [LLMS Full Context](https://wrpdetailing.ae/llms-full.txt): Machine-readable expanded context for AI systems and agents.
 - [الصفحة الرئيسية العربية](https://wrpdetailing.ae/ar/): الواجهة العربية الرئيسية للموقع.

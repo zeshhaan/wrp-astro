@@ -152,6 +152,9 @@ const extendMeta = [
     <link rel="alternate" hreflang="ar-AE" href={isArabic ? canonicalURL : alternateUrl} />
     <link rel="alternate" hreflang="x-default" href={isArabic ? alternateUrl : canonicalURL} />
 
+    <!-- RSS autodiscovery -->
+    <link rel="alternate" type="application/rss+xml" title={isArabic ? 'WRP Detailing Studio — خلاصة RSS' : 'WRP Detailing Studio — RSS Feed'} href={new URL(isArabic ? '/ar/rss.xml' : '/rss.xml', Astro.site)} />
+
     <!-- View Transitions Fallback for browsers without native support -->
     <ClientRouter />
 
