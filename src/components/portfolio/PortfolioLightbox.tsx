@@ -20,13 +20,23 @@ export function PortfolioLightbox({ items }: Props) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
 
-  // Flatten all galleries into slides with proper structure
+  // Flatten all galleries into slides with responsive srcSet
+  // Use 1200w for main lightbox view, provide srcSet for responsive
   const slides = items.flatMap((item) =>
-    item.gallery.map((src) => ({
-      src,
-      title: item.title,
-      description: item.subtitle,
-    }))
+    item.gallery.map((src) => {
+      const basePath = src.replace(/\.(webp|jpg|jpeg|png|avif)$/, '');
+      return {
+        src: `${basePath}-1200w.webp`,
+        alt: `${item.title} ${item.subtitle}`,
+        srcSet: [
+          { src: `${basePath}-480w.webp`, width: 480 },
+          { src: `${basePath}-800w.webp`, width: 800 },
+          { src: `${basePath}-1200w.webp`, width: 1200 },
+        ],
+        title: item.title,
+        description: item.subtitle,
+      };
+    })
   );
 
   // Expose function to window for Astro to call

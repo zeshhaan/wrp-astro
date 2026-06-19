@@ -3,3 +3,26 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   X-XSS-Protection: 1; mode=block
+
+# Cache static assets aggressively
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache image variants
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/*.avif
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/*.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/*.svg
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# Redirect: /portfolio → /portfolio/ (avoids redirect chain penalty)
+/portfolio
+  Location: /portfolio/
+  Cache-Control: public, max-age=3600

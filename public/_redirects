@@ -1,0 +1,3 @@
+# Redirect /portfolio (no trailing slash) to /portfolio/ (with slash)
+# This eliminates the 1.1s redirect penalty detected in Lighthouse
+/portfolio  /portfolio/  301

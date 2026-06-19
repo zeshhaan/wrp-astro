@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
 
 interface Props {
   title: string;
@@ -17,13 +17,13 @@ const { title, subtitle, heroImage, index } = Astro.props;
   style={`--index: ${index};`}
 >
   <div class="relative overflow-hidden bg-black">
-    <img
+    <ResponsiveImage
       src={heroImage}
       alt={`${title} ${subtitle} - Professional car detailing work completed at WRP Detailing Studio luxury automotive studio`}
-      width="800"
-      height="600"
-      class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+      widths={[480, 800, 1200]}
+      sizes="(max-width: 640px) 480px, (max-width: 1024px) 800px, 1200px"
       loading="lazy"
+      class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
     />
     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
       <div class="absolute bottom-6 left-6 right-6 text-white">

@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"generate:llms": "node scripts/generate-llms.mjs",
-		"build": "node scripts/generate-llms.mjs && astro build && bun scripts/check-llms-coverage.ts",
+		"build": "node scripts/generate-llms.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",
 		"deploy": "astro build && wrangler deploy",
@@ -38,7 +38,7 @@
 		"mimetext": "^3.0.28",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
-		"sharp": "^0.34.5",
+		"sharp": "^0.35.1",
 		"tailwind-merge": "^3.5.0",
 		"tailwindcss": "^4.2.1",
 		"yet-another-react-lightbox": "^3.29.1"

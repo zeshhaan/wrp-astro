@@ -1,0 +1,79 @@
+---
+interface Props {
+  /** Base path without extension, e.g. "/portfolio/porsche-boxster-spyder-gray" */
+  src: string;
+  /** Original file extension, default "webp" */
+  extension?: string;
+  /** Alt text */
+  alt: string;
+  /** Widths for srcset — defaults to responsive breakpoints */
+  widths?: number[];
+  /** CSS sizes attribute for srcset */
+  sizes?: string;
+  /** Intrinsic width of the image (largest variant) */
+  width?: number;
+  /** Intrinsic height of the image (largest variant) */
+  height?: number;
+  /** CSS classes */
+  class?: string;
+  /** Loading strategy */
+  loading?: 'lazy' | 'eager';
+  /** Fetch priority for LCP images */
+  fetchpriority?: 'high' | 'low' | 'auto';
+  /** Decoding hint */
+  decoding?: 'async' | 'sync' | 'auto';
+  /** Inline styles */
+  style?: string;
+  /** HTML id */
+  id?: string;
+  /** Additional HTML attributes */
+  [key: string]: any;
+}
+
+const {
+  src,
+  extension = 'webp',
+  alt,
+  widths = [480, 800, 1200],
+  sizes = '(max-width: 640px) 480px, (max-width: 1024px) 800px, 1200px',
+  width,
+  height,
+  class: className = '',
+  loading = 'lazy',
+  fetchpriority,
+  decoding = 'async',
+  style,
+  id,
+} = Astro.props;
+
+// Normalize: strip trailing extension if accidentally included
+const basePath = src.replace(/\.(webp|jpg|jpeg|png|avif)$/, '');
+
+// Build srcset strings
+const avifSrcset = widths.map(w => `${basePath}-${w}w.avif ${w}w`).join(', ');
+const webpSrcset = widths.map(w => `${basePath}-${w}w.webp ${w}w`).join(', ');
+
+// Fallback src: largest WebP variant
+const fallbackSrc = `${basePath}-${widths[widths.length - 1]}w.webp`;
+---
+
+<picture>
+  <source type="image/avif" srcset={avifSrcset} sizes={sizes} />
+  <source type="image/webp" srcset={webpSrcset} sizes={sizes} />
+  <img
+    src={fallbackSrc}
+    alt={alt}
+    width={width}
+    height={height}
+    class={className}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding={decoding}
+    style={style}
+    id={id}
+  />
+</picture>
+
+{loading === 'eager' && (
+  <link rel="preload" as="image" href={`${basePath}-${widths[0]}w.avif`} type="image/avif" imagesrcset={avifSrcset} imagesizes={sizes} />
+)}

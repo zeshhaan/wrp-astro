@@ -171,13 +171,21 @@ const extendMeta = [
 
     <!-- Alpine.js loaded via @astrojs/alpinejs integration (no CDN needed) -->
 
-    <!-- Microsoft Clarity -->
+    <!-- Microsoft Clarity (deferred) -->
     <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "u18n0h2k1x");
+      // Defer Clarity loading to after initial page render
+      function loadClarity() {
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "u18n0h2k1x");
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadClarity, { timeout: 3000 });
+      } else {
+        setTimeout(loadClarity, 2000);
+      }
     </script>
 
     <style>
