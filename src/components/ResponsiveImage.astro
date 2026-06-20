@@ -75,5 +75,5 @@ const fallbackSrc = `${basePath}-${widths[widths.length - 1]}w.webp`;
 </picture>
 
 {loading === 'eager' && (
-  <link rel="preload" as="image" href={`${basePath}-${widths[0]}w.avif`} type="image/avif" imagesrcset={avifSrcset} imagesizes={sizes} />
+  <link rel="preload" as="image" href={`${basePath}-${widths[widths.length - 1]}w.avif`} type="image/avif" imagesrcset={avifSrcset} imagesizes={sizes} />
 )}

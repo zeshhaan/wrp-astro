@@ -10,6 +10,7 @@ import { Icon } from 'astro-icon/components';
 import { getLocale, localizeUrl } from '@/i18n/utils';
 import { t } from '@/i18n/translations';
 import { getLocalizedPortfolio } from '@/i18n/content';
+import { getImageDimensions } from '@/utils/image-dimensions';
 
 export const prerender = true;
 
@@ -32,6 +33,12 @@ const lightboxData = sortedItems.map(item => ({
   subtitle: item.data.subtitle,
   gallery: item.data.gallery,
 }));
+
+// Compute image dimensions for CLS prevention
+const portfolioDimensions = sortedItems.map((item) => {
+  const imgPath = item.data.heroImage.replace(/^\//, '');
+  return getImageDimensions(imgPath);
+});
 ---
 
 <BaseLayout
@@ -60,6 +67,8 @@ const lightboxData = sortedItems.map(item => ({
               subtitle={item.data.subtitle}
               heroImage={item.data.heroImage}
               index={index}
+              width={portfolioDimensions[index].width}
+              height={portfolioDimensions[index].height}
             />
           </div>
         ))}

@@ -51,11 +51,13 @@ const categoryLabels: Record<string, string> = {
 						{post.data.heroImage && (
 							<div class="relative aspect-[16/9] overflow-hidden">
 								<img
-									src={post.data.heroImage}
-									alt={post.data.title}
-									class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-									loading="lazy"
-								/>
+															src={post.data.heroImage}
+															alt={post.data.title}
+															width="1024"
+															height="1024"
+															class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+															loading="lazy"
+														/>
 							</div>
 						)}
 						<div class="p-5">
