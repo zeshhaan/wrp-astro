@@ -25,6 +25,9 @@ const sourcesHeading = locale === 'ar' ? 'إشارات الموثوقية' : 'Tr
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImageURL = heroImage ? new URL(heroImage, Astro.site).toString() : new URL('/og-image.jpg', Astro.site).toString();
+// Base path (no extension) for the optimized hero variants (AVIF/WebP @1920w)
+// that scripts/optimize-images.mjs generates for the luxury-*.jpg heroes.
+const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') : '';
 const articleTopics = (tags || []).map((tag) => ({ '@type': 'Thing', name: tag }));
 
 const categoryLabels: Record<string, Record<string, string>> = {
@@ -87,7 +90,7 @@ const breadcrumbs = [
 			<div class="w-full mb-10">
 				<div
 					class="relative h-[55vh] min-h-[300px] max-h-[550px] overflow-hidden"
-					style={`background-image: url(${heroImage}); background-size: cover; background-position: center; background-attachment: fixed;`}
+					style={`background-image: url('${heroImage}'); background-image: image-set(url('${heroBase}-1920w.avif') type('image/avif'), url('${heroBase}-1920w.webp') type('image/webp'), url('${heroImage}') type('image/jpeg')); background-size: cover; background-position: center; background-attachment: fixed;`}
 					role="img"
 					aria-label={title}
 				>
