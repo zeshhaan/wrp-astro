@@ -9,7 +9,6 @@ import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import robotsTxt from 'astro-robots-txt';
-import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
@@ -70,7 +69,6 @@ export default defineConfig({
         { userAgent: 'Google-Extended', allow: '/' },
       ],
     }),
-    icon(),
   ],
   adapter: cloudflare({
     imageService: 'cloudflare-binding',
