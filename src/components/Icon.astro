@@ -1,0 +1,55 @@
+---
+/**
+ * Drop-in replacement for astro-icon's <Icon> component.
+ *
+ * Renders inline SVGs from the Iconify "lucide" set by reading icon path data
+ * directly from @iconify-json/lucide — no astro-icon integration, no virtual
+ * module, and no @iconify/utils. This avoids the CJS-in-workerd incompatibility
+ * that broke `astro dev` under the @astrojs/cloudflare adapter (astro-icon is
+ * also unmaintained — last release targeted Astro v4).
+ *
+ * Usage is identical to before:
+ *   <Icon name="lucide:menu" class="h-6 w-6" />
+ *   <Icon name={`lucide:${feature.icon}`} class="..." />
+ *
+ * Only the `lucide:` set is supported (the only set this site uses). The whole
+ * pack is bundled server-side, exactly as astro-icon did with no `include`
+ * config, so any lucide icon — including dynamic names from content — works.
+ */
+import lucide from '@iconify-json/lucide/icons.json';
+
+type IconEntry = { body: string; width?: number; height?: number };
+const set = lucide as unknown as {
+  width?: number;
+  height?: number;
+  icons: Record<string, IconEntry>;
+};
+
+interface Props {
+  name: string;
+  [attr: string]: unknown;
+}
+
+const { name, ...attrs } = Astro.props;
+
+// Names look like "lucide:menu"; a bare "menu" is treated as lucide.
+const iconName = name.includes(':') ? name.slice(name.indexOf(':') + 1) : name;
+const entry = set.icons[iconName];
+
+if (!entry && import.meta.env.DEV) {
+  console.warn(`[Icon] Unknown icon "${name}" — not found in @iconify-json/lucide.`);
+}
+
+const w = entry?.width ?? set.width ?? 24;
+const h = entry?.height ?? set.height ?? 24;
+---
+{entry && (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1em"
+    height="1em"
+    viewBox={`0 0 ${w} ${h}`}
+    {...attrs}
+    set:html={entry.body}
+  />
+)}
