@@ -153,7 +153,9 @@ async function main() {
   const reviewDir = 'public/review-images';
   try {
     const reviewFiles = (await readdir(reviewDir))
-      .filter(f => f.endsWith('.jpg') || f.endsWith('.webp'));
+      // exclude already-generated variants (e.g. *-480w.webp) so re-runs don't
+      // re-optimize them into *-480w-480w.webp junk
+      .filter(f => (f.endsWith('.jpg') || f.endsWith('.webp')) && !f.match(/-\d{3,4}w\./));
     
     for (const file of reviewFiles) {
       const baseName = parse(file).name;
@@ -191,7 +193,9 @@ async function main() {
   const upholDir = 'public/upholstery';
   try {
     const upholFiles = (await readdir(upholDir))
-      .filter(f => f.endsWith('.jpg') || f.endsWith('.webp'));
+      // exclude already-generated variants (e.g. *-480w.webp) so re-runs don't
+      // re-optimize them into *-480w-480w.webp junk
+      .filter(f => (f.endsWith('.jpg') || f.endsWith('.webp')) && !f.match(/-\d{3,4}w\./));
     
     for (const file of upholFiles) {
       const baseName = parse(file).name;

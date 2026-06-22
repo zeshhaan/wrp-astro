@@ -33,3 +33,13 @@ pnpm-debug.log*
 # generated research output
 docs/reddit_results/
 docs/reddit_summary.txt
+
+# local-only docs (not committed)
+/proposal/
+/docs/reddit_urls.txt
+
+# tool-generated output (local only)
+.firecrawl/
+.hermes/
+.playwright-cli/
+.playwright-mcp/
