@@ -38,7 +38,6 @@ const services = defineCollection({
 		subtitle: z.string(),
 		description: z.string(),
 		heroImage: z.string(),
-		heroTitle: z.string().optional(), // Override H1 in hero; falls back to title
 		price: z.number().optional(),
 		lang: z.enum(['en', 'ar']).default('en'),
 		// Main description section
