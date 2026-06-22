@@ -2,7 +2,7 @@
 export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Schema from '../../components/Schema.astro';
 import Icon from '@/components/Icon.astro';
@@ -842,11 +842,11 @@ const aboutLines = t(locale, 'home.about.title').split('\n');
                   placeholder={t(locale, 'home.contact.messagePlaceholder')}
                 ></textarea>
               </div>
-              <Button size="lg" className="w-full" type="submit" :disabled="submitting">
+              <button type="submit" class={buttonVariants({ size: 'lg', className: 'w-full' })} :disabled="submitting">
                 <span x-show="!submitting">{t(locale, 'home.contact.submit')}</span>
                 <span x-show="submitting" x-cloak>{t(locale, 'home.contact.sending')}</span>
                 <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
-              </Button>
+              </button>
 
               <!-- Success Message -->
               <div

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import Icon from '@/components/Icon.astro';
 import { getLocale, localizeUrl } from '@/i18n/utils';
 import { t } from '@/i18n/translations';
@@ -254,11 +254,11 @@ const contactPageSchema = {
 
           <!-- Submit Button -->
           <div class="mt-8 flex justify-end">
-            <Button type="submit" size="lg" className="w-full sm:w-auto" :disabled="submitting">
+            <button type="submit" class={buttonVariants({ size: 'lg', className: 'w-full sm:w-auto' })} :disabled="submitting">
               <span x-show="!submitting">GET MY ESTIMATE</span>
               <span x-show="submitting" x-cloak>Sending...</span>
               <Icon name="lucide:arrow-right" class="ml-2 h-5 w-5" x-show="!submitting" />
-            </Button>
+            </button>
           </div>
 
           <!-- Success Message -->
