@@ -43,3 +43,5 @@ docs/reddit_summary.txt
 .hermes/
 .playwright-cli/
 .playwright-mcp/
+.claude/security/
+lh-home-after.json
