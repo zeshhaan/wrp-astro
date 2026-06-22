@@ -171,6 +171,115 @@ const breadcrumbs = [
     </section>
   )}
 
+  <!-- Additional Content Section (Service-Specific) -->
+  {additionalSection && (
+    <section class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{additionalSection.heading || 'Why Choose WRP'}</h2>
+          {additionalSection.subheading && (
+            <p class="text-muted-foreground">{additionalSection.subheading}</p>
+          )}
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          {additionalSection.cards.map((card) => (
+            <Card className={card.image ? 'overflow-hidden p-0' : 'p-8'}>
+              {card.image && (
+                <div class="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={card.image}
+                    alt={card.imageAlt || card.title}
+                    width="800"
+                    height="500"
+                    loading="lazy"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div class={card.image ? 'p-8' : ''}>
+                <h3 class="font-bold text-xl mb-4">{card.title}</h3>
+                <p class="text-muted-foreground leading-relaxed mb-4">
+                  {card.description}
+                </p>
+                {card.solution && (
+                  <p class="text-sm text-muted-foreground italic">
+                    Solution: {card.solution}
+                  </p>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Benefits Grid (Alternative to Additional Section) -->
+  {benefits && benefits.length > 0 && !additionalSection && (
+    <section class="py-32 px-6 bg-muted/30">
+      <div class="container mx-auto max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Why Choose This Service?</h2>
+          <p class="text-muted-foreground">The ultimate protection for Dubai's luxury vehicles</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          {benefits.map((benefit) => (
+            <Card className="p-6">
+              <h3 class="font-bold text-lg mb-3">{benefit.title}</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">
+                {benefit.description}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Real-time Work Gallery (actual jobs) -->
+  {realTimeWork && realTimeWork.items.length > 0 && (
+    <section class="py-32 px-6">
+      <div class="container mx-auto max-w-7xl">
+        <div class="text-center mb-16">
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{realTimeWork.heading}</h2>
+          {realTimeWork.subheading && (
+            <p class="text-muted-foreground max-w-2xl mx-auto">{realTimeWork.subheading}</p>
+          )}
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {realTimeWork.items.map((item, i) => (
+            <button
+              type="button"
+              onclick={`window.openPortfolioLightbox(${i})`}
+              aria-label={item.title || `View ${title} work`}
+              class="group relative block aspect-square w-full cursor-pointer overflow-hidden outline outline-1 -outline-offset-1 outline-black/10"
+            >
+              <ResponsiveImage
+                src={item.image}
+                alt={item.alt || item.title || `${title} by WRP Detailing Studio in Dubai`}
+                widths={[480, 800, 1200]}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              {item.title && (
+                <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-left text-sm font-medium text-white">
+                  {item.title}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+      <PortfolioLightbox
+        items={realTimeWork.items.map((item) => ({ title: item.title || '', subtitle: '', gallery: [item.image] }))}
+        client:load
+      />
+    </section>
+  )}
+
   <!-- Packages Section (shown for services like car wash) -->
   {showPackages && packages && packages.length > 0 && (
     <section class="py-32 px-6 bg-muted/30">
@@ -242,76 +351,9 @@ const breadcrumbs = [
     </section>
   )}
 
-  <!-- Additional Content Section (Service-Specific) -->
-  {additionalSection && (
-    <section class="py-32 px-6">
-      <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-16">
-          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{additionalSection.heading || 'Why Choose WRP'}</h2>
-          {additionalSection.subheading && (
-            <p class="text-muted-foreground">{additionalSection.subheading}</p>
-          )}
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-8">
-          {additionalSection.cards.map((card) => (
-            <Card className={card.image ? 'overflow-hidden p-0' : 'p-8'}>
-              {card.image && (
-                <div class="aspect-[16/10] overflow-hidden">
-                  <img
-                    src={card.image}
-                    alt={card.imageAlt || card.title}
-                    width="800"
-                    height="500"
-                    loading="lazy"
-                    class="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div class={card.image ? 'p-8' : ''}>
-                <h3 class="font-bold text-xl mb-4">{card.title}</h3>
-                <p class="text-muted-foreground leading-relaxed mb-4">
-                  {card.description}
-                </p>
-                {card.solution && (
-                  <p class="text-sm text-muted-foreground italic">
-                    Solution: {card.solution}
-                  </p>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Benefits Grid (Alternative to Additional Section) -->
-  {benefits && benefits.length > 0 && !additionalSection && (
-    <section class="py-32 px-6 bg-muted/30">
-      <div class="container mx-auto max-w-6xl">
-        <div class="text-center mb-16">
-          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">Why Choose This Service?</h2>
-          <p class="text-muted-foreground">The ultimate protection for Dubai's luxury vehicles</p>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-8">
-          {benefits.map((benefit) => (
-            <Card className="p-6">
-              <h3 class="font-bold text-lg mb-3">{benefit.title}</h3>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                {benefit.description}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-
   <!-- Process Section -->
   {process && process.length > 0 && (
-    <section class="py-32 px-6 bg-muted/30">
+    <section class="py-32 px-6">
       <div class="container mx-auto max-w-6xl">
         <div class="text-center mb-16">
           <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{processHeading || 'Our Process'}</h2>
@@ -332,48 +374,6 @@ const breadcrumbs = [
           ))}
         </div>
       </div>
-    </section>
-  )}
-
-  <!-- Real-time Work Gallery (actual jobs) -->
-  {realTimeWork && realTimeWork.items.length > 0 && (
-    <section class="py-32 px-6">
-      <div class="container mx-auto max-w-7xl">
-        <div class="text-center mb-16">
-          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{realTimeWork.heading}</h2>
-          {realTimeWork.subheading && (
-            <p class="text-muted-foreground max-w-2xl mx-auto">{realTimeWork.subheading}</p>
-          )}
-        </div>
-        <div class="review-masonry">
-          {realTimeWork.items.map((item, i) => (
-            <button
-              type="button"
-              onclick={`window.openPortfolioLightbox(${i})`}
-              aria-label={item.title || `View ${title} work`}
-              class="group relative mb-6 block w-full cursor-pointer overflow-hidden break-inside-avoid"
-            >
-              <ResponsiveImage
-                src={item.image}
-                alt={item.alt || item.title || `${title} by WRP Detailing Studio in Dubai`}
-                widths={[480, 800, 1200]}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                class="w-full h-auto transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              {item.title && (
-                <span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-left text-sm font-medium text-white">
-                  {item.title}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-      <PortfolioLightbox
-        items={realTimeWork.items.map((item) => ({ title: item.title || '', subtitle: '', gallery: [item.image] }))}
-        client:load
-      />
     </section>
   )}
 
