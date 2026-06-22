@@ -211,7 +211,46 @@ async function main() {
   } catch {
     console.log('  ⏭️  No upholstery directory found, skipping');
   }
-  
+
+  // ---- 5. Window Tint Gallery Images ----
+  console.log('\n📁 Processing window-tint gallery images...');
+  const tintDir = 'public/window-tint';
+  try {
+    const tintFiles = (await readdir(tintDir))
+      // originals only — skip already-generated variants
+      .filter(f => /\.(jpe?g|png)$/i.test(f) && !f.match(/-\d{3,4}w\./));
+
+    for (const file of tintFiles) {
+      const baseName = parse(file).name;
+      const inputPath = join(tintDir, file);
+      const inputSize = (await stat(inputPath)).size;
+
+      console.log(`  📸 ${file} (${formatBytes(inputSize)})`);
+
+      for (const size of SIZES) {
+        try {
+          // .rotate() honours EXIF orientation from phone cameras
+          await sharp(inputPath)
+            .rotate()
+            .resize({ width: size.width, withoutEnlargement: true })
+            .webp({ quality: WEBP_QUALITY })
+            .toFile(join(tintDir, `${baseName}-${size.suffix}.webp`));
+          await sharp(inputPath)
+            .rotate()
+            .resize({ width: size.width, withoutEnlargement: true })
+            .avif({ quality: AVIF_QUALITY })
+            .toFile(join(tintDir, `${baseName}-${size.suffix}.avif`));
+          totalGenerated += 2;
+        } catch (err) {
+          console.error(`  ❌ Failed ${baseName}-${size.suffix}:`, err.message);
+        }
+      }
+      console.log(`    ✅ Generated ${SIZES.length * 2} variants`);
+    }
+  } catch {
+    console.log('  ⏭️  No window-tint directory found, skipping');
+  }
+
   console.log(`\n✨ Done! Generated ${totalGenerated} image variants total.`);
   console.log('   Run `bun build` to rebuild the site with optimized images.\n');
 }

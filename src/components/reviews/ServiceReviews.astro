@@ -15,7 +15,7 @@ interface Props {
 }
 
 const locale = getLocale(Astro.currentLocale);
-const { serviceSlug, limit = 4, heading } = Astro.props;
+const { serviceSlug, limit = 6, heading } = Astro.props;
 const reviews = getReviewsForService(serviceSlug).slice(0, limit);
 const business = getBusiness();
 const displayCount = getDisplayCount();
@@ -51,7 +51,7 @@ const toLocalNum = (n: string | number) => _toLocalNum(n, locale);
       </p>
     </div>
 
-    <div class="columns-1 md:columns-2 gap-6">
+    <div class="review-masonry">
       {reviews.map((review) => (
         <div class="mb-6 break-inside-avoid">
           <ReviewCard
