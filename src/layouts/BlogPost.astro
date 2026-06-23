@@ -204,6 +204,16 @@ const breadcrumbs = [
 			margin: 0;
 		}
 
+		/* Wide tables scroll within the content column instead of overflowing
+		 * the page on small screens. The wrapper carries the vertical margin. */
+		.blog-content .table-scroll {
+			margin: 1.75rem 0;
+			max-width: 100%;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			overscroll-behavior-x: contain;
+		}
+
 		/* Tables — dark header, sharp edges, proper cell line-height */
 		.blog-content table {
 			width: 100%;
@@ -212,6 +222,21 @@ const breadcrumbs = [
 			margin: 1.75rem 0;
 			border-radius: 0;
 			border: 1px solid var(--border);
+		}
+		/* When wrapped for scrolling, the wrapper owns the margin. */
+		.blog-content .table-scroll table {
+			margin: 0;
+		}
+		/* On phones the content column is too narrow for multi-column tables, so
+		 * cells wrap to 3-4 lines. Let the table size to its single-line content
+		 * (width: max-content) and scroll horizontally (via .table-scroll) instead
+		 * of cramming; min-width keeps small tables filling the column. Scoped to
+		 * small screens so desktop tables are unaffected. */
+		@media (max-width: 767px) {
+			.blog-content .table-scroll table {
+				width: max-content;
+				min-width: 100%;
+			}
 		}
 		.blog-content thead {
 			background: var(--foreground);

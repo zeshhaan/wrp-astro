@@ -43,6 +43,13 @@ const STATIC_AR_PAGES = [
   { title: 'الشروط والأحكام', url: `${SITE_URL}/ar/terms/`, description: 'الشروط والأحكام باللغة العربية.' },
 ];
 
+// Drop inline HTML anchor tags (e.g. the `data-contact-modal` contact trigger)
+// from bodies, keeping their text, so the LLM context stays clean markdown
+// instead of leaking element attributes and inline styles.
+function sanitizeBody(body) {
+  return body.replace(/<a\b[^>]*>/gi, '').replace(/<\/a>/gi, '');
+}
+
 function stripFrontmatter(raw) {
   const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
   if (!match) return { frontmatter: '', body: raw };
@@ -136,7 +143,7 @@ async function readCollection(dir) {
       title,
       description,
       frontmatter,
-      body: body.trim(),
+      body: sanitizeBody(body.trim()),
     });
   }
 
