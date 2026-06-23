@@ -378,7 +378,8 @@ const breadcrumbs = [
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{t(locale, 'services.faqs')}</h2>
         <p class="mt-6 text-base text-muted-foreground">
-          <a href={localizeUrl('/contact-us/', locale)} class="font-semibold hover:underline">{t(locale, 'nav.contact')}</a>
+          {t(locale, 'services.faqMore')}{' '}
+          <a href={localizeUrl('/contact-us/', locale)} class="font-semibold hover:underline">{t(locale, 'services.faqContact')}</a>
         </p>
       </div>
       <div class="mt-20">

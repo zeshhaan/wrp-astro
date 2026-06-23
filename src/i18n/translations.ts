@@ -111,6 +111,8 @@ export const translations = {
     'services.process': 'Our Process',
     'services.benefits': 'Benefits',
     'services.faqs': 'Frequently Asked Questions',
+    'services.faqMore': 'Still have questions?',
+    'services.faqContact': 'Get in touch with us',
     'services.relatedTitle': 'Related Services',
     'services.relatedSubtitle': 'You might also be interested in',
 
@@ -387,6 +389,8 @@ export const translations = {
     'services.process': 'طريقة العمل',
     'services.benefits': 'المزايا',
     'services.faqs': 'الأسئلة الشائعة',
+    'services.faqMore': 'هل لا تزال لديك أسئلة؟',
+    'services.faqContact': 'تواصل معنا',
     'services.relatedTitle': 'خدمات ذات صلة',
     'services.relatedSubtitle': 'قد تهمك أيضاً',
 
