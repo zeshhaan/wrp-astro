@@ -204,6 +204,16 @@ const breadcrumbs = [
 			margin: 0;
 		}
 
+		/* Wide tables scroll within the content column instead of overflowing
+		 * the page on small screens. The wrapper carries the vertical margin. */
+		.blog-content .table-scroll {
+			margin: 1.75rem 0;
+			max-width: 100%;
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			overscroll-behavior-x: contain;
+		}
+
 		/* Tables — dark header, sharp edges, proper cell line-height */
 		.blog-content table {
 			width: 100%;
@@ -212,6 +222,10 @@ const breadcrumbs = [
 			margin: 1.75rem 0;
 			border-radius: 0;
 			border: 1px solid var(--border);
+		}
+		/* When wrapped for scrolling, the wrapper owns the margin. */
+		.blog-content .table-scroll table {
+			margin: 0;
 		}
 		.blog-content thead {
 			background: var(--foreground);

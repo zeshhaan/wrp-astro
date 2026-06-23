@@ -10,11 +10,42 @@ import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import robotsTxt from 'astro-robots-txt';
 
+/**
+ * Wrap every markdown <table> in a horizontally-scrollable container so wide
+ * tables scroll within the content column instead of forcing the whole page
+ * to overflow on small screens. Keeps the table's own styling untouched.
+ * Self-contained hast walk (no unist-util-visit dependency).
+ */
+function rehypeWrapTables() {
+  return (tree) => {
+    const walk = (node) => {
+      if (!node || !Array.isArray(node.children)) return;
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        if (child && child.type === 'element' && child.tagName === 'table') {
+          node.children[i] = {
+            type: 'element',
+            tagName: 'div',
+            properties: { className: ['table-scroll'] },
+            children: [child],
+          };
+        } else {
+          walk(child);
+        }
+      }
+    };
+    walk(tree);
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://wrpdetailing.ae',
   output: 'server',
   trailingSlash: 'always',
+  markdown: {
+    rehypePlugins: [rehypeWrapTables],
+  },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ar'],
