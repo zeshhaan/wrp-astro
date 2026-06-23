@@ -165,9 +165,10 @@ const breadcrumbs = [
 					</div>
 				</div>
 			)}
-			<RelatedServices serviceIds={relatedServices} />
 		</div>
 	</article>
+
+	<RelatedServices serviceIds={relatedServices} />
 
 	{/* Review blade for blog posts with related services */}
 	{relatedServices && relatedServices.length > 0 && (

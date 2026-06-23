@@ -40,6 +40,13 @@ const services = defineCollection({
 		heroImage: z.string(),
 		price: z.number().optional(),
 		lang: z.enum(['en', 'ar']).default('en'),
+		// SEO/H1 decoupling: metaTitle overrides the <title>, heroTitle overrides
+		// the visible hero <h1>. Both optional — fall back to `title` so other
+		// service pages are unaffected.
+		metaTitle: z.string().optional(),
+		heroTitle: z.string().optional(),
+		heroDescription: z.string().optional(), // hero sub-line; falls back to `description`
+		quickAnswer: z.string().optional(), // custom "Quick answer" body; falls back to auto-generated
 		// Main description section
 		mainHeading: z.string().optional(),
 		mainDescription1: z.string().optional(),
@@ -66,7 +73,7 @@ const services = defineCollection({
 		})).optional(),
 		// Additional content section (service-specific)
 		additionalSection: z.object({
-			heading: z.string(),
+			heading: z.string().optional(), // defaults to "Why Choose WRP" in the layout
 			subheading: z.string().optional(),
 			cards: z.array(z.object({
 				title: z.string(),
@@ -89,6 +96,16 @@ const services = defineCollection({
 			title: z.string(),
 			description: z.string(),
 		})).optional(),
+		// "Real-time work we did" — gallery of actual jobs (optional)
+		realTimeWork: z.object({
+			heading: z.string(),
+			subheading: z.string().optional(),
+			items: z.array(z.object({
+				image: z.string(), // base path without extension if using responsive variants
+				title: z.string().optional(),
+				alt: z.string().optional(),
+			})),
+		}).optional(),
 		// FAQs
 		faqs: z.array(z.object({
 			question: z.string(),
