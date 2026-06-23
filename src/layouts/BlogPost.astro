@@ -227,6 +227,17 @@ const breadcrumbs = [
 		.blog-content .table-scroll table {
 			margin: 0;
 		}
+		/* On phones the content column is too narrow for multi-column tables, so
+		 * cells wrap to 3-4 lines. Let the table size to its single-line content
+		 * (width: max-content) and scroll horizontally (via .table-scroll) instead
+		 * of cramming; min-width keeps small tables filling the column. Scoped to
+		 * small screens so desktop tables are unaffected. */
+		@media (max-width: 767px) {
+			.blog-content .table-scroll table {
+				width: max-content;
+				min-width: 100%;
+			}
+		}
 		.blog-content thead {
 			background: var(--foreground);
 		}
