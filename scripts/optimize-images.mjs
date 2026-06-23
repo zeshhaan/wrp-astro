@@ -1,16 +1,22 @@
 /**
  * Image Optimization Script for WRP Detailing
- * 
+ *
  * Generates responsive variants (480w, 800w, 1200w) in WebP and AVIF
  * for portfolio images, homepage hero images, review images, and upholstery images.
- * 
- * Usage: node scripts/optimize-images.mjs
- * 
- * Original files are preserved for lightbox/full-res usage.
+ *
+ * Usage:
+ *   node scripts/optimize-images.mjs           # only generates MISSING variants (fast)
+ *   FORCE=1 node scripts/optimize-images.mjs   # re-encode everything (use after editing a source)
+ *   node scripts/optimize-images.mjs --force   # same as FORCE=1
+ *
+ * Variants are committed to the repo, so by default this is a near no-op on CI
+ * (skips anything that already exists) — keeping deploy builds fast. Original
+ * files are preserved for lightbox/full-res usage.
  */
 
 import sharp from 'sharp';
 import { readdir, stat, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join, parse } from 'path';
 
 const SIZES = [
@@ -23,43 +29,49 @@ const WEBP_QUALITY = 80;
 const AVIF_QUALITY = 65;
 const SMALL_THRESHOLD = 150 * 1024; // Skip full pipeline for images < 150KB
 
+// Force re-encoding of variants that already exist (e.g. after replacing a source image).
+const FORCE = process.argv.includes('--force') || process.env.FORCE === '1';
+
+let totalGenerated = 0;
+let totalSkipped = 0;
+
 /**
- * Generate responsive variants for a single source image.
+ * Encode a single variant, skipping it if the output already exists (unless FORCE).
+ * Returns true if it generated the file, false if skipped or failed.
  */
-async function optimizeImage(inputPath, outputDir, baseName, skipWebpSizes = []) {
-  const results = [];
-  
-  for (const size of SIZES) {
-    const shouldSkipWebp = skipWebpSizes.includes(size.suffix);
-    
-    // WebP variant (skip if source is already smaller)
-    if (!shouldSkipWebp) {
-      const webpPath = join(outputDir, `${baseName}-${size.suffix}.webp`);
-      try {
-        await sharp(inputPath)
-          .resize({ width: size.width, withoutEnlargement: true })
-          .webp({ quality: WEBP_QUALITY })
-          .toFile(webpPath);
-        results.push(webpPath);
-      } catch (err) {
-        console.error(`  ❌ Failed ${baseName}-${size.suffix}.webp:`, err.message);
-      }
-    }
-    
-    // AVIF variant
-    const avifPath = join(outputDir, `${baseName}-${size.suffix}.avif`);
-    try {
-      await sharp(inputPath)
-        .resize({ width: size.width, withoutEnlargement: true })
-        .avif({ quality: AVIF_QUALITY })
-        .toFile(avifPath);
-      results.push(avifPath);
-    } catch (err) {
-      console.error(`  ❌ Failed ${baseName}-${size.suffix}.avif:`, err.message);
-    }
+async function makeVariant(inputPath, outputPath, { format, quality, width, rotate = false }) {
+  if (!FORCE && existsSync(outputPath)) {
+    totalSkipped++;
+    return false;
   }
-  
-  return results;
+  try {
+    let pipe = sharp(inputPath);
+    if (rotate) pipe = pipe.rotate(); // honour EXIF orientation (phone cameras)
+    pipe = pipe.resize({ width, withoutEnlargement: true });
+    pipe = format === 'avif' ? pipe.avif({ quality }) : pipe.webp({ quality });
+    await pipe.toFile(outputPath);
+    totalGenerated++;
+    return true;
+  } catch (err) {
+    console.error(`  ❌ Failed ${outputPath}:`, err.message);
+    return false;
+  }
+}
+
+/**
+ * Generate responsive WebP + AVIF variants for a single source image.
+ */
+async function optimizeImage(inputPath, outputDir, baseName, { skipWebpSizes = [], rotate = false } = {}) {
+  for (const size of SIZES) {
+    if (!skipWebpSizes.includes(size.suffix)) {
+      await makeVariant(inputPath, join(outputDir, `${baseName}-${size.suffix}.webp`), {
+        format: 'webp', quality: WEBP_QUALITY, width: size.width, rotate,
+      });
+    }
+    await makeVariant(inputPath, join(outputDir, `${baseName}-${size.suffix}.avif`), {
+      format: 'avif', quality: AVIF_QUALITY, width: size.width, rotate,
+    });
+  }
 }
 
 /**
@@ -84,129 +96,74 @@ function formatBytes(bytes) {
 }
 
 async function main() {
-  console.log('🖼️  WRP Image Optimization\n');
-  let totalGenerated = 0;
-  let totalSaved = 0;
-  
+  console.log(`🖼️  WRP Image Optimization${FORCE ? ' (FORCE: re-encoding all)' : ' (skipping existing variants)'}\n`);
+
   // ---- 1. Portfolio Images ----
   console.log('📁 Processing portfolio images...');
   const portfolioDir = 'public/portfolio';
   const portfolioFiles = (await readdir(portfolioDir))
     .filter(f => f.endsWith('.webp') && !f.match(/-\d{3,4}w\./));
-  
+
   for (const file of portfolioFiles) {
     const baseName = parse(file).name;
     const inputPath = join(portfolioDir, file);
     const inputSize = (await stat(inputPath)).size;
-    const { width } = await getDimensions(inputPath);
-    
-    console.log(`  📸 ${file} (${width}x?, ${formatBytes(inputSize)})`);
-    
+    console.log(`  📸 ${file} (${formatBytes(inputSize)})`);
     // For small images, skip 480w webp (source is already close)
     const skipWebpSizes = inputSize < SMALL_THRESHOLD ? ['480w'] : [];
-    
-    const results = await optimizeImage(inputPath, portfolioDir, baseName, skipWebpSizes);
-    totalGenerated += results.length;
-    console.log(`    ✅ Generated ${results.length} variants`);
+    await optimizeImage(inputPath, portfolioDir, baseName, { skipWebpSizes });
   }
-  
+
   // ---- 2. Homepage Hero Images ----
   console.log('\n📁 Processing homepage hero images...');
   const heroDir = 'public';
   const heroFiles = (await readdir(heroDir))
     .filter(f => f.startsWith('luxury-') && f.endsWith('.jpg'));
-  
+
   for (const file of heroFiles) {
     const baseName = parse(file).name;
     const inputPath = join(heroDir, file);
-    const inputSize = (await stat(inputPath)).size;
-    const { width } = await getDimensions(inputPath);
-    
-    console.log(`  📸 ${file} (${width}x?, ${formatBytes(inputSize)})`);
-    
-    // For hero images, also generate 1920w variants since they serve full-width
-    const results = await optimizeImage(inputPath, heroDir, baseName);
-    
-    // Also generate 1920w variant for hero images
-    try {
-      await sharp(inputPath)
-        .resize({ width: 1920, withoutEnlargement: true })
-        .webp({ quality: WEBP_QUALITY })
-        .toFile(join(heroDir, `${baseName}-1920w.webp`));
-      results.push('1920w.webp');
-      
-      await sharp(inputPath)
-        .resize({ width: 1920, withoutEnlargement: true })
-        .avif({ quality: AVIF_QUALITY })
-        .toFile(join(heroDir, `${baseName}-1920w.avif`));
-      results.push('1920w.avif');
-    } catch (err) {
-      console.error(`  ❌ Failed 1920w variant:`, err.message);
-    }
-    
-    totalGenerated += results.length;
-    console.log(`    ✅ Generated ${results.length} variants`);
+    console.log(`  📸 ${file}`);
+    await optimizeImage(inputPath, heroDir, baseName);
+    // Hero images also get a 1920w variant since they serve full-width
+    await makeVariant(inputPath, join(heroDir, `${baseName}-1920w.webp`), { format: 'webp', quality: WEBP_QUALITY, width: 1920 });
+    await makeVariant(inputPath, join(heroDir, `${baseName}-1920w.avif`), { format: 'avif', quality: AVIF_QUALITY, width: 1920 });
   }
-  
+
   // ---- 3. Review Images ----
   console.log('\n📁 Processing review images...');
   const reviewDir = 'public/review-images';
   try {
     const reviewFiles = (await readdir(reviewDir))
-      // exclude already-generated variants (e.g. *-480w.webp) so re-runs don't
-      // re-optimize them into *-480w-480w.webp junk
+      // originals only — skip already-generated variants
       .filter(f => (f.endsWith('.jpg') || f.endsWith('.webp')) && !f.match(/-\d{3,4}w\./));
-    
+
     for (const file of reviewFiles) {
       const baseName = parse(file).name;
       const inputPath = join(reviewDir, file);
-      const inputSize = (await stat(inputPath)).size;
-      
-      console.log(`  📸 ${file} (${formatBytes(inputSize)})`);
-      
-      // Review images only need 480w and 800w (they're small thumbnails)
-      for (const size of [SIZES[0], SIZES[1]]) { // 480w and 800w only
-        try {
-          await sharp(inputPath)
-            .resize({ width: size.width, withoutEnlargement: true })
-            .webp({ quality: 75 })
-            .toFile(join(reviewDir, `${baseName}-${size.suffix}.webp`));
-          
-          await sharp(inputPath)
-            .resize({ width: size.width, withoutEnlargement: true })
-            .avif({ quality: 60 })
-            .toFile(join(reviewDir, `${baseName}-${size.suffix}.avif`));
-          
-          totalGenerated += 2;
-        } catch (err) {
-          console.error(`  ❌ Failed ${baseName}-${size.suffix}:`, err.message);
-        }
+      console.log(`  📸 ${file}`);
+      // Review images only need 480w and 800w (small thumbnails), lighter quality
+      for (const size of [SIZES[0], SIZES[1]]) {
+        await makeVariant(inputPath, join(reviewDir, `${baseName}-${size.suffix}.webp`), { format: 'webp', quality: 75, width: size.width });
+        await makeVariant(inputPath, join(reviewDir, `${baseName}-${size.suffix}.avif`), { format: 'avif', quality: 60, width: size.width });
       }
-      console.log(`    ✅ Generated 4 variants`);
     }
   } catch {
     console.log('  ⏭️  No review-images directory found, skipping');
   }
-  
+
   // ---- 4. Upholstery Images ----
   console.log('\n📁 Processing upholstery images...');
   const upholDir = 'public/upholstery';
   try {
     const upholFiles = (await readdir(upholDir))
-      // exclude already-generated variants (e.g. *-480w.webp) so re-runs don't
-      // re-optimize them into *-480w-480w.webp junk
       .filter(f => (f.endsWith('.jpg') || f.endsWith('.webp')) && !f.match(/-\d{3,4}w\./));
-    
+
     for (const file of upholFiles) {
       const baseName = parse(file).name;
       const inputPath = join(upholDir, file);
-      const inputSize = (await stat(inputPath)).size;
-      
-      console.log(`  📸 ${file} (${formatBytes(inputSize)})`);
-      
-      const results = await optimizeImage(inputPath, upholDir, baseName);
-      totalGenerated += results.length;
-      console.log(`    ✅ Generated ${results.length} variants`);
+      console.log(`  📸 ${file}`);
+      await optimizeImage(inputPath, upholDir, baseName);
     }
   } catch {
     console.log('  ⏭️  No upholstery directory found, skipping');
@@ -217,42 +174,23 @@ async function main() {
   const tintDir = 'public/window-tint';
   try {
     const tintFiles = (await readdir(tintDir))
-      // originals only — skip already-generated variants
       .filter(f => /\.(jpe?g|png)$/i.test(f) && !f.match(/-\d{3,4}w\./));
 
     for (const file of tintFiles) {
       const baseName = parse(file).name;
       const inputPath = join(tintDir, file);
-      const inputSize = (await stat(inputPath)).size;
-
-      console.log(`  📸 ${file} (${formatBytes(inputSize)})`);
-
-      for (const size of SIZES) {
-        try {
-          // .rotate() honours EXIF orientation from phone cameras
-          await sharp(inputPath)
-            .rotate()
-            .resize({ width: size.width, withoutEnlargement: true })
-            .webp({ quality: WEBP_QUALITY })
-            .toFile(join(tintDir, `${baseName}-${size.suffix}.webp`));
-          await sharp(inputPath)
-            .rotate()
-            .resize({ width: size.width, withoutEnlargement: true })
-            .avif({ quality: AVIF_QUALITY })
-            .toFile(join(tintDir, `${baseName}-${size.suffix}.avif`));
-          totalGenerated += 2;
-        } catch (err) {
-          console.error(`  ❌ Failed ${baseName}-${size.suffix}:`, err.message);
-        }
-      }
-      console.log(`    ✅ Generated ${SIZES.length * 2} variants`);
+      console.log(`  📸 ${file}`);
+      // .rotate() honours EXIF orientation from phone cameras
+      await optimizeImage(inputPath, tintDir, baseName, { rotate: true });
     }
   } catch {
     console.log('  ⏭️  No window-tint directory found, skipping');
   }
 
-  console.log(`\n✨ Done! Generated ${totalGenerated} image variants total.`);
-  console.log('   Run `bun build` to rebuild the site with optimized images.\n');
+  console.log(`\n✨ Done! Generated ${totalGenerated} new variant(s), skipped ${totalSkipped} existing.`);
+  if (totalSkipped > 0 && !FORCE) {
+    console.log('   (Run with FORCE=1 to re-encode existing variants, e.g. after replacing a source image.)');
+  }
 }
 
 main().catch(console.error);
