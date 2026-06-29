@@ -12,7 +12,7 @@ tags:
   - دبي
 author: WRP Detailing Studio
 readingTime: 6
-heroImage: /window-tint/mercedes-amg-e-class.jpg
+heroImage: /window-tint/tesla-cybertruck.jpg
 relatedServices:
   - window-film
 lang: "ar"
