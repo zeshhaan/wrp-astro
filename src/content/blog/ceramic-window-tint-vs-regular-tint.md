@@ -13,7 +13,7 @@ tags:
   - dubai
 author: WRP Detailing Studio
 readingTime: 8
-heroImage: /window-tint/gmc-yukon-denali.jpg
+heroImage: /window-tint/subaru-wrx-studio.jpg
 relatedServices:
   - window-film
 ---
