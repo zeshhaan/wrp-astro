@@ -41,7 +41,7 @@ const {
   title, subtitle, description, heroImage,
   mainHeading, mainDescription1, mainDescription2, mainImage, mainImageAlt, iconFeatures,
   startingPrice, showPackages, packagesHeading, packagesSubheading, packages,
-  additionalSection, processHeading, processSubheading, process, benefits,
+  additionalSection, processHeading, processSubheading, process, benefits, benefitsHeading,
   faqs, ctaHeading, ctaDescription,
 } = service.data;
 
@@ -179,7 +179,7 @@ const breadcrumbs = [
     <section class="py-32 px-6 bg-muted/30">
       <div class="container mx-auto max-w-6xl">
         <div class="text-center mb-16">
-          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{t(locale, 'services.benefits')}</h2>
+          <h2 class="font-serif text-4xl md:text-5xl font-bold mb-4">{benefitsHeading || t(locale, 'services.benefits')}</h2>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
           {benefits.map((b) => (<Card className="p-6"><h3 class="font-bold text-lg mb-3">{b.title}</h3><p class="text-sm text-muted-foreground leading-relaxed">{b.description}</p></Card>))}
