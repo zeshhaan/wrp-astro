@@ -13,7 +13,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 8
 featured: false
-heroImage: /luxury-suv-black-and-white-premium-detail.jpg
+heroImage: /leather-care-hero.jpg
 relatedServices:
   - leather-upholstery
   - premium-car-wash
