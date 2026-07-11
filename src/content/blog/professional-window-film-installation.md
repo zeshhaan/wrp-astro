@@ -11,7 +11,7 @@ tags:
   - dubai
 author: WRP Detailing Studio
 readingTime: 7
-heroImage: /window-tint/toyota-land-cruiser-hero.jpg
+heroImage: /window-film-install-hero.jpg
 relatedServices:
   - window-film
 ---

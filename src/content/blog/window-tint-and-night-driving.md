@@ -12,7 +12,7 @@ tags:
   - dubai
 author: WRP Detailing Studio
 readingTime: 7
-heroImage: /window-tint/mercedes-amg-e-class-hero.jpg
+heroImage: /night-driving-hero.jpg
 relatedServices:
   - window-film
 ---
