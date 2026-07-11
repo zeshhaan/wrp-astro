@@ -13,7 +13,7 @@ tags:
   - dubai
 author: WRP Detailing Studio
 readingTime: 8
-heroImage: /window-tint/subaru-wrx-studio.jpg
+heroImage: /ceramic-tint-hero.jpg
 relatedServices:
   - window-film
 ---

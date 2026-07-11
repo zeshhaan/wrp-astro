@@ -92,6 +92,7 @@ const services = defineCollection({
 			description: z.string(),
 		})).optional(),
 		// Benefits (if additional section isn't used)
+		benefitsHeading: z.string().optional(), // overrides the default "Why Choose This Service?" heading
 		benefits: z.array(z.object({
 			title: z.string(),
 			description: z.string(),
