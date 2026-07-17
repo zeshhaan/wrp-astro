@@ -187,6 +187,23 @@ async function main() {
     console.log('  ⏭️  No window-tint directory found, skipping');
   }
 
+  // ---- 6. PPF Gallery Images ----
+  console.log('\n📁 Processing ppf gallery images...');
+  const ppfDir = 'public/ppf';
+  try {
+    const ppfFiles = (await readdir(ppfDir))
+      .filter(f => /\.(jpe?g|png)$/i.test(f) && !f.match(/-\d{3,4}w\./));
+
+    for (const file of ppfFiles) {
+      const baseName = parse(file).name;
+      const inputPath = join(ppfDir, file);
+      console.log(`  📸 ${file}`);
+      await optimizeImage(inputPath, ppfDir, baseName, { rotate: true });
+    }
+  } catch {
+    console.log('  ⏭️  No ppf directory found, skipping');
+  }
+
   console.log(`\n✨ Done! Generated ${totalGenerated} new variant(s), skipped ${totalSkipped} existing.`);
   if (totalSkipped > 0 && !FORCE) {
     console.log('   (Run with FORCE=1 to re-encode existing variants, e.g. after replacing a source image.)');
