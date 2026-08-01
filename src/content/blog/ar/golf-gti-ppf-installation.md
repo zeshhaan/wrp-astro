@@ -11,7 +11,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 6
 featured: false
-heroImage: /luxury-car-detailing-craftsman-working-black-and-w.jpg
+heroImage: /golf-gti-hero.jpg
 relatedServices:
   - paint-protection-film
 lang: "ar"
