@@ -11,7 +11,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 7
 featured: false
-heroImage: /luxury-supercar-close-up-detail-black-and-white.jpg
+heroImage: /benefits-ppf-hero.jpg
 relatedServices:
   - paint-protection-film
   - ceramic-coating
