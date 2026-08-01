@@ -21,14 +21,6 @@ lang: "ar"
 
 مباشرة من المعرض إلى WRP Detailing Solutions. جاءت هذه الجولف GTI صفرية العداد للحفاظ على طلائها المصنعي النقي قبل أن تلمسه طرق الصحراء.
 
-<figure style="margin:2.5rem auto;max-width:360px;">
-  <video style="display:block;width:100%;height:auto;border-radius:12px;background:#111;" muted loop autoplay playsinline preload="metadata" aria-label="سيارة فولكس واجن جولف GTI صفرية العداد يُكشف عنها تحت غطاء أحمر في استوديو WRP للتفصيل في دبي" poster="data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xAB5AAADAQEBAQAAAAAAAAAAAAAFBAMGBwECAQADAQEAAAAAAAAAAAAAAAADAgEFBBAAAQMCBAMECwEAAAAAAAAAAQIRAAMhEjFBUQSBcZFhIhMFFELwweHRoVKTklMRAAICAwEBAQAAAAAAAAAAAAEAEQMCIUEScVH/wAARCAArABgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwA2k4QElWIgZ5P3tJFSMYt4mLG+VntltFwjXMtz6PAfrNVrcOrmflFSy6BSzZg41O0jjVsOwfSVSFqphRS2+o7Ys8eEcpenXSiqungIQhPiWbh88+kAq9LU0khFMlL5uA/Joa4lFUJXhp4nGSe/VszOb+TW/wAFfrMCT+O7RXXkCbDHBt6dTrU+JuCCD7Bazam7/COeVT/GlMpwVBaSVKplCmYEixB9/vNhgXuP5EOCIce3DzmQNjnxOYjPXvBb3jes5FWpJEni6T4VE3lY/wD/2Q==">
-    <source src="/ppf/golf-gti/gti-reveal.webm" type="video/webm" />
-    <source src="/ppf/golf-gti/gti-reveal.mp4" type="video/mp4" />
-  </video>
-  <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">الكشف: جولف GTI صفرية العداد، قبل لحظات من الحماية.</figcaption>
-</figure>
-
 إليك نظرة من الداخل على كيفية تدريعنا لهذه الجولف GTI الجديدة، مع التركيز على عملية التركيب الدقيقة والنتيجة النهائية المذهلة.
 
 ## تركيب دقيق: وضع الدرع غير المرئي
@@ -81,7 +73,19 @@ lang: "ar"
   <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">خطوط GTI الحادة، ملفوفة بالكامل ومطويّة الحواف.</figcaption>
 </figure>
 
-بلفّ هذه الجولف GTI فور تسليمها، يستطيع مالكها الآن الاستمتاع بإثارة سيارة أداء جديدة دون القلق أبداً من رشقات الحصى أو أضرار الشمس. وإن كنت لا تزال تزن القرار، فإن دليلينا حول [ما إذا كان PPF يستحق العناء في دبي](/ar/blog/is-ppf-worth-it-dubai/) و[الفوائد الكاملة لتركيب PPF](/ar/blog/benefits-of-ppf-dubai/) يوضّحان الأرقام.
+## الكشف الكبير: تسليم جولف GTI محمية
+
+بعد معالجة الفيلم وفحصه، تأتي أفضل لحظة في أي عمل: تسليم المفاتيح. كشفنا عن الجولف GTI المكتملة بأسلوب المعارض، وطلاؤها المصنعي مختوم الآن تحت طبقة حماية غير مرئية، جاهزة ليقودها مالكها دون قلق.
+
+<figure style="margin:2.5rem auto;max-width:360px;">
+  <video style="display:block;width:100%;height:auto;border-radius:12px;background:#111;" muted loop autoplay playsinline preload="metadata" aria-label="سيارة فولكس واجن جولف GTI محمية يُكشف عنها من تحت غطاء أحمر لمالكها في استوديو WRP للتفصيل في دبي" poster="data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xAB5AAADAQEBAQAAAAAAAAAAAAAFBAMGBwECAQADAQEAAAAAAAAAAAAAAAADAgEFBBAAAQMCBAMECwEAAAAAAAAAAQIRAAMhEjFBUQSBcZFhIhMFFELwweHRoVKTklMRAAICAwEBAQAAAAAAAAAAAAEAEQMCIUEScVH/wAARCAArABgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwA2k4QElWIgZ5P3tJFSMYt4mLG+VntltFwjXMtz6PAfrNVrcOrmflFSy6BSzZg41O0jjVsOwfSVSFqphRS2+o7Ys8eEcpenXSiqungIQhPiWbh88+kAq9LU0khFMlL5uA/Joa4lFUJXhp4nGSe/VszOb+TW/wAFfrMCT+O7RXXkCbDHBt6dTrU+JuCCD7Bazam7/COeVT/GlMpwVBaSVKplCmYEixB9/vNhgXuP5EOCIce3DzmQNjnxOYjPXvBb3jes5FWpJEni6T4VE3lY/wD/2Q==">
+    <source src="/ppf/golf-gti/gti-reveal.webm" type="video/webm" />
+    <source src="/ppf/golf-gti/gti-reveal.mp4" type="video/mp4" />
+  </video>
+  <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">تسليم بأسلوب المعارض: الكشف عن الجولف GTI المكتملة والمحمية بالكامل لمالكها.</figcaption>
+</figure>
+
+بحماية هذه الجولف GTI فور وصولها، يستطيع مالكها الآن الاستمتاع بإثارة سيارة أداء جديدة دون القلق أبداً من رشقات الحصى أو أضرار الشمس. وإن كنت لا تزال تزن القرار، فإن دليلينا حول [ما إذا كان PPF يستحق العناء في دبي](/ar/blog/is-ppf-worth-it-dubai/) و[الفوائد الكاملة لتركيب PPF](/ar/blog/benefits-of-ppf-dubai/) يوضّحان الأرقام.
 
 ## مستعدّ لحماية سيارتك الجديدة من اليوم الأول؟
 

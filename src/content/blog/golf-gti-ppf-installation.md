@@ -20,14 +20,6 @@ There is nothing quite like taking delivery of a brand-new Volkswagen Golf GTI. 
 
 Straight from the showroom to WRP Detailing Solutions. This zero-mile Golf GTI came in to preserve its pristine factory paint before the desert roads could touch it.
 
-<figure style="margin:2.5rem auto;max-width:360px;">
-  <video style="display:block;width:100%;height:auto;border-radius:12px;background:#111;" muted loop autoplay playsinline preload="metadata" aria-label="A zero-mile Volkswagen Golf GTI unveiled under a red cover at WRP Detailing Studio in Dubai" poster="data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xAB5AAADAQEBAQAAAAAAAAAAAAAFBAMGBwECAQADAQEAAAAAAAAAAAAAAAADAgEFBBAAAQMCBAMECwEAAAAAAAAAAQIRAAMhEjFBUQSBcZFhIhMFFELwweHRoVKTklMRAAICAwEBAQAAAAAAAAAAAAEAEQMCIUEScVH/wAARCAArABgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwA2k4QElWIgZ5P3tJFSMYt4mLG+VntltFwjXMtz6PAfrNVrcOrmflFSy6BSzZg41O0jjVsOwfSVSFqphRS2+o7Ys8eEcpenXSiqungIQhPiWbh88+kAq9LU0khFMlL5uA/Joa4lFUJXhp4nGSe/VszOb+TW/wAFfrMCT+O7RXXkCbDHBt6dTrU+JuCCD7Bazam7/COeVT/GlMpwVBaSVKplCmYEixB9/vNhgXuP5EOCIce3DzmQNjnxOYjPXvBb3jes5FWpJEni6T4VE3lY/wD/2Q==">
-    <source src="/ppf/golf-gti/gti-reveal.webm" type="video/webm" />
-    <source src="/ppf/golf-gti/gti-reveal.mp4" type="video/mp4" />
-  </video>
-  <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">The reveal: a zero-mile Golf GTI, moments before protection.</figcaption>
-</figure>
-
 Here is an inside look at how we armored this fresh GTI, focusing purely on our precision installation process and the breathtaking final result.
 
 ## Precision Installation: Laying Down Invisible Armor
@@ -80,7 +72,19 @@ Once the film fully cured in our climate-controlled bay, the GTI underwent a fin
   <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">Sharp GTI lines, fully wrapped and edge-tucked.</figcaption>
 </figure>
 
-By wrapping this Golf GTI immediately after delivery, its owner can now enjoy the thrill of a brand-new performance car without ever stressing over stone chips or sun damage. If you are still weighing the decision, our guides on [whether PPF is worth it in Dubai](/blog/is-ppf-worth-it-dubai/) and the [full benefits of installing PPF](/blog/benefits-of-ppf-dubai/) break down the numbers.
+## The Big Reveal: Handing Back a Protected GTI
+
+With the film cured and inspected, the best moment of any job arrives: handing back the keys. We unveiled the finished GTI showroom style, its factory paint now sealed under an invisible layer of protection, ready for the owner to drive worry-free.
+
+<figure style="margin:2.5rem auto;max-width:360px;">
+  <video style="display:block;width:100%;height:auto;border-radius:12px;background:#111;" muted loop autoplay playsinline preload="metadata" aria-label="A protected Volkswagen Golf GTI unveiled from under a red cover for its owner at WRP Detailing Studio in Dubai" poster="data:image/jpeg;base64,/9j//gAQTGF2YzYyLjI4LjEwMgD/2wBDAAgYGBwYHCEhISEhISckJygoKCcnJycoKCgrKyszMzMrKysoKCsrMDAzMzc5NzQ0MzQ5OTw8PEhIRUVUVFdnZ3z/xAB5AAADAQEBAQAAAAAAAAAAAAAFBAMGBwECAQADAQEAAAAAAAAAAAAAAAADAgEFBBAAAQMCBAMECwEAAAAAAAAAAQIRAAMhEjFBUQSBcZFhIhMFFELwweHRoVKTklMRAAICAwEBAQAAAAAAAAAAAAEAEQMCIUEScVH/wAARCAArABgDASIAAhEAAxEA/9oADAMBAAIRAxEAPwA2k4QElWIgZ5P3tJFSMYt4mLG+VntltFwjXMtz6PAfrNVrcOrmflFSy6BSzZg41O0jjVsOwfSVSFqphRS2+o7Ys8eEcpenXSiqungIQhPiWbh88+kAq9LU0khFMlL5uA/Joa4lFUJXhp4nGSe/VszOb+TW/wAFfrMCT+O7RXXkCbDHBt6dTrU+JuCCD7Bazam7/COeVT/GlMpwVBaSVKplCmYEixB9/vNhgXuP5EOCIce3DzmQNjnxOYjPXvBb3jes5FWpJEni6T4VE3lY/wD/2Q==">
+    <source src="/ppf/golf-gti/gti-reveal.webm" type="video/webm" />
+    <source src="/ppf/golf-gti/gti-reveal.mp4" type="video/mp4" />
+  </video>
+  <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">Showroom-style delivery: unveiling the finished, fully-protected GTI to its owner.</figcaption>
+</figure>
+
+By protecting this Golf GTI the moment it arrived, its owner can now enjoy the thrill of a brand-new performance car without ever stressing over stone chips or sun damage. If you are still weighing the decision, our guides on [whether PPF is worth it in Dubai](/blog/is-ppf-worth-it-dubai/) and the [full benefits of installing PPF](/blog/benefits-of-ppf-dubai/) break down the numbers.
 
 ## Ready to Protect Your New Car from Day One?
 
