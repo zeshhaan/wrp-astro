@@ -2,9 +2,9 @@
 #
 # NOTE: this file only decorates responses served by the Cloudflare ASSETS
 # binding, i.e. prerendered routes. SSR routes (contact-us) are rendered by the
-# Worker and never see these rules — their Link header comes from
-# src/middleware.ts via AGENT_DISCOVERY_LINK_HEADER in src/consts.ts. Keep the
-# Link value below in sync with that const.
+# Worker and never see these rules — they get the equivalent headers from
+# src/middleware.ts, via AGENT_DISCOVERY_LINK_HEADER / SECURITY_HEADERS_* in
+# src/consts.ts. Keep the values below in sync with those consts.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN

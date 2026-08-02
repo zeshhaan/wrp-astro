@@ -17,6 +17,26 @@ export const AGENT_DISCOVERY_LINK_HEADER =
   '</llms.txt>; rel="describedby"; type="text/plain", ' +
   '</llms-full.txt>; rel="describedby"; type="text/plain"';
 
+/**
+ * Security headers mirrored from `public/_headers`. That file only decorates
+ * responses served by the Cloudflare ASSETS binding, so until the middleware
+ * started applying these the SSR routes (both contact pages and the contact
+ * API) were shipping with none of them. Keep the two lists in sync.
+ *
+ * Split by applicability rather than copied wholesale: `nosniff` matters on
+ * every response, and arguably most on the JSON API, where MIME sniffing is
+ * the actual risk. The other two only govern how a *document* is framed or
+ * scanned, so applying them to an API response would be noise.
+ */
+export const SECURITY_HEADERS_ALL = {
+  'X-Content-Type-Options': 'nosniff',
+} as const;
+
+export const SECURITY_HEADERS_HTML = {
+  'X-Frame-Options': 'SAMEORIGIN',
+  'X-XSS-Protection': '1; mode=block',
+} as const;
+
 export const NAV_PAGES = [
   { name: 'Blog', href: '/blog/' },
   { name: 'Portfolio', href: '/portfolio/' },

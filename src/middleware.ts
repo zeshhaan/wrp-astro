@@ -1,13 +1,19 @@
 import { defineMiddleware } from 'astro:middleware';
-import { AGENT_DISCOVERY_LINK_HEADER } from './consts';
+import {
+  AGENT_DISCOVERY_LINK_HEADER,
+  SECURITY_HEADERS_ALL,
+  SECURITY_HEADERS_HTML,
+} from './consts';
 
 /**
- * Middleware for i18n cookie management and agent-discovery Link headers.
+ * Middleware for i18n cookie management and response headers.
  * - Reads the `wrp-lang` cookie to track language preference.
  * - Sets the cookie when a user visits an Arabic page (so they stay in Arabic on return).
  * - Does NOT redirect — language banner handles the suggestion.
- * - Adds the RFC 8288 `Link` header to SSR HTML responses. Prerendered pages
- *   bypass the Worker entirely, so they get theirs from `public/_headers`.
+ * - Applies the security and RFC 8288 `Link` headers that `public/_headers`
+ *   cannot reach. Prerendered pages are served straight from the Cloudflare
+ *   ASSETS binding and get theirs from that file; SSR routes are rendered by
+ *   the Worker, never touch it, and would otherwise ship bare.
  */
 export const onRequest = defineMiddleware(async ({ request, url, locals }, next) => {
   const cookies = parseCookies(request.headers.get('cookie') || '');
@@ -18,10 +24,22 @@ export const onRequest = defineMiddleware(async ({ request, url, locals }, next)
 
   const response = await next();
 
-  // Advertise the llms files to agents on HTML responses. `append` rather than
-  // `set` so any Link header the platform already attached survives — RFC 8288
-  // allows repeated Link fields and they combine.
-  if (response.headers.get('content-type')?.includes('text/html')) {
+  const isHtml = response.headers.get('content-type')?.includes('text/html') ?? false;
+
+  // `set`, not `append`: these are single-valued, so a repeated field would be
+  // malformed rather than additive.
+  for (const [name, value] of Object.entries(SECURITY_HEADERS_ALL)) {
+    response.headers.set(name, value);
+  }
+
+  if (isHtml) {
+    for (const [name, value] of Object.entries(SECURITY_HEADERS_HTML)) {
+      response.headers.set(name, value);
+    }
+
+    // Advertise the llms files to agents. `append` rather than `set` so any
+    // Link header the platform already attached survives — RFC 8288 allows
+    // repeated Link fields and defines them as combining.
     response.headers.append('Link', AGENT_DISCOVERY_LINK_HEADER);
   }
 
