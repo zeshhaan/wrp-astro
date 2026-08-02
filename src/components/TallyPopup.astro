@@ -36,15 +36,25 @@ const FORM_ID = 'Gxa89p';
 {
   enabled && (
     <script is:inline define:vars={{ FORM_ID, scrollPercent }}>
+      // Evaluated once, at load: Tally reads TallyConfig when embed.js
+      // initialises and never re-reads it, so a resize past the breakpoint
+      // will not change the behaviour for that page view. Matches Tailwind's
+      // `md`, so "phone" here means the same thing it means in the markup.
+      const isPhone = window.matchMedia('(max-width: 767px)').matches;
+
       // Tally reads this global when embed.js initialises, so it has to be set
       // before the script loads.
       window.TallyConfig = {
         formId: FORM_ID,
         popup: {
           width: 420,
-          // No dimmed backdrop. The popup sits alongside the page rather than
-          // blocking it, so it reads as an offer rather than an interruption.
-          overlay: false,
+          // The backdrop is the whole difference between a modal and a card
+          // parked on top of the page. Desktop keeps it off: the popup sits in
+          // the margin beside the content, so it can afford to be an offer
+          // rather than an interruption. A phone has no margin. The popup
+          // already covers about 60% of the screen, and undimmed it reads as
+          // page furniture, so there it becomes a real modal.
+          overlay: isPhone,
           emoji: { text: '👋', animation: 'wave' },
           open: { trigger: 'scroll', scrollPercent: scrollPercent },
           // The form title carries its own generous spacing, which costs about
@@ -62,7 +72,52 @@ const FORM_ID = 'Gxa89p';
           },
         },
       };
+
+      // Tally's backdrop blocks taps but not scrolling. It sets
+      // `overflow: hidden` on <body>, and the scrolling element on this page is
+      // <html>, so the page keeps moving behind the dim. That is the one thing
+      // left between "dimmed popup" and "modal", so lock it here.
+      //
+      // The backdrop is watched rather than hooked into an open/close callback
+      // because Tally exposes no event for a popup it opened itself on scroll.
+      // Presence of `.tally-overlay` in the DOM is the only honest signal, and
+      // it covers every way the popup can close: the X, the backdrop, autoClose
+      // after a submit.
+      if (isPhone) {
+        let scrollLockedAt = 0;
+
+        const setLocked = (locked) => {
+          const root = document.documentElement;
+          if (locked === root.classList.contains('tally-modal-open')) return;
+
+          if (locked) {
+            scrollLockedAt = window.scrollY;
+            root.classList.add('tally-modal-open');
+          } else {
+            root.classList.remove('tally-modal-open');
+            // Chrome keeps scrollTop across an overflow toggle, but Safari has
+            // historically dropped it. Restoring is a no-op when it did not.
+            window.scrollTo(0, scrollLockedAt);
+          }
+        };
+
+        new MutationObserver(() => {
+          setLocked(!!document.querySelector('.tally-overlay'));
+        }).observe(document.body, { childList: true, subtree: true });
+      }
     </script>
+
+    <style is:global>
+      /* Applied to both elements because which one scrolls depends on the
+         browser, and locking only the one that does not is how you ship a
+         modal that still scrolls. `overscroll-behavior` stops the gesture
+         chaining up to the page once the form itself hits its end. */
+      html.tally-modal-open,
+      html.tally-modal-open body {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+    </style>
 
     <script is:inline async src="https://tally.so/widgets/embed.js" />
   )
