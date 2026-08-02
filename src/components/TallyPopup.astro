@@ -1,0 +1,69 @@
+---
+/**
+ * Tally "Get a Quote" popup.
+ *
+ * Deliberately NOT rendered on the contact pages: someone already looking at a
+ * contact form does not need a popup asking them to fill in a contact form.
+ * BaseLayout passes `enabled={false}` there.
+ *
+ * Everything below is Tally's own configuration rather than custom behaviour,
+ * which is the point: the widget already handles triggering and frequency.
+ *
+ *   - `trigger: 'scroll'` fires on engagement rather than on a clock, so the
+ *     popup arrives once someone has chosen to keep reading. Exit intent
+ *     converts better on desktop but Tally cannot do it on mobile, and this
+ *     audience is mostly on a phone.
+ *   - `showOnce` is what stops a visitor who closed the popup being asked again
+ *     on the next page, and the next. Without it the widget only remembers
+ *     submissions, not dismissals.
+ *
+ * The `source_url` hidden field is what lets you see which pages actually
+ * generate enquiries. It is read at runtime rather than rendered server-side so
+ * it stays correct for prerendered pages served from cache.
+ */
+interface Props {
+  /** Set false to suppress the popup on a given page. */
+  enabled?: boolean;
+  /** How far down the page a visitor must scroll before it opens. */
+  scrollPercent?: number;
+}
+
+const { enabled = true, scrollPercent = 50 } = Astro.props;
+
+const FORM_ID = 'Gxa89p';
+---
+
+{
+  enabled && (
+    <script is:inline define:vars={{ FORM_ID, scrollPercent }}>
+      // Tally reads this global when embed.js initialises, so it has to be set
+      // before the script loads.
+      window.TallyConfig = {
+        formId: FORM_ID,
+        popup: {
+          width: 420,
+          // No dimmed backdrop. The popup sits alongside the page rather than
+          // blocking it, so it reads as an offer rather than an interruption.
+          overlay: false,
+          emoji: { text: '👋', animation: 'wave' },
+          open: { trigger: 'scroll', scrollPercent: scrollPercent },
+          // The form title carries its own generous spacing, which costs about
+          // 100px before the first question in a 420px-wide popup. Hidden here
+          // so the popup opens on "What can we do for your car?", while the
+          // standalone form page keeps its title for the link and browser tab.
+          hideTitle: true,
+          // Long enough to read the thank-you note, which carries the phone
+          // number for anyone who does not want to wait for a reply.
+          autoClose: 8000,
+          showOnce: true,
+          doNotShowAfterSubmit: true,
+          hiddenFields: {
+            source_url: window.location.pathname + window.location.search,
+          },
+        },
+      };
+    </script>
+
+    <script is:inline async src="https://tally.so/widgets/embed.js" />
+  )
+}

@@ -5,6 +5,7 @@ import Schema from '../components/Schema.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import LanguageBanner from '../components/LanguageBanner.astro';
+import TallyPopup from '../components/TallyPopup.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
@@ -26,6 +27,11 @@ interface Props {
   tags?: string[];
   articleSection?: string;
   publisher?: string;
+  /**
+   * Quote popup. Defaults to on everywhere except the contact pages, where the
+   * visitor is already looking at a contact form.
+   */
+  showQuotePopup?: boolean;
 }
 
 const {
@@ -43,7 +49,12 @@ const {
   tags = [],
   articleSection,
   publisher = 'WRP Detailing Studio',
+  showQuotePopup,
 } = Astro.props;
+
+// Suppress on the contact pages by default; an explicit prop still wins.
+const isContactPage = Astro.url.pathname.includes('/contact-us');
+const quotePopupEnabled = showQuotePopup ?? !isContactPage;
 
 const locale = getLocale(Astro.currentLocale);
 const dir = getDir(locale);
@@ -225,6 +236,10 @@ const extendMeta = [
     </div>
     <div transition:persist="whatsapp-button">
       <WhatsAppButton />
+    </div>
+    {/* Persisted so a view transition does not re-init the widget and re-arm the timer. */}
+    <div transition:persist="tally-quote-popup">
+      <TallyPopup enabled={quotePopupEnabled} />
     </div>
   </body>
 </html>
