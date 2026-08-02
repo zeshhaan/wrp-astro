@@ -176,6 +176,17 @@ export const POST: APIRoute = async ({ request }) => {
   let service = '';
   const details: string[] = [];
 
+  /**
+   * Every service question the respondent actually answered, with its original
+   * wording and the full option text, in the order it was asked.
+   *
+   * This is deliberately separate from `details` above. The database column
+   * wants one short scannable line; the notification email wants the whole
+   * answer, because that is what the team quotes from. Shortening there would
+   * throw away exactly the detail that decides the price.
+   */
+  const asked: { label: string; value: string }[] = [];
+
   for (const field of (data.fields ?? []) as TallyField[]) {
     const answer = readAnswer(field);
     if (!answer) continue;
@@ -184,10 +195,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (label === CATEGORY_LABEL) {
       category = answer;
+      asked.push({ label: field.label ?? '', value: answer });
     } else if (SERVICE_LABELS.has(label)) {
       service = answer;
+      asked.push({ label: field.label ?? '', value: answer });
     } else if (DETAIL_LABELS.has(label)) {
       details.push(shorten(answer));
+      asked.push({ label: field.label ?? '', value: answer });
     } else {
       const target = LABEL_MAP[label] ?? (field.type ? TYPE_MAP[field.type] : undefined);
       if (target) answers[target] = answer;
@@ -235,7 +249,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Email is best-effort. The lead is already safely in D1, so a mail failure
   // must not trigger a retry that would re-process the submission.
   try {
-    await notify(answers, serviceInterest);
+    await notify(answers, serviceInterest, asked);
   } catch (emailError) {
     console.error('Failed to send quote notification:', emailError);
   }
@@ -243,15 +257,23 @@ export const POST: APIRoute = async ({ request }) => {
   return json({ success: true }, 200);
 };
 
-async function notify(answers: Record<string, string>, serviceInterest: string | null) {
+async function notify(
+  answers: Record<string, string>,
+  serviceInterest: string | null,
+  asked: { label: string; value: string }[],
+) {
   const name = answers.name || 'Someone';
   const vehicle = answers.vehicle || '';
   const subject = vehicle
     ? `Popup quote: ${serviceInterest ?? 'enquiry'} for ${vehicle} from ${name}`
     : `Popup quote: ${serviceInterest ?? 'enquiry'} from ${name}`;
 
+  // Borders live on the cells rather than the table so they survive clients
+  // that drop `border-collapse`.
+  const cell = 'border: 1px solid #e0e0e0; padding: 10px 12px; vertical-align: top;';
   const row = (label: string, value: string) =>
-    `<tr><td><strong>${escapeHtml(label)}</strong></td><td>${value}</td></tr>`;
+    `<tr><td style="${cell} width: 40%; background: #fafafa;"><strong>${escapeHtml(label)}</strong></td>` +
+    `<td style="${cell}">${value}</td></tr>`;
 
   const msg = createMimeMessage();
   msg.setSender({ name: 'WRP Quote Popup', addr: 'noreply@wrpdetailing.ae' });
@@ -290,7 +312,15 @@ async function notify(answers: Record<string, string>, serviceInterest: string |
                     : ''
                 }
                 ${row('Vehicle', escapeHtml(answers.vehicle || 'Not provided'))}
-                ${row('Service', escapeHtml(serviceInterest ?? 'Not specified'))}
+                ${
+                  // One row per question the respondent actually answered, in
+                  // the order asked, with the full option text. Unanswered
+                  // branches are absent rather than listed as empty, so the
+                  // table stays as short as the enquiry actually was.
+                  asked
+                    .map(({ label, value }) => row(label, escapeHtml(value)))
+                    .join('\n                ')
+                }
                 ${row('Came from', escapeHtml(answers.source_url || 'Unknown'))}
               </table>
               ${
