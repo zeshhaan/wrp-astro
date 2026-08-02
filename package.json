@@ -8,7 +8,6 @@
 		"build": "node scripts/generate-llms.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",
-		"deploy": "astro build && wrangler deploy",
 		"cf-typegen": "wrangler types",
 		"reddit:fetch": "node scripts/reddit_fetch.mjs docs/reddit_urls.txt",
 		"check-llms-coverage": "bun scripts/check-llms-coverage.ts",

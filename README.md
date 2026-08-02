@@ -40,8 +40,9 @@ bun build
 # Preview build locally with Wrangler
 bun preview
 
-# Deploy to Cloudflare Workers
-bun deploy
+# Deploy: push to main — Cloudflare Workers Builds deploys automatically.
+# For a staging URL with zero production traffic shift:
+npx wrangler versions upload
 
 # Generate Cloudflare types
 bun cf-typegen
@@ -138,11 +139,13 @@ Located in `src/content/blog/` (for reference/future use):
 
 ## 🚢 Deployment
 
-The site is deployed on Cloudflare Workers:
+The site is deployed on Cloudflare Workers. The repo is git-connected to
+Cloudflare Workers Builds, so **pushing to `main` builds and deploys
+automatically** — there is no manual deploy step.
 
-1. Build: `bun build`
-2. Deploy: `bun deploy`
-3. Preview: `bun preview`
+1. Preview locally: `bun preview`
+2. Staging URL (no production traffic shift): `npx wrangler versions upload`
+3. Ship: merge to `main`
 
 **Live domains**:
 - [wrpdetailing.ae](https://wrpdetailing.ae)

@@ -18,8 +18,9 @@ bun build
 # Preview build locally with Wrangler
 bun preview
 
-# Deploy to Cloudflare Workers
-bun deploy
+# Deploy: push to main — Cloudflare Workers Builds deploys automatically.
+# For a staging URL with zero production traffic shift:
+npx wrangler versions upload
 
 # Generate Cloudflare types
 bun cf-typegen
@@ -170,9 +171,10 @@ const db = env.DB;
 ## Deployment
 
 - **Platform**: Cloudflare Workers
-- **Build Command**: `bun build` (generates `./dist`)
-- **Deploy Command**: `bun deploy` (uses Wrangler)
-- **Wrangler**: Used for local preview and deployment
+- **Trigger**: push to `main`. The repo is git-connected to Cloudflare Workers Builds, which runs the `build` script and deploys automatically. Deploy config lives in the Cloudflare dashboard, not in this repo — there is no CI workflow and no local deploy script.
+- **Build Command**: `bun build` — regenerates `public/llms.txt` + `llms-full.txt`, optimizes images, builds, then verifies llms coverage. Because the generator runs before `astro build` copies `public/` into `dist/`, the llms files that ship are always freshly derived; the copies committed to git are cosmetic.
+- **Staging**: `npx wrangler versions upload` prints a version preview URL with zero production traffic shift — use it to review before merging.
+- **Wrangler**: Used for local preview (`bun preview`) and staging uploads
 - **Database**: D1 database for form submissions
 - **Assets**: Served via Cloudflare's asset binding
 - **Domains**: wrpdetailing.ae, www.wrpdetailing.ae
