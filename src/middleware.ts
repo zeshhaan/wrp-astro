@@ -1,10 +1,13 @@
 import { defineMiddleware } from 'astro:middleware';
+import { AGENT_DISCOVERY_LINK_HEADER } from './consts';
 
 /**
- * Middleware for i18n cookie management.
+ * Middleware for i18n cookie management and agent-discovery Link headers.
  * - Reads the `wrp-lang` cookie to track language preference.
  * - Sets the cookie when a user visits an Arabic page (so they stay in Arabic on return).
  * - Does NOT redirect — language banner handles the suggestion.
+ * - Adds the RFC 8288 `Link` header to SSR HTML responses. Prerendered pages
+ *   bypass the Worker entirely, so they get theirs from `public/_headers`.
  */
 export const onRequest = defineMiddleware(async ({ request, url, locals }, next) => {
   const cookies = parseCookies(request.headers.get('cookie') || '');
@@ -14,6 +17,13 @@ export const onRequest = defineMiddleware(async ({ request, url, locals }, next)
   const isArabicPage = url.pathname.startsWith('/ar/') || url.pathname === '/ar';
 
   const response = await next();
+
+  // Advertise the llms files to agents on HTML responses. `append` rather than
+  // `set` so any Link header the platform already attached survives — RFC 8288
+  // allows repeated Link fields and they combine.
+  if (response.headers.get('content-type')?.includes('text/html')) {
+    response.headers.append('Link', AGENT_DISCOVERY_LINK_HEADER);
+  }
 
   // Set cookie if on Arabic page and no cookie set yet, or if cookie doesn't match
   if (isArabicPage && langCookie !== 'ar') {

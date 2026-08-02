@@ -1,8 +1,15 @@
-# Security headers for all pages
+# Security + agent-discovery headers for all prerendered pages.
+#
+# NOTE: this file only decorates responses served by the Cloudflare ASSETS
+# binding, i.e. prerendered routes. SSR routes (contact-us) are rendered by the
+# Worker and never see these rules — their Link header comes from
+# src/middleware.ts via AGENT_DISCOVERY_LINK_HEADER in src/consts.ts. Keep the
+# Link value below in sync with that const.
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   X-XSS-Protection: 1; mode=block
+  Link: </llms.txt>; rel="describedby"; type="text/plain", </llms-full.txt>; rel="describedby"; type="text/plain"
 
 # Cache static assets aggressively
 /_astro/*
