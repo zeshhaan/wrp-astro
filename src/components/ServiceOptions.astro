@@ -1,0 +1,37 @@
+---
+import type { Locale } from '@/i18n/translations';
+import { t } from '@/i18n/translations';
+import {
+  SERVICE_OPTION_GROUPS,
+  SERVICE_OPTION_OTHER,
+  label,
+} from '@/lib/service-options';
+
+/**
+ * The full set of <option>s for a "Service Interest" select, rendered from the
+ * shared catalogue in src/lib/service-options.ts so all four forms stay in step.
+ * Drop it inside a <select name="service"> and nothing else.
+ */
+interface Props {
+  locale: Locale | string | undefined;
+}
+
+const { locale } = Astro.props;
+---
+
+{/*
+  The placeholder is `value=""` and `disabled` on purpose. The homepage version
+  used to be a plain <option> with neither, which made "Select a service" a
+  perfectly valid answer, and it was duly submitted and stored as one.
+*/}
+<option value="" disabled selected>{t(locale, 'home.contact.selectService')}</option>
+{
+  SERVICE_OPTION_GROUPS.map((group) => (
+    <optgroup label={label(group, locale)}>
+      {group.options.map((option) => (
+        <option value={option.value}>{label(option, locale)}</option>
+      ))}
+    </optgroup>
+  ))
+}
+<option value={SERVICE_OPTION_OTHER.value}>{label(SERVICE_OPTION_OTHER, locale)}</option>

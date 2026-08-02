@@ -8,6 +8,7 @@ import Schema from '../../components/Schema.astro';
 import Icon from '@/components/Icon.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import HeroTestimonials from '../../components/reviews/HeroTestimonials.astro';
+import ServiceOptions from '@/components/ServiceOptions.astro';
 import { getReviewsForService, getDisplayCount } from '@/lib/reviews';
 import { getLocale, localizeUrl, toLocalNum as _toLocalNum } from '@/i18n/utils';
 import { t } from '@/i18n/translations';
@@ -822,14 +823,7 @@ const aboutLines = t(locale, 'home.about.title').split('\n');
                   name="service"
                   class="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 >
-                  <option>{t(locale, 'home.contact.selectService')}</option>
-                  <option>{t(locale, 'home.contact.optionWrap')}</option>
-                  <option>{t(locale, 'home.contact.optionReinforce')}</option>
-                  <option>{t(locale, 'home.contact.optionPolish')}</option>
-                  <option>{t(locale, 'home.contact.optionWindow')}</option>
-                  <option>{t(locale, 'home.contact.optionUpholstery')}</option>
-                  <option>{t(locale, 'home.contact.optionProtect')}</option>
-                  <option>{t(locale, 'home.contact.optionFull')}</option>
+                  <ServiceOptions locale={locale} />
                 </select>
               </div>
               <div>

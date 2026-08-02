@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { buttonVariants } from "@/components/ui/button";
 import Icon from '@/components/Icon.astro';
+import ServiceOptions from '@/components/ServiceOptions.astro';
 import { getLocale, localizeUrl, toLocalNum as _toLocalNum } from '@/i18n/utils';
 import { t } from '@/i18n/translations';
 
@@ -224,13 +225,7 @@ const contactPageSchema = {
                   name="service"
                   class="block w-full rounded-md bg-background px-3.5 py-2 text-base text-foreground outline outline-1 -outline-offset-1 outline-border focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-ring"
                 >
-                  <option value="">{t(locale, 'home.contact.selectService')}</option>
-                  <option value="ceramic-coating">طلاء السيراميك</option>
-                  <option value="paint-protection-film">فيلم حماية الطلاء (PPF)</option>
-                  <option value="polish">تلميع وتصحيح الطلاء</option>
-                  <option value="window-film">تظليل النوافذ وأفلام الزجاج</option>
-                  <option value="premium-car-wash">غسيل سيارات فاخر</option>
-                  <option value="leather-upholstery">العناية بالجلد والتنجيد</option>
+                  <ServiceOptions locale={locale} />
                 </select>
               </div>
             </div>
