@@ -11,6 +11,7 @@
 		"cf-typegen": "wrangler types",
 		"reddit:fetch": "node scripts/reddit_fetch.mjs docs/reddit_urls.txt",
 		"check-llms-coverage": "bun scripts/check-llms-coverage.ts",
+		"indexnow": "node scripts/indexnow.mjs",
 		"reddit:summarize": "node scripts/reddit_summarize.mjs"
 	},
 	"dependencies": {
