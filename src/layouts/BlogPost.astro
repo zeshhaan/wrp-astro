@@ -188,6 +188,22 @@ const breadcrumbs = [
 		 * For opacity variants, use color-mix(in oklch, ...).
 		 */
 
+		/*
+		 * Brand logos opt out of `prose-img:shadow-md`.
+		 *
+		 * That shadow is right for photographs, where it lifts the image off
+		 * the page. It is wrong for flat brand artwork: the mark sits on white
+		 * or transparent pixels, so the shadow traces the file's bounding box
+		 * and draws a floating card around the logo instead of the logo itself.
+		 *
+		 * Scoped to a wrapper class rather than applied per-image so any future
+		 * post with brand marks gets the same treatment without repeating inline
+		 * overrides.
+		 */
+		.blog-content .brand-logos img {
+			box-shadow: none;
+		}
+
 		/* Blockquotes as visual callout boxes */
 		.blog-content blockquote {
 			border-left: 3px solid var(--foreground);

@@ -27,7 +27,7 @@ This guide breaks down how they compare across the factors that actually matter:
   <!-- White panel, not a tinted one: the STEK source PNG has an opaque white
        background while the Avery lockup is transparent, so any tint would show
        a box around one logo and not the other. -->
-  <div style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fff;">
+  <div class="brand-logos" style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fff;">
     <img src="/logos/stek.png" alt="STEK paint protection film brand logo" width="384" height="90" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
     <span style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#999;">vs</span>
     <img src="/logos/avery-dennison.png" alt="Avery Dennison brand logo" width="260" height="85" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
