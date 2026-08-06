@@ -2409,7 +2409,10 @@ This guide breaks down how they compare across the factors that actually matter:
 > **Quick answer:** Both are genuinely top-tier, and on the headline numbers they are close: flagship gloss films from each carry up to a 10-year warranty and both self-heal with heat. The real split is character. STEK is a film specialist with far more finish variety, including matte, color-change, and pearl. Avery Dennison is a materials-science giant offering conservative, industrial-grade clear and matte films. On any given car, installer skill moves the result more than the badge on the box does.
 
 <figure style="margin:2.5rem 0;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fafafa;">
+  <!-- White panel, not a tinted one: the STEK source PNG has an opaque white
+       background while the Avery lockup is transparent, so any tint would show
+       a box around one logo and not the other. -->
+  <div class="brand-logos" style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fff;">
     <img src="/logos/stek.png" alt="STEK paint protection film brand logo" width="384" height="90" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
     <span style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#999;">vs</span>
     <img src="/logos/avery-dennison.png" alt="Avery Dennison brand logo" width="260" height="85" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
@@ -4557,7 +4560,10 @@ URL: https://wrpdetailing.ae/ar/blog/stek-vs-avery-dennison-ppf/
 > **إجابة سريعة:** كلتاهما من الفئة الأولى فعلاً، والأرقام الرئيسية متقاربة: الفيلم اللامع الرائد لدى كلٍّ منهما مشمول بضمان يصل إلى 10 سنوات، وكلاهما يتمتّع بالإصلاح الذاتي بالحرارة. الفارق الحقيقي في الطابع. فـ STEK متخصّصة في الأفلام وتقدّم تنوّعاً أكبر بكثير في اللمسات النهائية، بما فيها المطفي وتغيير اللون واللؤلؤي. أمّا Avery Dennison فهي عملاق في علوم المواد يقدّم أفلاماً شفّافة ومطفية بمواصفات صناعية ونهج محافظ. وفي أي سيارة بعينها، تؤثّر مهارة الفنّي في النتيجة أكثر من اسم العلامة على العلبة.
 
 <figure style="margin:2.5rem 0;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fafafa;">
+  <!-- White panel, not a tinted one: the STEK source PNG has an opaque white
+       background while the Avery lockup is transparent, so any tint would show
+       a box around one logo and not the other. -->
+  <div class="brand-logos" style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fff;">
     <img src="/logos/stek.png" alt="شعار علامة STEK لفيلم حماية الطلاء" width="384" height="90" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
     <span style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#999;">vs</span>
     <img src="/logos/avery-dennison.png" alt="شعار علامة Avery Dennison" width="260" height="85" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
