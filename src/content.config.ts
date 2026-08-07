@@ -13,7 +13,7 @@ const blog = defineCollection({
 			heroImage: z.string().optional(),
 			category: z.enum(['guide', 'news', 'update', 'event', 'listicle']).default('guide'),
 			tags: z.array(z.string()).default([]),
-			author: z.string().default('WRP Detailing Studio'),
+			author: z.string().default('WRP Detailing Solutions'),
 			readingTime: z.number().optional(),
 			featured: z.boolean().default(false),
 			lang: z.enum(['en', 'ar']).default('en'),

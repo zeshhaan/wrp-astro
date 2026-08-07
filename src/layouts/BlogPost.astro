@@ -49,10 +49,10 @@ const blogPostingJsonLd = {
   datePublished: new Date(pubDate).toISOString(),
   ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
-  author: { '@type': 'Organization', name: author || 'WRP Detailing Studio', url: Astro.site?.toString() },
+  author: { '@type': 'Organization', name: author || 'WRP Detailing Solutions', url: Astro.site?.toString() },
   publisher: {
     '@type': 'Organization',
-    name: 'WRP Detailing Studio',
+    name: 'WRP Detailing Solutions',
     url: Astro.site?.toString(),
     logo: { '@type': 'ImageObject', url: new URL('/wrp-logo.svg', Astro.site).toString() },
   },

@@ -56,11 +56,11 @@ const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetaili
 const blogListSchema = {
 	'@context': 'https://schema.org',
 	'@type': 'CollectionPage',
-	name: 'WRP Detailing Studio Blog',
+	name: 'WRP Detailing Solutions Blog',
 	description: 'Expert guides on ceramic coating, paint protection film, and car care in Dubai.',
 	url: `${siteUrl}/blog/`,
 	inLanguage: locale,
-	isPartOf: { '@type': 'WebSite', name: 'WRP Detailing Studio', url: `${siteUrl}/` },
+	isPartOf: { '@type': 'WebSite', name: 'WRP Detailing Solutions', url: `${siteUrl}/` },
 	mainEntity: {
 		'@type': 'ItemList',
 		numberOfItems: allPosts.length,
