@@ -96,6 +96,7 @@ export const translations = {
     'blog.featured': 'Featured',
     'blog.by': 'By',
     'blog.updated': 'Updated',
+    'blog.published': 'Published',
 
     // Portfolio
     'portfolio.title': 'Our Work',
@@ -367,6 +368,7 @@ export const translations = {
     'blog.featured': 'مميز',
     'blog.by': 'بقلم',
     'blog.updated': 'آخر تحديث',
+    'blog.published': 'نُشر',
 
     // Portfolio
     'portfolio.title': 'أعمالنا',

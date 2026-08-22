@@ -13,6 +13,14 @@ const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
 const dateLocale = getDateLocale(locale);
 const monthFormat = Astro.props.monthFormat ?? 'short';
 
+// Frontmatter carries calendar dates (`2026-08-06`), which Astro coerces to UTC
+// midnight. Emitting `...T00:00:00.000Z` would assert a publication *time* the
+// content never claimed, and midnight is exactly the value that lands on the
+// previous day once a crawler shifts it into a negative-offset timezone. Google
+// treats the date alone as sufficient, so emit date-only: it stays byte-for-byte
+// consistent with the visible date no matter who reads it.
+const isoDate = date.toISOString().slice(0, 10);
+
 const gregorianDate = date.toLocaleDateString(dateLocale, {
 	year: 'numeric',
 	month: monthFormat,
@@ -34,7 +42,7 @@ if (locale === 'ar' && Astro.props.showHijri) {
 }
 ---
 
-<time datetime={date.toISOString()}>
+<time datetime={isoDate}>
 	{gregorianDate}
 	{hijriDate && <><span aria-hidden="true"> / </span><span>{hijriDate}</span></>}
 </time>
