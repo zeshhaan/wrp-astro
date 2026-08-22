@@ -36,6 +36,12 @@ const categoryLabels: Record<string, Record<string, string>> = {
 };
 const getCategoryLabel = (cat: string) => categoryLabels[locale]?.[cat] || cat;
 
+// Structured-data dates are emitted date-only, matching the visible date exactly.
+// Frontmatter has no publication *time*, so `toISOString()` would invent one, and
+// a midnight stamp is precisely the value that slips to the previous day when
+// normalised into a negative-offset timezone. Google accepts the date alone.
+const toIsoDate = (d: Date | string) => new Date(d).toISOString().slice(0, 10);
+
 // BlogPosting JSON-LD for Google
 const blogPostingJsonLd = {
   '@context': 'https://schema.org',
@@ -46,8 +52,8 @@ const blogPostingJsonLd = {
   image: ogImageURL,
   inLanguage: locale === 'ar' ? 'ar' : 'en',
   isAccessibleForFree: true,
-  datePublished: new Date(pubDate).toISOString(),
-  ...(updatedDate ? { dateModified: new Date(updatedDate).toISOString() } : {}),
+  datePublished: toIsoDate(pubDate),
+  ...(updatedDate ? { dateModified: toIsoDate(updatedDate) } : {}),
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
   author: { '@type': 'Organization', name: author || 'WRP Detailing Solutions', url: Astro.site?.toString() },
   publisher: {
@@ -77,7 +83,7 @@ const breadcrumbs = [
   ogType="article"
   ogImage={heroImage ? heroImage : '/og-image.jpg'}
   publishedTime={pubDate}
-  modifiedTime={updatedDate || pubDate}
+  modifiedTime={updatedDate}
   author={author}
   tags={tags}
   articleSection={category ? getCategoryLabel(category) : undefined}
@@ -105,7 +111,7 @@ const breadcrumbs = [
 							{getCategoryLabel(category)}
 						</span>
 					)}
-					<FormattedDate date={pubDate} showHijri={locale === 'ar'} />
+					<span>{t(locale, 'blog.published')} <FormattedDate date={pubDate} showHijri={locale === 'ar'} /></span>
 					{readingTime && (
 						<>
 							<span class="text-border">|</span>
