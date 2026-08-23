@@ -14,7 +14,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 9
 featured: true
-heroImage: /window-tint/cadillac-escalade.jpg
+heroImage: /tint-guide-hero.jpg
 relatedServices:
   - window-film
 lang: "ar"
