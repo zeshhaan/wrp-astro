@@ -138,8 +138,11 @@ const extendMeta = [
         },
         image: {
           alt: title,
-          width: 1200,
-          height: 630,
+          // No hardcoded width/height. These were fixed at 1200x630 while real
+          // heroes range from 1200x675 to 1920x1080, so every post advertised
+          // dimensions its image did not have, which is worse than advertising
+          // none: scrapers use them to reserve and crop the card. Omitting lets
+          // each consumer read the actual file.
           type: 'image/jpeg',
         },
       }}

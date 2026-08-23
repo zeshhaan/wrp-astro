@@ -12,7 +12,7 @@ tags:
   - دبي
 author: WRP Detailing Studio
 readingTime: 6
-heroImage: /window-tint/tesla-cybertruck.jpg
+heroImage: /premium-tint-hero.jpg
 relatedServices:
   - window-film
 lang: "ar"
