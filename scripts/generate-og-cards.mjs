@@ -87,8 +87,10 @@ const SITE_HERO = '/stek-vs-avery-hero.jpg';
 
 const logoUri = await whiteLogo();
 
+// No eyebrow here. The title already says Dubai, so a "Dubai, UAE" line above it
+// just repeats itself. The service cards keep theirs because those carry a real
+// category ("Ultimate Protection", "Comfort & Privacy") the title does not.
 await write('site.jpg', await createOgCard({
-  eyebrow: 'Dubai, UAE',
   title: 'Premium Car Detailing Studio in Dubai',
   subtitle: 'Paint protection film, ceramic coating, window tinting and paint correction.',
   imageUrl: await photoDataUri(SITE_HERO),
