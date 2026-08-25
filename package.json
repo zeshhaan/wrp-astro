@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"generate:llms": "node scripts/generate-llms.mjs",
-		"build": "node scripts/generate-llms.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
+		"build": "node scripts/generate-llms.mjs && node scripts/generate-og-cards.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
 		"preview": "astro build && wrangler dev",
 		"astro": "astro",
 		"cf-typegen": "wrangler types",

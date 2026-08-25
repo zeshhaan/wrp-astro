@@ -47,7 +47,7 @@ const {
 
 const baseSlug = service.id.replace(/^ar\//, '');
 // English card on purpose: Satori cannot shape Arabic text (see src/lib/og.ts).
-const ogImage = `/og/service.png?slug=${baseSlug}`;
+const ogImage = `/og/service/${baseSlug}.jpg`;
 
 const hasRealPricing = startingPrice || (packages && packages.length > 0);
 const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;

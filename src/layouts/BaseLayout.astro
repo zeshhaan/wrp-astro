@@ -68,7 +68,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 // photograph because Discover avoids text-heavy thumbnails.
 // No `lang` on the card: Satori cannot shape Arabic, so both locales share the
 // English card rather than one locale getting a broken image (see src/lib/og.ts).
-const resolvedOgImage = ogImage ?? '/og/site.png';
+const resolvedOgImage = ogImage ?? '/og/site.jpg';
 const ogImageURL = new URL(resolvedOgImage, Astro.site).toString();
 // Only the generated cards have dimensions we can state truthfully. Hero photos
 // vary from 1200x675 to 1920x1080, so for those we say nothing rather than
@@ -149,7 +149,7 @@ const extendMeta = [
         image: {
           alt: title,
           ...(isGeneratedCard ? { width: 1200, height: 630 } : {}),
-          type: isGeneratedCard ? 'image/png' : 'image/jpeg',
+          type: 'image/jpeg',
         },
       }}
       twitter={{

@@ -27,7 +27,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 // Mirrors the og:image choice: the hero photo when there is one, otherwise the
 // generated card. Keeps schema.org `image` and og:image pointing at the same
 // file, which is what Discover reads to pick a thumbnail.
-const ogImageURL = new URL(heroImage ?? '/og/site.png', Astro.site).toString();
+const ogImageURL = new URL(heroImage ?? '/og/site.jpg', Astro.site).toString();
 // Base path (no extension) for the optimized hero variants (AVIF/WebP @1920w)
 // that scripts/optimize-images.mjs generates for the luxury-*.jpg heroes.
 const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') : '';

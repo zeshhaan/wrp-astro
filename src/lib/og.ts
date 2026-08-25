@@ -15,9 +15,22 @@
  * photograph and Discover prefers it untouched, so `BaseLayout` passes the hero
  * straight through and only non-article pages get a card.
  *
+ * RENDERED AT BUILD TIME, not per request. The first cut ran these as SSR
+ * routes on the Worker, which worked locally but returned `error code: 1101`
+ * (uncaught exception) on real edge infrastructure after the first hit. The
+ * card had to fetch its own photograph over HTTP, and with
+ * `global_fetch_strictly_public` set that is a self-referential subrequest back
+ * through the same Worker, on top of WASM rasterisation inside a 128MB isolate.
+ *
+ * There are seven cards in total and all of them come from static content, so
+ * rendering on demand bought nothing. Prerendering removes the subrequest, the
+ * per-request CPU, and that entire class of runtime failure. It also sidesteps
+ * `trailingSlash: 'always'`, because a prerendered card is a plain file in
+ * `dist/` rather than a route to be matched.
+ *
  * No custom font is loaded. @cf-wasm/og ships a default sans that renders
- * predictably in workerd; pulling a woff2 over the wire per request would add a
- * failure mode for no visual gain at this size.
+ * predictably; pulling a woff2 over the wire would add a failure mode for no
+ * visual gain at this size.
  *
  * ARABIC IS NOT RENDERED. The underlying shaper throws
  * `lookupType: 5 - substFormat: 3 is not yet supported` on Arabic text: the
@@ -26,7 +39,9 @@
  * rather than a broken one. Service names here are largely Latin anyway
  * ("Paint Protection Film"), so the card still communicates.
  */
-import { ImageResponse } from '@cf-wasm/og/workerd';
+// Node entrypoint, not workerd: these cards are prerendered during `astro build`,
+// which runs in Node. See the note on rendering at build time below.
+import { ImageResponse } from '@cf-wasm/og/node';
 import { createElement, type ReactElement, type ReactNode } from 'react';
 
 const WIDTH = 1200;
@@ -44,7 +59,7 @@ export interface OgCardOptions {
   title: string;
   /** One supporting line. Trimmed hard: the footer band is not a paragraph. */
   subtitle?: string;
-  /** Absolute URL of the background photograph. */
+  /** Background photograph as a data URI, read from disk at build time. */
   imageUrl?: string;
   /** Right-hand detail in the footer, e.g. "From AED 399". */
   badge?: string;
