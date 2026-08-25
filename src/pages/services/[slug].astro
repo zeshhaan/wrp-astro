@@ -61,7 +61,10 @@ const {
   ctaDescription,
 } = service.data;
 
-const ogImage = `/og-image.jpg`; // Use site-wide OG image for now
+// Generated 1200x630 card: the service hero under a scrim, with the name and
+// starting price in the footer. Replaces the old shared /og-image.jpg, which was
+// 1184x864 and identical on every service.
+const ogImage = `/og/service/${service.id}.jpg`;
 
 // Calculate price range for Service schema (only when real prices exist)
 const hasRealPricing = startingPrice || (packages && packages.length > 0);

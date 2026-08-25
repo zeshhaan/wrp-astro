@@ -39,7 +39,7 @@ const {
   description,
   showNav = true,
   showFooter = true,
-  ogImage = '/og-image.jpg',
+  ogImage,
   noindex = false,
   includeSchema = true,
   ogType = 'website',
@@ -63,7 +63,17 @@ const alternateOgLocale = getOgLocale(locale === 'ar' ? 'en' : 'ar');
 const isArabic = locale === 'ar';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImageURL = new URL(ogImage, Astro.site).toString();
+// Pages that do not supply their own image get a generated 1200x630 card.
+// Blog posts DO supply one (their hero photo), and deliberately stay a plain
+// photograph because Discover avoids text-heavy thumbnails.
+// No `lang` on the card: Satori cannot shape Arabic, so both locales share the
+// English card rather than one locale getting a broken image (see src/lib/og.ts).
+const resolvedOgImage = ogImage ?? '/og/site.jpg';
+const ogImageURL = new URL(resolvedOgImage, Astro.site).toString();
+// Only the generated cards have dimensions we can state truthfully. Hero photos
+// vary from 1200x675 to 1920x1080, so for those we say nothing rather than
+// guess: scrapers reserve and crop the card to whatever numbers we publish.
+const isGeneratedCard = resolvedOgImage.startsWith('/og/');
 const alternateUrl = new URL(getAlternateUrl(Astro.url.pathname, locale), Astro.site).toString();
 
 // Build Open Graph Article extension meta when applicable
@@ -138,11 +148,7 @@ const extendMeta = [
         },
         image: {
           alt: title,
-          // No hardcoded width/height. These were fixed at 1200x630 while real
-          // heroes range from 1200x675 to 1920x1080, so every post advertised
-          // dimensions its image did not have, which is worse than advertising
-          // none: scrapers use them to reserve and crop the card. Omitting lets
-          // each consumer read the actual file.
+          ...(isGeneratedCard ? { width: 1200, height: 630 } : {}),
           type: 'image/jpeg',
         },
       }}

@@ -24,7 +24,10 @@ const trustHeading = locale === 'ar' ? 'لماذا يمكن الوثوق بهذ�
 const sourcesHeading = locale === 'ar' ? 'إشارات الموثوقية' : 'Trust signals';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImageURL = heroImage ? new URL(heroImage, Astro.site).toString() : new URL('/og-image.jpg', Astro.site).toString();
+// Mirrors the og:image choice: the hero photo when there is one, otherwise the
+// generated card. Keeps schema.org `image` and og:image pointing at the same
+// file, which is what Discover reads to pick a thumbnail.
+const ogImageURL = new URL(heroImage ?? '/og/site.jpg', Astro.site).toString();
 // Base path (no extension) for the optimized hero variants (AVIF/WebP @1920w)
 // that scripts/optimize-images.mjs generates for the luxury-*.jpg heroes.
 const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') : '';
@@ -81,7 +84,10 @@ const breadcrumbs = [
   title={`${title} | WRP Blog`}
   description={description}
   ogType="article"
-  ogImage={heroImage ? heroImage : '/og-image.jpg'}
+  {/* Hero photo, deliberately not a generated card: Discover avoids
+      text-heavy thumbnails, and the hero is already a clean 16:9 photo.
+      Posts with no hero fall through to the generated site card. */}
+  ogImage={heroImage}
   publishedTime={pubDate}
   modifiedTime={updatedDate}
   author={author}
