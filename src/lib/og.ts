@@ -63,6 +63,8 @@ export interface OgCardOptions {
   imageUrl?: string;
   /** Right-hand detail in the footer, e.g. "From AED 399". */
   badge?: string;
+  /** The real WRP lockup as a data URI, rasterised from public/wrp-logo.svg. */
+  logoUri?: string;
 }
 
 function el(type: string, props: Record<string, unknown>, children?: ReactNode): ReactElement {
@@ -84,31 +86,22 @@ function titleSize(title: string): number {
   return 62;
 }
 
-function wordmark(): ReactElement {
-  return el('div', {
-    style: {
-      display: 'flex',
-      alignItems: 'baseline',
-      color: PAPER,
-      fontSize: 30,
-      fontWeight: 900,
-      letterSpacing: -0.5,
-      fontStyle: 'italic',
-    },
-  }, [
-    el('div', { style: { display: 'flex' } }, 'WRP.'),
-    el('div', {
-      style: {
-        display: 'flex',
-        marginLeft: 14,
-        fontSize: 12,
-        fontStyle: 'normal',
-        fontWeight: 700,
-        letterSpacing: 3.4,
-        color: MUTED,
-      },
-    }, 'WRAP · REINFORCE · PROTECT'),
-  ]);
+/**
+ * The real lockup, rasterised from public/wrp-logo.svg.
+ *
+ * An earlier version set "WRP." and the tagline as live text side by side. That
+ * was wrong twice over: the actual mark stacks the tagline underneath, and the
+ * heavy italic silently fell back to upright because the bundled font has no
+ * italic face. Drawing the shipped artwork removes both failure modes.
+ */
+function wordmark(logoUri: string | undefined): ReactElement | null {
+  if (!logoUri) return null;
+  return el('img', {
+    src: logoUri,
+    width: 169,
+    height: 62,
+    style: { width: 169, height: 62, objectFit: 'contain' },
+  });
 }
 
 function tree(options: OgCardOptions, withImage: boolean): ReactElement {
@@ -144,13 +137,14 @@ function tree(options: OgCardOptions, withImage: boolean): ReactElement {
   }));
 
   // Footer band, left aligned.
-  const footer: ReactNode[] = [wordmark()];
+  const mark = wordmark(options.logoUri);
+  const footer: ReactNode[] = mark ? [mark] : [];
 
   if (options.eyebrow) {
     footer.push(el('div', {
       style: {
         display: 'flex',
-        marginTop: 30,
+        marginTop: 26,
         color: MUTED,
         fontSize: 16,
         fontWeight: 700,
@@ -163,7 +157,7 @@ function tree(options: OgCardOptions, withImage: boolean): ReactElement {
   footer.push(el('div', {
     style: {
       display: 'flex',
-      marginTop: options.eyebrow ? 14 : 26,
+      marginTop: options.eyebrow ? 14 : 22,
       color: PAPER,
       fontSize: titleSize(title),
       fontWeight: 800,
@@ -253,7 +247,7 @@ export async function createOgCard(options: OgCardOptions): Promise<Response> {
     // Text shaping failure: the two attempts above both carry the copy, so a
     // bad glyph takes out both. Drop to wordmark-only rather than return a 500
     // and leave the scraper with no image at all.
-    ['wordmark', { title: '', imageUrl: options.imageUrl }, Boolean(options.imageUrl)],
+    ['wordmark', { title: '', imageUrl: options.imageUrl, logoUri: options.logoUri }, Boolean(options.imageUrl)],
   ];
 
   let lastError: unknown;

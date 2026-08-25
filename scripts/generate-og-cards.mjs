@@ -45,6 +45,21 @@ async function photoDataUri(publicPath) {
   }
 }
 
+/**
+ * The shipped WRP lockup, rasterised white for the dark scrim. The SVG is black
+ * artwork on transparency, so negating the colour channels alone flips it to
+ * white and leaves the alpha intact.
+ */
+async function whiteLogo() {
+  const svg = await readFile(join(PUBLIC, 'wrp-logo.svg'));
+  const png = await sharp(svg, { density: 600 })
+    .resize({ width: 420 })
+    .negate({ alpha: false })
+    .png()
+    .toBuffer();
+  return `data:image/png;base64,${png.toString('base64')}`;
+}
+
 function frontmatter(source) {
   const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   return match ? parseYaml(match[1]) : {};
@@ -70,11 +85,14 @@ async function write(name, response) {
 // the wordmark the card draws: two lockups in one frame reads as a mistake.
 const SITE_HERO = '/stek-vs-avery-hero.jpg';
 
+const logoUri = await whiteLogo();
+
 await write('site.jpg', await createOgCard({
   eyebrow: 'Dubai, UAE',
   title: 'Premium Car Detailing Studio in Dubai',
   subtitle: 'Paint protection film, ceramic coating, window tinting and paint correction.',
   imageUrl: await photoDataUri(SITE_HERO),
+  logoUri,
 }));
 
 // English service entries only. Arabic pages point at these same cards because
@@ -91,5 +109,6 @@ for (const file of files) {
     subtitle: d.heroDescription || d.description,
     imageUrl: d.heroImage ? await photoDataUri(d.heroImage) : undefined,
     badge: d.startingPrice ? `From AED ${d.startingPrice}` : undefined,
+    logoUri,
   }));
 }
