@@ -50,6 +50,7 @@ const {
   packagesHeading,
   packagesSubheading,
   packages,
+  comparison,
   additionalSection,
   processHeading,
   processSubheading,
@@ -69,7 +70,10 @@ const ogImage = `/og/service/${service.id}.jpg`;
 // Calculate price range for Service schema (only when real prices exist)
 const hasRealPricing = startingPrice || (packages && packages.length > 0);
 const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;
-const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
+// Max across both body types: with SUV pricing the top of the range is the SUV
+// rate (325), not the sedan one (300), and Service schema should quote the real
+// ceiling rather than undershoot it.
+const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => Math.max(p.price, p.priceSuv ?? p.price))) : lowPrice! * 4) : undefined;
 const quickAnswerDescription = description ? `${description.charAt(0).toLowerCase()}${description.slice(1).replace(/\.$/, '')}` : title;
 const quickAnswer = service.data.quickAnswer
   ? service.data.quickAnswer
@@ -292,7 +296,10 @@ const breadcrumbs = [
 
         <div class="grid md:grid-cols-3 gap-8">
           {packages.map((pkg) => {
-            const cardClass = `p-8 hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`;
+            // Column layout so the CTA sits on a shared baseline. Feature lists
+            // differ in length between levels, and without this the buttons land
+            // at three different heights across the row.
+            const cardClass = `p-8 flex flex-col h-full hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`;
             return (
           <Card className={cardClass}>
             {pkg.badge && (
@@ -300,11 +307,27 @@ const breadcrumbs = [
                 {pkg.badge}
               </div>
             )}
-            <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
-            <div class="text-3xl font-bold mb-6">
-              AED {pkg.price.toLocaleString()}
-            </div>
-            <ul class="space-y-3 mb-8">
+            <h3 class="font-serif text-2xl font-bold mb-1">{pkg.name}</h3>
+            {pkg.tagline && (
+              <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-4">{pkg.tagline}</p>
+            )}
+            {pkg.priceSuv ? (
+              <div class="flex gap-6 mb-6">
+                <div>
+                  <p class="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground mb-1">Sedan</p>
+                  <p class="text-3xl font-bold leading-none tabular-nums">AED {pkg.price.toLocaleString()}</p>
+                </div>
+                <div class="border-l border-border pl-6">
+                  <p class="text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground mb-1">SUV</p>
+                  <p class="text-3xl font-bold leading-none tabular-nums">AED {pkg.priceSuv.toLocaleString()}</p>
+                </div>
+              </div>
+            ) : (
+              <div class="text-3xl font-bold mb-6 tabular-nums">
+                AED {pkg.price.toLocaleString()}
+              </div>
+            )}
+            <ul class="space-y-3 mb-8 flex-1">
               {pkg.features.map((feature) => (
                 <li class="flex items-start gap-2">
                   <Icon name="lucide:check" class="h-5 w-5 flex-shrink-0 mt-0.5" />
@@ -318,6 +341,61 @@ const breadcrumbs = [
           </Card>
             );
           })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Feature comparison. Cards say what you get; this says what you give up by
+       going a level down, which is the real question when levels differ by
+       process rather than by quantity. -->
+  {comparison && comparison.rows.length > 0 && (
+    <section class="py-24 px-6">
+      <div class="container mx-auto max-w-5xl">
+        <div class="text-center mb-12">
+          <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">{comparison.heading || 'Compare levels'}</h2>
+          {comparison.subheading && (
+            <p class="text-muted-foreground max-w-2xl mx-auto">{comparison.subheading}</p>
+          )}
+        </div>
+        <div class="overflow-x-auto border border-border">
+          <table class="w-full min-w-[640px] border-collapse text-sm">
+            <thead>
+              <tr class="bg-foreground text-background">
+                <th scope="col" class="text-left font-semibold px-5 py-4 w-[44%]">Included</th>
+                {comparison.columns.map((col) => (
+                  <th scope="col" class="text-center font-semibold px-4 py-4 whitespace-nowrap">{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {comparison.rows.map((row, i) => (
+                <tr class={i % 2 === 1 ? 'bg-muted/30' : ''}>
+                  <th scope="row" class="text-left font-normal px-5 py-3 border-t border-border align-top">
+                    <span class="text-foreground">{row.label}</span>
+                    {row.note && <span class="block text-xs text-muted-foreground mt-0.5">{row.note}</span>}
+                  </th>
+                  {row.values.map((value) => (
+                    <td class="px-4 py-3 border-t border-border text-center align-middle">
+                      {value === 'yes' ? (
+                        <>
+                          <Icon name="lucide:check" class="h-4 w-4 inline-block" />
+                          <span class="sr-only">Included</span>
+                        </>
+                      ) : value === 'no' ? (
+                        <>
+                          <span aria-hidden="true" class="text-muted-foreground/50">&mdash;</span>
+                          <span class="sr-only">Not included</span>
+                        </>
+                      ) : (
+                        <span class="text-xs font-medium">{value}</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
