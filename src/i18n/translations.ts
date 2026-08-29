@@ -97,6 +97,10 @@ export const translations = {
     'blog.by': 'By',
     'blog.updated': 'Updated',
     'blog.published': 'Published',
+    'services.sedan': 'Sedan',
+    'services.suv': 'SUV',
+    'services.included': 'Included',
+    'services.notIncluded': 'Not included',
 
     // Portfolio
     'portfolio.title': 'Our Work',
@@ -369,6 +373,10 @@ export const translations = {
     'blog.by': 'بقلم',
     'blog.updated': 'آخر تحديث',
     'blog.published': 'نُشر',
+    'services.sedan': 'سيدان',
+    'services.suv': 'دفع رباعي',
+    'services.included': 'مشمول',
+    'services.notIncluded': 'غير مشمول',
 
     // Portfolio
     'portfolio.title': 'أعمالنا',

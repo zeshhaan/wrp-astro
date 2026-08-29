@@ -40,7 +40,7 @@ const { service } = Astro.props;
 const {
   title, subtitle, description, heroImage,
   mainHeading, mainDescription1, mainDescription2, mainImage, mainImageAlt, iconFeatures,
-  startingPrice, showPackages, packagesHeading, packagesSubheading, packages,
+  startingPrice, showPackages, packagesHeading, packagesSubheading, packages, comparison,
   additionalSection, processHeading, processSubheading, process, benefits, benefitsHeading,
   faqs, ctaHeading, ctaDescription,
 } = service.data;
@@ -51,7 +51,10 @@ const ogImage = `/og/service/${baseSlug}.jpg`;
 
 const hasRealPricing = startingPrice || (packages && packages.length > 0);
 const lowPrice = hasRealPricing ? (startingPrice || Math.min(...packages!.map(p => p.price))) : undefined;
-const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => p.price)) : lowPrice! * 4) : undefined;
+// Max across both body types: with SUV pricing the top of the range is the SUV
+// rate (325), not the sedan one (300), and Service schema should quote the real
+// ceiling rather than undershoot it.
+const highPrice = hasRealPricing ? (packages && packages.length > 0 ? Math.max(...packages.map(p => Math.max(p.price, p.priceSuv ?? p.price))) : lowPrice! * 4) : undefined;
 const quickAnswerDescription = description ? description.replace(/\.$/, '') : title;
 const quickAnswer = `إجابة سريعة: خدمة ${title} في WRP Detailing Studio بدبي مناسبة لمن يريد ${quickAnswerDescription}.${startingPrice ? ` الأسعار تبدأ من ${toLocalNum(startingPrice.toLocaleString())} د.إ.` : ''}`;
 
@@ -128,11 +131,25 @@ const breadcrumbs = [
         </div>
         <div class="grid md:grid-cols-3 gap-8">
           {packages.map((pkg) => (
-            <Card className={`p-8 hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`}>
+            <Card className={`p-8 flex flex-col h-full hover:shadow-2xl transition-shadow duration-300 ${pkg.badge ? 'border-2 border-primary relative' : ''}`}>
               {pkg.badge && <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold">{pkg.badge}</div>}
-              <h3 class="font-serif text-2xl font-bold mb-4">{pkg.name}</h3>
-              <div class="text-3xl font-bold mb-6">{toLocalNum(pkg.price.toLocaleString())} {locale === 'ar' ? 'د.إ' : 'AED'}</div>
-              <ul class="space-y-3 mb-8">
+              <h3 class="font-serif text-2xl font-bold mb-1">{pkg.name}</h3>
+              {pkg.tagline && <p class="text-xs tracking-[0.14em] text-muted-foreground mb-4">{pkg.tagline}</p>}
+              {pkg.priceSuv ? (
+                <div class="flex gap-6 mb-6">
+                  <div>
+                    <p class="text-[0.7rem] tracking-[0.12em] text-muted-foreground mb-1">{t(locale, 'services.sedan')}</p>
+                    <p class="text-3xl font-bold leading-none">{toLocalNum(pkg.price.toLocaleString())} {locale === 'ar' ? 'د.إ' : 'AED'}</p>
+                  </div>
+                  <div class="border-r border-border pr-6">
+                    <p class="text-[0.7rem] tracking-[0.12em] text-muted-foreground mb-1">{t(locale, 'services.suv')}</p>
+                    <p class="text-3xl font-bold leading-none">{toLocalNum(pkg.priceSuv.toLocaleString())} {locale === 'ar' ? 'د.إ' : 'AED'}</p>
+                  </div>
+                </div>
+              ) : (
+                <div class="text-3xl font-bold mb-6">{toLocalNum(pkg.price.toLocaleString())} {locale === 'ar' ? 'د.إ' : 'AED'}</div>
+              )}
+              <ul class="space-y-3 mb-8 flex-1">
                 {pkg.features.map((f) => (
                   <li class="flex items-start gap-2"><Icon name="lucide:check" class="h-5 w-5 flex-shrink-0 mt-0.5" /><span class="text-sm">{f}</span></li>
                 ))}
@@ -140,6 +157,50 @@ const breadcrumbs = [
               <Button variant={pkg.badge ? 'default' : 'outline'} className={`${pkg.badge ? 'w-full' : 'w-full bg-transparent'} cursor-pointer`} data-contact-modal>{t(locale, 'services.bookNow')}</Button>
             </Card>
           ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {comparison && comparison.rows.length > 0 && (
+    <section class="py-24 px-6">
+      <div class="container mx-auto max-w-5xl">
+        <div class="text-center mb-12">
+          <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">{comparison.heading}</h2>
+          {comparison.subheading && <p class="text-muted-foreground max-w-2xl mx-auto">{comparison.subheading}</p>}
+        </div>
+        <div class="overflow-x-auto border border-border">
+          <table class="w-full min-w-[640px] border-collapse text-sm">
+            <thead>
+              <tr class="bg-foreground text-background">
+                <th scope="col" class="text-right font-semibold px-5 py-4 w-[44%]">{t(locale, 'services.included')}</th>
+                {comparison.columns.map((col) => (
+                  <th scope="col" class="text-center font-semibold px-4 py-4 whitespace-nowrap">{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {comparison.rows.map((row, i) => (
+                <tr class={i % 2 === 1 ? 'bg-muted/30' : ''}>
+                  <th scope="row" class="text-right font-normal px-5 py-3 border-t border-border align-top">
+                    <span class="text-foreground">{row.label}</span>
+                    {row.note && <span class="block text-xs text-muted-foreground mt-0.5">{row.note}</span>}
+                  </th>
+                  {row.values.map((value) => (
+                    <td class="px-4 py-3 border-t border-border text-center align-middle">
+                      {value === 'yes' ? (
+                        <><Icon name="lucide:check" class="h-4 w-4 inline-block" /><span class="sr-only">{t(locale, 'services.included')}</span></>
+                      ) : value === 'no' ? (
+                        <><span aria-hidden="true" class="text-muted-foreground/50">&mdash;</span><span class="sr-only">{t(locale, 'services.notIncluded')}</span></>
+                      ) : (
+                        <span class="text-xs font-medium">{value}</span>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

@@ -67,10 +67,30 @@ const services = defineCollection({
 		packagesSubheading: z.string().optional(),
 		packages: z.array(z.object({
 			name: z.string(),
+			// `price` is the headline figure and the one Service schema quotes.
+			// Where a service is priced by body type, it is the sedan rate and
+			// `priceSuv` carries the larger-vehicle rate.
 			price: z.number(),
+			priceSuv: z.number().optional(),
+			tagline: z.string().optional(), // one-line positioning under the name
 			badge: z.string().optional(), // "RECOMMENDED", "BEST VALUE", etc.
 			features: z.array(z.string()),
 		})).optional(),
+		// Side-by-side feature matrix. Package cards say what you get; this says
+		// what you give up by going a level down, which is the question people
+		// actually have when levels differ by process rather than by quantity.
+		// `values` is positional against `columns`; "yes"/"no" render as marks,
+		// anything else renders as its own text.
+		comparison: z.object({
+			heading: z.string().optional(),
+			subheading: z.string().optional(),
+			columns: z.array(z.string()),
+			rows: z.array(z.object({
+				label: z.string(),
+				note: z.string().optional(),
+				values: z.array(z.string()),
+			})),
+		}).optional(),
 		// Additional content section (service-specific)
 		additionalSection: z.object({
 			heading: z.string().optional(), // defaults to "Why Choose WRP" in the layout
