@@ -337,7 +337,7 @@ A: Paint correction is essential before ceramic coating or PPF application. Thes
 > Hand-wash perfection using luxury-grade products and techniques that preserve your vehicle's finish
 URL: https://wrpdetailing.ae/services/premium-car-wash/
 
-Our premium car wash service goes far beyond a simple rinse. We employ professional detailing techniques and luxury-grade products to safely clean every surface of your vehicle without causing damage—a stark contrast to automated car washes that leave swirl marks and scratches.
+Our premium car wash service goes far beyond a simple rinse. We employ professional detailing techniques and luxury-grade products to safely clean every surface of your vehicle without causing damage. That is the opposite of an automated wash, which drags the same brushes over every car and leaves swirl marks behind.
 
 Every wash starts with a pre-rinse and a pre-wash to lift grit before anything touches the paint, then a contact wash with dedicated clean microfiber. Higher levels add chemical decontamination, acidic and neutralising washes, tar and iron removal, before the car is dried and sealed. Protection is ceramic rather than wax: two to three months on Level 2, six months on Level 3.
 
@@ -796,9 +796,9 @@ A: تصحيح الطلاء ضروري قبل تطبيق طلاء السيرام�
 > غسيل يدوي بإتقان باستخدام منتجات وتقنيات فاخرة تحافظ على طلاء سيارتك
 URL: https://wrpdetailing.ae/ar/services/premium-car-wash/
 
-خدمة الغسيل الفاخرة لدينا تتجاوز بكثير مجرد الشطف العادي. نستخدم تقنيات التلميع الاحترافية ومنتجات فاخرة لتنظيف كل سطح في سيارتك بأمان دون التسبب بأي ضرر — على عكس المغاسل الآلية التي تترك علامات دوران وخدوشاً.
+خدمة الغسيل الفاخرة لدينا تتجاوز بكثير مجرد الشطف العادي. نستخدم تقنيات احترافية ومنتجات فاخرة لتنظيف كل سطح في سيارتك بأمان دون التسبب بأي ضرر. وهذا عكس المغاسل الآلية تماماً، التي تمرّر الفرش نفسها على كل سيارة وتترك خلفها خدوشاً دائرية.
 
-كل غسلة تبدأ بشطف مبدئي شامل لإزالة الأوساخ السائبة، يليها غسيل يدوي بطريقة الدلوين باستخدام صابون متعادل الحموضة وقماش مايكروفايبر ناعم. نُنهي بماء مُفلتر خالٍ من البقع، وتجفيف دقيق، وتطبيق ملمّع شمعي فاخر لإعطاء لمعان المعرض — أمر أساسي في بيئة دبي القاسية.
+تبدأ كل غسلة بشطف أولي وغسيل تمهيدي لرفع الحبيبات قبل أن يلامس الطلاء أي شيء، ثم غسيل بالملامسة بميكروفايبر نظيف مخصّص. وتضيف المستويات الأعلى إزالة التلوّث الكيميائي، وغسيلاً حمضياً ومعادِلاً، وإزالة القار والحديد، قبل تجفيف السيارة وحمايتها. والحماية سيراميك لا شمع: من شهرين إلى ثلاثة في المستوى الثاني، وستة أشهر في المستوى الثالث.
 
 Starting from AED 100
 
@@ -829,10 +829,11 @@ Starting from AED 100
 
 ### Process
 
-1. **الشطف المبدئي**: شطف بضغط عالٍ لإزالة الأوساخ والحطام السائب
-2. **تطبيق الرغوة**: نقع مبدئي برغوة متعادلة الحموضة لتفكيك الملوّثات
-3. **الغسيل اليدوي**: طريقة الدلوين مع قفازات مايكروفايبر ناعمة
-4. **الشطف والتجفيف**: شطف بماء مُفلتر خالٍ من البقع وتجفيف آمن
+1. **الشطف الأولي**: شطف بضغط عالٍ لإزالة الأوساخ والحطام السائب
+2. **الغسيل التمهيدي**: نقع بالرغوة لرفع الحبيبات قبل أن يلامس الطلاء أي شيء
+3. **الغسيل بالملامسة**: ميكروفايبر نظيف مخصّص، مع تنظيف الشقوق والألواح
+4. **إزالة التلوّث**: غسيل حمضي ومعادِل وإزالة القار والحديد في المستوى الثالث
+5. **التجفيف والحماية**: تجفيف بالهواء وبالملامسة، ثم سيراميك حامٍ وتجديد للزوائد
 
 ### Frequently Asked Questions
 

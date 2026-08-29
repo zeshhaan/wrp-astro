@@ -37,7 +37,7 @@ export const translations = {
     // WhatsApp / Contact modal
     'contact.getInTouch': 'Get in Touch',
     'contact.teamReady': 'Our team is ready to assist you',
-    'contact.availableNow': 'Available Now \u2014 Quick Response During Business Hours',
+    'contact.availableNow': 'Available Now: Quick Response During Business Hours',
     'contact.from': 'from',
     'contact.googleReviews': 'Google reviews',
     'contact.messageWhatsapp': 'Message on WhatsApp',
@@ -313,7 +313,7 @@ export const translations = {
     // WhatsApp / Contact modal
     'contact.getInTouch': 'تواصل معنا',
     'contact.teamReady': 'فريقنا مستعد لمساعدتك',
-    'contact.availableNow': 'متاح الآن \u2014 رد سريع خلال ساعات العمل',
+    'contact.availableNow': 'متاح الآن: رد سريع خلال ساعات العمل',
     'contact.from': 'من',
     'contact.googleReviews': 'تقييمات جوجل',
     'contact.messageWhatsapp': 'راسلنا على واتساب',
