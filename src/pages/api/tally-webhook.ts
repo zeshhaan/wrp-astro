@@ -137,9 +137,7 @@ async function signatureIsValid(rawBody: string, provided: string | null, secret
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  // Cast through unknown: the secret is set with `wrangler secret put`, so it
-  // is not in the generated Env type.
-  const secret = (env as unknown as Record<string, string | undefined>).TALLY_SIGNING_SECRET;
+  const secret = env.TALLY_SIGNING_SECRET;
 
   // Refuse rather than accept unverified writes. A missing secret is a
   // deployment mistake, not a reason to trust the request.

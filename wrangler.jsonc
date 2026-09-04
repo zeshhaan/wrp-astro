@@ -40,7 +40,12 @@
 	"send_email": [
 		{
 			"name": "EMAIL",
-			"destination_address": "wrp.detailing@gmail.com"
+			// Both are verified destination addresses on this account. A send to
+			// anything not listed here is rejected by the runtime.
+			"allowed_destination_addresses": [
+				"wrp.detailing@gmail.com",
+				"work.zeeshan@gmail.com"
+			]
 		}
 	]
 	/**
