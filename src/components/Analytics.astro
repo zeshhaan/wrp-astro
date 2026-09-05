@@ -1,0 +1,117 @@
+---
+/**
+ * Google Tag Manager container, plus the site's own conversion events.
+ *
+ * GTM is the container and GA4 is configured inside it, rather than dropping a
+ * gtag.js snippet straight into the page. That keeps every future tag (Ads,
+ * Meta, a heatmap) a dashboard change rather than a deploy, which is the whole
+ * point of centralising measurement.
+ *
+ * NOT routed through Partytown. `astro.config.mjs` already forwards
+ * `dataLayer.push` and `gtag`, so the option is there, but GTM in a worker
+ * breaks Preview mode and any tag needing synchronous DOM or cookie access.
+ * Loading it on idle, the way Clarity already loads in BaseLayout, costs almost
+ * nothing on the main thread and stays debuggable.
+ *
+ * The script sits at template top level rather than inside `{enabled && ...}`.
+ * Inside an expression Astro parses element children as JSX, so every object
+ * literal in the body (`{ method: 'contact_modal' }`) becomes a parse error.
+ * It is emitted always and gated at runtime instead, which costs a few bytes
+ * and removes a whole class of breakage.
+ */
+import { GTM_ID, ANALYTICS_HOSTNAMES } from '../consts';
+
+const enabled = Boolean(GTM_ID);
+// Built here rather than inline: a template literal inside `set:html` trips the
+// template compiler the same way.
+const noscriptHtml = `<iframe src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
+---
+
+<script is:inline define:vars={{ GTM_ID, ANALYTICS_HOSTNAMES }}>
+  (function () {
+    // Only the real site reports. Staging previews and localhost run the same
+    // build, so without this every `wrangler versions upload` would quietly put
+    // traffic nobody made into the property.
+    var on = Boolean(GTM_ID) && ANALYTICS_HOSTNAMES.indexOf(window.location.hostname) !== -1;
+
+    window.dataLayer = window.dataLayer || [];
+
+    // Safe to call before GTM loads, and a no-op off production, so callers
+    // never have to guard.
+    window.wrpTrack = function (event, params) {
+      if (!on) return;
+      window.dataLayer.push(Object.assign({ event: event }, params || {}));
+    };
+
+    if (!on) return;
+
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+
+    var loadGtm = function () {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+      document.head.appendChild(s);
+    };
+    // Same idle strategy as Clarity: measurement should never compete with
+    // first paint on a phone.
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadGtm, { timeout: 3000 });
+    } else {
+      setTimeout(loadGtm, 2000);
+    }
+
+    // Conversion events, delegated from document so they survive Astro view
+    // transitions without rebinding.
+    document.addEventListener(
+      'click',
+      function (e) {
+        var t = e.target;
+        if (!t || !t.closest) return;
+
+        // The quote trigger appears on 33 pages, so match the attribute rather
+        // than any one button.
+        if (t.closest('[data-contact-modal]')) {
+          window.wrpTrack('quote_start', { method: 'contact_modal' });
+          return;
+        }
+
+        var link = t.closest('a[href]');
+        if (!link) return;
+        var href = link.getAttribute('href') || '';
+
+        // Phone and WhatsApp go out through dub.sh short links as well as bare
+        // tel: hrefs, so match either shape.
+        if (href.indexOf('tel:') === 0 || href.indexOf('dub.sh/wrp-phone') !== -1) {
+          window.wrpTrack('phone_click', { link_url: href });
+        } else if (href.indexOf('wa.me') !== -1 || href.indexOf('dub.sh/wrp-wa') !== -1) {
+          window.wrpTrack('whatsapp_click', { link_url: href });
+        }
+      },
+      // Capture phase: these links navigate away, and a bubbling listener can
+      // lose the race on a slow connection.
+      true
+    );
+
+    // Tally posts its lifecycle over postMessage as a JSON string. The popup can
+    // open on a scroll trigger with no click of ours to hang an event on, so
+    // this is the only reliable signal for it.
+    window.addEventListener('message', function (e) {
+      if (typeof e.data !== 'string' || e.data.indexOf('Tally.') === -1) return;
+      var msg;
+      try {
+        msg = JSON.parse(e.data);
+      } catch (err) {
+        return;
+      }
+      var formId = msg.payload && msg.payload.formId;
+      if (msg.event === 'Tally.FormLoaded') {
+        window.wrpTrack('quote_start', { method: 'tally_popup', form_id: formId });
+      } else if (msg.event === 'Tally.FormSubmitted') {
+        window.wrpTrack('quote_submit', { method: 'tally_popup', form_id: formId });
+      }
+    });
+  })();
+</script>
+
+{enabled && <noscript set:html={noscriptHtml} />}

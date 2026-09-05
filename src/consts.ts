@@ -44,3 +44,22 @@ export const NAV_PAGES = [
   { name: 'About', href: '/more-about-wrp/' },
   { name: 'Contact', href: '/contact-us/' },
 ];
+
+/**
+ * Google Tag Manager container ID, e.g. "GTM-XXXXXXX".
+ *
+ * GA4 is configured inside the container rather than as a separate gtag.js
+ * snippet, so adding a tag later is a dashboard change and not a deploy.
+ *
+ * Empty means measurement is off: `Analytics.astro` renders nothing at all, so
+ * the integration can sit in the repo inert until the container exists. Set it
+ * here, or override per environment with a `PUBLIC_GTM_ID` build variable.
+ */
+export const GTM_ID: string = import.meta.env.PUBLIC_GTM_ID ?? '';
+
+/**
+ * Hostnames allowed to report. Staging previews and localhost run the same
+ * build, so without this every `wrangler versions upload` would put traffic
+ * nobody made into the property.
+ */
+export const ANALYTICS_HOSTNAMES = ['wrpdetailing.ae', 'www.wrpdetailing.ae'];
