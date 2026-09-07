@@ -79,10 +79,12 @@ be treated as proof that a review, direction request or untracked conversation
 caused the sale.
 
 Apply `migrations/0004_add_lead_attribution.sql` before deploying the matching
-application code. The Tally form must contain hidden fields named `source_url`
-and `attribution`; the widget supplies both when it opens. The popup uses
-`Tally.openPopup()` so Astro client navigation does not freeze the page or
-attribution values from the beginning of the visit.
+application code. The Tally form must contain its conventional `originPage`
+hidden field and a custom field named `attribution`. Tally fills `originPage`
+from the host page automatically; the widget passes only the versioned
+attribution record through `Tally.openPopup()`. The form ID is read from the
+shared `TALLY_FORM_ID` configuration, which can be overridden with
+`PUBLIC_TALLY_FORM_ID` for preview builds.
 
 Clarity can be connected to GA4 for recordings and behavioral investigation.
 Do not use Clarity identifiers to join anonymous sessions to lead PII; D1 is the

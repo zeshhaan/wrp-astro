@@ -32,6 +32,8 @@ const LABEL_MAP: Record<string, string> = {
   'what is your name': 'name',
   'best number to reach you on whatsapp works': 'phone',
   'email if youd rather we write': 'email',
+  'originpage': 'source_url',
+  // Kept while the old Tally hidden field ages out of existing sessions.
   'source_url': 'source_url',
   'attribution': 'attribution',
 };

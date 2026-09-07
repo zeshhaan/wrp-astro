@@ -14,8 +14,11 @@
  *     on the next page, and the next. Without it the widget only remembers
  *     submissions, not dismissals.
  *
- * The `source_url` and `attribution` hidden fields must also exist in Tally.
+ * Tally supplies its conventional `originPage` hidden field automatically. We
+ * only pass the site's versioned `attribution` record as a custom hidden field.
  */
+import { TALLY_FORM_ID } from '../consts';
+
 interface Props {
   /** Set false to suppress the popup on a given page. */
   enabled?: boolean;
@@ -25,12 +28,11 @@ interface Props {
 
 const { enabled = true, scrollPercent = 50 } = Astro.props;
 
-const FORM_ID = 'Gxa89p';
 ---
 
 {
   enabled && (
-    <script is:inline define:vars={{ FORM_ID, scrollPercent }}>
+    <script is:inline define:vars={{ FORM_ID: TALLY_FORM_ID, scrollPercent }}>
       if (!window.__wrpTallyPopup) {
         let removeScrollListener = () => {};
 
@@ -51,6 +53,7 @@ const FORM_ID = 'Gxa89p';
             const tally = await ensureTally();
             const isPhone = window.matchMedia('(max-width: 767px)').matches;
             tally.openPopup(FORM_ID, {
+              key: 'wrp-quote-popup',
               width: 420,
               overlay: isPhone,
               emoji: { text: '👋', animation: 'wave' },
@@ -59,7 +62,6 @@ const FORM_ID = 'Gxa89p';
               showOnce: true,
               doNotShowAfterSubmit: true,
               hiddenFields: {
-                source_url: window.WRPAttribution?.currentPage() || window.location.pathname + window.location.search,
                 attribution: window.WRPAttribution?.serialize() || '',
               },
             });

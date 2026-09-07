@@ -1,8 +1,8 @@
 ---
-import { GTM_ID, ANALYTICS_HOSTNAMES } from '../consts';
+import { GTM_ID, ANALYTICS_HOSTNAMES, TALLY_FORM_ID } from '../consts';
 ---
 
-<script is:inline define:vars={{ GTM_ID, ANALYTICS_HOSTNAMES }}>
+<script is:inline define:vars={{ GTM_ID, ANALYTICS_HOSTNAMES, TALLY_FORM_ID }}>
   (() => {
     if (!/^GTM-[A-Z0-9]+$/.test(GTM_ID) ||
         !ANALYTICS_HOSTNAMES.includes(window.location.hostname) ||
@@ -38,7 +38,7 @@ import { GTM_ID, ANALYTICS_HOSTNAMES } from '../consts';
       let message;
       try { message = JSON.parse(event.data); } catch { return; }
       if (message?.event !== 'Tally.FormSubmitted' ||
-          message.payload?.formId !== 'Gxa89p') return;
+          message.payload?.formId !== TALLY_FORM_ID) return;
       track('generate_lead', 'tally_popup');
     });
   })();
