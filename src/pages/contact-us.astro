@@ -133,6 +133,8 @@ const contactPageSchema = {
 
             try {
               const formData = new FormData(form);
+              const attribution = window.WRPAttribution?.serialize?.();
+              if (attribution) formData.set('attribution', attribution);
               const response = await fetch('/api/contact', {
                 method: 'POST',
                 body: formData

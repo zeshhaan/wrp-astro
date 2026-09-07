@@ -50,3 +50,7 @@ export const NAV_PAGES = [
 // configuration that is invisible to this repository.
 export const GTM_ID: string = import.meta.env.PUBLIC_GTM_ID || 'GTM-WCQ2VMWM';
 export const ANALYTICS_HOSTNAMES = ['wrpdetailing.ae', 'www.wrpdetailing.ae'];
+
+// Tally requires a form ID to open a popup. Keep the production default in one
+// place and allow preview builds to target another form without editing code.
+export const TALLY_FORM_ID: string = import.meta.env.PUBLIC_TALLY_FORM_ID || 'Gxa89p';

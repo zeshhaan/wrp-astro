@@ -7,6 +7,7 @@ import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import LanguageBanner from '../components/LanguageBanner.astro';
 import TallyPopup from '../components/TallyPopup.astro';
 import Analytics from '../components/Analytics.astro';
+import Attribution from '../components/Attribution.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
@@ -192,6 +193,7 @@ const extendMeta = [
 
     <!-- Alpine.js loaded via @astrojs/alpinejs integration (no CDN needed) -->
 
+    <Attribution />
     <Analytics />
 
     <!-- Microsoft Clarity (deferred) -->
@@ -249,9 +251,6 @@ const extendMeta = [
     <div transition:persist="whatsapp-button">
       <WhatsAppButton />
     </div>
-    {/* Persisted so a view transition does not re-init the widget and re-arm the timer. */}
-    <div transition:persist="tally-quote-popup">
-      <TallyPopup enabled={quotePopupEnabled} />
-    </div>
+    <TallyPopup enabled={quotePopupEnabled} />
   </body>
 </html>
