@@ -6,6 +6,7 @@ import WhatsAppButton from '../components/WhatsAppButton.astro';
 import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import LanguageBanner from '../components/LanguageBanner.astro';
 import TallyPopup from '../components/TallyPopup.astro';
+import Analytics from '../components/Analytics.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
 import { Font } from 'astro:assets';
@@ -190,6 +191,8 @@ const extendMeta = [
     )}
 
     <!-- Alpine.js loaded via @astrojs/alpinejs integration (no CDN needed) -->
+
+    <Analytics />
 
     <!-- Microsoft Clarity (deferred) -->
     <script type="text/javascript">

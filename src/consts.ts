@@ -44,3 +44,9 @@ export const NAV_PAGES = [
   { name: 'About', href: '/more-about-wrp/' },
   { name: 'Contact', href: '/contact-us/' },
 ];
+
+// The container ID is public. A build variable can override it for a deliberate
+// container migration without making production analytics depend on dashboard
+// configuration that is invisible to this repository.
+export const GTM_ID: string = import.meta.env.PUBLIC_GTM_ID || 'GTM-WCQ2VMWM';
+export const ANALYTICS_HOSTNAMES = ['wrpdetailing.ae', 'www.wrpdetailing.ae'];

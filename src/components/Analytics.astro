@@ -1,0 +1,45 @@
+---
+import { GTM_ID, ANALYTICS_HOSTNAMES } from '../consts';
+---
+
+<script is:inline define:vars={{ GTM_ID, ANALYTICS_HOSTNAMES }}>
+  (() => {
+    if (!/^GTM-[A-Z0-9]+$/.test(GTM_ID) ||
+        !ANALYTICS_HOSTNAMES.includes(window.location.hostname) ||
+        window.__wrpAnalyticsLoaded) return;
+    window.__wrpAnalyticsLoaded = true;
+    window.dataLayer = window.dataLayer || [];
+
+    const track = (event, method) => window.dataLayer.push({ event, method });
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+    document.head.appendChild(script);
+
+    // A contact click is intent, not a completed enquiry or booking.
+    document.addEventListener('click', (event) => {
+      const link = event.target?.closest?.('a[href]');
+      if (!link) return;
+      const url = new URL(link.href);
+      const shortLink = url.hostname === 'dub.sh' ? url.pathname : '';
+      if (url.protocol === 'tel:' || shortLink === '/wrp-phone') {
+        track('phone_click', 'phone');
+      } else if (url.hostname === 'wa.me' || shortLink === '/wrp-wa') {
+        track('whatsapp_click', 'whatsapp');
+      }
+    }, true);
+
+    // Emitted only after the contact API confirms success. No form values sent.
+    document.addEventListener('wrp:lead', () => track('generate_lead', 'contact_form'));
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'https://tally.so' || typeof event.data !== 'string') return;
+      let message;
+      try { message = JSON.parse(event.data); } catch { return; }
+      if (message?.event !== 'Tally.FormSubmitted' ||
+          message.payload?.formId !== 'Gxa89p') return;
+      track('generate_lead', 'tally_popup');
+    });
+  })();
+</script>

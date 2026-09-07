@@ -141,9 +141,10 @@ const contactPageSchema = {
 
               const result = await response.json();
 
-              if (result.success) {
+              if (response.ok && result.success) {
                 this.success = true;
                 form.reset();
+                document.dispatchEvent(new Event('wrp:lead'));
               } else {
                 this.error = result.error || defaultError;
               }
