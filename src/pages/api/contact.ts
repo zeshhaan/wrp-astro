@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
+import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
 
 export const POST: APIRoute = async ({ request }) => {
   let locale = 'en';
@@ -153,7 +154,20 @@ export const POST: APIRoute = async ({ request }) => {
         msg.asRaw()
       );
 
-      await env.EMAIL.send(emailMessage);
+      // Email Workers accepts one envelope recipient per EmailMessage. Reusing
+      // the MIME body preserves BCC semantics because its To header still names
+      // the client. The helper always finishes this send before attempting the
+      // optional agency copy, and contains any copy-only failure.
+      await deliverClientLeadWithAgencyCopy({
+        agencyRecipient: env.AGENCY_COPY_EMAIL,
+        sendClient: () => env.EMAIL.send(emailMessage),
+        sendAgency: (recipient) =>
+          env.EMAIL.send(
+            new EmailMessage('noreply@wrpdetailing.ae', recipient, msg.asRaw())
+          ),
+        onAgencyError: (error) =>
+          console.error('Agency copy failed (client lead email was still sent):', error),
+      });
     } catch (emailError) {
       // Log email error but don't fail the request
       console.error('Failed to send email notification:', emailError);
