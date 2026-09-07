@@ -2,7 +2,6 @@
 
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
-import partytown from '@astrojs/partytown';
 import alpinejs from '@astrojs/alpinejs';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, fontProviders } from 'astro/config';
@@ -73,11 +72,6 @@ export default defineConfig({
           en: 'en-AE',
           ar: 'ar-AE',
         },
-      },
-    }),
-    partytown({
-      config: {
-        forward: ['dataLayer.push', 'gtag'],
       },
     }),
     alpinejs(),
