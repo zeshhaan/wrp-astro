@@ -1,0 +1,105 @@
+---
+/**
+ * Keeps acquisition context long enough to attach it to an operational lead.
+ * GA4 remains responsible for analytics attribution; this record exists so a
+ * later booking can still be matched to the source captured by the website.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const STORAGE_KEY = 'wrp:attribution:v1';
+    const MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+    const MAX_VALUE_LENGTH = 200;
+
+    const clean = (value, max = MAX_VALUE_LENGTH) => {
+      if (typeof value !== 'string') return undefined;
+      const trimmed = value.trim();
+      return trimmed ? trimmed.slice(0, max) : undefined;
+    };
+
+    const externalReferrer = () => {
+      try {
+        if (!document.referrer) return undefined;
+        const referrer = new URL(document.referrer);
+        const normalizeHost = (hostname) => hostname.toLowerCase().replace(/^www\./, '');
+        if (normalizeHost(referrer.hostname) === normalizeHost(window.location.hostname)) return undefined;
+        return clean(referrer.hostname.toLowerCase(), 253);
+      } catch {
+        return undefined;
+      }
+    };
+
+    const sourceFromReferrer = (hostname) => {
+      if (!hostname) return { source: 'direct', medium: 'none' };
+      if (/(^|\.)google\.[a-z.]+$/.test(hostname)) return { source: 'google', medium: 'organic' };
+      if (hostname === 'bing.com' || hostname.endsWith('.bing.com')) {
+        return { source: 'bing', medium: 'organic' };
+      }
+      if (hostname === 'search.yahoo.com') return { source: 'yahoo', medium: 'organic' };
+      if (hostname === 'duckduckgo.com') return { source: 'duckduckgo', medium: 'organic' };
+      return { source: hostname, medium: 'referral' };
+    };
+
+    const captureTouch = () => {
+      const params = new URLSearchParams(window.location.search);
+      const referrer = externalReferrer();
+      const utmSource = clean(params.get('utm_source'));
+      const utmMedium = clean(params.get('utm_medium'));
+      let classified = sourceFromReferrer(referrer);
+
+      if (utmSource) {
+        classified = { source: utmSource.toLowerCase(), medium: (utmMedium || 'campaign').toLowerCase() };
+      } else if (params.has('gclid') || params.has('gbraid') || params.has('wbraid')) {
+        classified = { source: 'google', medium: 'cpc' };
+      } else if (params.has('msclkid')) {
+        classified = { source: 'bing', medium: 'cpc' };
+      }
+
+      return {
+        source: classified.source,
+        medium: classified.medium,
+        campaign: clean(params.get('utm_campaign')),
+        content: clean(params.get('utm_content')),
+        term: clean(params.get('utm_term')),
+        landing_page: window.location.pathname.slice(0, 500),
+        referrer,
+        captured_at: new Date().toISOString(),
+      };
+    };
+
+    const isRecord = (value) => value && typeof value === 'object' && !Array.isArray(value);
+    const readStored = () => {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!isRecord(parsed) || parsed.version !== 1 || !isRecord(parsed.first)) return undefined;
+        const capturedAt = Date.parse(parsed.first.captured_at);
+        if (!Number.isFinite(capturedAt) || Date.now() - capturedAt > MAX_AGE_MS) return undefined;
+        return parsed;
+      } catch {
+        return undefined;
+      }
+    };
+
+    const touch = captureTouch();
+    const existing = readStored();
+    const isDirect = touch.source === 'direct' && touch.medium === 'none';
+    const attribution = existing || { version: 1, first: touch, last: touch };
+
+    // Direct returns do not erase the latest attributable campaign/referral.
+    if (existing && !isDirect) attribution.last = touch;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(attribution));
+    } catch {
+      // Storage can be unavailable in private/restricted contexts. The current
+      // touch is still available for a lead submitted during this page view.
+    }
+
+    window.WRPAttribution = {
+      read: () => attribution,
+      serialize: () => JSON.stringify(attribution),
+      currentPage: () => window.location.pathname + window.location.search,
+    };
+  })();
+</script>

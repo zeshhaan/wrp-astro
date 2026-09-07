@@ -3,6 +3,7 @@ import { env } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
 import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
+import { formatAttributionTouch, parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
 
 export const POST: APIRoute = async ({ request }) => {
   let locale = 'en';
@@ -15,6 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
     const vehicle = formData.get('vehicle')?.toString();
     const service = formData.get('service')?.toString();
     const message = formData.get('message')?.toString();
+    const attribution = parseLeadAttribution(formData.get('attribution'));
     locale = formData.get('locale')?.toString() === 'ar' ? 'ar' : 'en';
 
     const isArabic = locale === 'ar';
@@ -56,9 +58,18 @@ export const POST: APIRoute = async ({ request }) => {
     const db = env.DB;
 
     await db.prepare(`
-      INSERT INTO contact_submissions (name, email, phone, vehicle, service_interest, message)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).bind(name, email, phone || null, vehicle || null, service || null, message).run();
+      INSERT INTO contact_submissions
+        (name, email, phone, vehicle, service_interest, message, attribution_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      name,
+      email,
+      phone || null,
+      vehicle || null,
+      service || null,
+      message,
+      serializeLeadAttribution(attribution),
+    ).run();
 
     // Send email notification
     try {
@@ -133,6 +144,15 @@ export const POST: APIRoute = async ({ request }) => {
                     <td><strong>Service Interest</strong></td>
                     <td>${service || 'Not specified'}</td>
                   </tr>
+                  ${attribution ? `
+                  <tr>
+                    <td><strong>First touch</strong></td>
+                    <td>${escapeHtml(formatAttributionTouch(attribution.first))}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Latest source</strong></td>
+                    <td>${escapeHtml(formatAttributionTouch(attribution.last))}</td>
+                  </tr>` : ''}
                 </table>
                 <div class="message-box">
                   <strong>Message:</strong><br><br>
@@ -202,3 +222,12 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 };
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

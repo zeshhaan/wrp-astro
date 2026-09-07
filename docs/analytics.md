@@ -50,7 +50,9 @@ https://wrpdetailing.ae/?utm_source=google&utm_medium=organic&utm_campaign=googl
 If adding a separate appointment link to the contact page, use the same source,
 medium and campaign with utm_content=appointment. Do not add UTMs to internal
 website links. GA4 already understands campaign parameters; no custom attribution
-cookie, source guessing or storage layer is needed for source-to-enquiry reports.
+cookie or source guessing is needed for GA4 source-to-enquiry reports. Do not
+push the preserved operational fields back into GA4 as campaign parameters;
+that can replace Analytics' own source classification.
 
 Link WRP's Business Profile under GA4 Admin > Product links > Google Business
 Profile links to see aggregate profile metrics. A call count is a call-button
@@ -59,11 +61,36 @@ a supported booking provider; adding GA4 does not create a booking integration.
 
 Start with acquisition by campaign, landing page and generate_lead, with phone
 and WhatsApp clicks as separate intent measures. Actual booked jobs still need
-to be matched to the existing lead in a booking/customer record. The site does
-not yet carry campaign attribution into every D1 lead or connect leads to jobs.
-If that becomes the next requirement, preserve source with the lead and its
-booking record instead of claiming anonymous GA4 visitors are known customers.
-Even that establishes a tracked route, not whether reading reviews caused a sale.
+to be matched to the existing lead in a booking/customer record.
+
+The site preserves a versioned attribution record for 90 days in first-party
+browser storage and attaches it to both website contact submissions and Tally
+quote requests. It contains:
+
+- first touch: the first landing source, medium, campaign, page and external
+  referring hostname;
+- latest source: the most recent campaign or external referral before the lead;
+- no names, contact details, full referring URLs or advertising click IDs.
+
+Direct returns do not erase a known latest source. Values are parsed, bounded and
+normalized again at the API boundary before D1 storage. This record belongs to
+the operational lead and can later be copied or linked to a booking. It must not
+be treated as proof that a review, direction request or untracked conversation
+caused the sale.
+
+Apply `migrations/0004_add_lead_attribution.sql` before deploying the matching
+application code. The Tally form must contain hidden fields named `source_url`
+and `attribution`; the widget supplies both when it opens. The popup uses
+`Tally.openPopup()` so Astro client navigation does not freeze the page or
+attribution values from the beginning of the visit.
+
+Clarity can be connected to GA4 for recordings and behavioral investigation.
+Do not use Clarity identifiers to join anonymous sessions to lead PII; D1 is the
+durable lead record and GA4/Clarity remain aggregate analytics tools.
+
+Astro 6.4.8 supports the lifecycle and inline-script behavior used here. Astro 7
+is available, but its Vite 8/compiler and official-integration changes make it a
+separate framework upgrade rather than a dependency of attribution preservation.
 
 ## References
 
@@ -72,3 +99,9 @@ Even that establishes a tracked route, not whether reading reviews caused a sale
 - [Business Profile performance metric definitions](https://support.google.com/business/answer/9918094)
 - [Single-page application measurement](https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications)
 - [Tally event contract](https://developers.tally.so/widgets/events)
+- [Tally popup API](https://developers.tally.so/widgets/popups)
+- [GA4 traffic-source scopes](https://support.google.com/analytics/answer/11080067)
+- [GTM data-layer persistence](https://developers.google.com/tag-platform/tag-manager/datalayer)
+- [Clarity client API](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-api)
+- [Astro client-router script behavior](https://docs.astro.build/en/guides/view-transitions/#script-behavior-with-view-transitions)
+- [Astro 7 upgrade guide](https://docs.astro.build/en/guides/upgrade-to/v7/)

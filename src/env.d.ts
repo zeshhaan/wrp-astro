@@ -1,5 +1,17 @@
 /// <reference types="astro/client" />
 
+interface Window {
+  WRPAttribution?: {
+    read: () => unknown;
+    serialize: () => string;
+    currentPage: () => string;
+  };
+  __wrpTallyPopup?: { armForPage: () => void };
+  Tally?: {
+    openPopup: (formId: string, options: Record<string, unknown>) => void;
+  };
+}
+
 declare namespace Cloudflare {
   interface Env {
     /** Optional reporting copy for the standard contact-form notification. */

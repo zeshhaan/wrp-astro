@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
+import { formatAttributionTouch, parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
 
 /**
  * Receives submissions from the Tally "Get a Quote" popup and lands them in D1
@@ -32,6 +33,7 @@ const LABEL_MAP: Record<string, string> = {
   'best number to reach you on whatsapp works': 'phone',
   'email if youd rather we write': 'email',
   'source_url': 'source_url',
+  'attribution': 'attribution',
 };
 
 /** The opening question. Every respondent answers exactly this one. */
@@ -211,12 +213,13 @@ export const POST: APIRoute = async ({ request }) => {
   // were asked — so a lead reads "Paint Protection Film (PPF) · Full Body ·
   // Gloss" rather than just "Paint Protection & Coatings".
   const serviceInterest = [service || category, ...details].filter(Boolean).join(' · ') || null;
+  const attribution = parseLeadAttribution(answers.attribution);
 
   try {
     const inserted = await env.DB.prepare(
       `INSERT INTO quote_requests
-         (tally_submission_id, name, phone, email, vehicle, service_interest, message, source_url, raw_payload)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         (tally_submission_id, name, phone, email, vehicle, service_interest, message, source_url, attribution_json, raw_payload)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT (tally_submission_id) DO NOTHING`,
     )
       .bind(
@@ -228,6 +231,7 @@ export const POST: APIRoute = async ({ request }) => {
         serviceInterest,
         answers.message || null,
         answers.source_url || null,
+        serializeLeadAttribution(attribution),
         rawBody,
       )
       .run();
@@ -247,7 +251,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Email is best-effort. The lead is already safely in D1, so a mail failure
   // must not trigger a retry that would re-process the submission.
   try {
-    await notify(answers, serviceInterest, asked);
+    await notify(answers, serviceInterest, asked, attribution);
   } catch (emailError) {
     console.error('Failed to send quote notification:', emailError);
   }
@@ -259,6 +263,7 @@ async function notify(
   answers: Record<string, string>,
   serviceInterest: string | null,
   asked: { label: string; value: string }[],
+  attribution: ReturnType<typeof parseLeadAttribution>,
 ) {
   const name = answers.name || 'Someone';
   const vehicle = answers.vehicle || '';
@@ -320,6 +325,8 @@ async function notify(
                     .join('\n                ')
                 }
                 ${row('Came from', escapeHtml(answers.source_url || 'Unknown'))}
+                ${attribution ? row('First touch', escapeHtml(formatAttributionTouch(attribution.first))) : ''}
+                ${attribution ? row('Latest source', escapeHtml(formatAttributionTouch(attribution.last))) : ''}
               </table>
               ${
                 answers.message

@@ -6,20 +6,15 @@
  * contact form does not need a popup asking them to fill in a contact form.
  * BaseLayout passes `enabled={false}` there.
  *
- * Everything below is Tally's own configuration rather than custom behaviour,
- * which is the point: the widget already handles triggering and frequency.
- *
- *   - `trigger: 'scroll'` fires on engagement rather than on a clock, so the
- *     popup arrives once someone has chosen to keep reading. Exit intent
- *     converts better on desktop but Tally cannot do it on mobile, and this
- *     audience is mostly on a phone.
+ * The small scroll controller calls Tally.openPopup() at the moment the form is
+ * needed. This matters with Astro client navigation: it lets hidden fields read
+ * the current page and attribution at open time instead of freezing the values
+ * from the first page in the visit.
  *   - `showOnce` is what stops a visitor who closed the popup being asked again
  *     on the next page, and the next. Without it the widget only remembers
  *     submissions, not dismissals.
  *
- * The `source_url` hidden field is what lets you see which pages actually
- * generate enquiries. It is read at runtime rather than rendered server-side so
- * it stays correct for prerendered pages served from cache.
+ * The `source_url` and `attribution` hidden fields must also exist in Tally.
  */
 interface Props {
   /** Set false to suppress the popup on a given page. */
@@ -36,42 +31,66 @@ const FORM_ID = 'Gxa89p';
 {
   enabled && (
     <script is:inline define:vars={{ FORM_ID, scrollPercent }}>
-      // Evaluated once, at load: Tally reads TallyConfig when embed.js
-      // initialises and never re-reads it, so a resize past the breakpoint
-      // will not change the behaviour for that page view. Matches Tailwind's
-      // `md`, so "phone" here means the same thing it means in the markup.
-      const isPhone = window.matchMedia('(max-width: 767px)').matches;
+      if (!window.__wrpTallyPopup) {
+        let removeScrollListener = () => {};
 
-      // Tally reads this global when embed.js initialises, so it has to be set
-      // before the script loads.
-      window.TallyConfig = {
-        formId: FORM_ID,
-        popup: {
-          width: 420,
-          // The backdrop is the whole difference between a modal and a card
-          // parked on top of the page. Desktop keeps it off: the popup sits in
-          // the margin beside the content, so it can afford to be an offer
-          // rather than an interruption. A phone has no margin. The popup
-          // already covers about 60% of the screen, and undimmed it reads as
-          // page furniture, so there it becomes a real modal.
-          overlay: isPhone,
-          emoji: { text: '👋', animation: 'wave' },
-          open: { trigger: 'scroll', scrollPercent: scrollPercent },
-          // The form title carries its own generous spacing, which costs about
-          // 100px before the first question in a 420px-wide popup. Hidden here
-          // so the popup opens on "What can we do for your car?", while the
-          // standalone form page keeps its title for the link and browser tab.
-          hideTitle: true,
-          // Long enough to read the thank-you note, which carries the phone
-          // number for anyone who does not want to wait for a reply.
-          autoClose: 8000,
-          showOnce: true,
-          doNotShowAfterSubmit: true,
-          hiddenFields: {
-            source_url: window.location.pathname + window.location.search,
-          },
-        },
-      };
+        const ensureTally = () => new Promise((resolve, reject) => {
+          if (window.Tally) return resolve(window.Tally);
+          const existing = document.querySelector('script[src="https://tally.so/widgets/embed.js"]');
+          const script = existing || Object.assign(document.createElement('script'), {
+            src: 'https://tally.so/widgets/embed.js',
+            async: true,
+          });
+          script.addEventListener('load', () => resolve(window.Tally), { once: true });
+          script.addEventListener('error', reject, { once: true });
+          if (!existing) document.head.appendChild(script);
+        });
+
+        const openPopup = async () => {
+          try {
+            const tally = await ensureTally();
+            const isPhone = window.matchMedia('(max-width: 767px)').matches;
+            tally.openPopup(FORM_ID, {
+              width: 420,
+              overlay: isPhone,
+              emoji: { text: '👋', animation: 'wave' },
+              hideTitle: true,
+              autoClose: 8000,
+              showOnce: true,
+              doNotShowAfterSubmit: true,
+              hiddenFields: {
+                source_url: window.WRPAttribution?.currentPage() || window.location.pathname + window.location.search,
+                attribution: window.WRPAttribution?.serialize() || '',
+              },
+            });
+          } catch {
+            // The quote links elsewhere on the page remain available when the
+            // third-party widget cannot load.
+          }
+        };
+
+        const armForPage = () => {
+          removeScrollListener();
+          removeScrollListener = () => {};
+          if (window.location.pathname.includes('/contact-us')) return;
+
+          let armed = true;
+          const onScroll = () => {
+            const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+            if (!armed || scrollable <= 0 || (window.scrollY / scrollable) * 100 < scrollPercent) return;
+            armed = false;
+            removeScrollListener();
+            void openPopup();
+          };
+          window.addEventListener('scroll', onScroll, { passive: true });
+          removeScrollListener = () => window.removeEventListener('scroll', onScroll);
+          onScroll();
+        };
+
+        window.__wrpTallyPopup = { armForPage };
+        document.addEventListener('astro:page-load', armForPage);
+        void ensureTally().catch(() => {});
+        armForPage();
 
       // Tally's backdrop blocks taps but not scrolling. It sets
       // `overflow: hidden` on <body>, and the scrolling element on this page is
@@ -83,7 +102,6 @@ const FORM_ID = 'Gxa89p';
       // Presence of `.tally-overlay` in the DOM is the only honest signal, and
       // it covers every way the popup can close: the X, the backdrop, autoClose
       // after a submit.
-      if (isPhone) {
         let scrollLockedAt = 0;
 
         const setLocked = (locked) => {
@@ -118,7 +136,5 @@ const FORM_ID = 'Gxa89p';
         overscroll-behavior: none;
       }
     </style>
-
-    <script is:inline async src="https://tally.so/widgets/embed.js" />
   )
 }
