@@ -4,6 +4,11 @@ import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
 import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
 import { formatAttributionTouch, parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
+import {
+  createLeadOutcomeLinks,
+  leadOutcomeSigningSecretIsValid,
+  renderLeadOutcomeActions,
+} from '@/lib/lead-outcome';
 
 export const POST: APIRoute = async ({ request }) => {
   let locale = 'en';
@@ -57,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Save to D1 database
     const db = env.DB;
 
-    await db.prepare(`
+    const inserted = await db.prepare(`
       INSERT INTO contact_submissions
         (name, email, phone, vehicle, service_interest, message, attribution_json)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -70,9 +75,22 @@ export const POST: APIRoute = async ({ request }) => {
       message,
       serializeLeadAttribution(attribution),
     ).run();
+    const leadId = Number(inserted.meta.last_row_id);
+    if (!Number.isSafeInteger(leadId) || leadId < 1) throw new Error('Contact lead insert returned no id');
 
     // Send email notification
     try {
+      if (!leadOutcomeSigningSecretIsValid(env.LEAD_OUTCOME_SIGNING_SECRET)) {
+        throw new Error('LEAD_OUTCOME_SIGNING_SECRET is missing or too short');
+      }
+      const outcomeActions = renderLeadOutcomeActions(
+        await createLeadOutcomeLinks(
+          request.url,
+          { kind: 'contact', id: leadId },
+          env.LEAD_OUTCOME_SIGNING_SECRET,
+        ),
+      );
+
       // Create smart, descriptive subject line with fallbacks
       let subjectLine = 'New Estimate Request';
 
@@ -126,23 +144,23 @@ export const POST: APIRoute = async ({ request }) => {
                   </tr>
                   <tr>
                     <td><strong>Name</strong></td>
-                    <td>${name}</td>
+                    <td>${escapeHtml(name)}</td>
                   </tr>
                   <tr>
                     <td><strong>Email</strong></td>
-                    <td><a href="mailto:${email}">${email}</a></td>
+                    <td><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td>
                   </tr>
                   <tr>
                     <td><strong>Phone</strong></td>
-                    <td>${phone ? `<a href="tel:${phone}">${phone}</a>` : 'Not provided'}</td>
+                    <td>${phone ? `<a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>` : 'Not provided'}</td>
                   </tr>
                   <tr>
                     <td><strong>Vehicle</strong></td>
-                    <td>${vehicle || 'Not provided'}</td>
+                    <td>${escapeHtml(vehicle || 'Not provided')}</td>
                   </tr>
                   <tr>
                     <td><strong>Service Interest</strong></td>
-                    <td>${service || 'Not specified'}</td>
+                    <td>${escapeHtml(service || 'Not specified')}</td>
                   </tr>
                   ${attribution ? `
                   <tr>
@@ -156,8 +174,9 @@ export const POST: APIRoute = async ({ request }) => {
                 </table>
                 <div class="message-box">
                   <strong>Message:</strong><br><br>
-                  ${message.replace(/\n/g, '<br>')}
+                  ${escapeHtml(message).replace(/\n/g, '<br>')}
                 </div>
+                ${outcomeActions}
               </div>
               <div class="footer">
                 <p>Submitted via wrpdetailing.ae contact form on ${new Date().toLocaleString('en-AE', { timeZone: 'Asia/Dubai' })}</p>

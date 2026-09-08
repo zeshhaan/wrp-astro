@@ -60,8 +60,10 @@ click, and a directions request is not proof of a visit. Bookings in GBP require
 a supported booking provider; adding GA4 does not create a booking integration.
 
 Start with acquisition by campaign, landing page and generate_lead, with phone
-and WhatsApp clicks as separate intent measures. Actual booked jobs still need
-to be matched to the existing lead in a booking/customer record.
+and WhatsApp clicks as separate intent measures. Each lead notification now
+contains signed `Booked` and `Lost` links. Opening one only shows a confirmation
+page; the confirming POST records the first outcome and timestamp in D1. Repeat
+clicks and the opposite action cannot overwrite it.
 
 The site preserves a versioned attribution record for 90 days in first-party
 browser storage and attaches it to both website contact submissions and Tally
@@ -85,6 +87,22 @@ from the host page automatically; the widget passes only the versioned
 attribution record through `Tally.openPopup()`. The form ID is read from the
 shared `TALLY_FORM_ID` configuration, which can be overridden with
 `PUBLIC_TALLY_FORM_ID` for preview builds.
+
+Apply `migrations/0005_add_lead_outcomes.sql` and configure the Worker secret
+`LEAD_OUTCOME_SIGNING_SECRET` before deploying outcome links. Tokens contain
+only the lead table, numeric id, outcome and a 90-day expiry; they contain no
+customer fields. The action route is standalone, sends nothing to GA4, is not
+an admin dashboard, and returns `no-store`/`noindex` headers.
+
+Run the aggregate-only operational report without exporting customer data:
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=<account-id> npx wrangler d1 execute wrp-contact-forms \
+  --remote --file=reports/queries/booked-leads-by-attribution.sql
+```
+
+The result groups booked leads separately by first-touch and latest-touch
+source/medium. `unknown` means that lead had no accepted attribution record.
 
 Clarity can be connected to GA4 for recordings and behavioral investigation.
 Do not use Clarity identifiers to join anonymous sessions to lead PII; D1 is the
