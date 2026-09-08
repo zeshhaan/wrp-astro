@@ -2,7 +2,13 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { EmailMessage } from 'cloudflare:email';
 import { createMimeMessage } from 'mimetext/browser';
+import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
 import { formatAttributionTouch, parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
+import {
+  createLeadOutcomeLinks,
+  leadOutcomeSigningSecretIsValid,
+  renderLeadOutcomeActions,
+} from '@/lib/lead-outcome';
 
 /**
  * Receives submissions from the Tally "Get a Quote" popup and lands them in D1
@@ -158,6 +164,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   let payload: any;
+  let leadId: number;
   try {
     payload = JSON.parse(rawBody);
   } catch {
@@ -243,6 +250,8 @@ export const POST: APIRoute = async ({ request }) => {
     if (!inserted.meta.changes) {
       return json({ success: true, duplicate: true }, 200);
     }
+    leadId = Number(inserted.meta.last_row_id);
+    if (!Number.isSafeInteger(leadId) || leadId < 1) throw new Error('Tally lead insert returned no id');
   } catch (dbError) {
     // A 500 tells Tally to retry, which is what we want for a transient D1
     // failure. The raw body is in the payload it will resend.
@@ -253,7 +262,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Email is best-effort. The lead is already safely in D1, so a mail failure
   // must not trigger a retry that would re-process the submission.
   try {
-    await notify(answers, serviceInterest, asked, attribution);
+    await notify(answers, serviceInterest, asked, attribution, leadId, request.url);
   } catch (emailError) {
     console.error('Failed to send quote notification:', emailError);
   }
@@ -266,7 +275,19 @@ async function notify(
   serviceInterest: string | null,
   asked: { label: string; value: string }[],
   attribution: ReturnType<typeof parseLeadAttribution>,
+  leadId: number,
+  requestUrl: string,
 ) {
+  if (!leadOutcomeSigningSecretIsValid(env.LEAD_OUTCOME_SIGNING_SECRET)) {
+    throw new Error('LEAD_OUTCOME_SIGNING_SECRET is missing or too short');
+  }
+  const outcomeActions = renderLeadOutcomeActions(
+    await createLeadOutcomeLinks(
+      requestUrl,
+      { kind: 'tally', id: leadId },
+      env.LEAD_OUTCOME_SIGNING_SECRET,
+    ),
+  );
   const name = answers.name || 'Someone';
   const vehicle = answers.vehicle || '';
   const subject = vehicle
@@ -337,6 +358,7 @@ async function notify(
                      </div>`
                   : ''
               }
+              ${outcomeActions}
             </div>
             <div style="text-align: center; padding: 15px; color: #666; font-size: 12px;">
               Submitted ${new Date().toLocaleString('en-AE', { timeZone: 'Asia/Dubai' })}
@@ -347,9 +369,19 @@ async function notify(
     `,
   });
 
-  await env.EMAIL.send(
-    new EmailMessage('noreply@wrpdetailing.ae', 'wrp.detailing@gmail.com', msg.asRaw()),
+  const emailMessage = new EmailMessage(
+    'noreply@wrpdetailing.ae',
+    'wrp.detailing@gmail.com',
+    msg.asRaw(),
   );
+  await deliverClientLeadWithAgencyCopy({
+    agencyRecipient: env.AGENCY_COPY_EMAIL,
+    sendClient: () => env.EMAIL.send(emailMessage),
+    sendAgency: (recipient) =>
+      env.EMAIL.send(new EmailMessage('noreply@wrpdetailing.ae', recipient, msg.asRaw())),
+    onAgencyError: (error) =>
+      console.error('Agency copy failed (client Tally lead email was still sent):', error),
+  });
 }
 
 /** Answers are attacker-controllable and land in an HTML email. */
