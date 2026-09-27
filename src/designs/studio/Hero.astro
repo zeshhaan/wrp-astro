@@ -1,0 +1,139 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { heroImage, proof, whatsappQuote } from './content';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <Picture
+    base={heroImage.base}
+    alt={heroImage.alt}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    class="hero__bg"
+  />
+  <div class="st-wrap hero__inner">
+    <div class="hero__main">
+      <p class="st-eyebrow">Al Qusais, Dubai</p>
+      <h1 id="hero-title" class="hero__title">PPF, ceramic coating &amp; car detailing in Dubai</h1>
+    </div>
+    <div class="hero__side">
+      <p class="hero__lede">
+        Paint protection film from Avery Dennison and STEK, ceramic coating, polish and paint correction,
+        window tint, upholstery and hand washes, done properly and on time at our studio in Al Qusais Industrial
+        Area 1.
+      </p>
+      <div class="hero__actions">
+        <a class="st-btn st-btn--gold" href="#quote">Get a quick quote <Icon name="arrow-right" size={18} /></a>
+        <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />WhatsApp us
+        </a>
+        <a class="st-btn st-btn--ghost" href="#services">See services &amp; prices</a>
+      </div>
+      <a class="hero__rating" href={proof.reviewsUrl}>
+        <span class="hero__stars" aria-hidden="true">
+          {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+        </span>
+        <span><strong>{proof.rating}</strong> on Google · {proof.reviewCountDisplay} reviews</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-block-size: min(46rem, calc(100svh - var(--st-head)));
+    padding-block: 7rem 3.5rem;
+    color: var(--st-white);
+    background: var(--st-black);
+    overflow: hidden;
+  }
+  .hero :global(.hero__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .hero :global(.hero__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: 50% 60%;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, rgb(12 13 15 / 0.55) 0%, rgb(12 13 15 / 0.45) 35%, rgb(12 13 15 / 0.92) 100%),
+      linear-gradient(90deg, rgb(12 13 15 / 0.7), rgb(12 13 15 / 0.1) 70%);
+  }
+  .hero__inner {
+    display: grid;
+    gap: 1.5rem 4rem;
+    align-items: end;
+  }
+  .hero__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.5rem, 1.6rem + 4.2vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: 0.005em;
+    max-inline-size: 14ch;
+    margin-block-start: 0.75rem;
+  }
+  .hero__lede {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--st-on-dark);
+    max-inline-size: 36rem;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 1.5rem;
+  }
+  .hero__rating {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-block-start: 1.5rem;
+    min-block-size: 2.75rem;
+    color: var(--st-on-dark);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+  .hero__rating strong {
+    color: var(--st-white);
+  }
+  .hero__rating:hover span:last-child {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hero__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-gold);
+  }
+  @media (max-width: 29.99rem) {
+    .hero__actions .st-btn {
+      flex: 1 1 100%;
+    }
+  }
+  @media (min-width: 60rem) {
+    .hero {
+      padding-block: 9rem 5rem;
+    }
+    .hero__inner {
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+</style>

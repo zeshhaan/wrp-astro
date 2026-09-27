@@ -111,7 +111,7 @@ export const services: Service[] = [
     href: '/services/premium-car-wash/',
     name: 'Premium Car Wash',
     short: 'Wash',
-    line: 'A hand wash with pH-neutral products, filtered rinse water and a wax finish.',
+    line: 'A hand wash with pH-neutral products and filtered rinse water, sealed with ceramic rather than wax.',
     from: 100,
     time: '1–3 hours',
     minutes: 2 * 60,

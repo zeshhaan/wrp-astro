@@ -1,0 +1,103 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { lounge } from '../data';
+import { loungeList } from './content';
+
+const photo = lounge.photos[0];
+const quote = lounge.quotes[0];
+---
+
+<section class="lounge st-section st-dark" id="lounge" aria-labelledby="lounge-title">
+  <div class="st-wrap lounge__grid">
+    <figure class="lounge__media">
+      <Picture base={photo.base} alt={photo.alt} sizes="(min-width: 60rem) 50vw, 100vw" />
+      <figcaption>{photo.caption}</figcaption>
+    </figure>
+    <div class="lounge__text">
+      <p class="st-eyebrow">While you wait</p>
+      <h2 id="lounge-title" class="st-h2">The WRP Lounge</h2>
+      <p>
+        Staying while we work? The lounge is upstairs on the mezzanine, behind a glass wall that looks down on the
+        bays. Grab a coffee or karak, put the match on, or play a frame of billiards.
+      </p>
+      <ul class="lounge__list" role="list">
+        {
+          loungeList.map((item) => (
+            <li>
+              <Icon name="check" size={16} />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <blockquote class="lounge__quote">
+        <p>“{quote.text}”</p>
+        <footer>{quote.author}, Google review</footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lounge__grid {
+    display: grid;
+    gap: 2rem 4rem;
+    align-items: center;
+  }
+  .lounge__media :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .lounge__media figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  .lounge__text {
+    display: grid;
+    gap: 1.1rem;
+    max-inline-size: 36rem;
+  }
+  .lounge__text > p:not(.st-eyebrow) {
+    color: var(--st-on-dark);
+  }
+  .lounge__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lounge__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.9375rem;
+  }
+  .lounge__list :global(svg) {
+    flex: none;
+    color: var(--st-gold);
+  }
+  .lounge__quote {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 3px solid var(--st-gold);
+  }
+  .lounge__quote p {
+    font-style: italic;
+    color: var(--st-white);
+  }
+  .lounge__quote footer {
+    margin-block-start: 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  @media (min-width: 60rem) {
+    .lounge__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

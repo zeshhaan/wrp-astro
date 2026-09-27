@@ -1,6 +1,237 @@
 ---
+/**
+ * Studio: a deliberately conventional detailing-studio homepage.
+ * The familiar Dubai-studio structure (contact bar, dark photo hero, about
+ * split, services grid, CTA banner, why-us, reviews carousel, gallery, blog,
+ * quote form, four-column footer, floating WhatsApp/call) in WRP's own black,
+ * white and brass, with WRP's real photos, prices and Google reviews.
+ */
 import DesignShell from '../shared/DesignShell.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import About from './About.astro';
+import Services from './Services.astro';
+import CtaBanner from './CtaBanner.astro';
+import WhyUs from './WhyUs.astro';
+import Proof from './Proof.astro';
+import Testimonials from './Testimonials.astro';
+import Projects from './Projects.astro';
+import Lounge from './Lounge.astro';
+import Social from './Social.astro';
+import Blog from './Blog.astro';
+import Contact from './Contact.astro';
+import Footer from './Footer.astro';
+import FloatingContact from './FloatingContact.astro';
+import { heroImage } from './content';
 ---
-<DesignShell concept="studio" title="WRP Studio (in progress)" description="Round 3 concept in progress" fonts={['--font-inter']} themeColor="#000">
-  <main><h1>studio: in progress</h1></main>
+
+<DesignShell
+  concept="studio"
+  title="WRP Detailing Dubai: PPF, ceramic coating, detailing and window tint"
+  description="Paint protection film (Avery Dennison and STEK), ceramic coating, detailing, polish, window tint and upholstery in Al Qusais, Dubai. 5.0 on Google. Get a quick quote."
+  fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
+  themeColor="#0c0d0f"
+  colorScheme="dark"
+  preloadImage={{ base: heroImage.base, sizes: '100vw' }}
+>
+  <Header />
+  <main id="main">
+    <Hero />
+    <About />
+    <Services />
+    <CtaBanner />
+    <WhyUs />
+    <Proof />
+    <Testimonials />
+    <Projects />
+    <Lounge />
+    <Social />
+    <Blog />
+    <Contact />
+  </main>
+  <Footer />
+  <FloatingContact />
 </DesignShell>
+
+<style is:global>
+  :root[data-concept='studio'] {
+    --st-black: #0c0d0f;
+    --st-coal: #17191c;
+    --st-card-dark: #1f2226;
+    --st-paper: #f4f4f2;
+    --st-light: #ecece9;
+    --st-white: #ffffff;
+    --st-ink: #15171a;
+    --st-ink-2: #4a4f56;
+    --st-on-dark: #d4d7db;
+    --st-mute: #a3a8ae;
+    --st-gold: #c9a45c; /* brass, from WRP's black-and-gold event balloons */
+    --st-gold-deep: #7a5a1e; /* gold for text on light sections (5.7:1) */
+    --st-line-dark: #2c3035;
+    --st-line-light: #dcdcd8;
+
+    --st-head-font: var(--font-oswald), 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+    --st-body-font: var(--font-inter), 'Inter', system-ui, sans-serif;
+    --st-mark: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+
+    --st-head: 4.5rem;
+    --st-max: 76rem;
+    --st-pad: 1rem;
+    --st-gutter-x: max(var(--st-pad), calc((100vw - var(--st-max)) / 2));
+
+    color-scheme: dark;
+    scroll-padding-top: calc(var(--st-head) + 0.5rem);
+  }
+  @media (min-width: 48rem) {
+    :root[data-concept='studio'] {
+      --st-pad: 2rem;
+    }
+  }
+  :root[data-concept='studio'] body {
+    background: var(--st-black);
+    color: var(--st-white);
+    font-family: var(--st-body-font);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  :where(:root[data-concept='studio']) :is(a, button, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 3px;
+  }
+  :where(:root[data-concept='studio']) .st-light :is(a, button):focus-visible,
+  :where(:root[data-concept='studio']) .st-white :is(a, button):focus-visible {
+    outline-color: var(--st-gold-deep);
+  }
+  :root[data-concept='studio'] ::selection {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+
+  /* Layout */
+  :where(:root[data-concept='studio']) .st-wrap {
+    padding-inline: var(--st-gutter-x);
+  }
+  :where(:root[data-concept='studio']) .st-section {
+    padding-block: clamp(4rem, 2.5rem + 5vw, 6.5rem);
+  }
+  :where(:root[data-concept='studio']) .st-dark {
+    background: var(--st-coal);
+    color: var(--st-white);
+  }
+  :where(:root[data-concept='studio']) .st-black {
+    background: var(--st-black);
+    color: var(--st-white);
+  }
+  :where(:root[data-concept='studio']) .st-light {
+    background: var(--st-paper);
+    color: var(--st-ink);
+    color-scheme: light;
+  }
+  :where(:root[data-concept='studio']) .st-white {
+    background: var(--st-white);
+    color: var(--st-ink);
+    color-scheme: light;
+  }
+
+  /* Section headings: eyebrow, condensed uppercase title, short intro */
+  :where(:root[data-concept='studio']) .st-head {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-end: 2.5rem;
+    max-inline-size: 44rem;
+  }
+  :where(:root[data-concept='studio']) .st-head--center {
+    margin-inline: auto;
+    text-align: center;
+    justify-items: center;
+  }
+  :where(:root[data-concept='studio']) .st-eyebrow {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--st-gold);
+  }
+  :where(:root[data-concept='studio']) .st-eyebrow--dark {
+    color: var(--st-gold-deep);
+  }
+  :where(:root[data-concept='studio']) .st-h2 {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.4rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+  }
+  :where(:root[data-concept='studio']) .st-intro {
+    font-size: 1.0625rem;
+    color: var(--st-ink-2);
+    max-inline-size: 40rem;
+  }
+  :where(:root[data-concept='studio']) :is(.st-dark, .st-black) .st-intro {
+    color: var(--st-on-dark);
+  }
+
+  /* Buttons */
+  :where(:root[data-concept='studio']) .st-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-block-size: 3rem;
+    padding: 0.6rem 1.35rem;
+    border: 1.5px solid transparent;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  :where(:root[data-concept='studio']) .st-btn--gold {
+    background: var(--st-gold);
+    border-color: var(--st-gold);
+    color: var(--st-black);
+  }
+  :where(:root[data-concept='studio']) .st-btn--gold:hover {
+    background: #dcbb78;
+    border-color: #dcbb78;
+  }
+  :where(:root[data-concept='studio']) .st-btn--light {
+    background: var(--st-white);
+    border-color: var(--st-white);
+    color: var(--st-black);
+  }
+  :where(:root[data-concept='studio']) .st-btn--light:hover {
+    background: var(--st-paper);
+  }
+  :where(:root[data-concept='studio']) .st-btn--ghost {
+    background: transparent;
+    border-color: rgb(255 255 255 / 0.7);
+    color: var(--st-white);
+  }
+  :where(:root[data-concept='studio']) .st-btn--ghost:hover {
+    border-color: var(--st-gold);
+    color: var(--st-gold);
+  }
+  :where(:root[data-concept='studio']) .st-btn--dark {
+    background: var(--st-black);
+    border-color: var(--st-black);
+    color: var(--st-white);
+  }
+  :where(:root[data-concept='studio']) .st-btn--dark:hover {
+    background: var(--st-gold);
+    border-color: var(--st-gold);
+    color: var(--st-black);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-concept='studio'] .st-btn {
+      transition: none;
+    }
+  }
+</style>

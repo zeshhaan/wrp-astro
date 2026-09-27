@@ -1,0 +1,102 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { aboutChecklist } from './content';
+---
+
+<section class="about st-section st-light" id="about" aria-labelledby="about-title">
+  <div class="st-wrap about__grid">
+    <div class="about__text">
+      <p class="st-eyebrow st-eyebrow--dark">About WRP</p>
+      <h2 id="about-title" class="st-h2">Dubai’s paint protection and detailing studio</h2>
+      <p>
+        WRP stands for Wrap, Reinforce, Protect. We fit paint protection film, apply ceramic coatings, correct
+        paint, tint windows, stitch seats, make floor mats and wash cars by hand, all under one roof in Al Qusais. Customers
+        tell us their cars come back looking “brand new inside and out”.
+      </p>
+      <p>
+        We explain the options before we start and give you an honest price, then keep you posted with photos and
+        videos while the car is with us. When we give you a time, the car is ready at that time.
+      </p>
+      <ul class="about__list" role="list">
+        {
+          aboutChecklist.map((item) => (
+            <li>
+              <span class="about__tick">
+                <Icon name="check" size={16} />
+              </span>
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <a class="st-btn st-btn--dark" href="/more-about-wrp/">More about WRP</a>
+    </div>
+    <figure class="about__media">
+      <Picture
+        base="/portfolio/team-detailing-black-lexus-hood"
+        alt="Two WRP detailers working on the bonnet of a black Lexus in front of the WRP logo wall"
+        sizes="(min-width: 60rem) 40vw, 100vw"
+        width={1200}
+        height={1680}
+      />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .about__grid {
+    display: grid;
+    gap: 2.5rem 4rem;
+    align-items: center;
+  }
+  .about__text {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+    max-inline-size: 38rem;
+  }
+  .about__text p:not(.st-eyebrow) {
+    color: var(--st-ink-2);
+  }
+  .about__list {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0.5rem 0 0.75rem;
+    padding: 0;
+    list-style: none;
+    font-weight: 500;
+  }
+  .about__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .about__tick {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    border-radius: 50%;
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .about__media {
+    position: relative;
+  }
+  .about__media :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+  @media (min-width: 60rem) {
+    .about__grid {
+      grid-template-columns: 1.1fr 1fr;
+    }
+    .about__media :global(img) {
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>

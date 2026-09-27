@@ -1,0 +1,136 @@
+---
+import Picture from '../shared/Picture.astro';
+import { work } from '../data';
+---
+
+<section class="projects st-section st-light" id="work" aria-labelledby="work-title">
+  <div class="st-wrap">
+    <div class="projects__head">
+      <header class="st-head">
+        <p class="st-eyebrow st-eyebrow--dark">Recent work</p>
+        <h2 id="work-title" class="st-h2">Recent projects</h2>
+        <p class="st-intro">A few of the cars that have left the studio lately. More in the portfolio.</p>
+      </header>
+      <a class="st-btn st-btn--dark" href="/portfolio/">Browse the portfolio</a>
+    </div>
+    <ul class="gallery" role="list">
+      {
+        work.map((w, i) => (
+          <li class={`shot shot--${i}`}>
+            <a href="/portfolio/">
+              <Picture
+                base={w.image}
+                alt={`${w.title}: ${w.what.toLowerCase()} at WRP`}
+                sizes={i === 0 ? '(min-width: 60rem) 38vw, 100vw' : '(min-width: 60rem) 20vw, 50vw'}
+                width={1200}
+                height={1600}
+              />
+              <span class="shot__label">
+                <span class="shot__title">{w.title}</span>
+                <span class="shot__what">{w.what}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .projects__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-block-end: 2rem;
+  }
+  .projects__head .st-head {
+    margin-block-end: 0;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 13rem;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .shot--0 {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  @media (max-width: 59.99rem) {
+    .shot--5 {
+      grid-column: span 2;
+    }
+  }
+  .shot--4 :global(img) {
+    object-position: 50% 80%;
+  }
+  @media (min-width: 60rem) {
+    .gallery {
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      grid-auto-rows: 15rem;
+    }
+    .shot--0 {
+      grid-column: span 1;
+    }
+    .shot--4 {
+      grid-column: 2 / span 2;
+    }
+  }
+  .shot a {
+    position: relative;
+    display: block;
+    block-size: 100%;
+    overflow: hidden;
+    color: var(--st-white);
+    text-decoration: none;
+    background: var(--st-coal);
+  }
+  .shot :global(picture),
+  .shot :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+  }
+  .shot :global(img) {
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .shot a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(12 13 15 / 0) 50%, rgb(12 13 15 / 0.85));
+  }
+  .shot__label {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-end: 0.85rem;
+    z-index: 1;
+    display: grid;
+    gap: 0.1rem;
+  }
+  .shot__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .shot__what {
+    font-size: 0.8125rem;
+    color: var(--st-on-dark);
+  }
+  .shot a:hover :global(img) {
+    transform: scale(1.04);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shot :global(img) {
+      transition: none;
+    }
+  }
+</style>

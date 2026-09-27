@@ -1,0 +1,378 @@
+---
+import Icon from './Icon.astro';
+import { contact, whatsappQuote } from './content';
+
+const links = [
+  { label: 'Services', href: '#services' },
+  { label: 'About', href: '#about' },
+  { label: 'Reviews', href: '#reviews' },
+  { label: 'Our work', href: '#work' },
+  { label: 'Lounge', href: '#lounge' },
+  { label: 'Blog', href: '#blog' },
+  { label: 'Contact', href: '#contact' },
+];
+---
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="topbar">
+  <div class="st-wrap topbar__inner">
+    <ul class="topbar__list" role="list">
+      <li><a href={contact.phoneHref}><Icon name="phone" size={15} />{contact.phoneDisplay}</a></li>
+      <li class="topbar__email"><a href={`mailto:${contact.email}`}><Icon name="mail" size={15} />{contact.email}</a></li>
+      <li class="topbar__addr"><a href={contact.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" size={15} />{contact.address[0]}, Dubai</a></li>
+      <li class="topbar__hours"><span><Icon name="clock" size={15} />{contact.hoursShort} · {contact.closed}</span></li>
+    </ul>
+    <ul class="topbar__social" role="list">
+      <li><a href={contact.instagram} target="_blank" rel="noopener" aria-label={`Instagram ${contact.instagramHandle}`}><Icon name="instagram" size={17} /></a></li>
+      <li><a href={whatsappQuote} target="_blank" rel="noopener" aria-label="WhatsApp"><Icon name="whatsapp" size={17} /></a></li>
+    </ul>
+  </div>
+</div>
+
+<header class="head">
+  <div class="st-wrap head__inner">
+    <a class="logo" href="#main" aria-label="WRP Detailing, back to top">
+      <span class="logo__mark">WRP.</span>
+      <span class="logo__sub">Wrap · Reinforce · Protect</span>
+    </a>
+    <nav class="head__nav" aria-label="Main">
+      <ul role="list">
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="st-btn st-btn--gold head__cta" href="#quote">Get a quick quote</a>
+    <button
+      class="head__menu"
+      type="button"
+      commandfor="st-drawer"
+      command="show-modal"
+      aria-controls="st-drawer"
+      data-drawer-open
+    >
+      <Icon name="menu" size={24} />
+      <span class="visually-hidden">Menu</span>
+    </button>
+  </div>
+</header>
+
+<dialog class="drawer" id="st-drawer" aria-label="Menu">
+  <div class="drawer__top">
+    <span class="logo__mark">WRP.</span>
+    <button class="drawer__close" type="button" commandfor="st-drawer" command="close" data-drawer-close>
+      <Icon name="close" size={24} />
+      <span class="visually-hidden">Close menu</span>
+    </button>
+  </div>
+  <nav aria-label="Main (mobile)">
+    <ul role="list" class="drawer__links">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+  </nav>
+  <div class="drawer__actions">
+    <a class="st-btn st-btn--gold" href="#quote">Get a quick quote</a>
+    <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+    <a class="drawer__phone" href={contact.phoneHref}><Icon name="phone" size={18} />{contact.phoneDisplay}</a>
+    <p class="drawer__hours">{contact.hoursShort}. {contact.closed}.</p>
+  </div>
+</dialog>
+
+<script>
+  // Mobile menu: a modal <dialog> opened declaratively with Invoker Commands
+  // (modern-web-guidance: declarative-dialog-popover-control). Manual fallback
+  // for browsers without `commandfor` (no external polyfill in this project).
+  const dialog = document.getElementById('st-drawer') as HTMLDialogElement | null;
+  const opener = document.querySelector<HTMLButtonElement>('[data-drawer-open]');
+  if (dialog && opener) {
+    if (!('commandForElement' in HTMLButtonElement.prototype)) {
+      opener.addEventListener('click', () => dialog.showModal());
+      dialog.querySelector('[data-drawer-close]')?.addEventListener('click', () => dialog.close());
+    }
+    const sync = () => opener.setAttribute('aria-expanded', String(dialog.open));
+    sync();
+    dialog.addEventListener('close', sync);
+    new MutationObserver(sync).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+    // Light dismiss: a click on the backdrop lands on the dialog element itself.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // Following a link closes the drawer, then the page scrolls to the section.
+    dialog.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener('click', () => dialog.close()));
+  }
+</script>
+
+<style>
+  .skip {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--st-gold);
+    color: var(--st-black);
+    font-weight: 600;
+  }
+  .skip:focus {
+    inset-block-start: 0.5rem;
+  }
+
+  /* Thin contact bar */
+  .topbar {
+    background: var(--st-black);
+    color: var(--st-mute);
+    font-size: 0.8125rem;
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .topbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-block-size: 2.5rem;
+  }
+  .topbar__list,
+  .topbar__social {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .topbar__social {
+    gap: 0.25rem;
+  }
+  .topbar a,
+  .topbar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .topbar a:hover {
+    color: var(--st-white);
+  }
+  .topbar__list :global(svg) {
+    color: var(--st-gold);
+  }
+  .topbar__social a {
+    justify-content: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+  }
+  .topbar__email,
+  .topbar__addr,
+  .topbar__hours {
+    display: none;
+  }
+  @media (min-width: 48rem) {
+    .topbar__email,
+    .topbar__addr {
+      display: list-item;
+    }
+  }
+  @media (min-width: 72rem) {
+    .topbar__hours {
+      display: list-item;
+    }
+  }
+
+  /* Header */
+  .head {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--st-coal) 94%, transparent);
+    backdrop-filter: blur(8px);
+    border-block-end: 1px solid var(--st-line-dark);
+    color: var(--st-white);
+  }
+  .head__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-block-size: var(--st-head);
+  }
+  .logo {
+    display: grid;
+    gap: 0.1rem;
+    color: var(--st-white);
+    text-decoration: none;
+    margin-inline-end: auto;
+    align-content: center;
+    min-block-size: 2.75rem;
+  }
+  .logo__mark {
+    font-family: var(--st-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.85rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .logo__sub {
+    font-family: var(--st-head-font);
+    font-size: 0.625rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--st-gold);
+  }
+  @media (max-width: 29.99rem) {
+    .logo__sub {
+      display: none;
+    }
+  }
+  .head__nav {
+    display: none;
+  }
+  .head__nav ul {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .head__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 0.7rem;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--st-white);
+    text-decoration: none;
+    position: relative;
+  }
+  .head__nav a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.7rem;
+    inset-block-end: 0.45rem;
+    block-size: 2px;
+    background: var(--st-gold);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+  .head__nav a:hover::after {
+    transform: scaleX(1);
+  }
+  .head__cta {
+    display: none;
+  }
+  .head__menu {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 1px solid var(--st-line-dark);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  @media (min-width: 24rem) {
+    .head__cta {
+      display: inline-flex;
+      min-block-size: 2.75rem;
+      padding-inline: 1rem;
+    }
+  }
+  @media (min-width: 70rem) {
+    .head__nav {
+      display: block;
+    }
+    .head__menu {
+      display: none;
+    }
+  }
+
+  /* Drawer */
+  .drawer {
+    margin: 0 0 0 auto;
+    inline-size: min(22rem, 86vw);
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    padding: 1rem 1.25rem 5.5rem;
+    border: 0;
+    background: var(--st-coal);
+    color: var(--st-white);
+    overflow-y: auto;
+  }
+  .drawer::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .drawer[open] {
+      animation: drawer-in 0.25s ease-out;
+    }
+    @keyframes drawer-in {
+      from {
+        transform: translateX(100%);
+      }
+    }
+  }
+  .drawer__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 1rem;
+  }
+  .drawer__close {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 1px solid var(--st-line-dark);
+    color: inherit;
+    cursor: pointer;
+  }
+  .drawer__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--st-line-dark);
+  }
+  .drawer__links a {
+    display: flex;
+    align-items: center;
+    min-block-size: 3.25rem;
+    border-block-end: 1px solid var(--st-line-dark);
+    font-family: var(--st-head-font);
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: inherit;
+    text-decoration: none;
+  }
+  .drawer__links a:hover {
+    color: var(--st-gold);
+  }
+  .drawer__actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-start: 1.5rem;
+  }
+  .drawer__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    color: var(--st-white);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .drawer__phone :global(svg) {
+    color: var(--st-gold);
+  }
+  .drawer__hours {
+    color: var(--st-mute);
+    font-size: 0.875rem;
+  }
+</style>

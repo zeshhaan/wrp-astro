@@ -1,0 +1,60 @@
+---
+import Icon from './Icon.astro';
+import { contact, whatsappQuote } from './content';
+---
+
+<div class="float" role="group" aria-label="Quick contact">
+  <a class="float__btn float__btn--wa" href={whatsappQuote} target="_blank" rel="noopener">
+    <Icon name="whatsapp" size={26} />
+    <span class="visually-hidden">WhatsApp us</span>
+  </a>
+  <a class="float__btn float__btn--call" href={contact.phoneHref}>
+    <Icon name="phone" size={22} />
+    <span class="visually-hidden">Call {contact.phoneDisplay}</span>
+  </a>
+</div>
+
+<style>
+  .float {
+    position: fixed;
+    inset-inline-end: max(0.75rem, env(safe-area-inset-right));
+    /* Clear of the Design Lab bar at bottom-centre on phones. */
+    inset-block-end: calc(max(12px, env(safe-area-inset-bottom)) + 4.25rem);
+    z-index: 40;
+    display: grid;
+    gap: 0.6rem;
+  }
+  @media (min-width: 48rem) {
+    .float {
+      inset-block-end: 1.5rem;
+      inset-inline-end: 1.5rem;
+    }
+  }
+  .float__btn {
+    display: grid;
+    place-items: center;
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+    border-radius: 50%;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
+    transition: transform 0.2s ease;
+  }
+  .float__btn--wa {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .float__btn--call {
+    background: var(--st-black);
+    color: var(--st-white);
+    border: 1.5px solid var(--st-gold);
+  }
+  .float__btn:hover {
+    transform: translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .float__btn {
+      transition: none;
+    }
+  }
+</style>
