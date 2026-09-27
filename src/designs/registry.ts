@@ -7,7 +7,7 @@
  * concept gets its own Worker Preview URL (see docs/design-lab.md).
  */
 export type Concept = {
-  id: 'mezzanine' | 'menu' | 'layers' | 'diagnosis';
+  id: 'mezzanine' | 'menu' | 'studio';
   name: string;
   /** One line a teammate can repeat in a meeting. */
   idea: string;
@@ -42,24 +42,14 @@ export const concepts: Concept[] = [
     fonts: 'Instrument Serif + Instrument Sans',
   },
   {
-    id: 'layers',
-    name: 'Layers',
-    idea: 'A cross-section through a car\'s paint: scroll down through each layer WRP works on.',
-    signature: 'The page is a magnified paint cross-section; every layer (coating, film, clear coat, colour) is a service, drawn to its real thickness in microns.',
-    bestFor: 'Explaining PPF, ceramic and correction with real material science, which builds trust with owners who research.',
-    risk: 'Technical; the scale drawing must stay readable on a phone.',
-    palette: ['#0f1115', '#e8e6e1', '#9fb7c9', '#d4a24c', '#5a6470'],
-    fonts: 'Archivo + Fraunces',
-  },
-  {
-    id: 'diagnosis',
-    name: 'Diagnosis',
-    idea: 'Start from what is wrong with the car, not from a service list.',
-    signature: 'Pick a problem (stone chips, swirls, faded paint, a hot cabin, stained seats) and the page builds the fix: service, price, time, proof and a review from someone with the same problem.',
-    bestFor: 'Owners who know the problem but not the product name; leads arrive pre-qualified.',
-    risk: 'Needs good photos for each problem to feel as premium as the other directions.',
-    palette: ['#eef0f3', '#15181d', '#1f45c4', '#f0561d', '#1c6b47'],
-    fonts: 'Fraunces + Archivo',
+    id: 'studio',
+    name: 'Studio',
+    idea: 'A familiar, conventional detailing-studio site: dark studio hero, services grid, why-us, reviews, gallery, quote form.',
+    signature: 'Nothing unusual on purpose. Visitors who have seen other Dubai studio sites know exactly where everything is.',
+    bestFor: 'Feeling instantly familiar and trustworthy; the quickest route from landing to a quote.',
+    risk: 'Looks like the category; WRP stands out through its photos, prices and reviews rather than the layout.',
+    palette: ['#0c0d0f', '#17191c', '#f4f4f2', '#c9a45c', '#8a8f96'],
+    fonts: 'Oswald + Inter',
   },
 ];
 
