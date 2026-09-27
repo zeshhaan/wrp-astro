@@ -863,7 +863,8 @@ function togglePanel(mode: ViewerMode, id: PanelId) {
 type LiveViewer = { screen: ScreenId; el: HTMLElement; mode: ViewerMode; handle: CarViewerHandle; kind: '2d' | '3d' };
 let viewer: LiveViewer | null = null;
 let viewerToken = 0;
-let prefer3D = false;
+/** 3D by default where the device can run it; the 2D/3D button flips this. */
+let prefer3D = true;
 let has3D = false;
 
 function viewerOptions(mode: ViewerMode): CarViewerOptions {
@@ -932,6 +933,8 @@ function probe3D() {
       const r = await fetch('/models/cars/sedan.glb', { method: 'HEAD' });
       has3D = r.ok && !(r.headers.get('content-type') ?? '').includes('html');
       sync3DButtons();
+      // The flat drawing shows first; swap in the 3D car once we know it can load.
+      if (has3D && prefer3D && viewer && viewer.kind === '2d' && viewer.mode !== 'look') void mountViewer(viewer.screen);
     } catch {
       /* stay 2D */
     }

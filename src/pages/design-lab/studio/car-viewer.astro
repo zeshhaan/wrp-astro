@@ -42,11 +42,6 @@ const paints = [
       <p class="cv__status" id="status" role="status">Loading 3D viewer…</p>
     </div>
 
-    <p class="cv__credit">
-      <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">"Generic passenger car pack"</a> by Comrade1280,
-      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Split into
-      panels by WRP.
-    </p>
 
     <form class="cv__controls" id="controls" onsubmit="return false">
       <fieldset>
@@ -135,6 +130,12 @@ const paints = [
 
       <p class="cv__log" id="log" aria-live="polite"></p>
     </form>
+
+    <p class="cv__credit">
+      <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">"Generic passenger car pack"</a> by Comrade1280,
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Split into
+      panels by WRP.
+    </p>
   </main>
 
   <script define:vars={{ presets: ppfPresets, wrapDefault: ['bonnet', 'roof', 'mirror-l', 'mirror-r', 'spoiler'], wrapParts }}>
@@ -337,9 +338,9 @@ const paints = [
     outline-offset: -4px;
   }
   .cv__credit {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--muted, #6b6b6b);
-    margin: 0.5rem 0 0;
+    margin: 2rem 0 0;
   }
   .cv__credit a { color: inherit; }
   .cv__status {
