@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"generate:llms": "node scripts/generate-llms.mjs",
+		"build:cars": "bun scripts/cars/build-cars.ts",
 		"build": "node scripts/generate-llms.mjs && node scripts/generate-og-cards.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
 		"preview": "astro build && wrangler dev",
 		"preview:designs": "node scripts/preview-designs.mjs",
