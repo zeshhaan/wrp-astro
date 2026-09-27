@@ -1096,11 +1096,15 @@ body:has(main.q) .foot {
 .q-viewer__credit a {
   color: inherit;
 }
+/* Colour preview: 3D car where supported, the side drawing otherwise. The box is
+   sized for 3D so the swap from drawing to 3D does not shift the page. */
 .q-look {
-  aspect-ratio: 480 / 128;
-  max-inline-size: 30rem;
+  aspect-ratio: 16 / 9;
+  max-inline-size: 36rem;
   margin-inline: auto;
   inline-size: 100%;
+  display: grid;
+  align-items: center;
 }
 .q-look > svg {
   inline-size: 100%;

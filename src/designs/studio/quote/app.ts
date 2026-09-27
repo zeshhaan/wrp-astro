@@ -894,7 +894,7 @@ async function mountViewer(screen: ScreenId) {
   const opts = viewerOptions(mode);
   let kind: '2d' | '3d' = '2d';
   let handle: CarViewerHandle;
-  if (prefer3D && has3D && mode !== 'look') {
+  if (prefer3D && has3D) {
     try {
       const m = await import('./viewer/CarViewer3D');
       handle = await m.mount(el, opts);
@@ -909,6 +909,8 @@ async function mountViewer(screen: ScreenId) {
     return;
   }
   viewer = { screen, el, mode, handle, kind };
+  // Choices made while the 3D model was loading (colour, panels) apply now.
+  handle.update(viewerOptions(mode));
   sync3DButtons();
 }
 
@@ -934,7 +936,7 @@ function probe3D() {
       has3D = r.ok && !(r.headers.get('content-type') ?? '').includes('html');
       sync3DButtons();
       // The flat drawing shows first; swap in the 3D car once we know it can load.
-      if (has3D && prefer3D && viewer && viewer.kind === '2d' && viewer.mode !== 'look') void mountViewer(viewer.screen);
+      if (has3D && prefer3D && viewer && viewer.kind === '2d') void mountViewer(viewer.screen);
     } catch {
       /* stay 2D */
     }
