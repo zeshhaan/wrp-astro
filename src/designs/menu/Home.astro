@@ -1,29 +1,41 @@
 ---
 /**
- * The Menu — WRP as a house of hospitality.
- * A centred menu card for the services, a bill-style visit planner,
- * the lounge as the room upstairs, reviews as a guest book.
+ * The Menu, round 2: services first.
+ * The hero IS the menu: every service with its starting price, set like a printed
+ * carte beside a photo of the team at work. The full menu below is the order form
+ * (Planner), with a margin note from a customer beside each dish. The lounge gets
+ * one short section after the work and the reviews.
  */
 import DesignShell from '../shared/DesignShell.astro';
 import Picture from '../shared/Picture.astro';
 import Planner from './Planner.astro';
-import { contact, whatsappLink, services, work, lounge, studio, proof, pickQuotes, nav, pages } from '../data';
-import { courses, timeWords, aed } from './menu';
+import { contact, whatsappLink, work, lounge, studio, proof, pickQuotes, services, pages } from '../data';
+import { dishes, aed, heroQuote, promises } from './menu';
 
-const hero = { base: '/review-images/tariq_murad_2', sizes: '(min-width: 76rem) 72rem, calc(100vw - 2rem)' };
+const hero = {
+  base: '/portfolio/team-detailing-black-lexus-hood',
+  sizes: '(min-width: 64rem) 34rem, calc(100vw - 2rem)',
+};
+const main = dishes.filter((d) => !d.side);
+const side = dishes.filter((d) => d.side);
 const quotes = pickQuotes(6);
 const serviceName = (slug?: string) => services.find((s) => s.slug === slug)?.name;
-const [bigQuote, ...moreQuotes] = [lounge.quotes[0], lounge.quotes[1], lounge.quotes[3]];
-const pageLeft = quotes.slice(0, 3);
-const pageRight = quotes.slice(3, 6);
 const year = new Date().getFullYear();
-const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
+const hello = whatsappLink("Hello WRP, I'd like a quote for my car.");
+const nav = [
+  { label: 'Services', href: '#plan' },
+  { label: 'Work', href: '#work' },
+  { label: 'Reviews', href: '#reviews' },
+  { label: 'Lounge', href: '#lounge' },
+  { label: 'Visit', href: '#visit' },
+];
+const loungeQuote = lounge.quotes[0];
 ---
 
 <DesignShell
   concept="menu"
-  title="WRP Detailing, Dubai: car care with a lounge upstairs"
-  description="Paint protection film, ceramic coating, window film, polish, hand washes and interiors in Al Qusais, Dubai. Plan your visit, see starting prices and wait in the WRP Lounge."
+  title="WRP Detailing, Dubai: PPF, detailing, ceramic and tint, priced up front"
+  description="Paint protection film, detailing, paint correction, ceramic coating, upholstery, window tint and hand washes in Al Qusais, Dubai. See starting prices, build a plan for your car and send it on WhatsApp."
   fonts={['--font-instrument-serif', '--font-instrument-sans', '--font-montserrat']}
   themeColor="#F6F6F3"
   preloadImage={hero}
@@ -39,177 +51,128 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   <a class="skip" href="#content">Skip to content</a>
 
   <header class="masthead">
-    <div class="mast-row">
-      <a class="mast-hours" href="#visit">Open Saturday to Thursday, 9 AM to 9:30 PM</a>
-      <a class="wordmark" href="/" aria-label="WRP home">WRP.</a>
-      <a class="btn btn-ink mast-cta" href={hello} target="_blank" rel="noopener">
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
-        <span><span class="wide-only">Message us on </span>WhatsApp</span>
-      </a>
-    </div>
-    <nav aria-label="Main">
+    <nav aria-label="Main" class="mast-nav">
       <ul role="list">
         {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
       </ul>
     </nav>
+    <a class="wordmark" href="/" aria-label="WRP home">WRP.</a>
+    <div class="mast-end">
+      <a class="mast-hours" href="#visit">Sat to Thu, 9 AM to 9:30 PM</a>
+      <a class="btn btn-ink mast-cta" href={hello} target="_blank" rel="noopener">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+        <span>WhatsApp</span>
+      </a>
+    </div>
   </header>
 
   <main id="content" tabindex="-1">
-    <!-- Hero: the house, with the room upstairs in view -->
-    <section class="hero" aria-labelledby="hero-title">
-      <h1 id="hero-title">
-        <span>We look after the car.</span>
-        <span>The lounge looks after you.</span>
-      </h1>
-      <p class="hero-lede">
-        Paint protection film, ceramic coating, window tint, polish, hand washes and interiors, in Al Qusais,
-        Dubai. Wait upstairs with a coffee and a game of billiards, or leave the car and we’ll send you photos as we
-        work.
-      </p>
-      <div class="hero-actions">
-        <a class="btn btn-ink" href="#plan">Plan your visit</a>
-      </div>
-      <figure class="arch">
-        <Picture
-          base={hero.base}
-          alt="The WRP studio: black pendant lamps over the bays, and the glass-walled lounge on the mezzanine above"
-          sizes={hero.sizes}
-          loading="eager"
-          fetchpriority="high"
-          imgClass="arch-img"
-        />
-        <figcaption>The lounge sits behind the glass, above the bays. Photo by customer Tariq Murad.</figcaption>
-      </figure>
-    </section>
+    <!-- Hero: the menu itself, beside the team at work -->
+    <section class="hero" id="services" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div class="carte">
+          <a class="seal" href={proof.reviewsUrl} aria-label={`Rated ${proof.rating} on Google from ${proof.reviewCountDisplay} reviews`}>
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <path id="seal-ring" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"></path>
+              </defs>
+              <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+              <circle cx="60" cy="60" r="35" fill="none" stroke="currentColor" stroke-width="0.9"></circle>
+              <text class="seal-ring" textLength="280" lengthAdjust="spacing">
+                <textPath href="#seal-ring">RATED {proof.rating} ON GOOGLE ✦ {proof.reviewCountDisplay} REVIEWS ✦</textPath>
+              </text>
+              <text class="seal-num" x="60" y="66" text-anchor="middle">{proof.rating}</text>
+              <text class="seal-stars" x="60" y="80" text-anchor="middle">★★★★★</text>
+            </svg>
+          </a>
 
-    <!-- The menu card -->
-    <section class="menu" id="services" aria-labelledby="menu-title">
-      <div class="card" id="menu">
-        <header class="card-head">
-          <h2 id="menu-title">The menu</h2>
-          <p>Starting prices in dirhams. We look at every car before we confirm a quote.</p>
-        </header>
+          <h1 id="hero-title"><span>Brand new,</span> <span>inside and out.</span></h1>
+          <p class="carte-credit">
+            {heroQuote.author}’s words after his detail in {heroQuote.when?.split(' ')[0]}. “Brand new” comes up
+            in review after review.
+          </p>
 
-        {
-          courses.map((c) => (
-            <section class="course" aria-labelledby={`course-${c.id}`}>
-              <h3 id={`course-${c.id}`}>{c.title}</h3>
-              <p class="course-note">{c.note}</p>
-              <ul role="list" class="dishes">
-                {c.items.map((s) => (
-                  <li class="dish">
-                    <p class="dish-head">
-                      <a href={s.href} class="dish-name">
-                        {s.name}
-                      </a>
-                      <span class="leader" aria-hidden="true" />
-                      <span class="dish-price">
-                        {s.from ? (
-                          <>
-                            <i>from</i> {aed(s.from)}
-                          </>
-                        ) : (
-                          <i>Priced after inspection</i>
-                        )}
-                      </span>
-                    </p>
-                    <p class="dish-line">{s.line}</p>
-                    <p class="dish-time">With us {timeWords(s.time)}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))
-        }
-
-        <footer class="card-foot">
-          <p class="source-note">Our film comes from</p>
-          <ul role="list" class="films">
+          <ol class="carte-list" role="list">
             {
-              proof.films.map((f) => (
-                <li>
-                  <img src={f.logo} alt={f.name} height="40" width={f.name === 'STEK' ? 171 : 122} loading="lazy" />
+              main.map((d, i) => (
+                <li class="carte-row" style={`--i:${i}`}>
+                  <a href={d.href} class="carte-name">
+                    {d.short}
+                  </a>
+                  <span class="leader" aria-hidden="true" />
+                  <span class="carte-price">
+                    {d.sedan ? (
+                      <>
+                        <i>from</i> {aed(d.sedan)}
+                      </>
+                    ) : (
+                      <i>after inspection</i>
+                    )}
+                  </span>
                 </li>
               ))
             }
-          </ul>
-          <p class="source-note">Paint protection film carries up to a 10-year warranty.</p>
-        </footer>
+          </ol>
+          {
+            side.map((d) => (
+              <p class="carte-side" style={`--i:${main.length}`}>
+                <span>Also</span>
+                <a href={d.href}>{d.name}</a>
+                <span class="leader" aria-hidden="true" />
+                <i>after inspection</i>
+              </p>
+            ))
+          }
+
+          <div class="carte-actions">
+            <a class="btn btn-ink" href="#plan">Build your plan and price</a>
+            <a class="btn btn-line" href={hello} target="_blank" rel="noopener">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+              Ask on WhatsApp
+            </a>
+          </div>
+          <p class="carte-foot">Starting prices in dirhams, for a sedan. Al Qusais Industrial Area 1, Dubai.</p>
+        </div>
+
+        <figure class="hero-photo">
+          <Picture
+            base={hero.base}
+            alt="Two WRP detailers working on a black Lexus LX in the studio, under the WRP logo"
+            sizes={hero.sizes}
+            width={1200}
+            height={1680}
+            loading="eager"
+            fetchpriority="high"
+            imgClass="hero-img"
+          />
+        </figure>
       </div>
+
+      <ul class="promises" role="list" aria-label="With every job">
+        {
+          promises.map((p) => (
+            <li>
+              <p class="p-title">{p.title}</p>
+              <p class="p-proof">
+                {p.proof}{' '}<span>{p.who}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
     <Planner />
-
-    <!-- The room upstairs -->
-    <section class="lounge" id="lounge" aria-labelledby="lounge-title">
-      <div class="lounge-inner">
-        <header class="lounge-head">
-          <h2 id="lounge-title">{lounge.name}</h2>
-          <p class="lounge-where">{lounge.where}</p>
-          <p class="lounge-pitch">{lounge.pitch}</p>
-        </header>
-
-        <div class="lounge-photos">
-          <figure class="lp lp-main">
-            <Picture
-              base={lounge.photos[0].base}
-              alt={lounge.photos[0].alt}
-              sizes="(min-width: 60rem) 44rem, calc(100vw - 2rem)"
-            />
-            <figcaption>{lounge.photos[0].caption}</figcaption>
-          </figure>
-          <figure class="lp">
-            <Picture
-              base={lounge.photos[2].base}
-              alt={lounge.photos[2].alt}
-              sizes="(min-width: 60rem) 26rem, calc(100vw - 2rem)"
-            />
-            <figcaption>{lounge.photos[2].caption}</figcaption>
-          </figure>
-        </div>
-
-        <div class="notes">
-          <h3>House notes</h3>
-          <dl>
-            {
-              lounge.amenities.map((a) => (
-                <div>
-                  <dt>{a.name}</dt>
-                  <dd>{a.detail}</dd>
-                </div>
-              ))
-            }
-          </dl>
-        </div>
-
-        <figure class="lounge-quote">
-          <blockquote><p>“{bigQuote.text}”</p></blockquote>
-          <figcaption>{bigQuote.author}, from a Google review</figcaption>
-        </figure>
-        <ul role="list" class="lounge-more">
-          {
-            moreQuotes.map((q) => (
-              <li>
-                <figure>
-                  <blockquote><p>“{q.text}”</p></blockquote>
-                  <figcaption>{q.author}</figcaption>
-                </figure>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </section>
 
     <!-- Work -->
     <section class="work" id="work" aria-labelledby="work-title">
       <header class="sec-head">
         <h2 id="work-title">Recent work</h2>
-        <p>A few recent cars, photographed on the studio floor before they went home.</p>
+        <p>Cars photographed on the studio floor before they went home.</p>
       </header>
       <ul role="list" class="work-grid">
         {
-          work.map((w, i) => (
+          work.map((w) => (
             <li>
               <figure>
                 <Picture
@@ -237,13 +200,13 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
       <header class="sec-head">
         <h2 id="guests-title">The guest book</h2>
         <p>
-          Rated {proof.rating} out of 5 on Google, across {proof.reviewCount} reviews. A few lines from them, word for
+          Rated {proof.rating} out of 5 on Google, from {proof.reviewCountDisplay} reviews. A few of them, word for
           word.
         </p>
       </header>
       <div class="book">
         {
-          [pageLeft, pageRight].map((pg) => (
+          [quotes.slice(0, 3), quotes.slice(3, 6)].map((pg) => (
             <ul role="list" class="page">
               {pg.map((q) => (
                 <li>
@@ -262,7 +225,34 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
           ))
         }
       </div>
-      <p class="more"><a class="btn btn-line" href={proof.reviewsUrl}>Read all {proof.reviewCount} reviews</a></p>
+      <p class="more"><a class="btn btn-line" href={proof.reviewsUrl}>Read all {proof.reviewCountDisplay} reviews</a></p>
+    </section>
+
+    <!-- The lounge: one short, quiet section -->
+    <section class="lounge" id="lounge" aria-labelledby="lounge-title">
+      <div class="lounge-inner">
+        <figure class="lounge-photo">
+          <Picture
+            base={lounge.photos[0].base}
+            alt={lounge.photos[0].alt}
+            sizes="(min-width: 60rem) 34rem, calc(100vw - 2rem)"
+          />
+          <figcaption>Photo by customer Venkat K.</figcaption>
+        </figure>
+        <div class="lounge-text">
+          <h2 id="lounge-title">{lounge.name}</h2>
+          <p class="lounge-where">Upstairs, while we work</p>
+          <p>
+            If you’d rather wait, there’s a room above the bays: billiards, board games, coffee and karak, a big
+            screen and a sofa, air-conditioned all year, with a glass wall over the studio. The materials room is up
+            there too, so you can feel the leathers and films before you choose.
+          </p>
+          <figure class="lounge-quote">
+            <blockquote><p>“{loungeQuote.text}”</p></blockquote>
+            <figcaption>{loungeQuote.author}, Google review</figcaption>
+          </figure>
+        </div>
+      </div>
     </section>
 
     <!-- Reservations -->
@@ -271,8 +261,8 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
         <div class="visit-text">
           <h2 id="visit-title">Reservations</h2>
           <p class="visit-lede">
-            Message or call to book a time, and tell us whether you’ll wait upstairs or drop the car off. We
-            confirm the price once we’ve seen the car.
+            Message or call to book a day. Tell us whether you’ll wait, drop the car off, or want us to collect it.
+            We confirm the price once we’ve seen the car.
           </p>
           <p class="status" data-status hidden></p>
           <dl class="details">
@@ -308,7 +298,7 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
             <a class="btn btn-line" href={contact.phoneHref}>Call {contact.phoneDisplay}</a>
           </div>
         </div>
-        <figure class="arch arch-night">
+        <figure class="arch-night">
           <Picture
             base={studio.night.base}
             alt={studio.night.alt}
@@ -383,17 +373,18 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
     --ink-soft: #5e5061;
     --plum: #6d4a7a;
     --plum-wash: #efe9f0;
-    --brass: #b08d57;
+    --brass: #9a7744;
     --brass-light: #c4a26b;
     --linen: #d9d4cc;
     --linen-strong: #b9b0ba;
+    /* Paper grain: fractal noise, tinted aubergine, a few percent opaque. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .1 0 0 0 0 .18 .07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     --serif: var(--font-instrument-serif), 'Iowan Old Style', Georgia, serif;
     --sans: var(--font-instrument-sans), system-ui, sans-serif;
-    --step-h1: clamp(3rem, 1.4rem + 6.2vw, 7.25rem);
+    --step-h1: clamp(3rem, 1.6rem + 4.2vw, 5.75rem);
     --step-h2: clamp(2.5rem, 1.9rem + 2.6vw, 4.5rem);
-    --step-h3: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+    --step-h3: clamp(1.6rem, 1.4rem + 0.8vw, 2.1rem);
     color-scheme: light;
-    scroll-padding-top: 0;
   }
   :root[data-concept='menu'] body {
     background: var(--cloth);
@@ -485,7 +476,8 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
     margin-inline: auto;
   }
   .sec-head h2,
-  .visit h2 {
+  .visit h2,
+  .lounge h2 {
     font-family: var(--serif);
     font-weight: 400;
     font-size: var(--step-h2);
@@ -501,15 +493,45 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
     margin-block-start: 2.5rem;
   }
 
-  /* ---------- Masthead ---------- */
+  /* ---------- Masthead: one row, wordmark centred like a menu cover ---------- */
   .masthead {
-    padding: 1rem 1rem 0;
-    max-width: 90rem;
-    margin-inline: auto;
-  }
-  .mast-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding: 0.9rem 1rem;
+    border-block-end: 1px solid var(--linen);
+  }
+  .mast-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: clamp(0.25rem, 1.5vw, 1.25rem);
+    margin: 0;
+    padding: 0;
+  }
+  .mast-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.4rem;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+  .mast-nav a:hover {
+    color: var(--plum);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+  .masthead .wordmark {
+    font-size: 2.25rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+  }
+  .mast-end {
+    justify-self: end;
+    display: flex;
     align-items: center;
     gap: 1rem;
   }
@@ -522,383 +544,316 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
     color: var(--plum);
     text-decoration: underline;
   }
-  .masthead .wordmark {
-    font-size: 2.25rem;
-    line-height: 1;
-    padding: 0.25rem 0.5rem;
-  }
   .mast-cta {
-    justify-self: end;
     min-height: 2.75rem;
     padding-inline: 1.1rem;
     font-size: 0.9375rem;
   }
-  .masthead nav {
-    margin-block-start: 0.75rem;
-    border-block: 1px solid var(--linen);
-  }
-  .masthead nav ul {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    column-gap: clamp(0.25rem, 2vw, 2rem);
-    margin: 0;
-    padding: 0;
-  }
-  .masthead nav a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding-inline: 0.5rem;
-    font-size: 0.9375rem;
-    text-decoration: none;
-  }
-  .masthead nav a:hover {
-    color: var(--plum);
-    text-decoration: underline;
-    text-underline-offset: 0.3em;
-  }
-  @media (max-width: 47.99rem) {
-    .mast-row {
-      grid-template-columns: auto 1fr;
-    }
+  @media (max-width: 71.99rem) {
     .mast-hours {
       display: none;
     }
+  }
+  @media (max-width: 47.99rem) {
+    .masthead {
+      grid-template-columns: auto 1fr;
+      row-gap: 0.25rem;
+      padding-block-end: 0;
+    }
     .masthead .wordmark {
-      justify-self: start;
+      grid-row: 1;
+      grid-column: 1;
       padding-inline: 0;
     }
-    .wide-only {
-      display: none;
+    .mast-end {
+      grid-row: 1;
+      grid-column: 2;
+    }
+    .mast-nav {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      border-block-start: 1px solid var(--linen);
+      margin-inline: -0.25rem;
+    }
+    .mast-nav ul {
+      justify-content: space-between;
     }
   }
 
-  /* ---------- Hero ---------- */
+  /* ---------- Hero: the carte ---------- */
   .hero {
-    padding: clamp(2.5rem, 1.5rem + 4vw, 5rem) 1rem 0;
-    text-align: center;
+    padding: clamp(1.25rem, 0.5rem + 2.5vw, 2.5rem) 1rem 0;
   }
-  .hero h1 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: var(--step-h1);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    max-width: 14ch;
+  .hero-grid {
+    max-width: 82rem;
     margin-inline: auto;
+    display: grid;
+    gap: 1.5rem;
   }
-  .hero h1 span {
-    display: block;
-  }
-  @media (min-width: 60rem) {
-    .hero h1 {
-      max-width: none;
+  @media (min-width: 64rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(1.5rem, 2.5vw, 2.5rem);
     }
   }
-  .hero-lede {
-    max-width: 36rem;
-    margin: 1.75rem auto 0;
-    font-size: 1.125rem;
-    color: var(--ink-soft);
-  }
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-block-start: 2rem;
-  }
-
-  /* Arched window: the photo is framed like a doorway into the house. */
-  .arch {
-    margin: clamp(3rem, 2rem + 4vw, 5rem) auto 0;
-    max-width: 72rem;
-  }
-  .arch :global(.arch-img) {
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    object-position: 50% 30%;
-    border-radius: 50% 50% 0.25rem 0.25rem / 34% 34% 0.25rem 0.25rem;
-  }
-  @media (min-width: 48rem) {
-    .hero .arch :global(.arch-img) {
-      aspect-ratio: 2 / 1;
-      object-position: 50% 28%;
-      border-radius: 50% 50% 0.25rem 0.25rem / 60% 60% 0.25rem 0.25rem;
-    }
-  }
-  .arch figcaption {
-    margin-block-start: 0.75rem;
-    font-size: 0.875rem;
-    color: var(--ink-soft);
-    text-align: center;
-  }
-
-  /* ---------- Menu card ---------- */
-  .menu {
-    padding: clamp(4rem, 3rem + 5vw, 8rem) 1rem;
-  }
-  .card {
-    max-width: 50rem;
-    margin-inline: auto;
-    padding: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(1.25rem, 0.5rem + 4vw, 4.5rem);
-    background: var(--paper);
-    /* Double frame, the way a printed menu is bordered. */
+  .carte {
+    position: relative;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.25rem) clamp(1.25rem, 0.5rem + 3.5vw, 3.75rem)
+      clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--paper) var(--grain);
     border: 1px solid var(--plum);
     outline: 1px solid var(--linen-strong);
     outline-offset: -8px;
-    scroll-margin-block-start: 1rem;
+    box-shadow: 0 2rem 3rem -2.5rem rgb(43 27 46 / 0.45);
   }
-  .card-head {
-    text-align: center;
-  }
-  .card-head h2 {
+  .carte h1 {
     font-family: var(--serif);
     font-weight: 400;
-    font-size: var(--step-h2);
-    line-height: 1;
+    font-size: var(--step-h1);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
   }
-  .card-head p {
-    margin: 1rem auto 0;
+  .carte h1 span {
+    display: block;
+  }
+  .carte-credit {
+    margin-block-start: 0.9rem;
     max-width: 30rem;
-    color: var(--ink-soft);
-  }
-  .course {
-    margin-block-start: clamp(2.75rem, 2rem + 3vw, 4rem);
-  }
-  .course h3 {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: var(--step-h3);
-    line-height: 1.1;
-    text-align: center;
-    color: var(--plum);
-  }
-  .course-note {
-    text-align: center;
     font-size: 0.9375rem;
     color: var(--ink-soft);
-    margin: 0.4rem auto 0;
-    max-width: 30rem;
   }
-  .dishes {
-    margin: 1.75rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: 1.75rem;
+
+  /* The seal: brass, pressed into the corner, inked with the paper's grain. */
+  .seal {
+    position: absolute;
+    /* Pressed over the card's corner, the way a seal overlaps the edge of a page. */
+    inset-block-start: calc(-1 * clamp(0.6rem, 0.2rem + 1.2vw, 1.5rem));
+    inset-inline-end: calc(-1 * clamp(0.4rem, -0.2rem + 1.6vw, 1.5rem));
+    width: clamp(6.5rem, 5rem + 4vw, 9rem);
+    aspect-ratio: 1;
+    color: var(--brass);
+    rotate: -12deg;
+    border-radius: 50%;
+    text-decoration: none;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 0 0 0 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 0 0 0 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    -webkit-mask-size: 120px;
+    mask-size: 120px;
+    transition: color 0.2s ease;
   }
-  .dish-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    column-gap: 0.6rem;
+  .seal:hover {
+    color: var(--plum);
+  }
+  .seal:focus-visible {
+    border-radius: 50%;
+  }
+  .seal svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .seal text {
+    fill: currentColor;
+  }
+  .seal-ring {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 9.5px;
+  }
+  .seal-num {
     font-family: var(--serif);
-    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.75rem);
+    font-size: 27px;
+  }
+  .seal-stars {
+    font-size: 7.5px;
+    letter-spacing: 1px;
+  }
+
+  .carte-list {
+    margin: clamp(1.5rem, 1rem + 1.5vw, 2.25rem) 0 0;
+    padding: 0;
+    border-block-start: 1px solid var(--linen);
+  }
+  .carte-row,
+  .carte-side {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-family: var(--serif);
+  }
+  .carte-row {
+    padding-block: 0.4rem;
+    border-block-end: 1px solid var(--linen);
+    font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.9rem);
     line-height: 1.2;
   }
-  .dish-name {
+  .carte-name {
     text-decoration: none;
     background: linear-gradient(currentColor, currentColor) left 100% / 0 1px no-repeat;
     transition: background-size 0.3s ease;
   }
-  .dish-name:hover {
+  .carte-name:hover {
     color: var(--plum);
     background-size: 100% 1px;
   }
-  .leader {
-    flex: 1 1 2rem;
-    min-width: 2rem;
+  .carte .leader {
+    flex: 1 1 1.5rem;
+    min-width: 1.5rem;
     height: 4px;
     background: radial-gradient(circle, var(--linen-strong) 1.1px, transparent 1.5px) left bottom / 8px 4px repeat-x;
+    transition: background-image 0.2s;
   }
-  .dish-price {
-    margin-inline-start: auto;
+  .carte-row:has(.carte-name:hover) .leader {
+    background-image: radial-gradient(circle, var(--plum) 1.1px, transparent 1.5px);
+  }
+  .carte-price {
     white-space: nowrap;
-    text-wrap: nowrap;
   }
-  .dish-price i {
+  .carte-price i,
+  .carte-side i {
+    font-size: 0.8em;
     color: var(--ink-soft);
-    font-size: 0.85em;
   }
-  .dish-line {
-    margin-block-start: 0.35rem;
-    max-width: 34rem;
-    color: var(--ink-soft);
-    font-size: 1rem;
+  .carte-side {
+    margin-block-start: 0.75rem;
+    font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
   }
-  .dish-time {
-    margin-block-start: 0.2rem;
-    font-size: 0.875rem;
+  .carte-side > span:first-child {
+    font-style: italic;
     color: var(--plum);
   }
-  .card-foot {
-    margin-block-start: clamp(3rem, 2rem + 3vw, 4.5rem);
-    padding-block-start: 2rem;
-    border-block-start: 1px solid var(--linen);
-    text-align: center;
+  .carte-side a {
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--linen-strong);
   }
-  .source-note {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 1.125rem;
+  .carte-side a:hover {
+    color: var(--plum);
+  }
+  .carte-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  }
+  .carte-foot {
+    margin-block-start: 1rem;
+    font-size: 0.8125rem;
     color: var(--ink-soft);
   }
-  .films {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem 3rem;
-    margin: 1.25rem 0;
-    padding: 0;
+
+  /* The signature: on arrival the dot leaders run out from each name to its price, then the seal is pressed. */
+  @media (prefers-reduced-motion: no-preference) {
+    .carte .leader {
+      animation: run 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation-delay: calc(0.2s + var(--i, 0) * 0.08s);
+    }
+    .carte-price,
+    .carte-side i {
+      animation: ink 0.5s ease both;
+      animation-delay: calc(0.6s + var(--i, 0) * 0.08s);
+    }
+    .seal {
+      animation: stamp 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) 1.35s both;
+    }
   }
-  .films img {
-    height: 2.5rem;
-    width: auto;
+  @keyframes run {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes ink {
+    from {
+      opacity: 0;
+      translate: 0.35rem 0;
+    }
+  }
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      scale: 1.35;
+    }
   }
 
-  /* ---------- Lounge: the room upstairs ---------- */
-  .lounge {
-    background: var(--ink);
-    color: var(--cloth);
-    padding: clamp(4.5rem, 3rem + 6vw, 9rem) 1rem;
-  }
-  .lounge a:focus-visible {
-    outline-color: var(--brass-light);
-  }
-  .lounge-inner {
-    max-width: 72rem;
-    margin-inline: auto;
-  }
-  .lounge-head {
-    text-align: center;
-    max-width: 40rem;
-    margin-inline: auto;
-  }
-  .lounge-head h2 {
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: var(--step-h2);
-    line-height: 1;
-  }
-  .lounge-where {
-    margin-block-start: 0.6rem;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 1.375rem;
-    color: var(--brass-light);
-  }
-  .lounge-pitch {
-    margin-block-start: 1.25rem;
-    color: var(--linen);
-    font-size: 1.125rem;
-  }
-  .lounge-photos {
+  /* Photo: an arched window onto the studio floor. */
+  .hero-photo {
+    margin: 0;
     display: grid;
-    gap: 1.5rem;
-    margin-block-start: clamp(2.5rem, 2rem + 3vw, 4rem);
+    grid-template-rows: 1fr auto;
   }
-  @media (min-width: 60rem) {
-    .lounge-photos {
-      grid-template-columns: 5fr 3fr;
-      align-items: end;
+  .hero-photo :global(picture) {
+    display: block;
+    min-height: 0;
+  }
+  .hero-photo :global(.hero-img) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 40% 60%;
+    border-radius: 50% 50% 0.25rem 0.25rem / 26% 26% 0.25rem 0.25rem;
+  }
+  @media (min-width: 64rem) {
+    .hero-photo :global(.hero-img) {
+      aspect-ratio: auto;
+      min-height: 30rem;
     }
   }
-  .lp :global(img) {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: 0.25rem;
-  }
-  .lp:not(.lp-main) :global(img) {
-    aspect-ratio: 4 / 5;
-    object-position: 60% 50%;
-  }
-  .lp figcaption {
+  .hero-photo figcaption {
     margin-block-start: 0.6rem;
     font-size: 0.875rem;
-    color: var(--linen);
-  }
-  .notes {
-    margin-block-start: clamp(3rem, 2rem + 4vw, 5rem);
-    max-width: 66rem;
-    margin-inline: auto;
-  }
-  .notes h3 {
-    font-family: var(--serif);
-    font-style: italic;
-    font-weight: 400;
-    font-size: var(--step-h3);
+    color: var(--ink-soft);
     text-align: center;
-    color: var(--brass-light);
   }
-  .notes dl {
-    margin: 2rem 0 0;
+
+  /* Promises: the operational proof, straight under the offer. */
+  .promises {
+    max-width: 82rem;
+    margin: clamp(2rem, 1.5rem + 2vw, 3rem) auto 0;
+    padding: 1.5rem 0 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(13rem, 42%), 1fr));
-    gap: 1.75rem clamp(1.25rem, 3vw, 2.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(9.5rem, 100%), 1fr));
+    gap: 1.25rem clamp(1rem, 3vw, 2rem);
+    border-block-start: 1px solid var(--linen);
   }
-  .notes dl > div {
-    padding-block-start: 1rem;
-    border-block-start: 1px solid rgb(217 212 204 / 0.25);
-  }
-  .notes dt {
+  .p-title {
     font-family: var(--serif);
-    font-size: 1.5rem;
-    line-height: 1.2;
+    font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem);
+    line-height: 1.15;
+    display: flex;
+    gap: 0.55rem;
+    align-items: baseline;
   }
-  .notes dd {
-    margin: 0.25rem 0 0;
-    color: var(--linen);
-    font-size: 0.975rem;
+  .p-title::before {
+    content: '';
+    flex: none;
+    width: 0.7rem;
+    height: 0.38rem;
+    border-inline-start: 2px solid var(--brass);
+    border-block-end: 2px solid var(--brass);
+    rotate: -45deg;
+    translate: 0 -0.25rem;
   }
-  .lounge-quote {
-    margin: clamp(3.5rem, 2.5rem + 4vw, 6rem) auto 0;
-    max-width: 52rem;
-    text-align: center;
+  .p-proof {
+    padding-inline-start: 1.25rem;
   }
-  .lounge-quote blockquote p {
-    font-family: var(--serif);
-    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
-    line-height: 1.08;
-    letter-spacing: -0.01em;
-    text-wrap: balance;
-  }
-  .lounge-quote figcaption,
-  .lounge-more figcaption {
-    margin-block-start: 1rem;
+  .p-proof {
+    margin-block-start: 0.3rem;
     font-size: 0.9375rem;
-    color: var(--brass-light);
-  }
-  .lounge-more {
-    margin: 3rem auto 0;
-    padding: 0;
-    max-width: 52rem;
-    display: grid;
-    gap: 2rem 3rem;
-  }
-  @media (min-width: 48rem) {
-    .lounge-more {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  .lounge-more blockquote p {
-    font-family: var(--serif);
+    color: var(--ink-soft);
     font-style: italic;
-    font-size: 1.375rem;
-    line-height: 1.3;
-    color: var(--cloth);
   }
-  .lounge-more li {
-    text-align: center;
+  .p-proof span {
+    font-style: normal;
+    white-space: nowrap;
   }
 
   /* ---------- Work ---------- */
   .work {
     padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    border-block-start: 1px solid var(--linen);
   }
   .work-grid {
     max-width: 72rem;
@@ -942,7 +897,7 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   .book {
     max-width: 64rem;
     margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
-    background: var(--paper);
+    background: var(--paper) var(--grain);
     border: 1px solid var(--linen);
     border-radius: 0.25rem;
     box-shadow: 0 1.5rem 3rem -2rem rgb(43 27 46 / 0.35);
@@ -951,7 +906,6 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   @media (min-width: 48rem) {
     .book {
       grid-template-columns: 1fr 1fr;
-      /* The spine: a soft fold down the middle of the open book. */
       background:
         linear-gradient(
             to right,
@@ -961,6 +915,7 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
             rgb(43 27 46 / 0.07) calc(50% + 1px),
             transparent calc(50% + 2.5rem)
           ),
+        var(--grain),
         var(--paper);
     }
   }
@@ -980,7 +935,6 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
       padding-block-start: 0;
     }
     .page + .page li:first-child {
-      margin-block-start: 0;
       padding-block-start: 1.75rem;
       border-block-start: 1px solid var(--linen);
     }
@@ -1003,6 +957,71 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   }
   .g-for {
     color: var(--ink-soft);
+  }
+
+  /* ---------- Lounge: brief ---------- */
+  .lounge {
+    background: var(--ink);
+    color: var(--cloth);
+    padding: clamp(3.5rem, 2.5rem + 4vw, 6rem) 1rem;
+  }
+  .lounge-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 2rem clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .lounge-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .lounge-photo {
+    margin: 0;
+  }
+  .lounge-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+  }
+  .lounge-photo figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--linen);
+    text-align: center;
+  }
+  .lounge-where {
+    margin-block-start: 0.5rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.375rem;
+    color: var(--brass-light);
+  }
+  .lounge-where + p {
+    margin-block-start: 1rem;
+    color: var(--linen);
+    max-width: 34rem;
+  }
+  .lounge-quote {
+    margin: 1.75rem 0 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 2px solid var(--brass-light);
+  }
+  .lounge-quote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.8rem);
+    line-height: 1.2;
+  }
+  .lounge-quote figcaption {
+    margin-block-start: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--brass-light);
+  }
+  .lounge a:focus-visible {
+    outline-color: var(--brass-light);
   }
 
   /* ---------- Reservations ---------- */
@@ -1052,7 +1071,6 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   .details {
     margin: 2rem 0 0;
     display: grid;
-    gap: 0;
     border-block-start: 1px solid var(--linen-strong);
   }
   .details > div {
@@ -1095,8 +1113,17 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
     justify-self: center;
   }
   .arch-night :global(.arch-img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
     object-position: 100% 50%;
     border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+  }
+  .arch-night figcaption {
+    margin-block-start: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-align: center;
   }
   @media (max-width: 30rem) {
     .details > div {
@@ -1130,7 +1157,6 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   }
   .foot-brand .wordmark {
     font-size: 1.75rem;
-    font-style: italic;
   }
   .foot nav ul {
     display: flex;
@@ -1158,8 +1184,9 @@ const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dish-name,
-    .btn {
+    .carte-name,
+    .btn,
+    .seal {
       transition: none;
     }
   }

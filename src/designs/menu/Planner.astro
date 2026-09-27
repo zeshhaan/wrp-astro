@@ -1,28 +1,33 @@
 ---
 /**
- * The signature moment: "Plan your visit".
- * A real form. Ticking services updates a bill-style slip (starting total,
- * how long the car stays, what to do meanwhile) and the WhatsApp link.
+ * "Build your plan": the full menu is the order form.
+ * Tell us the car, tick what it needs; the bill beside it shows starting prices
+ * (sized to the car), how long we'll have it, how it gets to us, and what every
+ * job includes. Then the whole plan goes to WhatsApp, prefilled.
  */
 import { getEntry } from 'astro:content';
-import { contact, whatsappLink } from '../data';
-import { courses, timeRange, timeWords, aed, washLevelNotes, washLevelFallback, updatesQuote } from './menu';
+import { contact, whatsappLink, proof } from '../data';
+import { dishes, aed, washLevelFallback, washLevelNotes, promises } from './menu';
 
 const wash = await getEntry('services', 'premium-car-wash').catch(() => undefined);
-const levels =
+const allLevels =
   wash?.data.packages?.map((p) => ({ name: p.name, sedan: p.price, suv: p.priceSuv ?? p.price })) ?? washLevelFallback;
-
-const items = courses.flatMap((c) => c.items);
-const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me choose?";
+// Level 3 is sold as "Detailing"; the wash row offers Levels 1 and 2.
+const levels = allLevels.filter((l) => l.name !== 'Level 3');
+const level3 = allLevels.find((l) => l.name === 'Level 3') ?? washLevelFallback[2];
+const items = dishes.map((d) =>
+  d.slug === 'detailing' ? { ...d, sedan: level3.sedan, suv: level3.suv } : d,
+);
+const emptyMessage = "Hello WRP, I'd like a quote for my car.";
 ---
 
 <section class="plan" id="plan" aria-labelledby="plan-title">
   <div class="plan-inner">
     <header class="plan-head">
-      <h2 id="plan-title">Plan your visit</h2>
+      <h2 id="plan-title">Build your plan</h2>
       <p>
-        Tick what the car needs. You’ll see a starting price, how long the car stays with us and how to spend
-        that time. Then send the plan on WhatsApp and we’ll reply with a quote and a time.
+        Tell us the car and tick what it needs. You’ll see starting prices for your size of car and how long
+        we’ll have it. Then send the whole plan on WhatsApp and we’ll reply with a quote and a day.
       </p>
     </header>
 
@@ -32,62 +37,82 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
         <a href="#slip">See your plan</a>
       </p>
 
+      <fieldset class="car">
+        <legend>Your car</legend>
+        <div class="car-grid">
+          <div class="sizes" role="radiogroup" aria-label="Size of car">
+            <label class="chip">
+              <input type="radio" name="size" value="sedan" checked />
+              <span>Sedan, coupe or hatch</span>
+            </label>
+            <label class="chip">
+              <input type="radio" name="size" value="suv" />
+              <span>SUV, 4x4 or pickup</span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="plan-car">Make and model <span class="optional">(optional)</span></label>
+            <input
+              id="plan-car"
+              name="car"
+              type="text"
+              maxlength="80"
+              aria-describedby="plan-car-hint"
+              autocomplete="off"
+            />
+            <p class="hint" id="plan-car-hint">For example, Land Cruiser 2021. It helps us quote properly.</p>
+          </div>
+        </div>
+      </fieldset>
+
       <fieldset class="picks">
-        <legend>What does the car need?</legend>
+        <legend>What does it need?</legend>
         <ul role="list">
           {
-            items.map((s) => {
-              const r = timeRange(s.time);
-              const isWash = s.slug === 'premium-car-wash';
-              return (
-                <li class="pick" data-pick={s.slug}>
+            items.map((d) => (
+              <li class:list={['pick', { side: d.side }]} data-pick={d.slug} id={`menu-${d.slug}`}>
+                <div class="pick-row">
                   <input
                     class="tick"
                     type="checkbox"
                     name="service"
-                    value={s.slug}
-                    id={`pick-${s.slug}`}
-                    data-name={s.name}
-                    data-from={s.from ?? ''}
-                    data-minutes={s.minutes}
-                    data-lo={r.lo}
-                    data-hi={r.hi}
-                    data-unit={r.unit}
-                    aria-describedby={`pick-${s.slug}-meta`}
+                    value={d.slug}
+                    id={`pick-${d.slug}`}
+                    data-name={d.short}
+                    data-sedan={d.sedan ?? ''}
+                    data-suv={d.suv ?? ''}
+                    data-lo={d.lo}
+                    data-hi={d.hi}
+                    data-unit={d.unit ?? ''}
+                    aria-describedby={`pick-${d.slug}-line`}
                   />
-                  <label for={`pick-${s.slug}`} class="pick-label">
-                    <span class="pick-name">{s.name}</span>
+                  <label for={`pick-${d.slug}`} class="pick-label">
+                    <span class="pick-name">{d.name}</span>
+                    <span class="leader" aria-hidden="true" />
                     <span class="pick-price">
-                      {s.from ? (
+                      {d.sedan ? (
                         <>
-                          <i>from</i> {aed(s.from)}
+                          <i>from</i> <span data-price data-sedan={d.sedan} data-suv={d.suv ?? d.sedan}>{aed(d.sedan)}</span>
                         </>
                       ) : (
-                        <i>after inspection</i>
+                        <i>priced after inspection</i>
                       )}
                     </span>
                   </label>
-                  <span class="pick-meta" id={`pick-${s.slug}-meta`}>
-                    With us {timeWords(s.time)}
-                  </span>
+                </div>
 
-                  {isWash && (
-                    <div class="options" data-options hidden>
-                      <fieldset class="opt-set">
-                        <legend>Car size</legend>
-                        <div class="sizes">
-                          <label class="chip">
-                            <input type="radio" name="size" value="sedan" checked />
-                            <span>Sedan or coupe</span>
-                          </label>
-                          <label class="chip">
-                            <input type="radio" name="size" value="suv" />
-                            <span>SUV or 4x4</span>
-                          </label>
-                        </div>
-                      </fieldset>
-                      <fieldset class="opt-set">
-                        <legend>Wash level</legend>
+                <div class="pick-body">
+                  <div class="pick-text">
+                    <p class="pick-line" id={`pick-${d.slug}-line`}>{d.line}</p>
+                    <p class="pick-meta">
+                      {d.unit ? <>With us {d.time}.</> : <>Time and price once we’ve seen the car.</>}
+                      {d.facts.length > 0 && <> {d.facts.join('. ')}.</>}
+                    </p>
+                    <a class="pick-more" href={d.href}>{d.hrefLabel}</a>
+
+                    {d.levels && (
+                      <fieldset class="options" data-options hidden>
+                        <legend>Which wash?</legend>
                         <div class="levels">
                           {levels.map((l, i) => (
                             <label class="level">
@@ -100,7 +125,7 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
                                 checked={i === 0}
                               />
                               <span class="level-name">{l.name}</span>
-                              <span class="level-price" data-level-price>
+                              <span class="level-price" data-price data-sedan={l.sedan} data-suv={l.suv}>
                                 {aed(l.sedan)}
                               </span>
                               <span class="level-note">{washLevelNotes[l.name] ?? ''}</span>
@@ -108,26 +133,58 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
                           ))}
                         </div>
                       </fieldset>
-                    </div>
-                  )}
-                </li>
-              );
-            })
+                    )}
+                  </div>
+
+                  <figure class="note">
+                    <blockquote>
+                      <p>“{d.note.text}”</p>
+                    </blockquote>
+                    <figcaption>
+                      {d.note.author}, Google review{d.note.when && <>, {d.note.when}</>}
+                    </figcaption>
+                  </figure>
+                </div>
+              </li>
+            ))
           }
         </ul>
       </fieldset>
 
-      <div class="field">
-        <label for="plan-car">Your car <span class="optional">(optional)</span></label>
-        <p class="hint" id="plan-car-hint">Make, model and year help us quote properly.</p>
-        <input id="plan-car" name="car" type="text" aria-describedby="plan-car-hint" maxlength="80" />
-      </div>
+      <fieldset class="how">
+        <legend>Getting the car to us</legend>
+        <div class="sizes">
+          <label class="chip">
+            <input type="radio" name="how" value="bring" checked />
+            <span>I’ll bring it in</span>
+          </label>
+          <label class="chip">
+            <input type="radio" name="how" value="collect" />
+            <span>Please collect it and bring it back</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <footer class="films-foot">
+        <p>Our paint protection film comes from</p>
+        <ul role="list" class="films">
+          {
+            proof.films.map((f) => (
+              <li>
+                <img src={f.logo} alt={f.name} height="40" width={f.name === 'STEK' ? 171 : 122} loading="lazy" />
+              </li>
+            ))
+          }
+        </ul>
+        <p>with up to a 10-year warranty.</p>
+      </footer>
     </form>
 
     <div class="slip-wrap">
-      <div class="slip" id="slip" tabindex="-1" data-wa={contact.whatsapp}>
-        <h3 id="slip-title">Your visit</h3>
-        <p class="slip-empty" data-empty>Nothing yet. Tick a service and it appears here.</p>
+      <div class="slip" id="slip" tabindex="-1" data-wa={contact.whatsapp} data-mode="empty">
+        <h3>Your plan</h3>
+        <p class="slip-car" data-car>Sedan or coupe</p>
+        <p class="slip-empty" data-empty>Tick a service and it appears here.</p>
         <ul role="list" class="slip-lines" data-lines></ul>
 
         <dl class="slip-sum">
@@ -137,21 +194,20 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
           </div>
           <p class="slip-extra" data-extra hidden></p>
           <div class="sum-time">
-            <dt>Your car stays with us</dt>
+            <dt>We’ll have the car</dt>
             <dd data-time>Tick a service</dd>
+          </div>
+          <div class="sum-how">
+            <dt>Getting it to us</dt>
+            <dd data-how>You bring it in</dd>
           </div>
         </dl>
 
-        <div class="slip-wait">
-          <h4 data-wait-title>While it’s with us</h4>
-          <p data-suggest>Tick a service and we’ll suggest how to spend the time.</p>
-          <p class="slip-materials" data-materials hidden>
-            Choosing film or leather? Look through the samples in the materials room upstairs first.
-          </p>
-          <blockquote class="slip-quote" data-quote hidden>
-            <p>“{updatesQuote.text}”</p>
-            <footer>{updatesQuote.author}, from a Google review</footer>
-          </blockquote>
+        <div class="slip-promise">
+          <h4>With every job</h4>
+          <ul role="list">
+            {promises.map((p) => <li>{p.title}</li>)}
+          </ul>
         </div>
 
         <a class="send" data-send href={whatsappLink(emptyMessage)} target="_blank" rel="noopener">
@@ -159,7 +215,7 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
           Send this plan on WhatsApp
         </a>
         <div class="slip-foot">
-          <button type="reset" form="plan-form" class="clear">Clear the plan</button>
+          <button type="reset" form="plan-form" class="clear">Start again</button>
           <p>Starting prices. We confirm the final price once we’ve seen the car.</p>
         </div>
       </div>
@@ -172,13 +228,12 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
 
 <script>
   // Build links here rather than importing data.ts, which would ship the review data to the client.
-
-  type Line = { slug: string; label: string; price: number | null; lo: number; hi: number; unit: string; minutes: number };
+  type Line = { slug: string; label: string; price: number | null; lo: number; hi: number; unit: string };
 
   const form = document.getElementById('plan-form') as HTMLFormElement | null;
   const slip = document.getElementById('slip');
   if (form && slip) {
-    const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = slip) => root.querySelector<T>(sel)!;
+    const $ = <T extends Element = HTMLElement>(sel: string) => slip.querySelector<T>(sel)!;
     const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="service"]')];
     const options = form.querySelector<HTMLElement>('[data-options]');
     const linesEl = $<HTMLUListElement>('[data-lines]');
@@ -187,71 +242,49 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
     const waBase = slip.dataset.wa ?? 'https://wa.me/971547173000';
     const whatsappLink = (m: string) => `${waBase}?text=${encodeURIComponent(m)}`;
+    const sizeName = { sedan: 'Sedan or coupe', suv: 'SUV or 4x4' } as const;
     let announceTimer = 0;
     let lastTotal = '';
 
-    const readLines = (): Line[] => {
-      const size = form.querySelector<HTMLInputElement>('input[name="size"]:checked')?.value ?? 'sedan';
+    const val = (name: string) => form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
+
+    const readLines = (size: 'sedan' | 'suv'): Line[] => {
       const level = form.querySelector<HTMLInputElement>('input[name="level"]:checked');
       return boxes
         .filter((b) => b.checked)
         .map((b) => {
           const d = b.dataset;
-          let price = d.from ? Number(d.from) : null;
+          const raw = size === 'suv' ? d.suv : d.sedan;
+          let price = raw ? Number(raw) : null;
           let label = d.name ?? b.value;
           if (b.value === 'premium-car-wash' && level) {
             price = Number(size === 'suv' ? level.dataset.suv : level.dataset.sedan);
-            label = `${label}, ${level.value}, ${size === 'suv' ? 'SUV' : 'sedan'}`;
+            label = `${label}, ${level.value}`;
           }
-          return {
-            slug: b.value,
-            label,
-            price,
-            lo: Number(d.lo),
-            hi: Number(d.hi),
-            unit: d.unit ?? 'hours',
-            minutes: Number(d.minutes),
-          };
+          return { slug: b.value, label, price, lo: Number(d.lo), hi: Number(d.hi), unit: d.unit ?? '' };
         });
     };
 
-    /** Honest timing: day jobs overlap, but each extra one can add a day. Hour jobs add up. */
+    /** Day jobs overlap, but each extra one can add a day. Hour jobs add up; a long day becomes a drop-off. */
     const timing = (lines: Line[]) => {
-      if (!lines.length) return null;
-      const dropOff = lines.some((l) => l.minutes >= 8 * 60);
-      const days = lines.filter((l) => l.unit === 'days');
+      const timed = lines.filter((l) => l.unit);
+      if (!timed.length) return null;
+      const days = timed.filter((l) => l.unit === 'days');
       if (days.length) {
         const lo = Math.max(...days.map((l) => l.lo));
         const hi = Math.max(...days.map((l) => l.hi)) + days.length - 1;
-        return { text: `${lo} to ${hi} days`, mode: 'dropoff' as const };
+        return { text: `${lo} to ${hi} days`, short: false };
       }
-      const lo = lines.reduce((a, l) => a + l.lo, 0);
-      const hi = lines.reduce((a, l) => a + l.hi, 0);
-      const total = lines.reduce((a, l) => a + l.minutes, 0);
-      const mode = dropOff ? ('dropoff' as const) : total <= 180 ? ('short' as const) : ('long' as const);
-      return { text: `About ${lo} to ${hi} hours`, mode };
-    };
-
-    const suggestions = {
-      short: {
-        title: 'While you wait',
-        text: 'Stay for it. That’s time for a karak upstairs and a frame of billiards, or a board game if someone came with you.',
-        say: "I'll wait upstairs in the lounge.",
-      },
-      long: {
-        title: 'Stay or go',
-        text: 'Either works. The lounge has the sofa, the big screen and coffee for the afternoon, or drop the car off in the morning and collect it that evening.',
-        say: "I may wait in the lounge or drop the car off, whichever suits.",
-      },
-      dropoff: {
-        title: 'Leave it with us',
-        text: 'This one is a drop-off. We send photos and videos while we work, so you see it come together without waiting around.',
-        say: "I'll drop the car off.",
-      },
+      const lo = timed.reduce((a, l) => a + l.lo, 0);
+      const hi = timed.reduce((a, l) => a + l.hi, 0);
+      if (hi > 10) return { text: '1 to 2 days', short: false };
+      return { text: `About ${lo} to ${hi} hours`, short: hi <= 3 };
     };
 
     const render = () => {
-      const lines = readLines();
+      const size = (val('size') as 'sedan' | 'suv' | undefined) ?? 'sedan';
+      const how = val('how') ?? 'bring';
+      const lines = readLines(size);
       const t = timing(lines);
       const known = lines.filter((l) => l.price !== null);
       const unknown = lines.filter((l) => l.price === null);
@@ -263,11 +296,10 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
       const washOn = boxes.find((b) => b.value === 'premium-car-wash')?.checked ?? false;
       if (options) options.hidden = !washOn;
 
-      // Wash level prices follow the chosen size.
-      const size = form.querySelector<HTMLInputElement>('input[name="size"]:checked')?.value ?? 'sedan';
-      form.querySelectorAll<HTMLInputElement>('input[name="level"]').forEach((r) => {
-        const out = r.parentElement?.querySelector('[data-level-price]');
-        if (out) out.textContent = aed(Number(size === 'suv' ? r.dataset.suv : r.dataset.sedan));
+      // Prices on the menu follow the size of car.
+      form.querySelectorAll<HTMLElement>('[data-price]').forEach((el) => {
+        const n = Number(size === 'suv' ? el.dataset.suv : el.dataset.sedan);
+        if (n) el.textContent = aed(n);
       });
 
       // Slip lines: keyed, so only new lines animate in.
@@ -285,11 +317,14 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
           linesEl.insertBefore(li, next ?? null);
         }
         li.querySelector('.l-name')!.textContent = l.label;
-        li.querySelector('.l-price')!.textContent = l.price === null ? 'After inspection' : aed(l.price);
+        li.querySelector('.l-price')!.textContent = l.price === null ? 'On inspection' : aed(l.price);
       });
       $('[data-empty]').hidden = lines.length > 0;
 
-      const totalText = known.length ? `From ${aed(total)}` : unknown.length ? 'After inspection' : 'AED 0';
+      const carLine = car ? `${car}, ${sizeName[size]}` : sizeName[size];
+      $('[data-car]').textContent = carLine;
+
+      const totalText = known.length ? `From ${aed(total)}` : unknown.length ? 'On inspection' : 'AED 0';
       const totalEl = $('[data-total]');
       totalEl.textContent = totalText;
       if (totalText !== lastTotal && lastTotal) {
@@ -301,76 +336,71 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
 
       const extra = $('[data-extra]');
       extra.hidden = !(unknown.length && known.length);
-      extra.textContent = `Plus ${unknown.map((l) => l.label.toLowerCase()).join(' and ')}, priced after inspection.`;
+      extra.textContent = `Plus ${unknown.map((l) => l.label.toLowerCase()).join(' and ')}, priced once we’ve seen the car.`;
 
-      $('[data-time]').textContent = t ? (t.mode === 'dropoff' ? `${t.text}, drop-off` : t.text) : 'Tick a service';
-      const s = t ? suggestions[t.mode] : null;
-      $('[data-wait-title]').textContent = s ? s.title : 'While it’s with us';
-      $('[data-suggest]').textContent = s ? s.text : 'Tick a service and we’ll suggest how to spend the time.';
-      $('[data-quote]').hidden = t?.mode !== 'dropoff';
-      $('[data-materials]').hidden = !lines.some((l) =>
-        ['paint-protection-film', 'window-film', 'leather-upholstery'].includes(l.slug),
-      );
-      slip.dataset.mode = t?.mode ?? 'empty';
+      const timeText = t
+        ? `${t.text}${t.short ? ', short enough to wait for' : ''}`
+        : unknown.length
+          ? 'Timed once we’ve seen the car'
+          : 'Tick a service';
+      $('[data-time]').textContent = timeText;
+      $('[data-how]').textContent = how === 'collect' ? 'We collect it and bring it back' : 'You bring it in';
+      slip.dataset.mode = lines.length ? 'full' : 'empty';
 
-      peekText.textContent = lines.length
-        ? `${totalText}, ${t!.text.replace(/^About /, 'about ')}`
-        : 'Nothing ticked yet';
+      peekText.textContent = lines.length ? `${totalText}, ${timeText.replace(/^About /, 'about ')}` : 'Nothing ticked yet';
 
-      // The WhatsApp message.
-      let msg = "Hello WRP, I'd like to plan a visit. Could you help me choose?";
+      // The WhatsApp message: everything the team needs to quote without a round trip.
+      const out = [lines.length ? "Hello WRP, I'd like a quote for this plan." : emptyGreeting(), ''];
+      out.push(`Car: ${car ? `${car} (${sizeName[size]})` : sizeName[size]}`);
       if (lines.length) {
-        const out = ["Hello WRP, I'd like to plan a visit.", ''];
+        out.push('');
         lines.forEach((l) => out.push(`- ${l.label}: ${l.price === null ? 'price after inspection' : `from ${aed(l.price)}`}`));
         out.push('');
-        if (known.length) out.push(`Starting total: from ${aed(total)}${unknown.length ? ', plus the inspection items' : ''}`);
-        out.push(`Time with you: ${t!.text.replace(/^About /, 'about ')}`);
-        out.push(suggestions[t!.mode].say);
-        if (car) out.push(`My car: ${car}`);
-        out.push('', 'Which day works for you?');
-        msg = out.join('\n');
-      } else if (car) {
-        msg += `\nMy car: ${car}`;
+        if (known.length) out.push(`Starting total: from ${aed(total)}${unknown.length ? ', plus the items priced after inspection' : ''}`);
+        if (t) out.push(`Time with you: ${t.text.replace(/^About /, 'about ')}`);
       }
-      $<HTMLAnchorElement>('[data-send]').href = whatsappLink(msg);
+      out.push(how === 'collect' ? 'Please collect the car and bring it back.' : "I'll bring the car in.");
+      out.push('', 'Which day works for you?');
+      $<HTMLAnchorElement>('[data-send]').href = whatsappLink(out.join('\n'));
 
       // One polite, debounced announcement per change.
       window.clearTimeout(announceTimer);
       announceTimer = window.setTimeout(() => {
         announceEl.textContent = lines.length
-          ? `Plan updated. ${lines.length} ${lines.length === 1 ? 'service' : 'services'}. ${totalText}. ${t!.text}${t!.mode === 'dropoff' ? ', drop-off' : ''}.`
-          : 'Plan cleared.';
+          ? `Plan updated. ${lines.length} ${lines.length === 1 ? 'service' : 'services'}. ${totalText}. ${timeText}.`
+          : 'Plan is empty.';
       }, 450);
     };
+    function emptyGreeting() {
+      return "Hello WRP, I'd like a quote for my car.";
+    }
 
     form.addEventListener('change', render);
     form.addEventListener('input', (e) => {
       if ((e.target as HTMLElement).id === 'plan-car') render();
     });
     form.addEventListener('reset', () => requestAnimationFrame(render));
-    // Restore state after back/forward navigation (browsers keep checked boxes).
     window.addEventListener('pageshow', render);
+
     render();
   }
 </script>
 
 <style>
   .plan {
-    padding-block: clamp(4rem, 3rem + 5vw, 8rem);
+    padding-block: clamp(4rem, 3rem + 5vw, 7.5rem);
     padding-inline: 1rem;
-    border-block-start: 1px solid var(--linen);
     accent-color: var(--plum);
+    background: var(--cloth);
   }
   .plan-inner {
-    max-width: 72rem;
+    max-width: 82rem;
     margin-inline: auto;
     display: grid;
     gap: 2.5rem;
   }
   .plan-head {
-    text-align: center;
-    max-width: 38rem;
-    margin-inline: auto;
+    max-width: 44rem;
   }
   .plan-head h2 {
     font-family: var(--serif);
@@ -380,14 +410,14 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     letter-spacing: -0.01em;
   }
   .plan-head p {
-    margin-block-start: 1.25rem;
+    margin-block-start: 1.1rem;
     color: var(--ink-soft);
+    max-width: 38rem;
   }
-
-  @media (min-width: 60rem) {
+  @media (min-width: 64rem) {
     .plan-inner {
-      grid-template-columns: minmax(0, 1fr) minmax(22rem, 26rem);
-      column-gap: clamp(2.5rem, 5vw, 5rem);
+      grid-template-columns: minmax(0, 1fr) minmax(21rem, 24rem);
+      column-gap: clamp(2rem, 4vw, 4rem);
       align-items: start;
     }
     .plan-head {
@@ -395,33 +425,114 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     }
     .slip-wrap {
       position: sticky;
-      top: 1.5rem;
+      top: 1.25rem;
     }
     .peek {
       display: none !important;
     }
   }
 
-  /* ---------- Form ---------- */
+  /* ---------- The form is a printed menu card ---------- */
   .plan-form {
     display: grid;
-    gap: 2rem;
+    gap: clamp(2rem, 1.5rem + 2vw, 3rem);
     min-width: 0;
+    padding: clamp(1.5rem, 0.75rem + 3vw, 3.5rem) clamp(1.1rem, 0.5rem + 3vw, 3.5rem);
+    background: var(--paper) var(--grain);
+    border: 1px solid var(--plum);
+    outline: 1px solid var(--linen-strong);
+    outline-offset: -8px;
+    container-type: inline-size;
   }
-  .picks {
+  fieldset {
     border: 0;
     margin: 0;
     padding: 0;
     min-width: 0;
   }
+  .car > legend,
   .picks > legend,
-  .field > label {
+  .how > legend {
     font-family: var(--serif);
-    font-size: 1.75rem;
-    line-height: 1.15;
+    font-style: italic;
+    color: var(--plum);
+    font-size: var(--step-h3);
+    line-height: 1.1;
     padding: 0;
     margin-block-end: 1rem;
   }
+  .car-grid {
+    display: grid;
+    gap: 1.25rem 2rem;
+  }
+  @container (min-width: 44rem) {
+    .car-grid {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+  .sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 1rem 0.4rem 0.8rem;
+    border: 1px solid var(--linen-strong);
+    border-radius: 999px;
+    background: var(--cloth);
+    cursor: pointer;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .chip:has(:checked) {
+    border-color: var(--plum);
+    box-shadow: inset 0 0 0 1px var(--plum);
+    background: var(--plum-wash);
+  }
+  .chip input,
+  .level input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    flex: none;
+  }
+  .field {
+    display: grid;
+    gap: 0.3rem;
+    max-width: 26rem;
+  }
+  .field label {
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+  .optional,
+  .hint {
+    font-weight: 400;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+  }
+  .field input {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--ink-soft);
+    border-radius: 0.5rem;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+  .field input:focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 2px;
+    border-color: var(--plum);
+  }
+
+  /* ---------- Menu rows ---------- */
   .picks ul {
     margin: 0;
     padding: 0;
@@ -429,12 +540,10 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
   .pick {
     position: relative;
-    display: grid;
-    grid-template-columns: 1.25rem minmax(0, 1fr);
-    column-gap: 1rem;
-    padding: 1.1rem 1rem 1.1rem 0.9rem;
+    padding: 1.4rem 0.75rem 1.5rem 0.9rem;
     border-block-end: 1px solid var(--linen);
-    transition: background-color 0.2s ease;
+    transition: background-color 0.25s ease;
+    scroll-margin-block-start: 5rem;
   }
   .pick::before {
     content: '';
@@ -446,72 +555,130 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     transform: scaleY(0);
     transition: transform 0.25s ease;
   }
-  :is(.pick:has(> .tick:checked), .pick.is-on) {
+  :is(.pick:has(.tick:checked), .pick.is-on) {
     background: var(--plum-wash);
   }
-  :is(.pick:has(> .tick:checked), .pick.is-on)::before {
+  :is(.pick:has(.tick:checked), .pick.is-on)::before {
     transform: scaleY(1);
   }
+  .pick:target {
+    background: var(--plum-wash);
+  }
+  .pick-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    column-gap: 0.9rem;
+    align-items: baseline;
+  }
   .tick {
-    grid-row: 1;
-    grid-column: 1;
+    position: relative;
+    z-index: 1;
     width: 1.25rem;
     height: 1.25rem;
-    margin: 0.3rem 0 0;
+    margin: 0;
+    align-self: center;
     cursor: pointer;
   }
   .pick-label {
-    grid-row: 1;
-    grid-column: 2;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    justify-content: space-between;
-    column-gap: 1rem;
+    column-gap: 0.6rem;
     cursor: pointer;
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.9rem);
+    line-height: 1.15;
   }
-  /* Make the whole row a tap target without nesting controls in the label. */
+  /* The whole name row is the tap target. */
   .pick-label::after {
     content: '';
     position: absolute;
-    inset: 0;
-    z-index: 0;
+    inset: -0.5rem -0.5rem;
   }
-  .tick,
+  .leader {
+    flex: 1 1 2rem;
+    min-width: 2rem;
+    height: 4px;
+    background: radial-gradient(circle, var(--linen-strong) 1.1px, transparent 1.5px) left bottom / 8px 4px repeat-x;
+  }
+  :is(.pick:has(.tick:checked), .pick.is-on) .leader {
+    background-image: radial-gradient(circle, var(--plum) 1.1px, transparent 1.5px);
+  }
+  .pick-price {
+    margin-inline-start: auto;
+    white-space: nowrap;
+  }
+  .pick-price i {
+    color: var(--ink-soft);
+    font-size: 0.8em;
+  }
+  .side .pick-label {
+    font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.45rem);
+  }
+  .pick-body {
+    display: grid;
+    gap: 1rem 2.5rem;
+    margin-inline-start: 2.15rem;
+    margin-block-start: 0.5rem;
+  }
+  @container (min-width: 42rem) {
+    .pick-body {
+      grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+    }
+  }
+  .pick-line {
+    color: var(--ink);
+    max-width: 34rem;
+  }
+  .pick-meta {
+    margin-block-start: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    max-width: 34rem;
+  }
+  .pick-more {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--plum);
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--linen-strong);
+  }
+  .pick-more:hover {
+    text-decoration-color: currentColor;
+  }
+  /* The margin note: what someone wrote about this exact service. */
+  .note {
+    margin: 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 2px solid var(--brass);
+    align-self: start;
+  }
+  .note p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .note figcaption {
+    margin-block-start: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  /* Wash levels: revealed when the wash is ticked. */
   .options {
     position: relative;
     z-index: 1;
-  }
-  .pick-name {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    line-height: 1.2;
-  }
-  .pick-price {
-    font-family: var(--serif);
-    font-size: 1.25rem;
-    white-space: nowrap;
-    text-wrap: nowrap;
-  }
-  .pick-price i,
-  .level-price i {
-    color: var(--ink-soft);
-  }
-  .pick-meta {
-    grid-column: 2;
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
-    margin-block-start: 0.15rem;
-  }
-
-  /* Wash options: revealed when the wash is ticked. */
-  .options {
-    grid-column: 2;
     display: grid;
-    gap: 1.25rem;
-    margin-block-start: 1.1rem;
-    padding-block-start: 1.1rem;
-    border-block-start: 1px dashed var(--linen-strong);
+    gap: 0.6rem;
+    margin-block-start: 0.75rem;
     opacity: 1;
     translate: 0 0;
     transition:
@@ -529,44 +696,11 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
       translate: 0 -0.5rem;
     }
   }
-  .opt-set {
-    border: 0;
-    margin: 0;
-    padding: 0;
-    min-width: 0;
-  }
-  .opt-set legend {
+  .options legend {
     font-size: 0.9375rem;
     font-weight: 600;
     padding: 0;
-    margin-block-end: 0.6rem;
-  }
-  .sizes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    min-height: 2.75rem;
-    padding: 0.4rem 1rem 0.4rem 0.8rem;
-    border: 1px solid var(--linen-strong);
-    border-radius: 999px;
-    background: var(--cloth);
-    cursor: pointer;
-    font-size: 0.9375rem;
-  }
-  .chip:has(:checked) {
-    border-color: var(--plum);
-    box-shadow: inset 0 0 0 1px var(--plum);
-  }
-  .chip input,
-  .level input {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin: 0;
+    margin-block-end: 0.5rem;
   }
   .levels {
     display: grid;
@@ -577,10 +711,10 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     grid-template-columns: 1.1rem minmax(0, 1fr) auto;
     column-gap: 0.75rem;
     align-items: baseline;
-    padding: 0.75rem 0.9rem;
+    padding: 0.7rem 0.9rem;
     border: 1px solid var(--linen-strong);
     border-radius: 0.5rem;
-    background: var(--cloth);
+    background: var(--paper);
     cursor: pointer;
   }
   .level input {
@@ -600,40 +734,31 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
   .level-note {
     grid-column: 2 / -1;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--ink-soft);
   }
 
-  .field {
-    display: grid;
-    gap: 0.35rem;
-    max-width: 30rem;
-  }
-  .field > label {
-    margin: 0;
-  }
-  .optional {
-    font-family: var(--sans);
-    font-size: 0.9375rem;
+  .films-foot {
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--linen);
+    text-align: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.125rem;
     color: var(--ink-soft);
   }
-  .hint {
-    font-size: 0.9375rem;
-    color: var(--ink-soft);
+  .films {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem 3rem;
+    margin: 1rem 0;
+    padding: 0;
   }
-  .field input {
-    margin-block-start: 0.35rem;
-    min-height: 3rem;
-    padding: 0.6rem 0.9rem;
-    border: 1px solid var(--ink-soft);
-    border-radius: 0.5rem;
-    background: #fff;
-    color: var(--ink);
-  }
-  .field input:focus-visible {
-    outline: 2px solid var(--plum);
-    outline-offset: 2px;
-    border-color: var(--plum);
+  .films img {
+    height: 2.25rem;
+    width: auto;
   }
 
   /* Mobile: a small sticky summary so the total stays in view while ticking. */
@@ -645,7 +770,8 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.55rem 0.6rem 0.55rem 1rem;
+    margin-block-end: -1rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
     border-radius: 999px;
     background: var(--ink);
     color: var(--cloth);
@@ -659,7 +785,7 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     min-height: 2.75rem;
     padding-inline: 1rem;
     border-radius: 999px;
-    background: var(--brass);
+    background: var(--brass-light);
     color: var(--ink);
     font-weight: 600;
     text-decoration: none;
@@ -669,21 +795,20 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     outline-offset: 2px;
   }
 
-  /* ---------- The slip: a bill in a dark folder ---------- */
+  /* ---------- The bill ---------- */
   .slip-wrap {
-    filter: drop-shadow(0 1.5rem 2rem rgb(43 27 46 / 0.18));
+    filter: drop-shadow(0 1.5rem 2rem rgb(43 27 46 / 0.2));
   }
   .slip {
     background: var(--ink);
     color: var(--cloth);
-    padding: 2rem clamp(1.25rem, 4vw, 2rem) 1.5rem;
+    padding: 1.75rem clamp(1.25rem, 4vw, 1.75rem) 1.4rem;
     border-radius: 0.25rem 0.25rem 0 0;
     scroll-margin-block-start: 5rem;
   }
   .slip:focus {
     outline: none;
   }
-  /* Scalloped tear-off edge: masked on an empty sibling so no text is ever clipped. */
   .slip-edge {
     height: 12px;
     background: var(--ink);
@@ -696,11 +821,18 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     font-size: 2.25rem;
     line-height: 1;
     text-align: center;
-    padding-block-end: 1.25rem;
+  }
+  .slip-car {
+    margin-block-start: 0.4rem;
+    padding-block-end: 1rem;
     border-block-end: 1px solid rgb(217 212 204 / 0.25);
+    text-align: center;
+    font-size: 0.9375rem;
+    color: var(--brass-light);
+    overflow-wrap: anywhere;
   }
   .slip-empty {
-    padding-block: 1.25rem;
+    padding-block: 1rem;
     color: var(--linen);
     font-family: var(--serif);
     font-style: italic;
@@ -715,14 +847,14 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     padding: 0;
   }
   .slip-lines:not(:empty) {
-    padding-block: 1rem 0.5rem;
+    padding-block: 0.9rem 0.5rem;
   }
   .slip-lines :global(li) {
     display: flex;
     align-items: baseline;
     gap: 0.5rem;
-    padding-block: 0.35rem;
-    font-size: 0.975rem;
+    padding-block: 0.3rem;
+    font-size: 0.95rem;
     transition:
       opacity 0.35s ease,
       translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -735,7 +867,6 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
   .slip-lines :global(.l-dots) {
     flex: 1 1 1rem;
-    align-self: baseline;
     height: 3px;
     background: radial-gradient(circle, rgb(217 212 204 / 0.55) 0.9px, transparent 1.3px) left bottom / 6px 3px repeat-x;
   }
@@ -746,13 +877,13 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
   .slip-sum {
     margin: 0;
-    padding-block: 1.25rem;
+    padding-block: 1.1rem;
     border-block: 1px solid rgb(217 212 204 / 0.25);
     display: grid;
-    gap: 1rem;
+    gap: 0.85rem;
   }
   .slip-sum dt {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--linen);
   }
   .slip-sum dd {
@@ -760,7 +891,7 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
   .sum-total dd {
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+    font-size: clamp(2.4rem, 2rem + 1.5vw, 3rem);
     line-height: 1.05;
     color: var(--brass-light);
     display: inline-block;
@@ -778,55 +909,51 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
       opacity: 0.4;
     }
   }
-  .sum-time dd {
+  .sum-time dd,
+  .sum-how dd {
     font-family: var(--serif);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     line-height: 1.2;
   }
   .slip-extra {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--linen);
-    margin-block-start: -0.5rem;
+    margin-block-start: -0.4rem;
   }
-  .slip-extra[hidden],
-  .slip-quote[hidden],
-  .slip-materials[hidden] {
+  .slip-extra[hidden] {
     display: none;
   }
-  .slip-wait {
-    padding-block: 1.25rem 1.5rem;
-    display: grid;
-    gap: 0.75rem;
+  .slip-promise {
+    padding-block: 1.1rem 1.25rem;
   }
-  .slip-wait h4 {
+  .slip-promise h4 {
     font-family: var(--serif);
     font-style: italic;
     font-weight: 400;
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     color: var(--brass-light);
   }
-  .slip-wait p {
-    font-size: 0.975rem;
-    color: var(--cloth);
+  .slip-promise ul {
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
   }
-  .slip-materials {
-    color: var(--linen) !important;
+  .slip-promise li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    font-size: 0.9375rem;
   }
-  .slip-quote {
-    margin: 0.25rem 0 0;
-    padding-inline-start: 1rem;
-    border-inline-start: 2px solid var(--brass);
-  }
-  .slip-quote p {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 1.15rem !important;
-    line-height: 1.35;
-  }
-  .slip-quote footer {
-    margin-block-start: 0.35rem;
-    font-size: 0.8125rem;
-    color: var(--linen);
+  .slip-promise li::before {
+    content: '';
+    flex: none;
+    width: 0.7rem;
+    height: 0.4rem;
+    border-inline-start: 2px solid var(--brass-light);
+    border-block-end: 2px solid var(--brass-light);
+    rotate: -45deg;
+    translate: 0 -0.2rem;
   }
   .send {
     display: flex;
@@ -859,7 +986,7 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     display: grid;
     justify-items: center;
     gap: 0.25rem;
-    margin-block-start: 0.75rem;
+    margin-block-start: 0.6rem;
     text-align: center;
   }
   .slip-foot p {
@@ -875,39 +1002,8 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
     text-decoration: underline;
     text-underline-offset: 0.2em;
     cursor: pointer;
+    font: inherit;
     font-size: 0.9375rem;
-  }
-
-  /* Brand-consistent checkboxes: accent-color above; custom box only where it's unsupported. */
-  @supports not (accent-color: red) {
-    .tick {
-      position: absolute !important;
-      clip-path: inset(50%) !important;
-      width: 1px !important;
-      height: 1px !important;
-      overflow: hidden !important;
-    }
-    .pick-label::before {
-      content: '';
-      position: absolute;
-      inset-inline-start: 0.9rem;
-      top: 1.35rem;
-      width: 1.25rem;
-      height: 1.25rem;
-      border: 2px solid var(--ink-soft);
-      border-radius: 3px;
-      background: #fff;
-    }
-    .tick:checked + .pick-label::before {
-      background: var(--plum)
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E")
-        center / 80% no-repeat;
-      border-color: var(--plum);
-    }
-    .tick:focus-visible + .pick-label::before {
-      outline: 2px solid var(--plum);
-      outline-offset: 2px;
-    }
   }
 
   .tick:focus-visible,
@@ -918,28 +1014,23 @@ const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me cho
   }
 
   @media (max-width: 30rem) {
-    .pick-name {
-      font-size: 1.3rem;
-    }
-    .pick-price {
-      font-size: 1.1rem;
-    }
     .pick {
-      padding-inline-end: 0.75rem;
+      padding-inline: 0.6rem 0.4rem;
+    }
+    .pick-body {
+      margin-inline-start: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .options,
     .slip-lines :global(li),
-    .pick::before {
+    .pick,
+    .pick::before,
+    .chip {
       transition: none;
     }
-    .slip[data-mode='empty'] .sum-total dd {
-    color: var(--linen);
-    opacity: 0.6;
-  }
-  .sum-total dd.bump {
+    .sum-total dd.bump {
       animation: none;
     }
   }
