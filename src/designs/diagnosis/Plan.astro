@@ -1,0 +1,313 @@
+---
+/**
+ * The car, drawn in plan view like an inspection sheet: nose to the right,
+ * roof cut away so the seats show. Every paintable or fixable area is a zone
+ * (data-zone) that the tool marks as a problem (orange), a wish (blue) or,
+ * in the "after" view, done (green). Callouts carry the finding numbers.
+ */
+import { symptoms } from './fix';
+---
+
+<svg class="plan" viewBox="0 0 640 300" role="img" aria-labelledby="plan-title plan-desc" data-plan>
+  <title id="plan-title">Plan view of a car</title>
+  <desc id="plan-desc">Areas you tick are marked on the drawing. The written job card below lists the same findings.</desc>
+  <defs>
+    <clipPath id="dx-body">
+      <path d="M118 52H492C548 52 586 72 596 108Q603 150 596 192C586 228 548 248 492 248H118C72 248 46 232 40 196Q34 150 40 104C46 68 72 52 118 52Z" />
+    </clipPath>
+    <pattern id="dx-hatch-defect" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="7" height="7" style="fill: var(--dx-defect-wash)" />
+      <line x1="0" y1="0" x2="0" y2="7" style="stroke: var(--dx-defect)" stroke-width="2.2" />
+    </pattern>
+    <pattern id="dx-hatch-wish" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="7" height="7" style="fill: var(--dx-blue-wash)" />
+      <line x1="0" y1="0" x2="0" y2="7" style="stroke: var(--dx-blue)" stroke-width="2.2" />
+    </pattern>
+    <pattern id="dx-hatch-fixed" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="7" height="7" style="fill: var(--dx-fixed-wash)" />
+      <line x1="0" y1="0" x2="0" y2="7" style="stroke: var(--dx-fixed)" stroke-width="2.2" />
+    </pattern>
+  </defs>
+
+  <!-- Underbody and arches: a halo just outside the body. -->
+  <path
+    class="zone zone--halo"
+    data-zone="under"
+    d="M118 52H492C548 52 586 72 596 108Q603 150 596 192C586 228 548 248 492 248H118C72 248 46 232 40 196Q34 150 40 104C46 68 72 52 118 52Z"
+  />
+
+  <!-- Wheels peek out under the body. -->
+  <g class="zone zone--wheel" data-zone="wheels">
+    <rect x="462" y="38" width="66" height="18" rx="5" />
+    <rect x="462" y="244" width="66" height="18" rx="5" />
+    <rect x="104" y="38" width="66" height="18" rx="5" />
+    <rect x="104" y="244" width="66" height="18" rx="5" />
+  </g>
+
+  <!-- Mirrors sit outside the body line. -->
+  <g class="zone" data-zone="mirrors">
+    <path d="M404 52 L410 34 Q420 30 426 36 L424 52 Z" />
+    <path d="M404 248 L410 266 Q420 270 426 264 L424 248 Z" />
+  </g>
+
+  <g clip-path="url(#dx-body)">
+    <rect class="zone" data-zone="bumper-f" x="566" y="40" width="44" height="220" />
+    <path class="zone" data-zone="bonnet" d="M432 76 L556 82 C566 110 566 190 556 218 L432 224 Z" />
+    <rect class="zone" data-zone="wing-l" x="432" y="40" width="134" height="36" />
+    <rect class="zone" data-zone="wing-r" x="432" y="224" width="134" height="36" />
+    <rect class="zone" data-zone="side-l" x="86" y="40" width="346" height="36" />
+    <rect class="zone" data-zone="side-r" x="86" y="224" width="346" height="36" />
+    <path class="zone" data-zone="boot" d="M86 76 H196 V224 H86 Z" />
+    <rect class="zone" data-zone="bumper-r" x="28" y="40" width="58" height="220" />
+  </g>
+
+  <!-- Cabin, roof cut away: floor, seats, dash, wheel. -->
+  <rect class="zone zone--floor" data-zone="floor" x="238" y="86" width="150" height="128" />
+  <g class="zone zone--seat" data-zone="seats">
+    <rect x="326" y="98" width="46" height="44" rx="9" />
+    <rect x="326" y="158" width="46" height="44" rx="9" />
+    <rect x="248" y="98" width="52" height="104" rx="11" />
+  </g>
+  <rect class="dash" x="378" y="90" width="10" height="120" rx="2" />
+  <ellipse class="dash" cx="382" cy="120" rx="4" ry="15" />
+
+  <!-- The roof outline, dashed where it has been cut away. -->
+  <rect class="zone zone--roof" data-zone="roof" x="236" y="84" width="154" height="132" rx="6" />
+
+  <!-- Glass. -->
+  <path class="zone zone--glass" data-zone="screen" d="M392 84 L430 76 L430 224 L392 216 Z" />
+  <path class="zone zone--glass" data-zone="rear-glass" d="M198 78 L234 86 L234 214 L198 222 Z" />
+  <g class="zone zone--glass" data-zone="side-glass">
+    <rect x="236" y="76" width="154" height="8" />
+    <rect x="236" y="216" width="154" height="8" />
+  </g>
+
+  <!-- Chrome trim along the window line, and a lip spoiler on the boot. -->
+  <g class="zone zone--trim" data-zone="trim">
+    <line x1="198" y1="75" x2="430" y2="75" />
+    <line x1="198" y1="225" x2="430" y2="225" />
+  </g>
+  <rect class="zone zone--spoiler" data-zone="spoiler" x="92" y="86" width="10" height="128" rx="3" />
+
+  <!-- Panel lines drawn over everything, for a crisp outline. -->
+  <path
+    class="outline"
+    d="M118 52H492C548 52 586 72 596 108Q603 150 596 192C586 228 548 248 492 248H118C72 248 46 232 40 196Q34 150 40 104C46 68 72 52 118 52Z"
+  />
+  <g class="panel-lines">
+    <path d="M566 58 C586 90 590 210 566 242" />
+    <path d="M432 76 L556 82 C566 110 566 190 556 218 L432 224" />
+    <line x1="432" y1="52" x2="432" y2="76" />
+    <line x1="432" y1="224" x2="432" y2="248" />
+    <line x1="318" y1="52" x2="318" y2="76" />
+    <line x1="318" y1="224" x2="318" y2="248" />
+    <path d="M196 76 V224" />
+    <path d="M86 70 C80 110 80 190 86 230" />
+  </g>
+
+  <!-- Lamps, for a car that reads as a car. -->
+  <g class="lamps" aria-hidden="true">
+    <path d="M572 66 Q584 72 590 88 L580 90 Q576 78 568 72 Z" />
+    <path d="M572 234 Q584 228 590 212 L580 210 Q576 222 568 228 Z" />
+    <path d="M52 70 Q44 80 42 94 L50 94 Q52 82 58 74 Z" />
+    <path d="M52 230 Q44 220 42 206 L50 206 Q52 218 58 226 Z" />
+  </g>
+
+  <!-- Callouts: one per symptom, shown when ticked. -->
+  <g class="callouts">
+    {
+      symptoms.map((s) => (
+        <g class="callout" data-callout={s.id} data-kind={s.kind}>
+          <line x1={s.callout.x} y1={s.callout.y} x2={s.callout.tx} y2={s.callout.ty} />
+          <circle class="callout__dot" cx={s.callout.tx} cy={s.callout.ty} r="3.5" />
+          <circle class="callout__badge" cx={s.callout.x} cy={s.callout.y} r="15" />
+          <text x={s.callout.x} y={s.callout.y} dy="0.36em" text-anchor="middle" data-num />
+          <path
+            class="callout__tick"
+            d={`M${s.callout.x - 6} ${s.callout.y} l4.5 5 l8 -10`}
+          />
+        </g>
+      ))
+    }
+  </g>
+</svg>
+
+<style>
+  .plan {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .zone,
+  .zone :global(*) {
+    fill: transparent;
+    stroke: none;
+    transition: fill 280ms var(--dx-ease), stroke 280ms var(--dx-ease), opacity 280ms var(--dx-ease);
+  }
+  .zone--wheel :global(rect) {
+    fill: var(--dx-rule-strong);
+  }
+  .zone--halo {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 16;
+    stroke-linejoin: round;
+  }
+  .zone--floor {
+    fill: var(--dx-sheet-2);
+  }
+  .zone--seat :global(rect) {
+    fill: var(--dx-sheet);
+    stroke: var(--dx-ink-3);
+    stroke-width: 1.4;
+  }
+  .zone--roof {
+    stroke: var(--dx-ink-3);
+    stroke-width: 1.2;
+    stroke-dasharray: 5 5;
+  }
+  .zone--glass,
+  .zone--glass :global(rect) {
+    fill: var(--dx-glass);
+  }
+  .zone--trim :global(line) {
+    stroke: var(--dx-ink-3);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+  .zone--spoiler {
+    stroke: var(--dx-ink-3);
+    stroke-width: 1.2;
+    stroke-dasharray: 3 3;
+  }
+  .dash {
+    fill: var(--dx-ink-3);
+  }
+  .lamps :global(path) {
+    fill: var(--dx-sheet);
+    stroke: var(--dx-ink);
+    stroke-width: 1.3;
+    stroke-linejoin: round;
+  }
+  .outline {
+    fill: none;
+    stroke: var(--dx-ink);
+    stroke-width: 2;
+  }
+  .panel-lines :global(*) {
+    fill: none;
+    stroke: var(--dx-ink-3);
+    stroke-width: 1.2;
+  }
+  [data-zone='mirrors'] :global(path) {
+    stroke: var(--dx-ink);
+    stroke-width: 1.6;
+    fill: var(--dx-sheet);
+  }
+
+  /* Marked states, written by the tool script. */
+  .zone[data-state='defect'] {
+    --dx-zone-fill: var(--dx-defect-wash);
+    --dx-zone-line: var(--dx-defect);
+  }
+  .zone[data-state='wish'] {
+    --dx-zone-fill: var(--dx-blue-wash);
+    --dx-zone-line: var(--dx-blue);
+  }
+  .plan[data-view='after'] .zone[data-state] {
+    --dx-zone-fill: var(--dx-fixed-wash);
+    --dx-zone-line: var(--dx-fixed);
+  }
+  .zone[data-state]:not(.zone--halo),
+  .zone[data-state] :global(:is(rect, path)) {
+    fill: var(--dx-hatch);
+  }
+  .zone[data-state='defect'] {
+    --dx-hatch: url(#dx-hatch-defect);
+  }
+  .zone[data-state='wish'] {
+    --dx-hatch: url(#dx-hatch-wish);
+  }
+  .plan[data-view='after'] .zone[data-state] {
+    --dx-hatch: url(#dx-hatch-fixed);
+  }
+  .zone[data-state]:is(.zone--roof, .zone--spoiler),
+  .zone[data-state]:is(.zone--seat, .zone--wheel) :global(rect),
+  [data-zone='mirrors'][data-state] :global(path) {
+    stroke: var(--dx-zone-line);
+    stroke-dasharray: none;
+  }
+  .zone--trim[data-state] :global(line) {
+    stroke: var(--dx-zone-line);
+    stroke-width: 4;
+  }
+  .zone--halo[data-state] {
+    stroke: var(--dx-zone-line);
+    opacity: 0.35;
+  }
+
+  .callout {
+    display: none;
+  }
+  .callout[data-on] {
+    display: inline;
+  }
+  .callout line {
+    stroke: var(--dx-callout);
+    stroke-width: 1.4;
+  }
+  .callout__dot,
+  .callout__badge {
+    fill: var(--dx-callout);
+  }
+  .callout {
+    --dx-callout: var(--dx-defect-ink);
+  }
+  .callout[data-kind='wish'] {
+    --dx-callout: var(--dx-blue);
+  }
+  .plan[data-view='after'] .callout {
+    --dx-callout: var(--dx-fixed);
+  }
+  .callout text {
+    fill: #fff;
+    font: 700 17px/1 var(--dx-ui);
+    font-variant-numeric: tabular-nums;
+  }
+  .callout__tick {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: none;
+  }
+  .plan[data-view='after'] .callout text {
+    display: none;
+  }
+  .plan[data-view='after'] .callout__tick {
+    display: inline;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .callout[data-on] .callout__badge {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dx-pop 360ms var(--dx-spring);
+    }
+    .callout[data-on] line {
+      stroke-dasharray: 200;
+      animation: dx-draw 420ms var(--dx-ease) both;
+    }
+  }
+  @keyframes dx-pop {
+    from {
+      transform: scale(0.2);
+    }
+  }
+  @keyframes dx-draw {
+    from {
+      stroke-dashoffset: 200;
+    }
+  }
+</style>

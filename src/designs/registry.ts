@@ -58,7 +58,7 @@ export const concepts: Concept[] = [
     signature: 'Pick a problem (stone chips, swirls, faded paint, a hot cabin, stained seats) and the page builds the fix: service, price, time, proof and a review from someone with the same problem.',
     bestFor: 'Owners who know the problem but not the product name; leads arrive pre-qualified.',
     risk: 'Needs good photos for each problem to feel as premium as the other directions.',
-    palette: ['#f4f5f7', '#101318', '#2f5bea', '#ff6a3d', '#c9ced6'],
+    palette: ['#eef0f3', '#15181d', '#1f45c4', '#f0561d', '#1c6b47'],
     fonts: 'Fraunces + Archivo',
   },
 ];
