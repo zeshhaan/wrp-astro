@@ -1,17 +1,19 @@
 # Design Lab: choosing the new homepage
 
-Four complete homepage directions for the WRP redesign. They all use the same
-real content (prices from `src/content/services`, verbatim Google reviews, real
-customer photos) and all replace the old "Signature Fleet" logo wall with **The
-WRP Lounge**: billiards, board games, coffee, the big screen and the glass wall
-over the bays.
+Four complete homepage directions for the WRP redesign (round 2). They all use the
+same real content: prices from `src/content/services`, live Google reviews (5.0,
+120+ reviews, read 27 Sep 2026) and real customer photos. Services lead every
+page; the WRP Lounge (billiards, board games, coffee, the glass wall over the
+bays) has one section further down, replacing the old "Signature Fleet" logo wall.
 
 | Concept | The idea | Signature moment |
 | --- | --- | --- |
-| **Mezzanine** | The page is the building: your car downstairs, you upstairs. | A glass line splits the hero into two floors; a lift-style floor indicator; an interactive floor plan of the lounge. |
-| **Gloss** | Light moving across paint. | The page changes colour as you scroll, using paint sampled from cars WRP finished; a specular highlight follows the cursor across "WRP." |
-| **The Menu** | WRP as a house of hospitality. | "Plan your visit": tick services, see the starting total and time, get lounge suggestions, send the plan on WhatsApp. |
-| **Paddock** | Your car goes in the pit; you go to the club. | Tap panels on a car diagram to see which PPF package covers them; a two-lane "you upstairs / your car downstairs" timeline. |
+| **Mezzanine** | The page is the building: the studio floor where the work happens, the glass mezzanine above. | A glass line splits the hero into two floors, with a lift-style floor indicator. |
+| **The Menu** | Services laid out like a fine-dining menu with honest starting prices. | "Plan your visit": pick services and your car, see the starting total and time, send it on WhatsApp. |
+| **Layers** | A cross-section through a car's paint. | Scroll down through ceramic, film, clear coat and colour, each drawn to its real thickness in microns. |
+| **Diagnosis** | Start from what's wrong with the car. | Pick the problems; the page builds the fix with price, time and a review from someone with the same problem. |
+
+Round 1 also had Gloss and Paddock; the owner dropped them.
 
 ## Where to look
 
@@ -25,9 +27,9 @@ at `/`, exactly as it would be on wrpdetailing.ae:
 | Preview | Serves |
 | --- | --- |
 | `design-mezzanine` | Mezzanine at `/` |
-| `design-gloss` | Gloss at `/` |
 | `design-menu` | The Menu at `/` |
-| `design-paddock` | Paddock at `/` |
+| `design-layers` | Layers at `/` |
+| `design-diagnosis` | Diagnosis at `/` |
 | the branch's own Preview | All four under `/design-lab/` |
 
 URLs follow `https://<preview>-wrp-astro.<subdomain>.workers.dev`. They update on

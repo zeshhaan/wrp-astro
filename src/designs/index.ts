@@ -1,14 +1,14 @@
 /** Concept id → homepage component. Kept separate from registry.ts so plain TS can import metadata without .astro files. */
 import Mezzanine from './mezzanine/Home.astro';
-import Gloss from './gloss/Home.astro';
 import Menu from './menu/Home.astro';
-import Paddock from './paddock/Home.astro';
+import Layers from './layers/Home.astro';
+import Diagnosis from './diagnosis/Home.astro';
 
 export const conceptComponents = {
   mezzanine: Mezzanine,
-  gloss: Gloss,
   menu: Menu,
-  paddock: Paddock,
+  layers: Layers,
+  diagnosis: Diagnosis,
 } as const;
 
 export type ConceptId = keyof typeof conceptComponents;

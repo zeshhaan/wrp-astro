@@ -7,7 +7,7 @@
  * concept gets its own Worker Preview URL (see docs/design-lab.md).
  */
 export type Concept = {
-  id: 'mezzanine' | 'gloss' | 'menu' | 'paddock';
+  id: 'mezzanine' | 'menu' | 'layers' | 'diagnosis';
   name: string;
   /** One line a teammate can repeat in a meeting. */
   idea: string;
@@ -24,42 +24,42 @@ export const concepts: Concept[] = [
   {
     id: 'mezzanine',
     name: 'Mezzanine',
-    idea: 'The page is the building: your car on the ground floor, you upstairs in the lounge.',
-    signature: 'A glass line splits the screen into two floors, with a lift-style floor indicator as you scroll.',
-    bestFor: 'Leading with hospitality and the lounge, which no competitor can copy.',
-    risk: 'Services sit one level down in the story, so price shoppers scroll further.',
+    idea: 'The page is the building: the studio floor where the work happens, the glass mezzanine above it.',
+    signature: 'A glass line splits the hero into two floors, with a lift-style floor indicator as you scroll.',
+    bestFor: 'A premium, architectural feel that shows the real studio and leads straight into the services.',
+    risk: 'The building metaphor has to stay light so it never gets in the way of prices and booking.',
     palette: ['#e9ebe8', '#b9c7c2', '#1f6b4f', '#15171a', '#c9a45c'],
     fonts: 'Bricolage Grotesque + Geist',
   },
   {
-    id: 'gloss',
-    name: 'Gloss',
-    idea: 'Light moving across paint. The page changes colour like a car under studio lights.',
-    signature: 'Scroll-driven paint colours sampled from real WRP cars, and a specular highlight that follows the cursor.',
-    bestFor: 'Enthusiasts and supercar owners who buy on emotion and finish.',
-    risk: 'The most visually intense; relies on strong photography going forward.',
-    palette: ['#2f5d3a', '#5e1622', '#1d3f8a', '#8a8d90', '#f2f2ef'],
-    fonts: 'Syne + Inter',
-  },
-  {
     id: 'menu',
     name: 'The Menu',
-    idea: 'WRP as a house of hospitality: services ordered like courses, the lounge as the dining room.',
-    signature: 'Build your visit: pick services, see the total and time, and get lounge suggestions, then send it on WhatsApp.',
+    idea: 'Services laid out like a fine-dining menu, with honest starting prices and a visit planner.',
+    signature: 'Plan your visit: pick services, see the starting total and how long the car stays, then send it on WhatsApp.',
     bestFor: 'Converting enquiries: every visitor leaves with a priced plan and a message ready to send.',
     risk: 'The most unconventional metaphor for a detailing studio; copy must stay tight.',
     palette: ['#f6f6f3', '#2b1b2e', '#6d4a7a', '#b08d57', '#d9d4cc'],
     fonts: 'Instrument Serif + Instrument Sans',
   },
   {
-    id: 'paddock',
-    name: 'Paddock',
-    idea: 'Motorsport paddock: your car goes into the pit, you go to the Paddock Club.',
-    signature: 'Tap panels on a car diagram to build PPF coverage and see which package covers it.',
-    bestFor: 'Explaining PPF coverage and pricing, the highest-value service, at a glance.',
-    risk: 'Sportier than the current luxury tone; may feel less "premium" to some owners.',
-    palette: ['#f4f4f2', '#141414', '#ffd23f', '#e2e2de', '#6b6b6b'],
-    fonts: 'Barlow Condensed + Barlow',
+    id: 'layers',
+    name: 'Layers',
+    idea: 'A cross-section through a car\'s paint: scroll down through each layer WRP works on.',
+    signature: 'The page is a magnified paint cross-section; every layer (coating, film, clear coat, colour) is a service, drawn to its real thickness in microns.',
+    bestFor: 'Explaining PPF, ceramic and correction with real material science, which builds trust with owners who research.',
+    risk: 'Technical; the scale drawing must stay readable on a phone.',
+    palette: ['#0f1115', '#e8e6e1', '#9fb7c9', '#d4a24c', '#5a6470'],
+    fonts: 'Archivo + Fraunces',
+  },
+  {
+    id: 'diagnosis',
+    name: 'Diagnosis',
+    idea: 'Start from what is wrong with the car, not from a service list.',
+    signature: 'Pick a problem (stone chips, swirls, faded paint, a hot cabin, stained seats) and the page builds the fix: service, price, time, proof and a review from someone with the same problem.',
+    bestFor: 'Owners who know the problem but not the product name; leads arrive pre-qualified.',
+    risk: 'Needs good photos for each problem to feel as premium as the other directions.',
+    palette: ['#f4f5f7', '#101318', '#2f5bea', '#ff6a3d', '#c9ced6'],
+    fonts: 'Fraunces + Archivo',
   },
 ];
 

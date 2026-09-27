@@ -6,7 +6,7 @@
  * the lounge details from verified Google reviews (data/google-reviews.json).
  * Where a service has no published starting price we say so rather than invent one.
  */
-import { getAllReviews, getBusiness, getDisplayCount, type Review } from '@/lib/reviews';
+import { getAllReviews, getBusiness, type Review } from '@/lib/reviews';
 
 export const contact = {
   phoneDisplay: '+971 54 717 3000',
@@ -238,10 +238,16 @@ export const studio = {
 };
 
 const business = getBusiness();
+/**
+ * Live Google Maps figures, read 27 Sep 2026 (Firecrawl maps-google-com).
+ * data/google-reviews.json is the February scrape (68 reviews); the newest 60
+ * on Maps (7 Mar to 26 Sep 2026) are all 5-star and 59 of them are new names,
+ * so the listing has at least 127. "120+" is the honest floor.
+ */
 export const proof = {
   rating: business.rating.toFixed(1),
-  reviewCount: business.totalReviews,
-  reviewCountDisplay: getDisplayCount(),
+  reviewCount: 127,
+  reviewCountDisplay: '120+',
   reviewsUrl: '/reviews/',
   films: [
     { name: 'Avery Dennison', logo: '/logos/avery-dennison.png' },
@@ -250,6 +256,20 @@ export const proof = {
 };
 
 export type Quote = { text: string; author: string; service?: string; photo?: string };
+
+/**
+ * Written Google reviews posted since the February scrape, verbatim (typos
+ * kept), newest first. `service` matches a `services[].slug` where one fits.
+ */
+export const freshQuotes: (Quote & { when: string })[] = [
+  { text: 'I got a PPF on my car. The service is amazing. Afzal kept me informed on the progress of the process. It’s been a really good experience with these guys.', author: 'Siddik Akbar', service: 'paint-protection-film', when: 'September 2026' },
+  { text: 'Got my car detailed at WRP, and they did an amazing job honestly. The car was super dirty when i dropped it off and they made it look brand new inside and out.', author: 'Aadithya Dhanesh', service: 'premium-car-wash', when: 'September 2026' },
+  { text: 'I went for the Matte black hood + spoiler combo and i must say that the result is outstanding. Huge thanks to Mr. Afzal and the remaining crew members.', author: 'A Khalid', when: 'August 2026' },
+  { text: 'Very happy with their work. Got complete interior detailing done along with exterior wash for better paint. Quick turn around time too!', author: 'Muhammad Nadir', service: 'leather-upholstery', when: 'August 2026' },
+  { text: 'The team is really humble and professional, The quality of work is spot on and will definitely be going back for the detailed wash.', author: 'Sunit Gonsalves', service: 'premium-car-wash', when: 'July 2026' },
+  { text: 'Give a drity car get it clean by 24 hours car washing including cleaning inside deep cleaning best service must recommend for suv and small cars', author: 'Huzaifa Hamid', service: 'premium-car-wash', when: 'July 2026' },
+  { text: 'Nice work done quickly and professionally. Detailing and ceramic coating polish works done efficiently!', author: 'James Daniel', service: 'ceramic-coating', when: 'July 2026' },
+];
 
 /** A handful of strong, short, verbatim review quotes. */
 export function pickQuotes(count = 6): Quote[] {
