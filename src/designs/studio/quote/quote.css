@@ -1089,6 +1089,13 @@ body:has(main.q) .foot {
   font-size: 0.875rem;
   color: var(--st-mute);
 }
+.q-viewer__credit {
+  font-size: 0.75rem;
+  color: var(--st-mute);
+}
+.q-viewer__credit a {
+  color: inherit;
+}
 .q-look {
   aspect-ratio: 480 / 128;
   max-inline-size: 30rem;

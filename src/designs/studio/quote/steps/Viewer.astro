@@ -30,6 +30,10 @@ const list = mode === 'wrap' ? panels.filter((p) => wrapParts.includes(p.id)) : 
     </div>
   </div>
   <p class="q-viewer__legend">{legend}</p>
+  <p class="q-viewer__credit" data-q-3d-credit hidden>
+    3D car: <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">Comrade1280</a>,
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified by WRP.
+  </p>
   {
     mode === 'wrap' ? (
       <div class="q-chips q-chips--parts" role="group" aria-label="Parts to wrap">

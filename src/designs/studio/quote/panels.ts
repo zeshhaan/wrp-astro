@@ -2,8 +2,8 @@
  * Shared contract for the Studio quote flow and its car viewers.
  *
  * Panel ids are the single vocabulary used by:
- *  - the build-time Manifold models (each panel is a separately named mesh
- *    node in public/models/cars/<body>.glb),
+ *  - the car models (each panel is a separately named mesh node in
+ *    public/models/cars/<body>.glb, see scripts/cars/import-pack.ts),
  *  - the three.js viewer (tap a mesh → toggle that panel id),
  *  - the 2D top-down fallback (one SVG path per panel id),
  *  - the quote state and the WhatsApp/enquiry message.
@@ -114,7 +114,7 @@ export const tintOptions: { id: string; name: string; vlt: number; heat: string;
 
 /**
  * Viewer API implemented by src/designs/studio/quote/viewer/CarViewer3D.ts
- * (three.js + build-time Manifold GLB) and by the 2D SVG fallback.
+ * (three.js + GLB car models) and by the 2D SVG fallback.
  */
 export type ViewerMode = 'ppf' | 'wrap' | 'tint' | 'look';
 

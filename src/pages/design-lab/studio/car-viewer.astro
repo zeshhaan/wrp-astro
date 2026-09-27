@@ -1,7 +1,7 @@
 ---
 /**
  * Design Lab test bench for the Studio quote flow's 3D car viewer.
- * Exercises CarViewer3D (three.js + build-time Manifold GLBs) with every body,
+ * Exercises CarViewer3D (three.js + the converted car pack GLBs) with every body,
  * mode, PPF preset, tint and paint colour. Internal only (noindex via DesignShell).
  */
 export const prerender = true;
@@ -32,7 +32,7 @@ const paints = [
       <p class="cv__eyebrow">Design Lab · Studio quote flow</p>
       <h1>Car viewer</h1>
       <p class="cv__lede">
-        Build-time Manifold models, three.js at runtime. Drag sideways to turn, pinch to zoom, tap a panel to toggle it,
+        Comrade1280's car pack split into panels at build time, three.js at runtime. Drag sideways to turn, pinch to zoom, tap a panel to toggle it,
         double-tap to reset.
       </p>
     </header>
@@ -42,21 +42,13 @@ const paints = [
       <p class="cv__status" id="status" role="status">Loading 3D viewer…</p>
     </div>
 
-    <p class="cv__credit" id="credit" hidden>
+    <p class="cv__credit">
       <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">"Generic passenger car pack"</a> by Comrade1280,
       <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Split into
       panels by WRP.
     </p>
 
     <form class="cv__controls" id="controls" onsubmit="return false">
-      <fieldset>
-        <legend>Models</legend>
-        <div class="cv__row">
-          <label class="cv__chip"><input type="radio" name="set" value="studio" checked /><span>In-house (Manifold)</span></label>
-          <label class="cv__chip"><input type="radio" name="set" value="pack" /><span>Comrade1280 pack</span></label>
-        </div>
-      </fieldset>
-
       <fieldset>
         <legend>Body</legend>
         <div class="cv__row">
@@ -150,7 +142,6 @@ const paints = [
   </script>
   <script>
     import type { BodyType, CarViewerHandle, PanelId, ViewerMode } from '@/designs/studio/quote/panels';
-    import type { ModelSet } from '@/designs/studio/quote/viewer/CarViewer3D';
 
     type Data = { presets: { id: string; panels: PanelId[]; partial?: PanelId[] }[]; wrapDefault: PanelId[] };
     const data = (window as unknown as { __carViewerData: Data }).__carViewerData;
@@ -170,10 +161,9 @@ const paints = [
       partial: new Set<PanelId>(data.presets[0].partial ?? []),
       tintVlt: 50,
       paint: '#8d9299',
-      set: 'studio' as ModelSet,
     };
     const url = new URL(location.href);
-    for (const k of ['body', 'mode', 'set'] as const) {
+    for (const k of ['body', 'mode'] as const) {
       const v = url.searchParams.get(k);
       if (v) (state as Record<string, unknown>)[k] = v;
     }
@@ -193,8 +183,6 @@ const paints = [
     }
 
     function syncForm() {
-      (form.querySelector(`input[name=set][value="${state.set}"]`) as HTMLInputElement).checked = true;
-      document.getElementById('credit')!.hidden = state.set !== 'pack';
       (form.querySelector(`input[name=body][value="${state.body}"]`) as HTMLInputElement).checked = true;
       (form.querySelector(`input[name=mode][value="${state.mode}"]`) as HTMLInputElement).checked = true;
       (form.elements.namedItem('vlt') as HTMLInputElement).value = String(state.tintVlt);
@@ -212,15 +200,6 @@ const paints = [
 
     form.addEventListener('change', (e) => {
       const t = e.target as HTMLInputElement;
-      if (t.name === 'set') {
-        state.set = t.value as ModelSet;
-        const u = new URL(location.href);
-        u.searchParams.set('set', state.set);
-        history.replaceState(null, '', u);
-        syncForm();
-        start();
-        return;
-      }
       if (t.name === 'body') state.body = t.value as BodyType;
       if (t.name === 'mode') {
         state.mode = t.value as ViewerMode;
@@ -269,7 +248,6 @@ const paints = [
       import('@/designs/studio/quote/viewer/CarViewer3D')
       .then(async (m) => {
         if (!m.isSupported()) throw new Error('isSupported() is false');
-        m.setModelSet(state.set);
         const v = await m.mount(viewerEl, {
           ...state,
           onToggle(id) {

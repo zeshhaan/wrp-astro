@@ -946,6 +946,8 @@ function sync3DButtons() {
     b.textContent = viewer?.kind === '3d' ? '2D' : '3D';
     b.setAttribute('aria-label', viewer?.kind === '3d' ? 'Show the flat drawing' : 'Show the car in 3D');
   });
+  // The 3D models are CC BY: credit them wherever they are on screen.
+  qa<HTMLElement>('[data-q-3d-credit]').forEach((p) => (p.hidden = viewer?.kind !== '3d'));
 }
 function disable3D() {
   has3D = false;

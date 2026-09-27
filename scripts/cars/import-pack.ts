@@ -1,9 +1,8 @@
 /**
  * Import "Generic passenger car pack" by Comrade1280 (CC BY 4.0,
  * https://skfb.ly/6sUFy) for the quote viewer: `bun scripts/cars/import-pack.ts`.
- * Writes public/models/cars/pack/<body>.glb in the same shape as the Manifold
- * models (one node per panel / glass id, extras.part), so CarViewer3D can load
- * either set.
+ * Writes public/models/cars/<body>.glb: one node per panel / glass id
+ * (extras.part), the contract in src/designs/studio/quote/panels.ts.
  *
  * Each body in the pack is one textured mesh. We bake it upright with the nose
  * at +x and the car's left at -z, then split the triangles into panels by
@@ -15,13 +14,13 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Document, Logger, NodeIO, type Node, type Primitive, type Texture } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { meshopt, reorder } from '@gltf-transform/functions';
+import { meshopt, reorder, weld } from '@gltf-transform/functions';
 import { MeshoptEncoder } from 'meshoptimizer';
 import sharp from 'sharp';
 import type { BodyType } from '../../src/designs/studio/quote/panels';
 
 const SRC = fileURLToPath(new URL('../../assets-src/comrade1280/generic-passenger-car-pack.glb', import.meta.url));
-const OUT = fileURLToPath(new URL('../../public/models/cars/pack/', import.meta.url));
+const OUT = fileURLToPath(new URL('../../public/models/cars/', import.meta.url));
 
 /** Which pack body stands in for each of our body types, and how many side doors it has. */
 const pick: Record<BodyType, { node: string; doors: 2 | 4 }> = {
@@ -129,6 +128,49 @@ function place(tris: Tri[], rot: (v: V3) => V3, off: V3) {
   }
 }
 
+/**
+ * Cut triangles along the plane v[axis] = value (axis 3 = |z|, for the
+ * bonnet/fender seams on both sides). Pieces keep their parent's colour, so a
+ * panel boundary becomes a clean line instead of following big triangles.
+ */
+function clip(tris: Tri[], axis: 0 | 1 | 3, value: number): Tri[] {
+  const d = (v: V3) => (axis === 3 ? Math.abs(v[2]) : v[axis]) - value;
+  const out: Tri[] = [];
+  const lerp = (a: V3, b: V3, t: number): V3 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  const make = (t: Tri, p: V3[], n: V3[]): Tri => ({
+    ...t,
+    p: p as Tri['p'],
+    n: n as Tri['n'],
+    c: [(p[0][0] + p[1][0] + p[2][0]) / 3, (p[0][1] + p[1][1] + p[2][1]) / 3, (p[0][2] + p[1][2] + p[2][2]) / 3],
+  });
+  for (const t of tris) {
+    const ds = t.p.map(d);
+    // For |z| planes, only cut triangles that sit on one side of the centreline.
+    const crossesCentre = axis === 3 && Math.min(...t.p.map((v) => v[2])) < 0 && Math.max(...t.p.map((v) => v[2])) > 0;
+    const pos = ds.filter((x) => x > 1e-5).length;
+    const neg = ds.filter((x) => x < -1e-5).length;
+    if (crossesCentre || !pos || !neg) {
+      out.push(t);
+      continue;
+    }
+    // Rotate so vertex 0 is alone on its side.
+    const lone = ds.findIndex((x, i) => Math.sign(x) !== Math.sign(ds[(i + 1) % 3]) && Math.sign(x) !== Math.sign(ds[(i + 2) % 3]));
+    if (lone < 0) {
+      out.push(t);
+      continue;
+    }
+    const i0 = lone, i1 = (lone + 1) % 3, i2 = (lone + 2) % 3;
+    const [a, b, c] = [t.p[i0], t.p[i1], t.p[i2]];
+    const [na, nb, nc] = [t.n[i0], t.n[i1], t.n[i2]];
+    const tab = ds[i0] / (ds[i0] - ds[i1]);
+    const tac = ds[i0] / (ds[i0] - ds[i2]);
+    const ab = lerp(a, b, tab), ac = lerp(a, c, tac);
+    const nab = norm(lerp(na, nb, tab)), nac = norm(lerp(na, nc, tac));
+    out.push(make(t, [a, ab, ac], [na, nab, nac]), make(t, [ab, b, c], [nab, nb, nc]), make(t, [ab, c, ac], [nab, nc, nac]));
+  }
+  return out;
+}
+
 function bounds(tris: Tri[]) {
   const min: V3 = [Infinity, Infinity, Infinity];
   const max: V3 = [-Infinity, -Infinity, -Infinity];
@@ -224,6 +266,15 @@ async function importBody(body: BodyType) {
   const doorSplit = cfg.doors === 4 ? frontEdge - (frontEdge - rearEdge) * 0.5 : -Infinity;
   const isPickup = body === 'pickup';
   const bedFront = isPickup ? Math.min(...glass.filter((t) => t.f[0] < -0.35).map((t) => t.c[0])) - 0.08 : 0;
+
+  // Cut the body along the panel boundaries used below, so seams are straight.
+  const cuts: [0 | 1 | 3, number][] = [
+    [0, frontEdge], [0, rearEdge], [0, xF + r * 0.95], [0, xR - r * 0.95], [0, wsMin], [0, wsMax],
+    [1, yRocker], [1, yBumper], [1, yBelt], [3, halfW * 0.72],
+  ];
+  if (cfg.doors === 4) cuts.push([0, doorSplit]);
+  if (isPickup) cuts.push([0, bedFront]);
+  for (const [axis, value] of cuts) parts.body = clip(parts.body, axis, value);
 
   // Black trim is judged against this body's own paint colour (the median texel).
   const lumas = parts.body.map((t) => t.lmax).sort((a, b) => a - b);
@@ -334,6 +385,7 @@ async function write(partsById: Record<string, Tri[]>, file: string, extras: Rec
   }
   await MeshoptEncoder.ready;
   await doc.transform(
+    weld(),
     reorder({ encoder: MeshoptEncoder }),
     meshopt({ encoder: MeshoptEncoder, level: 'high', quantizePosition: 14, quantizeNormal: 8, quantizationVolume: 'mesh' }),
   );
