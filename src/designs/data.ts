@@ -308,5 +308,6 @@ export const pages = {
   contact: '/contact-us/',
   privacy: '/privacy/',
   terms: '/terms/',
+  credits: '/credits/',
   arabic: '/ar/',
 };
