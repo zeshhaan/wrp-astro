@@ -1,0 +1,230 @@
+---
+/**
+ * Work: each finished car is a paint stage. As it scrolls past, the whole page
+ * takes on that car's colour.
+ */
+import Picture from '../shared/Picture.astro';
+import { work, pages } from '../data';
+import { stage, stages, hex } from './paint';
+
+const find = (img: string) => work.find((w) => w.image.includes(img))!;
+const cars = [
+  { stage: 'w-subaru', ...find('blue-subaru'), w: 1200, h: 1600 },
+  { stage: 'w-911', ...find('green-porsche'), w: 1179, h: 2091 },
+  { stage: 'w-lotus', ...find('burgundy-lotus'), w: 1200, h: 1561 },
+  { stage: 'w-boxster', ...find('boxster'), w: 1200, h: 1600 },
+  { stage: 'w-lexus', ...find('lexus'), w: 1200, h: 1269 },
+].map((c) => ({ ...c, paint: stages.find((s) => s.id === c.stage)! }));
+const more = find('supra');
+---
+
+<section class="work" id="work" aria-labelledby="work-title">
+  {
+    cars.map((car, i) => (
+      <div class="stage" {...stage(car.stage)}>
+        {i === 0 && (
+          <header class="wrap work-head">
+            <h2 id="work-title">The colours on this page came off these cars</h2>
+            <div>
+              <p>
+                Recent cars from our studio. As each one goes past, the page takes on its paint, sampled from the
+                photo.
+              </p>
+              <a class="btn btn-line" href={pages.portfolio}>
+                See the full portfolio
+              </a>
+            </div>
+          </header>
+        )}
+        <article class={`wrap car ${i % 2 ? 'flip' : ''}`}>
+          <figure class="car-photo">
+            <Picture
+              base={car.image}
+              alt={`${car.title} at WRP after ${car.what.toLowerCase()}`}
+              sizes="(min-width: 60rem) 30rem, 100vw"
+              width={car.w}
+              height={car.h}
+            />
+          </figure>
+          <div class="car-copy">
+            <p class="swatch">
+              <span class="sw" style={`--c:${car.paint.own}`} aria-hidden="true" />
+              <span>
+                {car.paint.name} <span class="hex">{hex(car.paint.own)}</span>
+              </span>
+            </p>
+            <h3>{car.title}</h3>
+            <p class="what">{car.what}</p>
+          </div>
+        </article>
+        {i === cars.length - 1 && more && (
+          <div class="wrap more">
+            <Picture
+              base={more.image}
+              alt={`${more.title} in the WRP showroom`}
+              sizes="8rem"
+              widths={[480]}
+              width={1200}
+              height={1600}
+              class="more-pic"
+            />
+            <p>
+              <span class="more-title">{more.title}</span>
+              <span class="more-what">{more.what}</span>
+            </p>
+            <a class="btn btn-solid" href={pages.portfolio}>
+              See every car in the portfolio
+            </a>
+          </div>
+        )}
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .stage {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .stage:first-child {
+    padding-top: clamp(5rem, 4rem + 5vw, 9rem);
+  }
+  .work-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 1.5rem 4rem;
+    align-items: end;
+    margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .work-head h2 {
+    font-size: var(--step-h2);
+    max-width: 16ch;
+  }
+  .work-head p {
+    color: var(--ink-soft);
+    max-width: 40ch;
+    margin-bottom: 1.25rem;
+  }
+
+  .car {
+    display: grid;
+    grid-template-columns: minmax(0, 30rem) minmax(0, 1fr);
+    gap: 2rem clamp(2rem, 7vw, 8rem);
+    align-items: center;
+  }
+  .car.flip {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+  }
+  .car.flip .car-photo {
+    order: 2;
+  }
+  .car.flip .car-copy {
+    justify-self: end;
+    text-align: right;
+  }
+  .car.flip .swatch {
+    justify-content: flex-end;
+  }
+  .car-photo {
+    margin: 0;
+  }
+  .car-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 78%;
+    border-radius: 3px;
+    box-shadow: 0 40px 70px -35px rgb(0 0 0 / 0.65);
+  }
+  .swatch {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+  .sw {
+    flex: none;
+    width: 1.1rem;
+    height: 2.2rem;
+    border-radius: 2px;
+    background: var(--c);
+    box-shadow: 0 0 0 1.5px var(--ink);
+  }
+  .hex {
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    margin-left: 0.35rem;
+  }
+  .car h3 {
+    margin-top: 1rem;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: var(--step-4);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    max-width: 10ch;
+  }
+  .car.flip h3 {
+    margin-left: auto;
+  }
+  .what {
+    margin-top: 1rem;
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+  }
+
+  .more {
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem 1.75rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .more :global(.more-pic img) {
+    width: 4.5rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .more p {
+    display: grid;
+    flex: 1 1 14rem;
+  }
+  .more-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: var(--step-1);
+  }
+  .more-what {
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 60rem) {
+    .work-head,
+    .car,
+    .car.flip {
+      grid-template-columns: 1fr;
+    }
+    .car.flip .car-photo {
+      order: 0;
+    }
+    .car.flip .car-copy {
+      justify-self: start;
+      text-align: left;
+    }
+    .car.flip .swatch {
+      justify-content: flex-start;
+    }
+    .car.flip h3 {
+      margin-left: 0;
+    }
+    .car-photo :global(img) {
+      max-height: 75svh;
+    }
+  }
+</style>

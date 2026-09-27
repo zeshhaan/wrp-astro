@@ -1,0 +1,362 @@
+---
+/**
+ * Services as the bays on the ground floor. Two rows of painted bays face each
+ * other across the aisle; the films we fit sit in the aisle between them.
+ */
+import Car from './Car.astro';
+import { services, proof, type Service } from '../data';
+
+const price = (s: Service) => (s.from === null ? null : `AED ${s.from.toLocaleString('en-US')}`);
+/** Short jobs you can wait for upstairs; longer ones are a drop-off. */
+const stay = (s: Service) => (s.minutes <= 5 * 60 ? `Wait upstairs, ${s.time}` : `Drop-off, ${s.time}`);
+const rows = [services.slice(0, 3), services.slice(3, 6)];
+---
+
+<section class="bays-section" id="services" aria-labelledby="bays-title">
+  <div class="wrap">
+    <div class="head">
+      <h2 id="bays-title">The bays</h2>
+      <p>
+        Your car stays down here while we work. Prices are starting prices; we confirm yours once we have seen the
+        car.
+      </p>
+    </div>
+
+    {
+      rows.map((row, r) => (
+        <>
+          <ul role="list" class:list={['row', r === 0 ? 'row--back' : 'row--front']}>
+            {row.map((s, i) => (
+              <li class="bay">
+                <span class="bay__no" aria-hidden="true">
+                  {r * 3 + i + 1}
+                </span>
+                <div class="bay__body">
+                  <Car service={s.slug} class="bay__car" />
+                  <div class="bay__text">
+                    <h3>
+                      <a class="bay__link" href={s.href}>
+                        {s.name}
+                      </a>
+                    </h3>
+                    <p class="bay__line">{s.line}</p>
+                    <p class="bay__price">
+                      {price(s) ? (
+                        <>
+                          From <strong>{price(s)}</strong>
+                        </>
+                      ) : (
+                        <strong class="bay__quote">Priced after inspection</strong>
+                      )}
+                    </p>
+                    <p class="bay__stay">{stay(s)}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {r === 0 && (
+            <div class="aisle">
+              <div class="plate">
+                <p class="plate__title">The films we fit</p>
+                <ul role="list" class="plate__logos">
+                  {proof.films.map((f) => (
+                    <li>
+                      <img src={f.logo} alt={f.name} height="36" width={f.name === 'STEK' ? 154 : 110} loading="lazy" />
+                    </li>
+                  ))}
+                </ul>
+                <p class="plate__note">
+                  Up to a 10-year warranty on paint protection film. Handle the samples in the materials room
+                  upstairs before you choose.
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .bays-section {
+    padding: 2.5rem var(--mz-gutter) 4rem;
+  }
+  .wrap {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+  }
+  .head {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-end: 2rem;
+  }
+  h2 {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+  .head p {
+    max-width: 44ch;
+    color: var(--mz-ink-2);
+    font-size: 1.0625rem;
+  }
+
+  /* ---------- A row of bays: painted lines on the floor ---------- */
+  .row {
+    --paint: var(--mz-lamp);
+    --line-w: 5px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bay {
+    position: relative;
+    isolation: isolate;
+    border-inline: var(--line-w) solid var(--paint);
+    padding: 1.25rem 1.1rem 1.5rem;
+    transition: background-color 0.3s;
+  }
+  .row--back .bay:first-child {
+    border-top: var(--line-w) solid var(--paint);
+  }
+  .bay + .bay {
+    border-top: var(--line-w) solid var(--paint);
+  }
+  .row--front .bay:last-child {
+    border-bottom: var(--line-w) solid var(--paint);
+  }
+  /* A pendant lamp's pool of light when you point at a bay. */
+  .bay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 55% at 50% 0%, rgb(255 246 226 / 0.9), transparent);
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .bay:hover::before,
+  .bay:has(.bay__link:focus-visible)::before {
+    opacity: 1;
+  }
+  .bay:has(.bay__link:focus-visible) {
+    outline: 3px solid var(--mz-felt);
+    outline-offset: -3px;
+  }
+  .bay__no {
+    position: absolute;
+    right: 0.9rem;
+    bottom: 0.4rem;
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: 4.5rem;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(21 23 26 / 0.3);
+    pointer-events: none;
+  }
+  .bay__body {
+    display: grid;
+    gap: 1rem;
+  }
+  .bay__body {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .bay :global(.bay__car) {
+    width: 100%;
+    height: auto;
+  }
+  .bay__text {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+  h3 {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .bay__link {
+    text-decoration: none;
+  }
+  .bay__link:focus-visible {
+    outline: none;
+  }
+  .bay__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .bay:hover .bay__link {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
+  }
+  .bay__line {
+    color: var(--mz-ink-2);
+    max-width: 40ch;
+  }
+  .bay__price {
+    margin-block-start: 0.5rem;
+    font-size: 0.9375rem;
+  }
+  .bay__price strong {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+    color: var(--mz-felt);
+  }
+  .bay__price .bay__quote {
+    font-size: 1.125rem;
+  }
+  .bay__stay {
+    font-size: 0.875rem;
+    color: var(--mz-ink-2);
+    padding-inline-end: 4rem;
+  }
+
+
+  /* ---------- The aisle, with the films in it ---------- */
+  .aisle {
+    position: relative;
+    padding-block: 2rem;
+    display: grid;
+    place-items: center;
+  }
+  .aisle::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 4px;
+    translate: 0 -50%;
+    background: repeating-linear-gradient(
+      to right,
+      var(--mz-brass) 0 2.5rem,
+      transparent 2.5rem 4.25rem
+    );
+  }
+  .plate {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    max-width: 34rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--mz-wall);
+    text-align: center;
+  }
+  .plate__title {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+  .plate__logos {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  .plate__logos img {
+    height: 2.25rem;
+    width: auto;
+    /* The logo files carry white backgrounds; let the plate show through. */
+    mix-blend-mode: multiply;
+  }
+  .plate__note {
+    color: var(--mz-ink-2);
+    font-size: 0.9375rem;
+    max-width: 42ch;
+  }
+
+  /* ---------- Desktop: three bays a row, facing each other ---------- */
+  @media (min-width: 56rem) {
+    .bays-section {
+      padding-block: 3rem 5rem;
+    }
+    .head {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: end;
+      gap: 3rem;
+      margin-block-end: 2.5rem;
+    }
+    .head p {
+      justify-self: end;
+    }
+    .row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .row .bay {
+      border: 0;
+      border-inline-start: var(--line-w) solid var(--paint);
+      padding: 1.5rem 1.5rem 5rem;
+    }
+    .row .bay:last-child {
+      border-inline-end: var(--line-w) solid var(--paint);
+    }
+    /* Back row: the back wall line is at the top; the bay opens onto the aisle. */
+    .row--back .bay {
+      border-top: var(--line-w) solid var(--paint);
+    }
+    .row--back .bay__no {
+      bottom: 0.25rem;
+      right: auto;
+      left: 1.5rem;
+    }
+    /* Front row mirrors it: open to the aisle at the top, back line at the bottom,
+       and the cars park nose-in the other way. */
+    .row--front .bay {
+      border-bottom: var(--line-w) solid var(--paint);
+      padding: 5rem 1.5rem 1.5rem;
+    }
+    .row--front .bay__no {
+      top: 0.25rem;
+      bottom: auto;
+      right: auto;
+      left: 1.5rem;
+    }
+    .row--front :global(.bay__car) {
+      rotate: 180deg;
+    }
+    .row--front .bay::before {
+      background: radial-gradient(60% 55% at 50% 100%, rgb(255 246 226 / 0.9), transparent);
+    }
+    .bay__body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+    .bay :global(.bay__car) {
+      width: 5.75rem;
+      justify-self: center;
+    }
+    .bay__no {
+      font-size: 5rem;
+    }
+    .bay__price .bay__quote {
+    font-size: 1.125rem;
+  }
+  .bay__stay {
+      padding-inline-end: 0;
+    }
+    .aisle {
+      padding-block: 2.5rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bay,
+    .bay::before {
+      transition: none;
+    }
+  }
+</style>

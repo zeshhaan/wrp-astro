@@ -1,0 +1,123 @@
+---
+/**
+ * Mezzanine: the page is the building.
+ * Ground floor (the bays) -> first floor (the lounge) -> the street (visit).
+ * A lift panel tracks which floor you are on.
+ */
+import DesignShell from '../shared/DesignShell.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import FloorSign from './FloorSign.astro';
+import Bays from './Bays.astro';
+import Work from './Work.astro';
+import Lounge from './Lounge.astro';
+import Reviews from './Reviews.astro';
+import Visit from './Visit.astro';
+import Footer from './Footer.astro';
+import { heroPhoto } from './building';
+---
+
+<DesignShell
+  concept="mezzanine"
+  title="WRP Detailing, Dubai: PPF, ceramic coating and a lounge upstairs"
+  description="Paint protection film, ceramic coating, window film and detailing in Al Qusais, Dubai. Wait in the WRP Lounge upstairs while we work on your car below."
+  fonts={['--font-bricolage', '--font-geist', '--font-montserrat']}
+  themeColor="#E9EBE8"
+  preloadImage={{ base: heroPhoto.base, sizes: '(min-width: 60rem) 1200px, 150vw' }}
+>
+  <Header />
+  <main id="main">
+    <Hero />
+
+    <div class="floor floor--ground" id="ground-floor" data-floor="G">
+      <FloorSign code="G" name="Ground floor" tone="wall" />
+      <Bays />
+      <Work />
+    </div>
+
+    <div class="floor floor--first" id="first-floor" data-floor="1">
+      <FloorSign code="1" name="First floor" tone="beam" />
+      <Lounge />
+      <Reviews />
+    </div>
+
+    <div class="floor floor--street" id="street" data-floor="S">
+      <FloorSign code="S" name="Street" tone="beam" />
+      <Visit />
+    </div>
+  </main>
+  <Footer />
+</DesignShell>
+
+<style is:global>
+  :root {
+    /* The building */
+    --mz-wall: #e9ebe8; /* gallery-wall grey-white */
+    --mz-wall-2: #dfe2de; /* wall in shade */
+    --mz-glass: #b9c7c2; /* glass green-grey */
+    --mz-glass-light: #d6dfdb;
+    --mz-smoke: #232b29; /* the glass wall seen from the bays */
+    --mz-felt: #1f6b4f; /* billiards felt, the one accent */
+    --mz-felt-ink: #185740; /* felt dark enough for text on glass */
+    --mz-lamp: #15171a; /* pendant-lamp black */
+    --mz-brass: #c9a45c; /* lamp glow, sparingly */
+    --mz-night: #1b1f25; /* the street outside, after dark */
+    --mz-ink: #15171a;
+    --mz-ink-2: #474e4b;
+    --mz-on-dark: #e9ebe8;
+    --mz-on-dark-2: #aebbb6;
+
+    --mz-display: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+    --mz-text: var(--font-geist), 'Geist', system-ui, sans-serif;
+    --mz-mark: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+
+    --mz-hh: 3.75rem; /* header height */
+    --mz-gutter: 1rem;
+    --mz-max: 76rem;
+    --mz-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+    color-scheme: light;
+  }
+  @media (min-width: 60rem) {
+    :root {
+      --mz-hh: 4.25rem;
+      /* keeps content clear of the lift panel fixed at the right edge */
+      --mz-gutter: 6rem;
+    }
+  }
+  /* Scoped to this concept: in dev, other concepts' global styles share the page. */
+  :root[data-concept='mezzanine'] {
+    scroll-padding-top: var(--mz-hh);
+  }
+  :root[data-concept='mezzanine'] body {
+    background: var(--mz-wall);
+    color: var(--mz-ink);
+    font-family: var(--mz-text);
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  :where(:root[data-concept='mezzanine'] a) {
+    color: inherit;
+  }
+  :where(:root[data-concept='mezzanine'] :is(a, button)):focus-visible {
+    outline: 3px solid var(--mz-felt);
+    outline-offset: 3px;
+  }
+  :where(.floor--street) :is(a, button):focus-visible {
+    outline-color: var(--mz-brass);
+  }
+  :root[data-concept='mezzanine'] ::selection {
+    background: var(--mz-glass);
+    color: var(--mz-ink);
+  }
+</style>
+
+<style>
+  .floor--first {
+    background: var(--mz-glass-light);
+  }
+  .floor--street {
+    background: var(--mz-night);
+    color: var(--mz-on-dark);
+  }
+</style>

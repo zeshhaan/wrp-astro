@@ -1,0 +1,213 @@
+---
+/**
+ * A car seen from the mezzanine above, drawn like the lounge floor plan.
+ * Each service marks the part of the car it works on.
+ */
+interface Props {
+  service: string;
+  class?: string;
+}
+const { service, class: className } = Astro.props;
+const id = `mz-car-${service}`;
+const body =
+  'M60 6C86 6 102 14 104 38L106 204C106 226 92 234 60 234S14 226 14 204L16 38C18 14 34 6 60 6Z';
+const drops = [
+  [40, 30], [58, 24], [78, 32], [50, 44], [70, 48], [44, 120], [62, 132], [78, 118], [52, 150], [74, 148],
+  [40, 208], [60, 214], [80, 206],
+];
+---
+
+<svg class:list={['car', `car--${service}`, className]} viewBox="0 0 120 240" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id={id}><path d={body}></path></clipPath>
+  </defs>
+  <g fill="#15171a">
+    <rect x="7" y="46" width="11" height="32" rx="2.5"></rect>
+    <rect x="102" y="46" width="11" height="32" rx="2.5"></rect>
+    <rect x="7" y="168" width="11" height="32" rx="2.5"></rect>
+    <rect x="102" y="168" width="11" height="32" rx="2.5"></rect>
+  </g>
+  <path d={body} class="c-body"></path>
+
+  <g clip-path={`url(#${id})`}>
+    {service === 'paint-protection-film' && <rect x="0" y="0" width="120" height="72" class="c-film" />}
+    {
+      service === 'ceramic-coating' && (
+        <>
+          <rect x="0" y="0" width="120" height="240" class="c-coat" />
+          <path d="M-10 150 90 -10h22L12 150Z" class="c-sheen" />
+        </>
+      )
+    }
+    {
+      service === 'polish' && (
+        <>
+          <g class="c-swirl">
+            <circle cx="38" cy="34" r="6" />
+            <circle cx="34" cy="38" r="11" />
+            <circle cx="44" cy="48" r="4" />
+            <circle cx="42" cy="134" r="10" />
+            <circle cx="38" cy="128" r="5" />
+            <circle cx="40" cy="208" r="9" />
+            <circle cx="44" cy="202" r="4" />
+          </g>
+          <path d="M60 8V232" class="c-tape" />
+          <path d="M80 30h12M86 24v12M78 132h10M83 127v10M80 206h10M85 201v10" class="c-gleam" />
+        </>
+      )
+    }
+  </g>
+  <path d={body} class="c-outline"></path>
+
+  <path d="M34 22Q60 16 86 22" class="c-line"></path>
+  <path d="M20 22q5-9 16-11M100 22q-5-9-16-11M22 224q8 5 16 5M98 224q-8 5-16 5" class="c-line"></path>
+  <ellipse cx="13" cy="84" rx="6" ry="3.5" class:list={['c-mirror', service === 'paint-protection-film' && 'c-film-solid']}></ellipse>
+  <ellipse cx="107" cy="84" rx="6" ry="3.5" class:list={['c-mirror', service === 'paint-protection-film' && 'c-film-solid']}></ellipse>
+
+  <path d="M28 72Q60 62 92 72L87 106Q60 100 33 106Z" class:list={['c-glass', service === 'window-film' && 'c-tint-light']}></path>
+  <path d="M33 164Q60 170 87 164L91 190Q60 198 29 190Z" class:list={['c-glass', service === 'window-film' && 'c-tint']}></path>
+  <path d="M21 84 28 108v52l-5 22M99 84l-7 24v52l5 22" class:list={['c-side', service === 'window-film' && 'c-side-tint']}></path>
+
+  {
+    service === 'leather-upholstery' ? (
+      <g class="c-cabin">
+        <rect x="33" y="104" width="54" height="62" rx="5" class="c-floor" />
+        <circle cx="46" cy="110" r="5.5" class="c-wheel" />
+        <rect x="37" y="114" width="19" height="22" rx="5" class="c-seat" />
+        <rect x="64" y="114" width="19" height="22" rx="5" class="c-seat" />
+        <rect x="37" y="142" width="46" height="18" rx="5" class="c-seat" />
+      </g>
+    ) : (
+      <rect x="33" y="106" width="54" height="58" rx="4" class="c-roof" />
+    )
+  }
+
+  {
+    service === 'premium-car-wash' && (
+      <g class="c-drops">
+        {drops.map(([x, y]) => (
+          <circle cx={x} cy={y} r="3" />
+        ))}
+      </g>
+    )
+  }
+  {
+    service === 'ceramic-coating' && (
+      <g class="c-beads">
+        {drops.slice(0, 5).map(([x, y]) => (
+          <circle cx={x} cy={y} r="2.2" />
+        ))}
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .car {
+    display: block;
+    overflow: visible;
+  }
+  .c-body {
+    fill: #fff;
+  }
+  .c-outline {
+    fill: none;
+    stroke: #15171a;
+    stroke-width: 2;
+  }
+  .c-line {
+    fill: none;
+    stroke: #15171a;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+  .c-mirror {
+    fill: #fff;
+    stroke: #15171a;
+    stroke-width: 1.5;
+  }
+  .c-glass {
+    fill: #d6dfdb;
+    stroke: #15171a;
+    stroke-width: 1.5;
+  }
+  .c-side {
+    fill: none;
+    stroke: #b9c7c2;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+  .c-roof {
+    fill: #fff;
+    stroke: #15171a;
+    stroke-width: 1.2;
+  }
+  /* Paint protection film: the front end and mirrors, where stones hit. */
+  .c-film {
+    fill: rgb(31 107 79 / 0.55);
+  }
+  .c-film-solid {
+    fill: #1f6b4f;
+  }
+  /* Ceramic: a glassy layer over everything. */
+  .c-coat {
+    fill: rgb(31 107 79 / 0.2);
+  }
+  .c-sheen {
+    fill: rgb(255 255 255 / 0.75);
+  }
+  .c-beads circle {
+    fill: #fff;
+    stroke: #1f6b4f;
+    stroke-width: 1.2;
+  }
+  /* Window film. */
+  .c-tint {
+    fill: #15171a;
+  }
+  .c-tint-light {
+    fill: #4f5a56;
+  }
+  .c-side-tint {
+    stroke: #15171a;
+  }
+  /* Polish: swirls on one half, corrected gloss on the other. */
+  .c-swirl circle {
+    fill: none;
+    stroke: #6f7975;
+    stroke-width: 1.3;
+  }
+  /* Masking tape down the middle: before on one side, after on the other. */
+  .c-tape {
+    stroke: #c9a45c;
+    stroke-width: 3;
+    stroke-dasharray: 5 3;
+  }
+  .c-gleam {
+    stroke: #1f6b4f;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  /* Wash. */
+  .c-drops circle {
+    fill: #d6dfdb;
+    stroke: #1f6b4f;
+    stroke-width: 1.2;
+  }
+  /* Leather: the roof comes off so you can see the seats. */
+  .c-floor {
+    fill: #f1efe9;
+    stroke: #15171a;
+    stroke-width: 1.2;
+  }
+  .c-seat {
+    fill: #b88a52;
+    stroke: #15171a;
+    stroke-width: 1.2;
+  }
+  .c-wheel {
+    fill: none;
+    stroke: #15171a;
+    stroke-width: 1.6;
+  }
+</style>

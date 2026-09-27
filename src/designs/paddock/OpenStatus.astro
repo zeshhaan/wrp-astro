@@ -1,0 +1,123 @@
+---
+/**
+ * Live "Open now / Closed, opens Saturday 9 AM" line, computed in Dubai time
+ * from contact.schedule. Server renders the plain hours so it reads correctly
+ * without JavaScript; the script swaps in the live state.
+ */
+import { contact } from '../data';
+
+interface Props {
+  /** 'light' for dark backgrounds. */
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+const { tone = 'dark', class: className } = Astro.props;
+---
+
+<p class:list={['status', `tone-${tone}`, className]} data-open-status data-schedule={JSON.stringify(contact.schedule)}>
+  <span class="dot" aria-hidden="true"></span>
+  <span data-open-text>{contact.hoursShort}. {contact.closed}.</span>
+</p>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    margin: 0;
+    font-family: var(--font-barlow), system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+  .dot {
+    flex: none;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    background: var(--pd-grey);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pd-grey) 22%, transparent);
+  }
+  .status[data-state='open'] .dot {
+    background: #1f9d55;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #1f9d55 25%, transparent);
+  }
+  .status[data-state='closed'] .dot {
+    background: var(--pd-grey);
+  }
+  .tone-light { color: var(--pd-white); }
+  .tone-light .dot { background: #8d8d8d; }
+  .tone-light[data-state='open'] .dot { background: #3ccf7a; }
+  :global(.status strong) { font-weight: 600; }
+</style>
+
+<script>
+  type Schedule = { open: string; close: string; closedDays: number[]; timeZone: string };
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const SHORT: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+  const toMinutes = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  };
+  const label = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    return m ? `${h12}:${String(m).padStart(2, '0')} ${suffix}` : `${h12} ${suffix}`;
+  };
+
+  /** Day of week and minutes past midnight in the studio's time zone. */
+  function nowIn(timeZone: string) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      weekday: 'short',
+      hour: 'numeric',
+      minute: 'numeric',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '0';
+    return { day: SHORT[get('weekday')] ?? 0, minutes: Number(get('hour')) * 60 + Number(get('minute')) };
+  }
+
+  function describe(s: Schedule) {
+    const { day, minutes } = nowIn(s.timeZone);
+    const open = toMinutes(s.open);
+    const close = toMinutes(s.close);
+    const isOpenDay = (d: number) => !s.closedDays.includes(d);
+    if (isOpenDay(day) && minutes >= open && minutes < close) {
+      return { state: 'open', html: `<strong>Open now</strong>, until ${label(s.close)}` };
+    }
+    if (isOpenDay(day) && minutes < open) {
+      return { state: 'closed', html: `<strong>Closed</strong>, opens today at ${label(s.open)}` };
+    }
+    let offset = 1;
+    while (!isOpenDay((day + offset) % 7) && offset < 7) offset++;
+    const next = (day + offset) % 7;
+    const when =
+      offset === 1 && isOpenDay(day) ? `tomorrow at ${label(s.open)}` : `${DAYS[next]} ${label(s.open)}`;
+    const prefix = isOpenDay(day) ? 'Closed' : `Closed ${DAYS[day]}s`;
+    return { state: 'closed', html: `<strong>${prefix}</strong>, opens ${when}` };
+  }
+
+  function update() {
+    document.querySelectorAll<HTMLElement>('[data-open-status]').forEach((el) => {
+      const s = JSON.parse(el.dataset.schedule ?? '{}') as Schedule;
+      const text = el.querySelector('[data-open-text]');
+      if (!text || !s.timeZone) return;
+      const { state, html } = describe(s);
+      el.dataset.state = state;
+      text.innerHTML = html;
+    });
+    document.querySelectorAll<HTMLElement>('[data-today-row]').forEach((row) => {
+      const s = JSON.parse(document.querySelector<HTMLElement>('[data-open-status]')?.dataset.schedule ?? '{}') as Schedule;
+      if (!s.timeZone) return;
+      const { day } = nowIn(s.timeZone);
+      const isFriday = s.closedDays.includes(day);
+      row.toggleAttribute('data-today', row.dataset.todayRow === (isFriday ? 'closed' : 'open'));
+    });
+  }
+
+  update();
+  setInterval(update, 60_000);
+</script>

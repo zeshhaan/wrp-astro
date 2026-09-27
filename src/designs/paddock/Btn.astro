@@ -1,0 +1,76 @@
+---
+/**
+ * Slanted call-to-action link: the italic of motorsport signage, applied to a
+ * button. The slant lives on a pseudo-element so the focus ring stays square.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'a'> {
+  variant?: 'tyre' | 'signal' | 'line' | 'line-light';
+  size?: 'md' | 'sm';
+}
+const { variant = 'tyre', size = 'md', class: className, ...rest } = Astro.props;
+---
+
+<a class:list={['btn', `v-${variant}`, `s-${size}`, className]} {...rest}><slot /></a>
+
+<style>
+  .btn {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-height: 48px;
+    padding: 0.55em 1.35em 0.6em;
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1;
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .s-sm {
+    min-height: 44px;
+    font-size: 1.125rem;
+    padding-inline: 1.05em;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: skewX(-12deg);
+    transition: background-color 0.15s, transform 0.2s;
+  }
+  .v-tyre { color: var(--pd-white); }
+  .v-tyre::before { background: var(--pd-tyre); }
+  .v-tyre:hover::before { background: #2f3033; }
+
+  .v-signal { color: #000; }
+  .v-signal::before { background: var(--pd-signal); }
+  .v-signal:hover::before { background: #ffe07a; }
+
+  .v-line { color: var(--pd-tyre); }
+  .v-line::before { border: 2px solid var(--pd-tyre); }
+  .v-line:hover::before { background: color-mix(in srgb, var(--pd-tyre) 8%, transparent); }
+
+  .v-line-light { color: var(--pd-white); }
+  .v-line-light::before { border: 2px solid color-mix(in srgb, var(--pd-white) 75%, transparent); }
+  .v-line-light:hover::before { border-color: var(--pd-white); }
+
+  .btn:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 4px;
+  }
+  .v-signal:focus-visible { outline-color: var(--pd-signal); }
+  .v-tyre:focus-visible { outline-color: var(--pd-tyre); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn:hover::before { transform: skewX(-12deg) translateX(2px); }
+  }
+</style>

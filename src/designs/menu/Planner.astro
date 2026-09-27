@@ -1,0 +1,946 @@
+---
+/**
+ * The signature moment: "Plan your visit".
+ * A real form. Ticking services updates a bill-style slip (starting total,
+ * how long the car stays, what to do meanwhile) and the WhatsApp link.
+ */
+import { getEntry } from 'astro:content';
+import { contact, whatsappLink } from '../data';
+import { courses, timeRange, timeWords, aed, washLevelNotes, washLevelFallback, updatesQuote } from './menu';
+
+const wash = await getEntry('services', 'premium-car-wash').catch(() => undefined);
+const levels =
+  wash?.data.packages?.map((p) => ({ name: p.name, sedan: p.price, suv: p.priceSuv ?? p.price })) ?? washLevelFallback;
+
+const items = courses.flatMap((c) => c.items);
+const emptyMessage = "Hello WRP, I'd like to plan a visit. Could you help me choose?";
+---
+
+<section class="plan" id="plan" aria-labelledby="plan-title">
+  <div class="plan-inner">
+    <header class="plan-head">
+      <h2 id="plan-title">Plan your visit</h2>
+      <p>
+        Tick what the car needs. You’ll see a starting price, how long the car stays with us and how to spend
+        that time. Then send the plan on WhatsApp and we’ll reply with a quote and a time.
+      </p>
+    </header>
+
+    <form class="plan-form" id="plan-form" autocomplete="off">
+      <p class="peek" data-peek>
+        <span data-peek-text>Nothing ticked yet</span>
+        <a href="#slip">See your plan</a>
+      </p>
+
+      <fieldset class="picks">
+        <legend>What does the car need?</legend>
+        <ul role="list">
+          {
+            items.map((s) => {
+              const r = timeRange(s.time);
+              const isWash = s.slug === 'premium-car-wash';
+              return (
+                <li class="pick" data-pick={s.slug}>
+                  <input
+                    class="tick"
+                    type="checkbox"
+                    name="service"
+                    value={s.slug}
+                    id={`pick-${s.slug}`}
+                    data-name={s.name}
+                    data-from={s.from ?? ''}
+                    data-minutes={s.minutes}
+                    data-lo={r.lo}
+                    data-hi={r.hi}
+                    data-unit={r.unit}
+                    aria-describedby={`pick-${s.slug}-meta`}
+                  />
+                  <label for={`pick-${s.slug}`} class="pick-label">
+                    <span class="pick-name">{s.name}</span>
+                    <span class="pick-price">
+                      {s.from ? (
+                        <>
+                          <i>from</i> {aed(s.from)}
+                        </>
+                      ) : (
+                        <i>after inspection</i>
+                      )}
+                    </span>
+                  </label>
+                  <span class="pick-meta" id={`pick-${s.slug}-meta`}>
+                    With us {timeWords(s.time)}
+                  </span>
+
+                  {isWash && (
+                    <div class="options" data-options hidden>
+                      <fieldset class="opt-set">
+                        <legend>Car size</legend>
+                        <div class="sizes">
+                          <label class="chip">
+                            <input type="radio" name="size" value="sedan" checked />
+                            <span>Sedan or coupe</span>
+                          </label>
+                          <label class="chip">
+                            <input type="radio" name="size" value="suv" />
+                            <span>SUV or 4x4</span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      <fieldset class="opt-set">
+                        <legend>Wash level</legend>
+                        <div class="levels">
+                          {levels.map((l, i) => (
+                            <label class="level">
+                              <input
+                                type="radio"
+                                name="level"
+                                value={l.name}
+                                data-sedan={l.sedan}
+                                data-suv={l.suv}
+                                checked={i === 0}
+                              />
+                              <span class="level-name">{l.name}</span>
+                              <span class="level-price" data-level-price>
+                                {aed(l.sedan)}
+                              </span>
+                              <span class="level-note">{washLevelNotes[l.name] ?? ''}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                    </div>
+                  )}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </fieldset>
+
+      <div class="field">
+        <label for="plan-car">Your car <span class="optional">(optional)</span></label>
+        <p class="hint" id="plan-car-hint">Make, model and year help us quote properly.</p>
+        <input id="plan-car" name="car" type="text" aria-describedby="plan-car-hint" maxlength="80" />
+      </div>
+    </form>
+
+    <div class="slip-wrap">
+      <div class="slip" id="slip" tabindex="-1" data-wa={contact.whatsapp}>
+        <h3 id="slip-title">Your visit</h3>
+        <p class="slip-empty" data-empty>Nothing yet. Tick a service and it appears here.</p>
+        <ul role="list" class="slip-lines" data-lines></ul>
+
+        <dl class="slip-sum">
+          <div class="sum-total">
+            <dt>Starting total</dt>
+            <dd data-total>AED 0</dd>
+          </div>
+          <p class="slip-extra" data-extra hidden></p>
+          <div class="sum-time">
+            <dt>Your car stays with us</dt>
+            <dd data-time>Tick a service</dd>
+          </div>
+        </dl>
+
+        <div class="slip-wait">
+          <h4 data-wait-title>While it’s with us</h4>
+          <p data-suggest>Tick a service and we’ll suggest how to spend the time.</p>
+          <p class="slip-materials" data-materials hidden>
+            Choosing film or leather? Look through the samples in the materials room upstairs first.
+          </p>
+          <blockquote class="slip-quote" data-quote hidden>
+            <p>“{updatesQuote.text}”</p>
+            <footer>{updatesQuote.author}, from a Google review</footer>
+          </blockquote>
+        </div>
+
+        <a class="send" data-send href={whatsappLink(emptyMessage)} target="_blank" rel="noopener">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><use href="#i-wa"></use></svg>
+          Send this plan on WhatsApp
+        </a>
+        <div class="slip-foot">
+          <button type="reset" form="plan-form" class="clear">Clear the plan</button>
+          <p>Starting prices. We confirm the final price once we’ve seen the car.</p>
+        </div>
+      </div>
+      <div class="slip-edge" aria-hidden="true"></div>
+    </div>
+
+    <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-announce></p>
+  </div>
+</section>
+
+<script>
+  // Build links here rather than importing data.ts, which would ship the review data to the client.
+
+  type Line = { slug: string; label: string; price: number | null; lo: number; hi: number; unit: string; minutes: number };
+
+  const form = document.getElementById('plan-form') as HTMLFormElement | null;
+  const slip = document.getElementById('slip');
+  if (form && slip) {
+    const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = slip) => root.querySelector<T>(sel)!;
+    const boxes = [...form.querySelectorAll<HTMLInputElement>('input[name="service"]')];
+    const options = form.querySelector<HTMLElement>('[data-options]');
+    const linesEl = $<HTMLUListElement>('[data-lines]');
+    const announceEl = document.querySelector<HTMLElement>('[data-announce]')!;
+    const peekText = form.querySelector<HTMLElement>('[data-peek-text]')!;
+    const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
+    const waBase = slip.dataset.wa ?? 'https://wa.me/971547173000';
+    const whatsappLink = (m: string) => `${waBase}?text=${encodeURIComponent(m)}`;
+    let announceTimer = 0;
+    let lastTotal = '';
+
+    const readLines = (): Line[] => {
+      const size = form.querySelector<HTMLInputElement>('input[name="size"]:checked')?.value ?? 'sedan';
+      const level = form.querySelector<HTMLInputElement>('input[name="level"]:checked');
+      return boxes
+        .filter((b) => b.checked)
+        .map((b) => {
+          const d = b.dataset;
+          let price = d.from ? Number(d.from) : null;
+          let label = d.name ?? b.value;
+          if (b.value === 'premium-car-wash' && level) {
+            price = Number(size === 'suv' ? level.dataset.suv : level.dataset.sedan);
+            label = `${label}, ${level.value}, ${size === 'suv' ? 'SUV' : 'sedan'}`;
+          }
+          return {
+            slug: b.value,
+            label,
+            price,
+            lo: Number(d.lo),
+            hi: Number(d.hi),
+            unit: d.unit ?? 'hours',
+            minutes: Number(d.minutes),
+          };
+        });
+    };
+
+    /** Honest timing: day jobs overlap, but each extra one can add a day. Hour jobs add up. */
+    const timing = (lines: Line[]) => {
+      if (!lines.length) return null;
+      const dropOff = lines.some((l) => l.minutes >= 8 * 60);
+      const days = lines.filter((l) => l.unit === 'days');
+      if (days.length) {
+        const lo = Math.max(...days.map((l) => l.lo));
+        const hi = Math.max(...days.map((l) => l.hi)) + days.length - 1;
+        return { text: `${lo} to ${hi} days`, mode: 'dropoff' as const };
+      }
+      const lo = lines.reduce((a, l) => a + l.lo, 0);
+      const hi = lines.reduce((a, l) => a + l.hi, 0);
+      const total = lines.reduce((a, l) => a + l.minutes, 0);
+      const mode = dropOff ? ('dropoff' as const) : total <= 180 ? ('short' as const) : ('long' as const);
+      return { text: `About ${lo} to ${hi} hours`, mode };
+    };
+
+    const suggestions = {
+      short: {
+        title: 'While you wait',
+        text: 'Stay for it. That’s time for a karak upstairs and a frame of billiards, or a board game if someone came with you.',
+        say: "I'll wait upstairs in the lounge.",
+      },
+      long: {
+        title: 'Stay or go',
+        text: 'Either works. The lounge has the sofa, the big screen and coffee for the afternoon, or drop the car off in the morning and collect it that evening.',
+        say: "I may wait in the lounge or drop the car off, whichever suits.",
+      },
+      dropoff: {
+        title: 'Leave it with us',
+        text: 'This one is a drop-off. We send photos and videos while we work, so you see it come together without waiting around.',
+        say: "I'll drop the car off.",
+      },
+    };
+
+    const render = () => {
+      const lines = readLines();
+      const t = timing(lines);
+      const known = lines.filter((l) => l.price !== null);
+      const unknown = lines.filter((l) => l.price === null);
+      const total = known.reduce((a, l) => a + (l.price ?? 0), 0);
+      const car = (form.elements.namedItem('car') as HTMLInputElement | null)?.value.trim() ?? '';
+
+      // Checked-row styling fallback for browsers without :has().
+      boxes.forEach((b) => b.closest('.pick')?.classList.toggle('is-on', b.checked));
+      const washOn = boxes.find((b) => b.value === 'premium-car-wash')?.checked ?? false;
+      if (options) options.hidden = !washOn;
+
+      // Wash level prices follow the chosen size.
+      const size = form.querySelector<HTMLInputElement>('input[name="size"]:checked')?.value ?? 'sedan';
+      form.querySelectorAll<HTMLInputElement>('input[name="level"]').forEach((r) => {
+        const out = r.parentElement?.querySelector('[data-level-price]');
+        if (out) out.textContent = aed(Number(size === 'suv' ? r.dataset.suv : r.dataset.sedan));
+      });
+
+      // Slip lines: keyed, so only new lines animate in.
+      const keep = new Set(lines.map((l) => l.slug));
+      linesEl.querySelectorAll<HTMLLIElement>('li').forEach((li) => {
+        if (!keep.has(li.dataset.slug!)) li.remove();
+      });
+      lines.forEach((l, i) => {
+        let li = linesEl.querySelector<HTMLLIElement>(`li[data-slug="${l.slug}"]`);
+        if (!li) {
+          li = document.createElement('li');
+          li.dataset.slug = l.slug;
+          li.innerHTML = '<span class="l-name"></span><span class="l-dots" aria-hidden="true"></span><span class="l-price"></span>';
+          const next = lines.slice(i + 1).map((n) => linesEl.querySelector(`li[data-slug="${n.slug}"]`)).find(Boolean);
+          linesEl.insertBefore(li, next ?? null);
+        }
+        li.querySelector('.l-name')!.textContent = l.label;
+        li.querySelector('.l-price')!.textContent = l.price === null ? 'After inspection' : aed(l.price);
+      });
+      $('[data-empty]').hidden = lines.length > 0;
+
+      const totalText = known.length ? `From ${aed(total)}` : unknown.length ? 'After inspection' : 'AED 0';
+      const totalEl = $('[data-total]');
+      totalEl.textContent = totalText;
+      if (totalText !== lastTotal && lastTotal) {
+        totalEl.classList.remove('bump');
+        void totalEl.offsetWidth;
+        totalEl.classList.add('bump');
+      }
+      lastTotal = totalText;
+
+      const extra = $('[data-extra]');
+      extra.hidden = !(unknown.length && known.length);
+      extra.textContent = `Plus ${unknown.map((l) => l.label.toLowerCase()).join(' and ')}, priced after inspection.`;
+
+      $('[data-time]').textContent = t ? (t.mode === 'dropoff' ? `${t.text}, drop-off` : t.text) : 'Tick a service';
+      const s = t ? suggestions[t.mode] : null;
+      $('[data-wait-title]').textContent = s ? s.title : 'While it’s with us';
+      $('[data-suggest]').textContent = s ? s.text : 'Tick a service and we’ll suggest how to spend the time.';
+      $('[data-quote]').hidden = t?.mode !== 'dropoff';
+      $('[data-materials]').hidden = !lines.some((l) =>
+        ['paint-protection-film', 'window-film', 'leather-upholstery'].includes(l.slug),
+      );
+      slip.dataset.mode = t?.mode ?? 'empty';
+
+      peekText.textContent = lines.length
+        ? `${totalText}, ${t!.text.replace(/^About /, 'about ')}`
+        : 'Nothing ticked yet';
+
+      // The WhatsApp message.
+      let msg = "Hello WRP, I'd like to plan a visit. Could you help me choose?";
+      if (lines.length) {
+        const out = ["Hello WRP, I'd like to plan a visit.", ''];
+        lines.forEach((l) => out.push(`- ${l.label}: ${l.price === null ? 'price after inspection' : `from ${aed(l.price)}`}`));
+        out.push('');
+        if (known.length) out.push(`Starting total: from ${aed(total)}${unknown.length ? ', plus the inspection items' : ''}`);
+        out.push(`Time with you: ${t!.text.replace(/^About /, 'about ')}`);
+        out.push(suggestions[t!.mode].say);
+        if (car) out.push(`My car: ${car}`);
+        out.push('', 'Which day works for you?');
+        msg = out.join('\n');
+      } else if (car) {
+        msg += `\nMy car: ${car}`;
+      }
+      $<HTMLAnchorElement>('[data-send]').href = whatsappLink(msg);
+
+      // One polite, debounced announcement per change.
+      window.clearTimeout(announceTimer);
+      announceTimer = window.setTimeout(() => {
+        announceEl.textContent = lines.length
+          ? `Plan updated. ${lines.length} ${lines.length === 1 ? 'service' : 'services'}. ${totalText}. ${t!.text}${t!.mode === 'dropoff' ? ', drop-off' : ''}.`
+          : 'Plan cleared.';
+      }, 450);
+    };
+
+    form.addEventListener('change', render);
+    form.addEventListener('input', (e) => {
+      if ((e.target as HTMLElement).id === 'plan-car') render();
+    });
+    form.addEventListener('reset', () => requestAnimationFrame(render));
+    // Restore state after back/forward navigation (browsers keep checked boxes).
+    window.addEventListener('pageshow', render);
+    render();
+  }
+</script>
+
+<style>
+  .plan {
+    padding-block: clamp(4rem, 3rem + 5vw, 8rem);
+    padding-inline: 1rem;
+    border-block-start: 1px solid var(--linen);
+    accent-color: var(--plum);
+  }
+  .plan-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 2.5rem;
+  }
+  .plan-head {
+    text-align: center;
+    max-width: 38rem;
+    margin-inline: auto;
+  }
+  .plan-head h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h2);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .plan-head p {
+    margin-block-start: 1.25rem;
+    color: var(--ink-soft);
+  }
+
+  @media (min-width: 60rem) {
+    .plan-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(22rem, 26rem);
+      column-gap: clamp(2.5rem, 5vw, 5rem);
+      align-items: start;
+    }
+    .plan-head {
+      grid-column: 1 / -1;
+    }
+    .slip-wrap {
+      position: sticky;
+      top: 1.5rem;
+    }
+    .peek {
+      display: none !important;
+    }
+  }
+
+  /* ---------- Form ---------- */
+  .plan-form {
+    display: grid;
+    gap: 2rem;
+    min-width: 0;
+  }
+  .picks {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .picks > legend,
+  .field > label {
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    line-height: 1.15;
+    padding: 0;
+    margin-block-end: 1rem;
+  }
+  .picks ul {
+    margin: 0;
+    padding: 0;
+    border-block-start: 1px solid var(--linen);
+  }
+  .pick {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    column-gap: 1rem;
+    padding: 1.1rem 1rem 1.1rem 0.9rem;
+    border-block-end: 1px solid var(--linen);
+    transition: background-color 0.2s ease;
+  }
+  .pick::before {
+    content: '';
+    position: absolute;
+    inset-block: -1px;
+    inset-inline-start: 0;
+    width: 3px;
+    background: var(--plum);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+  }
+  :is(.pick:has(> .tick:checked), .pick.is-on) {
+    background: var(--plum-wash);
+  }
+  :is(.pick:has(> .tick:checked), .pick.is-on)::before {
+    transform: scaleY(1);
+  }
+  .tick {
+    grid-row: 1;
+    grid-column: 1;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.3rem 0 0;
+    cursor: pointer;
+  }
+  .pick-label {
+    grid-row: 1;
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: 1rem;
+    cursor: pointer;
+  }
+  /* Make the whole row a tap target without nesting controls in the label. */
+  .pick-label::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .tick,
+  .options {
+    position: relative;
+    z-index: 1;
+  }
+  .pick-name {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .pick-price {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    white-space: nowrap;
+    text-wrap: nowrap;
+  }
+  .pick-price i,
+  .level-price i {
+    color: var(--ink-soft);
+  }
+  .pick-meta {
+    grid-column: 2;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    margin-block-start: 0.15rem;
+  }
+
+  /* Wash options: revealed when the wash is ticked. */
+  .options {
+    grid-column: 2;
+    display: grid;
+    gap: 1.25rem;
+    margin-block-start: 1.1rem;
+    padding-block-start: 1.1rem;
+    border-block-start: 1px dashed var(--linen-strong);
+    opacity: 1;
+    translate: 0 0;
+    transition:
+      opacity 0.3s ease,
+      translate 0.3s ease,
+      display 0.3s allow-discrete;
+  }
+  .options[hidden] {
+    display: none;
+    opacity: 0;
+  }
+  @starting-style {
+    .options {
+      opacity: 0;
+      translate: 0 -0.5rem;
+    }
+  }
+  .opt-set {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .opt-set legend {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    padding: 0;
+    margin-block-end: 0.6rem;
+  }
+  .sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.75rem;
+    padding: 0.4rem 1rem 0.4rem 0.8rem;
+    border: 1px solid var(--linen-strong);
+    border-radius: 999px;
+    background: var(--cloth);
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+  .chip:has(:checked) {
+    border-color: var(--plum);
+    box-shadow: inset 0 0 0 1px var(--plum);
+  }
+  .chip input,
+  .level input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+  }
+  .levels {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .level {
+    display: grid;
+    grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--linen-strong);
+    border-radius: 0.5rem;
+    background: var(--cloth);
+    cursor: pointer;
+  }
+  .level input {
+    align-self: center;
+  }
+  .level:has(:checked) {
+    border-color: var(--plum);
+    box-shadow: inset 0 0 0 1px var(--plum);
+  }
+  .level-name {
+    font-weight: 600;
+  }
+  .level-price {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    white-space: nowrap;
+  }
+  .level-note {
+    grid-column: 2 / -1;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  .field {
+    display: grid;
+    gap: 0.35rem;
+    max-width: 30rem;
+  }
+  .field > label {
+    margin: 0;
+  }
+  .optional {
+    font-family: var(--sans);
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+  .hint {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+  .field input {
+    margin-block-start: 0.35rem;
+    min-height: 3rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--ink-soft);
+    border-radius: 0.5rem;
+    background: #fff;
+    color: var(--ink);
+  }
+  .field input:focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 2px;
+    border-color: var(--plum);
+  }
+
+  /* Mobile: a small sticky summary so the total stays in view while ticking. */
+  .peek {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.6rem 0.55rem 1rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--cloth);
+    font-size: 0.875rem;
+    box-shadow: 0 0.5rem 1.5rem -0.75rem rgb(43 27 46 / 0.6);
+  }
+  .peek a {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border-radius: 999px;
+    background: var(--brass);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .peek a:focus-visible {
+    outline: 2px solid var(--cloth);
+    outline-offset: 2px;
+  }
+
+  /* ---------- The slip: a bill in a dark folder ---------- */
+  .slip-wrap {
+    filter: drop-shadow(0 1.5rem 2rem rgb(43 27 46 / 0.18));
+  }
+  .slip {
+    background: var(--ink);
+    color: var(--cloth);
+    padding: 2rem clamp(1.25rem, 4vw, 2rem) 1.5rem;
+    border-radius: 0.25rem 0.25rem 0 0;
+    scroll-margin-block-start: 5rem;
+  }
+  .slip:focus {
+    outline: none;
+  }
+  /* Scalloped tear-off edge: masked on an empty sibling so no text is ever clipped. */
+  .slip-edge {
+    height: 12px;
+    background: var(--ink);
+    -webkit-mask: radial-gradient(circle at 10px 12px, transparent 6px, #000 6.5px) -10px 0 / 20px 12px repeat-x;
+    mask: radial-gradient(circle at 10px 12px, transparent 6px, #000 6.5px) -10px 0 / 20px 12px repeat-x;
+  }
+  .slip h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 2.25rem;
+    line-height: 1;
+    text-align: center;
+    padding-block-end: 1.25rem;
+    border-block-end: 1px solid rgb(217 212 204 / 0.25);
+  }
+  .slip-empty {
+    padding-block: 1.25rem;
+    color: var(--linen);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    text-align: center;
+  }
+  .slip-empty[hidden] {
+    display: none;
+  }
+  .slip-lines {
+    margin: 0;
+    padding: 0;
+  }
+  .slip-lines:not(:empty) {
+    padding-block: 1rem 0.5rem;
+  }
+  .slip-lines :global(li) {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-block: 0.35rem;
+    font-size: 0.975rem;
+    transition:
+      opacity 0.35s ease,
+      translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @starting-style {
+    .slip-lines :global(li) {
+      opacity: 0;
+      translate: 0 -0.4rem;
+    }
+  }
+  .slip-lines :global(.l-dots) {
+    flex: 1 1 1rem;
+    align-self: baseline;
+    height: 3px;
+    background: radial-gradient(circle, rgb(217 212 204 / 0.55) 0.9px, transparent 1.3px) left bottom / 6px 3px repeat-x;
+  }
+  .slip-lines :global(.l-price) {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    white-space: nowrap;
+  }
+  .slip-sum {
+    margin: 0;
+    padding-block: 1.25rem;
+    border-block: 1px solid rgb(217 212 204 / 0.25);
+    display: grid;
+    gap: 1rem;
+  }
+  .slip-sum dt {
+    font-size: 0.875rem;
+    color: var(--linen);
+  }
+  .slip-sum dd {
+    margin: 0;
+  }
+  .sum-total dd {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+    line-height: 1.05;
+    color: var(--brass-light);
+    display: inline-block;
+  }
+  .slip[data-mode='empty'] .sum-total dd {
+    color: var(--linen);
+    opacity: 0.6;
+  }
+  .sum-total dd.bump {
+    animation: bump 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes bump {
+    from {
+      translate: 0 0.25rem;
+      opacity: 0.4;
+    }
+  }
+  .sum-time dd {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .slip-extra {
+    font-size: 0.875rem;
+    color: var(--linen);
+    margin-block-start: -0.5rem;
+  }
+  .slip-extra[hidden],
+  .slip-quote[hidden],
+  .slip-materials[hidden] {
+    display: none;
+  }
+  .slip-wait {
+    padding-block: 1.25rem 1.5rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .slip-wait h4 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.35rem;
+    color: var(--brass-light);
+  }
+  .slip-wait p {
+    font-size: 0.975rem;
+    color: var(--cloth);
+  }
+  .slip-materials {
+    color: var(--linen) !important;
+  }
+  .slip-quote {
+    margin: 0.25rem 0 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 2px solid var(--brass);
+  }
+  .slip-quote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.15rem !important;
+    line-height: 1.35;
+  }
+  .slip-quote footer {
+    margin-block-start: 0.35rem;
+    font-size: 0.8125rem;
+    color: var(--linen);
+  }
+  .send {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.25rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--brass-light);
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s ease;
+  }
+  .send svg {
+    flex: none;
+    fill: currentColor;
+  }
+  .send:hover {
+    background: var(--cloth);
+  }
+  .send:focus-visible,
+  .clear:focus-visible {
+    outline: 2px solid var(--cloth);
+    outline-offset: 3px;
+  }
+  .slip-foot {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    margin-block-start: 0.75rem;
+    text-align: center;
+  }
+  .slip-foot p {
+    font-size: 0.8125rem;
+    color: var(--linen);
+  }
+  .clear {
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border: 0;
+    background: none;
+    color: var(--cloth);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+
+  /* Brand-consistent checkboxes: accent-color above; custom box only where it's unsupported. */
+  @supports not (accent-color: red) {
+    .tick {
+      position: absolute !important;
+      clip-path: inset(50%) !important;
+      width: 1px !important;
+      height: 1px !important;
+      overflow: hidden !important;
+    }
+    .pick-label::before {
+      content: '';
+      position: absolute;
+      inset-inline-start: 0.9rem;
+      top: 1.35rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--ink-soft);
+      border-radius: 3px;
+      background: #fff;
+    }
+    .tick:checked + .pick-label::before {
+      background: var(--plum)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E")
+        center / 80% no-repeat;
+      border-color: var(--plum);
+    }
+    .tick:focus-visible + .pick-label::before {
+      outline: 2px solid var(--plum);
+      outline-offset: 2px;
+    }
+  }
+
+  .tick:focus-visible,
+  .chip input:focus-visible,
+  .level input:focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 30rem) {
+    .pick-name {
+      font-size: 1.3rem;
+    }
+    .pick-price {
+      font-size: 1.1rem;
+    }
+    .pick {
+      padding-inline-end: 0.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .options,
+    .slip-lines :global(li),
+    .pick::before {
+      transition: none;
+    }
+    .slip[data-mode='empty'] .sum-total dd {
+    color: var(--linen);
+    opacity: 0.6;
+  }
+  .sum-total dd.bump {
+      animation: none;
+    }
+  }
+</style>

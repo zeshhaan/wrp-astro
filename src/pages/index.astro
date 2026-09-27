@@ -13,6 +13,11 @@ import ServiceOptions from '@/components/ServiceOptions.astro';
 import { getReviewsForService, getDisplayCount } from '@/lib/reviews';
 import { getLocale, localizeUrl, toLocalNum as _toLocalNum } from '@/i18n/utils';
 import { t } from '@/i18n/translations';
+import { activeDesign } from '@/designs';
+
+// Design Lab: a build with PUBLIC_WRP_DESIGN=<concept> serves that concept at `/`
+// so each concept gets its own Worker Preview. Unset in production.
+if (activeDesign) return Astro.rewrite(`/design-lab/${activeDesign}/`);
 
 const locale = getLocale(Astro.currentLocale);
 

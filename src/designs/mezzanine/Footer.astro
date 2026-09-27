@@ -1,0 +1,82 @@
+---
+import { pages } from '../data';
+
+const footerLinks = [
+  { label: 'Portfolio', href: pages.portfolio },
+  { label: 'Reviews', href: pages.reviews },
+  { label: 'Blog', href: pages.blog },
+  { label: 'About WRP', href: pages.about },
+  { label: 'Contact', href: pages.contact },
+  { label: 'Privacy', href: pages.privacy },
+  { label: 'Terms', href: pages.terms },
+];
+---
+
+<footer class="foot">
+  <div class="foot__inner">
+    <p class="foot__mark">WRP.</p>
+    <p class="foot__line">Wrap, reinforce, protect. A detailing studio with a lounge upstairs, in Al Qusais, Dubai.</p>
+    <nav aria-label="Site pages">
+      <ul role="list">
+        {footerLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        <li><a href={pages.arabic} lang="ar" hreflang="ar">العربية</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--mz-night);
+    color: var(--mz-on-dark);
+    padding: 2.5rem var(--mz-gutter) 6.5rem;
+    border-top: 1px solid rgb(233 235 232 / 0.12);
+  }
+  .foot__inner {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+    display: grid;
+    gap: 1rem;
+  }
+  .foot__mark {
+    font-family: var(--mz-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.5rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .foot__line {
+    color: var(--mz-on-dark-2);
+    max-width: 40ch;
+  }
+  .foot ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.25rem;
+    margin-inline-start: -0.6rem;
+  }
+  .foot a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.6rem;
+    color: var(--mz-on-dark);
+    text-underline-offset: 0.25em;
+  }
+  .foot a:focus-visible {
+    outline: 3px solid var(--mz-brass);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 56rem) {
+    .foot__inner {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 2rem;
+    }
+    .foot ul {
+      justify-content: end;
+    }
+  }
+</style>

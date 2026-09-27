@@ -1,0 +1,699 @@
+---
+/**
+ * PPF coverage builder: tap panels on a top-down car, see which real WRP
+ * package covers them. Package contents come from
+ * src/content/services/paint-protection-film.mdx; the only price shown is the
+ * published starting price (services[].from), never the package prices.
+ */
+import { contact, proof, services } from '../data';
+import Btn from './Btn.astro';
+
+const ppf = services.find((s) => s.slug === 'paint-protection-film')!;
+const fromPrice = `AED ${ppf.from!.toLocaleString('en-US')}`;
+
+type Tier = 1 | 2 | 3;
+type Panel = {
+  id: string;
+  name: string;
+  tier: Tier;
+  /** Left-hand (or centre) outline in the 200 × 440 viewBox. */
+  d: string[];
+  /** Draw a mirrored copy on the right-hand side. */
+  pair?: boolean;
+  /** Extra invisible hit area for slim panels. */
+  hit?: { kind: 'stroke'; d: string } | { kind: 'circle'; cx: number; cy: number; r: number };
+};
+
+// Front of the car at the top. Ordered front to back: this is the tab order
+// and the order the film "goes on" when a package is chosen.
+const panels: Panel[] = [
+  {
+    id: 'front-bumper',
+    name: 'Front bumper',
+    tier: 1,
+    d: ['M26 47 L24 37 Q30 16 60 11 Q80 8 100 8 Q120 8 140 11 Q170 16 176 37 L174 47 Z'],
+  },
+  {
+    id: 'headlights',
+    name: 'Headlights',
+    tier: 1,
+    pair: true,
+    d: ['M30 51 Q31 43 45 41 L65 42 Q70 50 64 58 L37 59 Q30 57 30 51 Z'],
+  },
+  {
+    id: 'bonnet',
+    name: 'Bonnet',
+    tier: 1,
+    d: ['M53 51 L147 51 L143 149 Q100 155 57 149 Z'],
+  },
+  {
+    id: 'front-fenders',
+    name: 'Front fenders',
+    tier: 1,
+    pair: true,
+    d: ['M24 51 L49 51 L53 150 L19 150 Q14 122 15 98 Q16 70 24 51 Z'],
+  },
+  {
+    id: 'mirrors',
+    name: 'Side mirrors',
+    tier: 1,
+    pair: true,
+    d: ['M18 165 L7 163 Q1 169 2 178 Q3 187 10 187 L18 185 Z'],
+    hit: { kind: 'circle', cx: 10, cy: 175, r: 17 },
+  },
+  {
+    id: 'a-pillars',
+    name: 'A-pillars',
+    tier: 2,
+    pair: true,
+    d: ['M52 155 L57 155 L65 207 L60 208 Z'],
+    hit: { kind: 'stroke', d: 'M55 158 L62 205' },
+  },
+  {
+    id: 'doors',
+    name: 'Doors',
+    tier: 3,
+    pair: true,
+    d: ['M21 155 L48 155 L56 208 L58 262 L21 262 Z'],
+  },
+  {
+    id: 'door-edges',
+    name: 'Door edges & handles',
+    tier: 2,
+    pair: true,
+    d: ['M21 266 L59 266 L59 273 L21 273 Z', 'M26 244 L40 244 Q42 247 40 250 L26 250 Q24 247 26 244 Z'],
+    hit: { kind: 'stroke', d: 'M22 270 L58 270' },
+  },
+  {
+    id: 'sills',
+    name: 'Rocker panels',
+    tier: 2,
+    pair: true,
+    d: ['M11 157 L17 157 L17 273 L11 273 Z'],
+    hit: { kind: 'stroke', d: 'M12 196 L12 272' },
+  },
+  {
+    id: 'roof',
+    name: 'Roof',
+    tier: 3,
+    d: ['M65 211 Q100 206 135 211 L137 299 Q100 304 63 299 Z'],
+  },
+  {
+    id: 'rear-fenders',
+    name: 'Rear fenders',
+    tier: 2,
+    pair: true,
+    d: ['M21 277 L60 277 L64 342 L56 384 L25 384 Q15 350 15 322 Q16 296 21 277 Z'],
+  },
+  {
+    id: 'boot',
+    name: 'Boot lid',
+    tier: 3,
+    d: ['M69 345 Q100 349 131 345 L141 384 Q100 390 59 384 Z'],
+  },
+  {
+    id: 'rear-bumper',
+    name: 'Rear bumper',
+    tier: 2,
+    d: ['M24 389 Q100 397 176 389 L176 400 Q168 424 140 429 Q120 432 100 432 Q80 432 60 429 Q32 424 24 400 Z'],
+  },
+];
+
+const packages = [
+  {
+    id: 'front',
+    tier: 1,
+    name: 'Front End Protection',
+    covers: 'Front bumper, bonnet, front fenders, mirrors and headlights: the parts that take the stone chips.',
+  },
+  {
+    id: 'track',
+    tier: 2,
+    name: 'Track Package',
+    covers: 'Everything in Front End, plus A-pillars, door edges and handles, rocker panels, rear fenders and rear bumper.',
+  },
+  {
+    id: 'full',
+    tier: 3,
+    name: 'Full Body Protection',
+    covers: 'Every painted panel, roof and boot included, with door jambs done too.',
+  },
+] as const;
+
+const mirror = 'matrix(-1 0 0 1 200 0)';
+const data = {
+  panels: panels.map(({ id, name, tier }) => ({ id, name, tier })),
+  packages: packages.map(({ id, tier, name }) => ({ id, tier, name })),
+  whatsapp: contact.whatsapp,
+  from: fromPrice,
+};
+---
+
+<section class="builder" id="coverage" aria-labelledby="coverage-title" data-builder data-config={JSON.stringify(data)}>
+  <div class="wrap">
+    <header class="intro">
+      <h2 id="coverage-title">Tap the panels you want protected</h2>
+      <p>
+        Paint protection film is priced by coverage. Pick the panels that worry you and we’ll show which of our
+        three packages covers them. Or start from a package and see what’s in it.
+      </p>
+    </header>
+
+    <div class="rig">
+      <div class="car-col">
+        <svg
+          class="car"
+          viewBox="0 0 200 440"
+          role="group"
+          aria-label="Car seen from above, front at the top. Each panel is a checkbox."
+        >
+          <g class="deco" aria-hidden="true">
+            <rect class="tyre" x="3" y="68" width="14" height="62" rx="4"></rect>
+            <rect class="tyre" x="3" y="298" width="14" height="64" rx="4"></rect>
+            <rect class="tyre" x="183" y="68" width="14" height="62" rx="4"></rect>
+            <rect class="tyre" x="183" y="298" width="14" height="64" rx="4"></rect>
+            <path class="glass" d="M59 156 Q100 150 141 156 L134 206 Q100 201 66 206 Z"></path>
+            <path class="glass" d="M65 304 Q100 309 135 304 L129 340 Q100 344 71 340 Z"></path>
+          </g>
+          {
+            panels.map((p, i) => (
+              <g
+                class="panel"
+                role="checkbox"
+                tabindex="0"
+                aria-checked="false"
+                aria-label={p.name}
+                data-panel={p.id}
+                data-tier={p.tier}
+                style={`--i:${i}`}
+              >
+                {p.hit?.kind === 'stroke' && (
+                  <>
+                    <path class="hit" d={p.hit.d} />
+                    {p.pair && <path class="hit" d={p.hit.d} transform={mirror} />}
+                  </>
+                )}
+                {p.hit?.kind === 'circle' && (
+                  <>
+                    <circle class="hit" cx={p.hit.cx} cy={p.hit.cy} r={p.hit.r} />
+                    {p.pair && <circle class="hit" cx={200 - p.hit.cx} cy={p.hit.cy} r={p.hit.r} />}
+                  </>
+                )}
+                {p.d.map((d) => (
+                  <>
+                    <path class="shape" d={d} />
+                    {p.pair && <path class="shape" d={d} transform={mirror} />}
+                  </>
+                ))}
+              </g>
+            ))
+          }
+        </svg>
+        <p class="readout" aria-hidden="true" data-readout>Tap a panel</p>
+      </div>
+
+      <div class="side">
+        <ol class="ladder" role="list" aria-label="Packages, smallest to largest">
+          {
+            packages.map((pkg) => (
+              <li class="rung" data-rung={pkg.id} data-tier={pkg.tier}>
+                <button type="button" class="pkg" data-pkg={pkg.id} aria-pressed="false" aria-describedby={`pkg-${pkg.id}`}>
+                  <span class="pkg-name">{pkg.name}</span>
+                </button>
+                <p class="pkg-covers" id={`pkg-${pkg.id}`}>{pkg.covers}</p>
+                <p class="pkg-fit" aria-hidden="true" data-fit></p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="result">
+          <p class="result-head" role="status" data-result>Nothing picked yet. Tap a panel or choose a package.</p>
+          <p class="result-detail" data-detail></p>
+          <p class="price">
+            PPF starts from <strong>{fromPrice}</strong>. Your price depends on the car’s size, the film and the
+            coverage, so we confirm it after a look at the paint.
+          </p>
+          <div class="actions">
+            <Btn variant="signal" href={contact.whatsapp} data-send>Send my panels on WhatsApp</Btn>
+            <button type="button" class="btn-clear" data-clear>Clear the car</button>
+          </div>
+        </div>
+
+        <div class="films">
+          <p class="films-line">
+            Film by Avery Dennison or STEK, self-healing, with up to a 10-year warranty.
+          </p>
+          <ul class="plates" role="list">
+            {
+              proof.films.map((f) => (
+                <li class="plate">
+                  <img src={f.logo} alt={f.name} width="160" height="44" loading="lazy" />
+                </li>
+              ))
+            }
+          </ul>
+          <a class="more" href={ppf.href}>How our PPF install works</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .builder {
+    background: var(--pd-tyre);
+    color: var(--pd-white);
+    padding-block: var(--section);
+    --line: color-mix(in srgb, var(--pd-white) 55%, transparent);
+  }
+  .wrap {
+    width: min(100% - 2 * var(--gutter), var(--maxw));
+    margin-inline: auto;
+  }
+  .intro {
+    max-width: 44rem;
+    margin-block-end: clamp(2rem, 5vw, 3.5rem);
+  }
+  h2 {
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: var(--fs-h2);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    margin-block-end: 1rem;
+  }
+  .intro p {
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--pd-white) 82%, transparent);
+    max-width: 60ch;
+  }
+
+  /* Layout: car beside the package ladder, from phones up. */
+  .rig {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 1.25rem 0.75rem;
+    align-items: start;
+  }
+  .side {
+    display: contents;
+  }
+  .ladder { grid-column: 2; grid-row: 1; }
+  .result, .films { grid-column: 1 / -1; }
+
+  @media (min-width: 60rem) {
+    .rig {
+      grid-template-columns: minmax(16rem, 5fr) 7fr;
+      gap: 2rem clamp(2rem, 5vw, 5rem);
+    }
+    .side {
+      display: grid;
+      gap: 2rem;
+      grid-column: 2;
+    }
+    .ladder, .result, .films { grid-column: auto; grid-row: auto; }
+  }
+
+  /* The car */
+  .car {
+    width: 100%;
+    max-width: 19rem;
+    height: auto;
+    margin-inline: auto;
+    overflow: visible;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tyre { fill: #000; }
+  .glass {
+    fill: #0a0b0c;
+    stroke: var(--line);
+    stroke-width: 0.8;
+  }
+  .panel {
+    cursor: pointer;
+    outline: none;
+  }
+  .shape {
+    fill: #2c2d2f;
+    stroke: var(--line);
+    stroke-width: 1;
+    stroke-linejoin: round;
+    transition: fill 0.18s ease-out, stroke 0.18s;
+  }
+  .hit {
+    fill: transparent;
+    stroke: transparent;
+    stroke-width: 16;
+    stroke-linecap: round;
+  }
+  @media (hover: hover) {
+    .panel:hover .shape { fill: #45474a; }
+  }
+  .panel[aria-checked='true'] .shape {
+    fill: var(--pd-signal);
+    stroke: #000;
+  }
+  @media (hover: hover) {
+    .panel[aria-checked='true']:hover .shape { fill: #ffe07a; }
+  }
+  /* Focus: a white keyline plus a halo, visible on dark and on yellow panels. */
+  .panel:focus-visible .shape {
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-dasharray: 5 2.5;
+  }
+  .panel:focus-visible {
+    filter: drop-shadow(0 0 3px rgb(255 255 255 / 0.9));
+  }
+
+  /* Previewing a package: dashed outline on what it includes (progressive: needs :has()). */
+  .rig:has(.rung[data-tier='1'] .pkg:is(:hover, :focus-visible)) .panel[data-tier='1'] .shape,
+  .rig:has(.rung[data-tier='2'] .pkg:is(:hover, :focus-visible)) .panel:is([data-tier='1'], [data-tier='2']) .shape,
+  .rig:has(.rung[data-tier='3'] .pkg:is(:hover, :focus-visible)) .panel .shape {
+    stroke: var(--pd-signal);
+    stroke-width: 1.6;
+    stroke-dasharray: 3 2;
+  }
+
+  /* The one orchestrated motion: film goes on front to back when a package is chosen. */
+  @media (prefers-reduced-motion: no-preference) {
+    .car[data-sweep] .shape {
+      transition-delay: calc(var(--i) * 45ms);
+      transition-duration: 0.28s;
+    }
+  }
+
+  .readout {
+    margin-block-start: 0.75rem;
+    text-align: center;
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 1.125rem;
+    min-height: 1.5em;
+    color: color-mix(in srgb, var(--pd-white) 75%, transparent);
+  }
+
+  /* Package ladder */
+  .ladder {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+    counter-reset: none;
+  }
+  .rung {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.25rem 0 0.9rem 0.9rem;
+    border-inline-start: 4px solid #3a3b3e;
+    transition: border-color 0.2s;
+  }
+  .pkg {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.3rem, 1.1rem + 1vw, 1.9rem);
+    line-height: 1;
+    color: var(--pd-white);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: #55575b;
+  }
+  .pkg:hover { text-decoration-color: var(--pd-signal); }
+  .pkg:focus-visible {
+    outline: 3px solid var(--pd-signal);
+    outline-offset: 4px;
+  }
+  .pkg[aria-pressed='true'] { text-decoration-color: var(--pd-signal); }
+  .pkg-covers {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--pd-white) 72%, transparent);
+    max-width: 46ch;
+  }
+  .pkg-fit {
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: color-mix(in srgb, var(--pd-white) 60%, transparent);
+    min-height: 1.3em;
+  }
+  .rung[data-fit='best'] { border-color: var(--pd-signal); }
+  .rung[data-fit='best'] .pkg-fit { color: var(--pd-signal); }
+  .rung[data-fit='more'] { border-color: #6f6a55; }
+  .rung[data-fit='short'] .pkg-covers,
+  .rung[data-fit='short'] .pkg-name { opacity: 0.6; }
+
+  @media (max-width: 37.5rem) {
+    .pkg-covers { display: none; }
+    .rung { padding-block-end: 0.5rem; }
+  }
+
+  /* Result */
+  .result {
+    display: grid;
+    gap: 0.9rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 2px solid #3a3b3e;
+  }
+  .result-head {
+    font-family: var(--font-barlow-condensed), 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem);
+    line-height: 1.02;
+    max-width: 28ch;
+    text-wrap: balance;
+  }
+  .result-detail {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--pd-white) 80%, transparent);
+    max-width: 58ch;
+  }
+  .result-detail:empty { display: none; }
+  .price {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--pd-white) 72%, transparent);
+    max-width: 58ch;
+  }
+  .price strong {
+    color: var(--pd-white);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-block-start: 0.4rem;
+  }
+  .btn-clear {
+    all: unset;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--pd-white) 80%, transparent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .btn-clear:hover { color: var(--pd-white); }
+  .btn-clear:focus-visible { outline: 3px solid var(--pd-signal); outline-offset: 3px; }
+
+  /* Films: sponsor plates on the pit wall */
+  .films {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .films-line {
+    font-size: 0.9375rem;
+    color: color-mix(in srgb, var(--pd-white) 80%, transparent);
+  }
+  .plates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .plate {
+    background: var(--pd-white);
+    padding: 0.9rem 1.25rem;
+    display: grid;
+    place-items: center;
+    min-width: 9.5rem;
+    height: 4.25rem;
+  }
+  .plate img {
+    width: auto;
+    max-width: 8.5rem;
+    max-height: 2.4rem;
+    object-fit: contain;
+  }
+  .more {
+    color: var(--pd-white);
+    font-weight: 500;
+    text-underline-offset: 0.2em;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+  }
+  .more:hover { color: var(--pd-signal); }
+  .more:focus-visible { outline: 3px solid var(--pd-signal); outline-offset: 3px; }
+</style>
+
+<script>
+  type Config = {
+    panels: { id: string; name: string; tier: number }[];
+    packages: { id: string; tier: number; name: string }[];
+    whatsapp: string;
+    from: string;
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-builder]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const cfg = JSON.parse(root.dataset.config ?? '{}') as Config;
+    const svg = root.querySelector<SVGSVGElement>('.car')!;
+    const panelEls = [...root.querySelectorAll<SVGGElement>('.panel')];
+    const readout = root.querySelector<HTMLElement>('[data-readout]')!;
+    const result = root.querySelector<HTMLElement>('[data-result]')!;
+    const detail = root.querySelector<HTMLElement>('[data-detail]')!;
+    const send = root.querySelector<HTMLAnchorElement>('[data-send]')!;
+    const rungs = [...root.querySelectorAll<HTMLElement>('.rung')];
+    const selected = new Set<string>();
+    const byId = new Map(cfg.panels.map((p) => [p.id, p]));
+    const idle = 'Tap a panel';
+    let sweepTimer = 0;
+
+    const list = (names: string[]) =>
+      names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+    const lower = (s: string) => (s.startsWith('A-') ? s : s.charAt(0).toLowerCase() + s.slice(1));
+
+    function render() {
+      panelEls.forEach((g) => g.setAttribute('aria-checked', String(selected.has(g.dataset.panel!))));
+      const picked = cfg.panels.filter((p) => selected.has(p.id));
+      const tier = picked.reduce((t, p) => Math.max(t, p.tier), 0);
+      const pkg = cfg.packages.find((p) => p.tier === tier);
+
+      rungs.forEach((rung) => {
+        const t = Number(rung.dataset.tier);
+        const fit = rung.querySelector<HTMLElement>('[data-fit]')!;
+        const btn = rung.querySelector<HTMLButtonElement>('.pkg')!;
+        const inPkg = cfg.panels.filter((p) => p.tier <= t);
+        const exact = picked.length === inPkg.length && inPkg.every((p) => selected.has(p.id));
+        btn.setAttribute('aria-pressed', String(exact));
+        if (!picked.length) {
+          rung.removeAttribute('data-fit');
+          fit.textContent = '';
+        } else if (t === tier) {
+          rung.dataset.fit = 'best';
+          fit.textContent = exact ? 'Selected' : 'Covers your panels';
+        } else if (t > tier) {
+          rung.dataset.fit = 'more';
+          fit.textContent = 'Covers them, and more';
+        } else {
+          const missing = picked.filter((p) => p.tier > t).map((p) => lower(p.name));
+          rung.dataset.fit = 'short';
+          fit.textContent =
+            missing.length > 2 ? `Misses ${missing.length} of your panels` : `Doesn’t include ${list(missing)}`;
+        }
+      });
+
+      if (!pkg) {
+        result.textContent = 'Nothing picked yet. Tap a panel or choose a package.';
+        detail.textContent = '';
+        send.href = `${cfg.whatsapp}?text=${encodeURIComponent('Hi WRP, I’d like a quote for paint protection film.')}`;
+        return;
+      }
+      const inPkg = cfg.panels.filter((p) => p.tier <= pkg.tier);
+      const extra = inPkg.filter((p) => !selected.has(p.id)).map((p) => lower(p.name));
+      const count = picked.length === 1 ? '1 panel' : `${picked.length} panels`;
+      result.textContent = extra.length
+        ? `${pkg.name} covers your ${count}.`
+        : `That’s exactly our ${pkg.name}.`;
+      detail.textContent = extra.length
+        ? `It also includes ${list(extra)}.${pkg.tier === 3 ? ' Door jambs are done too.' : ''}`
+        : pkg.tier === 3
+          ? 'Every painted panel, with door jambs included.'
+          : '';
+      const msg =
+        `Hi WRP, I’d like a PPF quote for: ${list(picked.map((p) => lower(p.name)))}. ` +
+        `That looks like your ${pkg.name}. My car is a `;
+      send.href = `${cfg.whatsapp}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function toggle(g: SVGGElement) {
+      const id = g.dataset.panel!;
+      selected.has(id) ? selected.delete(id) : selected.add(id);
+      svg.removeAttribute('data-sweep');
+      render();
+    }
+
+    panelEls.forEach((g) => {
+      g.addEventListener('click', () => toggle(g));
+      g.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          toggle(g);
+        }
+        if (e.key === ' ') e.preventDefault();
+      });
+      g.addEventListener('keyup', (e) => {
+        if (e.key === ' ') toggle(g);
+      });
+      const show = () => {
+        const p = byId.get(g.dataset.panel!);
+        if (!p) return;
+        const where = ['in all three packages', 'in Track and Full Body', 'in Full Body only'][p.tier - 1];
+        readout.textContent = `${p.name}, ${where}`;
+      };
+      g.addEventListener('pointerenter', show);
+      g.addEventListener('focus', show);
+      g.addEventListener('pointerleave', () => (readout.textContent = idle));
+      g.addEventListener('blur', () => (readout.textContent = idle));
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('.pkg').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tier = cfg.packages.find((p) => p.id === btn.dataset.pkg)?.tier ?? 0;
+        selected.clear();
+        cfg.panels.filter((p) => p.tier <= tier).forEach((p) => selected.add(p.id));
+        svg.setAttribute('data-sweep', '');
+        clearTimeout(sweepTimer);
+        sweepTimer = window.setTimeout(() => svg.removeAttribute('data-sweep'), 1200);
+        render();
+      });
+    });
+
+    root.querySelector('[data-clear]')?.addEventListener('click', () => {
+      selected.clear();
+      svg.setAttribute('data-sweep', '');
+      clearTimeout(sweepTimer);
+      sweepTimer = window.setTimeout(() => svg.removeAttribute('data-sweep'), 1200);
+      render();
+    });
+
+    render();
+  }
+</script>

@@ -1,0 +1,305 @@
+---
+/**
+ * The WRP Lounge: the warm pause in the page. The paint turns billiards-felt
+ * green and the pendant lamps come on.
+ */
+import Picture from '../shared/Picture.astro';
+import { lounge, whatsappLink } from '../data';
+import { stage } from './paint';
+
+const [main, mezz, materials, floor] = lounge.photos;
+const [lead, ...rest] = lounge.quotes;
+const smallQuotes = [rest[0], rest[2], rest[3]].filter(Boolean);
+const book = whatsappLink('Hi WRP, I would like to book my car in and wait in the lounge.');
+---
+
+<section class="lounge" id="lounge" {...stage('lounge')} aria-labelledby="lounge-title">
+  <div class="lamps" aria-hidden="true">
+    <span class="lamp" style="--x:14%;--drop:3.5rem"></span>
+    <span class="lamp" style="--x:50%;--drop:5.5rem"></span>
+    <span class="lamp" style="--x:86%;--drop:3rem"></span>
+  </div>
+
+  <div class="wrap top">
+    <div class="intro">
+      <p class="where">{lounge.where}</p>
+      <h2 id="lounge-title">Wait upstairs in the WRP Lounge</h2>
+      <p class="pitch">{lounge.pitch}</p>
+      {
+        lead && (
+          <figure class="lead-quote">
+            <blockquote>
+              <p>“{lead.text}”</p>
+            </blockquote>
+            <figcaption>{lead.author}, in a Google review</figcaption>
+          </figure>
+        )
+      }
+    </div>
+    {
+      main && (
+        <figure class="photo photo-main">
+          <Picture base={main.base} alt={main.alt} sizes="(min-width: 60rem) 55vw, 100vw" />
+          <figcaption>{main.caption}</figcaption>
+        </figure>
+      )
+    }
+  </div>
+
+  <div class="wrap amen">
+    <h3 class="amen-title">What’s upstairs</h3>
+    <ul class="amenities" role="list">
+      {
+        lounge.amenities.map((a) => (
+          <li>
+            <p class="a-name">{a.name}</p>
+            <p class="a-detail">{a.detail}</p>
+          </li>
+        ))
+      }
+      <li class="amen-cta">
+        <a class="btn btn-solid" href={book}>Book in on WhatsApp</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="wrap strip">
+    {
+      [mezz, materials, floor].map(
+        (p) =>
+          p && (
+            <figure class="photo">
+              <Picture base={p.base} alt={p.alt} sizes="(min-width: 60rem) 30vw, 100vw" />
+              <figcaption>{p.caption}</figcaption>
+            </figure>
+          )
+      )
+    }
+  </div>
+
+  <ul class="wrap small-quotes" role="list">
+    {
+      smallQuotes.map((q) => (
+        <li>
+          <figure>
+            <blockquote>
+              <p>“{q!.text}”</p>
+            </blockquote>
+            <figcaption>{q!.author}</figcaption>
+          </figure>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .lounge {
+    overflow: clip;
+    padding-block: clamp(9rem, 7rem + 6vw, 13rem) clamp(4rem, 3rem + 5vw, 8rem);
+  }
+
+  /* ---------- Pendant lamps: the studio's black domes, with warm light ---------- */
+  .lamps {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 100%;
+    pointer-events: none;
+  }
+  .lamps::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 30% 42rem at 14% 4rem, rgb(255 190 110 / 0.16), transparent 70%),
+      radial-gradient(ellipse 34% 48rem at 50% 6rem, rgb(255 190 110 / 0.2), transparent 70%),
+      radial-gradient(ellipse 30% 40rem at 86% 3.5rem, rgb(255 190 110 / 0.14), transparent 70%);
+  }
+  .lamp {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: 3.4rem;
+    height: calc(var(--drop) + 2.1rem);
+    translate: -50% 0;
+  }
+  .lamp::before {
+    /* cord */
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1.5px;
+    height: var(--drop);
+    background: rgb(0 0 0 / 0.55);
+  }
+  .lamp::after {
+    /* dome with a lit rim */
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2.1rem;
+    border-radius: 50% 50% 6% 6% / 95% 95% 8% 8%;
+    background: linear-gradient(100deg, #1a1a1a 30%, #3b3b3b 45%, #111 60%);
+    box-shadow:
+      0 3px 0 -1px #ffd9a0,
+      0 12px 26px 2px rgb(255 196 120 / 0.55);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports ((animation-timeline: view()) and (animation-range: entry)) {
+      .lamps {
+        view-timeline: --lounge-lamps;
+      }
+      .lamps::before,
+      .lamp::after {
+        animation: lamps-on linear both;
+        animation-timeline: --lounge-lamps;
+        animation-range: entry 30% entry 90%;
+      }
+    }
+  }
+  @keyframes lamps-on {
+    from {
+      opacity: 0.15;
+    }
+  }
+
+  /* ---------- Layout ---------- */
+  .top {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2.5rem clamp(2rem, 5vw, 6rem);
+    align-items: start;
+  }
+  .where {
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .lounge h2 {
+    margin-top: 0.75rem;
+    font-size: var(--step-h2);
+    max-width: 12ch;
+  }
+  .pitch {
+    margin-top: 1.5rem;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    max-width: 36ch;
+  }
+  .lead-quote {
+    margin-top: 2.5rem;
+    padding-left: 1.25rem;
+    border-left: 3px solid rgb(255 200 130 / 0.9);
+  }
+  .lead-quote p {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: var(--step-2);
+    line-height: 1.2;
+    max-width: 24ch;
+  }
+  .lounge figcaption {
+    margin-top: 0.7rem;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+  .photo {
+    margin: 0;
+  }
+  .photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+  .photo-main {
+    margin-top: 0.5rem;
+  }
+
+  .amen {
+    position: relative;
+    margin-top: clamp(3.5rem, 2.5rem + 4vw, 6.5rem);
+  }
+  .amen-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: var(--step-2);
+  }
+  .amenities {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--line);
+  }
+  .amenities li {
+    padding: 1.25rem 1.5rem 1.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .a-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: var(--step-1);
+    line-height: 1.2;
+  }
+  .a-detail {
+    margin-top: 0.35rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 26ch;
+  }
+  .amen-cta {
+    display: flex;
+    align-items: center;
+  }
+
+  .strip {
+    position: relative;
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+  }
+
+  .small-quotes {
+    position: relative;
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem clamp(1.5rem, 3vw, 3rem);
+  }
+  .small-quotes p {
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+
+  @media (max-width: 60rem) {
+    .top,
+    .strip,
+    .small-quotes {
+      grid-template-columns: 1fr;
+    }
+    .amenities {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .lounge h2 {
+      max-width: 13ch;
+    }
+  }
+  @media (max-width: 30rem) {
+    .amenities li {
+      padding-right: 0.75rem;
+    }
+    .amen-cta {
+      grid-column: 1 / -1;
+      padding-top: 1.5rem;
+    }
+  }
+</style>

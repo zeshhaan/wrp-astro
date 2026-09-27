@@ -1,0 +1,1166 @@
+---
+/**
+ * The Menu — WRP as a house of hospitality.
+ * A centred menu card for the services, a bill-style visit planner,
+ * the lounge as the room upstairs, reviews as a guest book.
+ */
+import DesignShell from '../shared/DesignShell.astro';
+import Picture from '../shared/Picture.astro';
+import Planner from './Planner.astro';
+import { contact, whatsappLink, services, work, lounge, studio, proof, pickQuotes, nav, pages } from '../data';
+import { courses, timeWords, aed } from './menu';
+
+const hero = { base: '/review-images/tariq_murad_2', sizes: '(min-width: 76rem) 72rem, calc(100vw - 2rem)' };
+const quotes = pickQuotes(6);
+const serviceName = (slug?: string) => services.find((s) => s.slug === slug)?.name;
+const [bigQuote, ...moreQuotes] = [lounge.quotes[0], lounge.quotes[1], lounge.quotes[3]];
+const pageLeft = quotes.slice(0, 3);
+const pageRight = quotes.slice(3, 6);
+const year = new Date().getFullYear();
+const hello = whatsappLink("Hello WRP, I'd like to ask about a visit.");
+---
+
+<DesignShell
+  concept="menu"
+  title="WRP Detailing, Dubai: car care with a lounge upstairs"
+  description="Paint protection film, ceramic coating, window film, polish, hand washes and interiors in Al Qusais, Dubai. Plan your visit, see starting prices and wait in the WRP Lounge."
+  fonts={['--font-instrument-serif', '--font-instrument-sans', '--font-montserrat']}
+  themeColor="#F6F6F3"
+  preloadImage={hero}
+>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-wa" viewBox="0 0 24 24">
+      <path
+        d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.28-.2-.57-.35M12.05 21.78h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.8 11.8 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.9 11.9 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.41"
+      ></path>
+    </symbol>
+  </svg>
+
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="masthead">
+    <div class="mast-row">
+      <a class="mast-hours" href="#visit">Open Saturday to Thursday, 9 AM to 9:30 PM</a>
+      <a class="wordmark" href="/" aria-label="WRP home">WRP.</a>
+      <a class="btn btn-ink mast-cta" href={hello} target="_blank" rel="noopener">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+        <span><span class="wide-only">Message us on </span>WhatsApp</span>
+      </a>
+    </div>
+    <nav aria-label="Main">
+      <ul role="list">
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+  </header>
+
+  <main id="content" tabindex="-1">
+    <!-- Hero: the house, with the room upstairs in view -->
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">
+        <span>We look after the car.</span>
+        <span>The lounge looks after you.</span>
+      </h1>
+      <p class="hero-lede">
+        Paint protection film, ceramic coating, window tint, polish, hand washes and interiors, in Al Qusais,
+        Dubai. Wait upstairs with a coffee and a game of billiards, or leave the car and we’ll send you photos as we
+        work.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-ink" href="#plan">Plan your visit</a>
+      </div>
+      <figure class="arch">
+        <Picture
+          base={hero.base}
+          alt="The WRP studio: black pendant lamps over the bays, and the glass-walled lounge on the mezzanine above"
+          sizes={hero.sizes}
+          loading="eager"
+          fetchpriority="high"
+          imgClass="arch-img"
+        />
+        <figcaption>The lounge sits behind the glass, above the bays. Photo by customer Tariq Murad.</figcaption>
+      </figure>
+    </section>
+
+    <!-- The menu card -->
+    <section class="menu" id="services" aria-labelledby="menu-title">
+      <div class="card" id="menu">
+        <header class="card-head">
+          <h2 id="menu-title">The menu</h2>
+          <p>Starting prices in dirhams. We look at every car before we confirm a quote.</p>
+        </header>
+
+        {
+          courses.map((c) => (
+            <section class="course" aria-labelledby={`course-${c.id}`}>
+              <h3 id={`course-${c.id}`}>{c.title}</h3>
+              <p class="course-note">{c.note}</p>
+              <ul role="list" class="dishes">
+                {c.items.map((s) => (
+                  <li class="dish">
+                    <p class="dish-head">
+                      <a href={s.href} class="dish-name">
+                        {s.name}
+                      </a>
+                      <span class="leader" aria-hidden="true" />
+                      <span class="dish-price">
+                        {s.from ? (
+                          <>
+                            <i>from</i> {aed(s.from)}
+                          </>
+                        ) : (
+                          <i>Priced after inspection</i>
+                        )}
+                      </span>
+                    </p>
+                    <p class="dish-line">{s.line}</p>
+                    <p class="dish-time">With us {timeWords(s.time)}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+
+        <footer class="card-foot">
+          <p class="source-note">Our film comes from</p>
+          <ul role="list" class="films">
+            {
+              proof.films.map((f) => (
+                <li>
+                  <img src={f.logo} alt={f.name} height="40" width={f.name === 'STEK' ? 171 : 122} loading="lazy" />
+                </li>
+              ))
+            }
+          </ul>
+          <p class="source-note">Paint protection film carries up to a 10-year warranty.</p>
+        </footer>
+      </div>
+    </section>
+
+    <Planner />
+
+    <!-- The room upstairs -->
+    <section class="lounge" id="lounge" aria-labelledby="lounge-title">
+      <div class="lounge-inner">
+        <header class="lounge-head">
+          <h2 id="lounge-title">{lounge.name}</h2>
+          <p class="lounge-where">{lounge.where}</p>
+          <p class="lounge-pitch">{lounge.pitch}</p>
+        </header>
+
+        <div class="lounge-photos">
+          <figure class="lp lp-main">
+            <Picture
+              base={lounge.photos[0].base}
+              alt={lounge.photos[0].alt}
+              sizes="(min-width: 60rem) 44rem, calc(100vw - 2rem)"
+            />
+            <figcaption>{lounge.photos[0].caption}</figcaption>
+          </figure>
+          <figure class="lp">
+            <Picture
+              base={lounge.photos[2].base}
+              alt={lounge.photos[2].alt}
+              sizes="(min-width: 60rem) 26rem, calc(100vw - 2rem)"
+            />
+            <figcaption>{lounge.photos[2].caption}</figcaption>
+          </figure>
+        </div>
+
+        <div class="notes">
+          <h3>House notes</h3>
+          <dl>
+            {
+              lounge.amenities.map((a) => (
+                <div>
+                  <dt>{a.name}</dt>
+                  <dd>{a.detail}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+
+        <figure class="lounge-quote">
+          <blockquote><p>“{bigQuote.text}”</p></blockquote>
+          <figcaption>{bigQuote.author}, from a Google review</figcaption>
+        </figure>
+        <ul role="list" class="lounge-more">
+          {
+            moreQuotes.map((q) => (
+              <li>
+                <figure>
+                  <blockquote><p>“{q.text}”</p></blockquote>
+                  <figcaption>{q.author}</figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Work -->
+    <section class="work" id="work" aria-labelledby="work-title">
+      <header class="sec-head">
+        <h2 id="work-title">Recent work</h2>
+        <p>A few recent cars, photographed on the studio floor before they went home.</p>
+      </header>
+      <ul role="list" class="work-grid">
+        {
+          work.map((w, i) => (
+            <li>
+              <figure>
+                <Picture
+                  base={w.image}
+                  alt={`${w.title}: ${w.what.toLowerCase()}`}
+                  width={1200}
+                  height={1600}
+                  sizes="(min-width: 60rem) 22rem, 50vw"
+                  imgClass="work-img"
+                />
+                <figcaption>
+                  <span class="work-title">{w.title}</span>
+                  <span class="work-what">{w.what}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="more"><a class="btn btn-line" href={pages.portfolio}>See the portfolio</a></p>
+    </section>
+
+    <!-- Guest book -->
+    <section class="guests" id="reviews" aria-labelledby="guests-title">
+      <header class="sec-head">
+        <h2 id="guests-title">The guest book</h2>
+        <p>
+          Rated {proof.rating} out of 5 on Google, across {proof.reviewCount} reviews. A few lines from them, word for
+          word.
+        </p>
+      </header>
+      <div class="book">
+        {
+          [pageLeft, pageRight].map((pg) => (
+            <ul role="list" class="page">
+              {pg.map((q) => (
+                <li>
+                  <figure>
+                    <blockquote>
+                      <p>“{q.text}”</p>
+                    </blockquote>
+                    <figcaption>
+                      <span class="g-name">{q.author}</span>
+                      {serviceName(q.service) && <span class="g-for">{serviceName(q.service)}</span>}
+                    </figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+      <p class="more"><a class="btn btn-line" href={proof.reviewsUrl}>Read all {proof.reviewCount} reviews</a></p>
+    </section>
+
+    <!-- Reservations -->
+    <section class="visit" id="visit" aria-labelledby="visit-title">
+      <div class="visit-inner">
+        <div class="visit-text">
+          <h2 id="visit-title">Reservations</h2>
+          <p class="visit-lede">
+            Message or call to book a time, and tell us whether you’ll wait upstairs or drop the car off. We
+            confirm the price once we’ve seen the car.
+          </p>
+          <p class="status" data-status hidden></p>
+          <dl class="details">
+            <div>
+              <dt>Hours</dt>
+              <dd>{contact.hours}.<br />{contact.closed}.</dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd>
+                {contact.address[0]},<br />{contact.address[1]}<br />
+                <a href={contact.mapsUrl} target="_blank" rel="noopener">Open in Google Maps</a>
+              </dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd><a href={contact.phoneHref}>{contact.phoneDisplay}</a></dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+            </div>
+            <div>
+              <dt>Instagram</dt>
+              <dd><a href={contact.instagram} target="_blank" rel="noopener">{contact.instagramHandle}</a></dd>
+            </div>
+          </dl>
+          <div class="visit-actions">
+            <a class="btn btn-ink" href={hello} target="_blank" rel="noopener">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+              Message us on WhatsApp
+            </a>
+            <a class="btn btn-line" href={contact.phoneHref}>Call {contact.phoneDisplay}</a>
+          </div>
+        </div>
+        <figure class="arch arch-night">
+          <Picture
+            base={studio.night.base}
+            alt={studio.night.alt}
+            sizes="(min-width: 60rem) 30rem, calc(100vw - 2rem)"
+            imgClass="arch-img"
+          />
+          <figcaption>After dark, look for the lit sign. Photo by customer Mark Ban.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-inner">
+      <p class="foot-brand"><span class="wordmark">WRP.</span> Wrap, reinforce, protect.</p>
+      <nav aria-label="Footer">
+        <ul role="list">
+          <li><a href={pages.blog}>Blog</a></li>
+          <li><a href={pages.portfolio}>Portfolio</a></li>
+          <li><a href={pages.reviews}>Reviews</a></li>
+          <li><a href={pages.about}>About WRP</a></li>
+          <li><a href={pages.contact}>Contact</a></li>
+          <li><a href={pages.privacy}>Privacy</a></li>
+          <li><a href={pages.terms}>Terms</a></li>
+          <li><a href={pages.arabic} lang="ar" dir="rtl">العربية</a></li>
+        </ul>
+      </nav>
+      <p class="foot-legal">© {year} WRP Detailing Solutions, Al Qusais Industrial Area 1, Dubai</p>
+    </div>
+  </footer>
+</DesignShell>
+
+<script>
+  // "Open now" status in Dubai time. Rendered client-side because the page is prerendered.
+  const el = document.querySelector<HTMLElement>('[data-status]');
+  if (el) {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Dubai',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    const mins = Number(get('hour')) * 60 + Number(get('minute'));
+    const open = 9 * 60;
+    const close = 21 * 60 + 30;
+    let text: string;
+    let state: 'open' | 'closed';
+    if (day !== 5 && mins >= open && mins < close) {
+      state = 'open';
+      text = close - mins <= 60 ? 'Open now, closing at 9:30 PM' : 'Open now, until 9:30 PM';
+    } else {
+      state = 'closed';
+      const opensToday = day !== 5 && mins < open;
+      const nextDay = opensToday ? 'today' : day === 4 || day === 5 ? 'Saturday' : 'tomorrow';
+      text = `Closed now. We open ${nextDay} at 9 AM`;
+    }
+    el.textContent = text;
+    el.dataset.state = state;
+    el.hidden = false;
+  }
+</script>
+
+<style is:global>
+  /* Scoped to this concept: the lab route imports every concept's styles. */
+  :root[data-concept='menu'] {
+    --cloth: #f6f6f3;
+    --paper: #fdfdfb;
+    --ink: #2b1b2e;
+    --ink-soft: #5e5061;
+    --plum: #6d4a7a;
+    --plum-wash: #efe9f0;
+    --brass: #b08d57;
+    --brass-light: #c4a26b;
+    --linen: #d9d4cc;
+    --linen-strong: #b9b0ba;
+    --serif: var(--font-instrument-serif), 'Iowan Old Style', Georgia, serif;
+    --sans: var(--font-instrument-sans), system-ui, sans-serif;
+    --step-h1: clamp(3rem, 1.4rem + 6.2vw, 7.25rem);
+    --step-h2: clamp(2.5rem, 1.9rem + 2.6vw, 4.5rem);
+    --step-h3: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+    color-scheme: light;
+    scroll-padding-top: 0;
+  }
+  :root[data-concept='menu'] body {
+    background: var(--cloth);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    accent-color: var(--plum);
+  }
+  :root[data-concept='menu'] ::selection {
+    background: var(--plum);
+    color: var(--cloth);
+  }
+</style>
+
+<style>
+  /* ---------- Shared bits ---------- */
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 10;
+    padding: 0.75rem 1rem;
+    background: var(--ink);
+    color: var(--cloth);
+    border-radius: 0.25rem;
+  }
+  .skip:focus {
+    top: 1rem;
+  }
+  main:focus {
+    outline: none;
+  }
+  a {
+    color: inherit;
+  }
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 3rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .btn svg {
+    fill: currentColor;
+    flex: none;
+  }
+  .btn-ink {
+    background: var(--ink);
+    color: var(--cloth);
+  }
+  .btn-ink:hover {
+    background: var(--plum);
+  }
+  .btn-line {
+    border: 1px solid var(--plum);
+    color: var(--plum);
+  }
+  .btn-line:hover {
+    background: var(--plum);
+    color: var(--cloth);
+  }
+  .btn:focus-visible {
+    border-radius: 999px;
+  }
+  .wordmark {
+    font-family: var(--font-montserrat), system-ui, sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .sec-head {
+    text-align: center;
+    max-width: 38rem;
+    margin-inline: auto;
+  }
+  .sec-head h2,
+  .visit h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h2);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .sec-head p {
+    margin-block-start: 1rem;
+    color: var(--ink-soft);
+  }
+  .more {
+    text-align: center;
+    margin-block-start: 2.5rem;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    padding: 1rem 1rem 0;
+    max-width: 90rem;
+    margin-inline: auto;
+  }
+  .mast-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+  }
+  .mast-hours {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .mast-hours:hover {
+    color: var(--plum);
+    text-decoration: underline;
+  }
+  .masthead .wordmark {
+    font-size: 2.25rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+  }
+  .mast-cta {
+    justify-self: end;
+    min-height: 2.75rem;
+    padding-inline: 1.1rem;
+    font-size: 0.9375rem;
+  }
+  .masthead nav {
+    margin-block-start: 0.75rem;
+    border-block: 1px solid var(--linen);
+  }
+  .masthead nav ul {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    column-gap: clamp(0.25rem, 2vw, 2rem);
+    margin: 0;
+    padding: 0;
+  }
+  .masthead nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.5rem;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+  .masthead nav a:hover {
+    color: var(--plum);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+  @media (max-width: 47.99rem) {
+    .mast-row {
+      grid-template-columns: auto 1fr;
+    }
+    .mast-hours {
+      display: none;
+    }
+    .masthead .wordmark {
+      justify-self: start;
+      padding-inline: 0;
+    }
+    .wide-only {
+      display: none;
+    }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: clamp(2.5rem, 1.5rem + 4vw, 5rem) 1rem 0;
+    text-align: center;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h1);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    max-width: 14ch;
+    margin-inline: auto;
+  }
+  .hero h1 span {
+    display: block;
+  }
+  @media (min-width: 60rem) {
+    .hero h1 {
+      max-width: none;
+    }
+  }
+  .hero-lede {
+    max-width: 36rem;
+    margin: 1.75rem auto 0;
+    font-size: 1.125rem;
+    color: var(--ink-soft);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block-start: 2rem;
+  }
+
+  /* Arched window: the photo is framed like a doorway into the house. */
+  .arch {
+    margin: clamp(3rem, 2rem + 4vw, 5rem) auto 0;
+    max-width: 72rem;
+  }
+  .arch :global(.arch-img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 30%;
+    border-radius: 50% 50% 0.25rem 0.25rem / 34% 34% 0.25rem 0.25rem;
+  }
+  @media (min-width: 48rem) {
+    .hero .arch :global(.arch-img) {
+      aspect-ratio: 2 / 1;
+      object-position: 50% 28%;
+      border-radius: 50% 50% 0.25rem 0.25rem / 60% 60% 0.25rem 0.25rem;
+    }
+  }
+  .arch figcaption {
+    margin-block-start: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  /* ---------- Menu card ---------- */
+  .menu {
+    padding: clamp(4rem, 3rem + 5vw, 8rem) 1rem;
+  }
+  .card {
+    max-width: 50rem;
+    margin-inline: auto;
+    padding: clamp(2.5rem, 1.5rem + 4vw, 5rem) clamp(1.25rem, 0.5rem + 4vw, 4.5rem);
+    background: var(--paper);
+    /* Double frame, the way a printed menu is bordered. */
+    border: 1px solid var(--plum);
+    outline: 1px solid var(--linen-strong);
+    outline-offset: -8px;
+    scroll-margin-block-start: 1rem;
+  }
+  .card-head {
+    text-align: center;
+  }
+  .card-head h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h2);
+    line-height: 1;
+  }
+  .card-head p {
+    margin: 1rem auto 0;
+    max-width: 30rem;
+    color: var(--ink-soft);
+  }
+  .course {
+    margin-block-start: clamp(2.75rem, 2rem + 3vw, 4rem);
+  }
+  .course h3 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--step-h3);
+    line-height: 1.1;
+    text-align: center;
+    color: var(--plum);
+  }
+  .course-note {
+    text-align: center;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    margin: 0.4rem auto 0;
+    max-width: 30rem;
+  }
+  .dishes {
+    margin: 1.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.75rem;
+  }
+  .dish-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.6rem;
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.75rem);
+    line-height: 1.2;
+  }
+  .dish-name {
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) left 100% / 0 1px no-repeat;
+    transition: background-size 0.3s ease;
+  }
+  .dish-name:hover {
+    color: var(--plum);
+    background-size: 100% 1px;
+  }
+  .leader {
+    flex: 1 1 2rem;
+    min-width: 2rem;
+    height: 4px;
+    background: radial-gradient(circle, var(--linen-strong) 1.1px, transparent 1.5px) left bottom / 8px 4px repeat-x;
+  }
+  .dish-price {
+    margin-inline-start: auto;
+    white-space: nowrap;
+    text-wrap: nowrap;
+  }
+  .dish-price i {
+    color: var(--ink-soft);
+    font-size: 0.85em;
+  }
+  .dish-line {
+    margin-block-start: 0.35rem;
+    max-width: 34rem;
+    color: var(--ink-soft);
+    font-size: 1rem;
+  }
+  .dish-time {
+    margin-block-start: 0.2rem;
+    font-size: 0.875rem;
+    color: var(--plum);
+  }
+  .card-foot {
+    margin-block-start: clamp(3rem, 2rem + 3vw, 4.5rem);
+    padding-block-start: 2rem;
+    border-block-start: 1px solid var(--linen);
+    text-align: center;
+  }
+  .source-note {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.125rem;
+    color: var(--ink-soft);
+  }
+  .films {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    margin: 1.25rem 0;
+    padding: 0;
+  }
+  .films img {
+    height: 2.5rem;
+    width: auto;
+  }
+
+  /* ---------- Lounge: the room upstairs ---------- */
+  .lounge {
+    background: var(--ink);
+    color: var(--cloth);
+    padding: clamp(4.5rem, 3rem + 6vw, 9rem) 1rem;
+  }
+  .lounge a:focus-visible {
+    outline-color: var(--brass-light);
+  }
+  .lounge-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  .lounge-head {
+    text-align: center;
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+  .lounge-head h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h2);
+    line-height: 1;
+  }
+  .lounge-where {
+    margin-block-start: 0.6rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.375rem;
+    color: var(--brass-light);
+  }
+  .lounge-pitch {
+    margin-block-start: 1.25rem;
+    color: var(--linen);
+    font-size: 1.125rem;
+  }
+  .lounge-photos {
+    display: grid;
+    gap: 1.5rem;
+    margin-block-start: clamp(2.5rem, 2rem + 3vw, 4rem);
+  }
+  @media (min-width: 60rem) {
+    .lounge-photos {
+      grid-template-columns: 5fr 3fr;
+      align-items: end;
+    }
+  }
+  .lp :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 0.25rem;
+  }
+  .lp:not(.lp-main) :global(img) {
+    aspect-ratio: 4 / 5;
+    object-position: 60% 50%;
+  }
+  .lp figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--linen);
+  }
+  .notes {
+    margin-block-start: clamp(3rem, 2rem + 4vw, 5rem);
+    max-width: 66rem;
+    margin-inline: auto;
+  }
+  .notes h3 {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--step-h3);
+    text-align: center;
+    color: var(--brass-light);
+  }
+  .notes dl {
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(13rem, 42%), 1fr));
+    gap: 1.75rem clamp(1.25rem, 3vw, 2.5rem);
+  }
+  .notes dl > div {
+    padding-block-start: 1rem;
+    border-block-start: 1px solid rgb(217 212 204 / 0.25);
+  }
+  .notes dt {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .notes dd {
+    margin: 0.25rem 0 0;
+    color: var(--linen);
+    font-size: 0.975rem;
+  }
+  .lounge-quote {
+    margin: clamp(3.5rem, 2.5rem + 4vw, 6rem) auto 0;
+    max-width: 52rem;
+    text-align: center;
+  }
+  .lounge-quote blockquote p {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .lounge-quote figcaption,
+  .lounge-more figcaption {
+    margin-block-start: 1rem;
+    font-size: 0.9375rem;
+    color: var(--brass-light);
+  }
+  .lounge-more {
+    margin: 3rem auto 0;
+    padding: 0;
+    max-width: 52rem;
+    display: grid;
+    gap: 2rem 3rem;
+  }
+  @media (min-width: 48rem) {
+    .lounge-more {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .lounge-more blockquote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.375rem;
+    line-height: 1.3;
+    color: var(--cloth);
+  }
+  .lounge-more li {
+    text-align: center;
+  }
+
+  /* ---------- Work ---------- */
+  .work {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+  }
+  .work-grid {
+    max-width: 72rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1rem;
+  }
+  @media (min-width: 60rem) {
+    .work-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3rem 2rem;
+    }
+  }
+  .work-grid :global(.work-img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 0.25rem;
+  }
+  .work-grid figcaption {
+    display: grid;
+    margin-block-start: 0.75rem;
+  }
+  .work-title {
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.2;
+  }
+  .work-what {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Guest book ---------- */
+  .guests {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    border-block-start: 1px solid var(--linen);
+  }
+  .book {
+    max-width: 64rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
+    background: var(--paper);
+    border: 1px solid var(--linen);
+    border-radius: 0.25rem;
+    box-shadow: 0 1.5rem 3rem -2rem rgb(43 27 46 / 0.35);
+    display: grid;
+  }
+  @media (min-width: 48rem) {
+    .book {
+      grid-template-columns: 1fr 1fr;
+      /* The spine: a soft fold down the middle of the open book. */
+      background:
+        linear-gradient(
+            to right,
+            transparent calc(50% - 2.5rem),
+            rgb(43 27 46 / 0.07) calc(50% - 1px),
+            rgb(43 27 46 / 0.14) 50%,
+            rgb(43 27 46 / 0.07) calc(50% + 1px),
+            transparent calc(50% + 2.5rem)
+          ),
+        var(--paper);
+    }
+  }
+  .page {
+    margin: 0;
+    padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    display: grid;
+    align-content: start;
+  }
+  .page li + li {
+    margin-block-start: 1.75rem;
+    padding-block-start: 1.75rem;
+    border-block-start: 1px solid var(--linen);
+  }
+  @media (max-width: 47.99rem) {
+    .page + .page {
+      padding-block-start: 0;
+    }
+    .page + .page li:first-child {
+      margin-block-start: 0;
+      padding-block-start: 1.75rem;
+      border-block-start: 1px solid var(--linen);
+    }
+  }
+  .page blockquote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+    line-height: 1.2;
+  }
+  .page figcaption {
+    margin-block-start: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.9375rem;
+  }
+  .g-name {
+    font-weight: 600;
+  }
+  .g-for {
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Reservations ---------- */
+  .visit {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    background: var(--plum-wash);
+  }
+  .visit-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .visit-inner {
+      grid-template-columns: 1fr minmax(0, 28rem);
+      gap: 5rem;
+    }
+  }
+  .visit-lede {
+    margin-block-start: 1rem;
+    max-width: 34rem;
+    color: var(--ink-soft);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 1.5rem;
+    font-weight: 500;
+  }
+  .status::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--ink-soft);
+  }
+  .status[data-state='open']::before {
+    background: #2f6b3f;
+    box-shadow: 0 0 0 3px rgb(47 107 63 / 0.18);
+  }
+  .status[hidden] {
+    display: none;
+  }
+  .details {
+    margin: 2rem 0 0;
+    display: grid;
+    gap: 0;
+    border-block-start: 1px solid var(--linen-strong);
+  }
+  .details > div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--linen-strong);
+  }
+  .details dt {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: var(--plum);
+  }
+  .details dd {
+    margin: 0;
+  }
+  .details a {
+    color: var(--ink);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--plum);
+    display: inline-block;
+    padding-block: 0.35rem;
+  }
+  .details a:hover {
+    color: var(--plum);
+  }
+  .visit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 2rem;
+  }
+  .arch-night {
+    margin: 0;
+    width: 100%;
+    max-width: 28rem;
+    justify-self: center;
+  }
+  .arch-night :global(.arch-img) {
+    object-position: 100% 50%;
+    border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+  }
+  @media (max-width: 30rem) {
+    .details > div {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    background: var(--cloth);
+    border-block-start: 1px solid var(--linen);
+    padding: 3rem 1rem calc(3rem + 64px);
+  }
+  .foot-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 1.5rem;
+    justify-items: center;
+    text-align: center;
+  }
+  .foot-brand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .foot-brand .wordmark {
+    font-size: 1.75rem;
+    font-style: italic;
+  }
+  .foot nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 1.25rem;
+    margin: 0;
+    padding: 0;
+  }
+  .foot nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.25rem;
+    font-size: 0.9375rem;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--linen-strong);
+  }
+  .foot nav a:hover {
+    color: var(--plum);
+  }
+  .foot-legal {
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dish-name,
+    .btn {
+      transition: none;
+    }
+  }
+</style>

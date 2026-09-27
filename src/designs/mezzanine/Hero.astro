@@ -1,0 +1,426 @@
+---
+/**
+ * The hero is a cross-section of the building. Tariq Murad's photo is cut along
+ * the mezzanine beam and the page's own beam replaces it, running the full width
+ * of the screen: glass and lounge above, bays below. The headline is split by it.
+ */
+import Picture from '../shared/Picture.astro';
+import { proof } from '../data';
+import { heroPhoto, whatsappHello } from './building';
+
+const lamps = [
+  { x: '14%', drop: 6, delay: 0.15 },
+  { x: '47%', drop: 34, delay: 0.4 },
+  { x: '80%', drop: 14, delay: 0.65 },
+];
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="slice slice--up">
+    <Picture
+      base={heroPhoto.base}
+      alt={heroPhoto.alt}
+      sizes="(min-width: 60rem) 1200px, 150vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div class="ceiling" aria-hidden="true">
+    {
+      lamps.map((l) => (
+        <span class="lamp" style={`--x:${l.x};--drop:${l.drop};--delay:${l.delay}s`}>
+          <svg viewBox="0 0 60 56" width="60" height="56">
+            <path d="M24 0h12v15l16 30c1.6 3.2-.4 5-3.6 5H11.6C8.4 50 6.4 48.2 8 45l16-30Z" fill="#15171a" />
+            <ellipse cx="30" cy="49.5" rx="19" ry="3.2" fill="#f4ecd8" class="lamp__lens" />
+          </svg>
+          <span class="lamp__glow" />
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="glass" aria-hidden="true"></div>
+
+  <div class="up-copy">
+    <p class="where">Upstairs: the WRP Lounge</p>
+    <p class="up-line">
+      Billiards, board games, karak and the match on a big screen, behind a glass wall that looks down on the bays.
+    </p>
+  </div>
+
+  <h1 class="h1" id="hero-title">
+    <span class="h1__up">One floor up</span>
+    <span class="h1__down">from your car.</span>
+  </h1>
+
+  <div class="beam" aria-hidden="true"><span class="beam__led"></span></div>
+
+  <div class="down-copy">
+    <p class="down-line">
+      Downstairs we fit paint protection film, ceramic coating and window film, and correct paint. In Al Qusais,
+      Dubai.
+    </p>
+    <div class="actions">
+      <a class="btn" href={whatsappHello} target="_blank" rel="noopener">Get a quote on WhatsApp</a>
+      <a class="text-link" href="#services">See services and prices</a>
+    </div>
+    <p class="rating">
+      <a href={proof.reviewsUrl}>Rated {proof.rating} on Google from {proof.reviewCount} reviews</a>
+    </p>
+  </div>
+
+  <div class="slice slice--down">
+    <Picture base={heroPhoto.base} alt="" sizes="(min-width: 60rem) 1200px, 150vw" loading="eager" />
+    <p class="credit">Photo by customer Tariq Murad</p>
+  </div>
+</section>
+
+<style>
+  /*
+   * Geometry. --k is the size of one pixel of the 1200×900 source photo.
+   * The photo's beam sits at y 473–528, its glass starts at y≈207.
+   */
+  .hero {
+    container: hero / inline-size;
+    --k: min(calc(150vw / 1200), 0.8px);
+    --crop-up: 150; /* mobile: start the photo at the lamps */
+    --h1: clamp(2.25rem, calc((100cqi - 2rem) * 0.148), 4.5rem);
+    --line: calc(var(--h1) * 1.02);
+    --beam: calc(var(--k) * 55);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows:
+      calc(var(--k) * (473 - var(--crop-up)))
+      auto
+      var(--line)
+      var(--beam)
+      var(--line)
+      auto
+      calc(var(--k) * 352);
+    grid-template-areas: 'up' 'gcopy' 'gline' 'beam' 'bline' 'bcopy' 'down';
+    background: var(--mz-wall);
+    overflow: clip;
+  }
+
+  /* ---------- Photo slices ---------- */
+  .slice {
+    position: relative;
+    overflow: hidden;
+    background: var(--mz-smoke);
+  }
+  .slice--up {
+    grid-area: up;
+  }
+  .slice--down {
+    grid-area: down;
+    background: var(--mz-wall-2);
+  }
+  .slice :global(img) {
+    position: absolute;
+    left: 50%;
+    translate: -50% 0;
+    width: auto;
+    max-width: none;
+    height: calc(var(--k) * 900);
+  }
+  .slice--up :global(img) {
+    top: calc(var(--k) * var(--crop-up) * -1);
+  }
+  .slice--down :global(img) {
+    top: calc(var(--k) * -528);
+  }
+  /* Mobile: the photo's glass melts into the smoked-glass panel below it. */
+  .slice--up::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 35%;
+    background: linear-gradient(to bottom, transparent, var(--mz-smoke));
+  }
+  .credit {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    background: rgb(21 23 26 / 0.72);
+    color: var(--mz-on-dark);
+    font-size: 0.75rem;
+  }
+
+  /* ---------- Upstairs: smoked glass ---------- */
+  .ceiling {
+    display: none;
+  }
+  .glass {
+    grid-row: gcopy-start / gline-end;
+    grid-column: 1;
+    background:
+      linear-gradient(100deg, transparent 38%, rgb(255 255 255 / 0.05) 46%, transparent 54%),
+      linear-gradient(100deg, transparent 58%, rgb(255 255 255 / 0.035) 62%, transparent 66%),
+      var(--mz-smoke);
+  }
+  .up-copy {
+    grid-area: gcopy;
+    padding: 0.5rem 1rem 1.25rem;
+    color: var(--mz-on-dark);
+    max-width: 38rem;
+    position: relative;
+  }
+  .where {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--mz-brass);
+    margin-block-end: 0.35rem;
+  }
+  .up-line {
+    color: #c9d3cf;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+
+  /* ---------- The headline, split by the beam ---------- */
+  .h1 {
+    grid-row: gline-start / bline-end;
+    grid-column: 1;
+    display: grid;
+    grid-template-rows: var(--line) var(--beam) var(--line);
+    margin: 0;
+    padding-inline: 1rem;
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: var(--h1);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    position: relative;
+    z-index: 1;
+    text-wrap: nowrap;
+  }
+  .h1__up,
+  .h1__down {
+    display: block;
+    text-box: trim-both cap alphabetic;
+  }
+  .h1__up {
+    grid-row: 1;
+    align-self: end;
+    padding-bottom: 0.2em;
+    color: var(--mz-glass);
+  }
+  .h1__down {
+    grid-row: 3;
+    align-self: start;
+    padding-top: 0.22em;
+    color: var(--mz-ink);
+  }
+
+  /* ---------- The beam ---------- */
+  .beam {
+    grid-area: beam;
+    grid-column: 1 / -1;
+    position: relative;
+    background: var(--mz-lamp);
+  }
+  .beam__led {
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: #f4ecd8;
+    box-shadow:
+      0 0 6px rgb(244 236 216 / 0.8),
+      0 2px 14px rgb(201 164 92 / 0.5);
+    transform-origin: left;
+  }
+
+  /* ---------- Downstairs: the bays ---------- */
+  .down-copy {
+    grid-area: bcopy;
+    padding: 1.25rem 1rem 1.75rem;
+    max-width: 38rem;
+  }
+  .down-line {
+    font-size: 1.0625rem;
+    color: var(--mz-ink-2);
+    max-width: 36ch;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-block: 1.25rem 1rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    background: var(--mz-felt);
+    color: #fff;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.15s;
+  }
+  .btn:hover {
+    background: var(--mz-felt-ink);
+  }
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  .text-link:hover {
+    text-decoration-thickness: 2.5px;
+  }
+  .rating {
+    font-size: 0.9375rem;
+    color: var(--mz-ink-2);
+  }
+  .rating a {
+    text-underline-offset: 0.25em;
+  }
+
+  /* ---------- Desktop: side by side, one continuous building ---------- */
+  @media (min-width: 60rem) {
+    .hero {
+      --H: clamp(36rem, calc(100svh - var(--mz-hh)), 54rem);
+      --k: calc(var(--H) / 780);
+      --crop-up: 100;
+      --pw: min(52cqi, calc(var(--k) * 1200));
+      /* Line the hero copy up with the page container below it. */
+      --pad: max(var(--mz-gutter), calc((100cqi - var(--mz-max)) / 2));
+      --h1: min(calc((100cqi - var(--pw) - var(--pad) - 2rem) * 0.148), calc(var(--k) * 100));
+
+      grid-template-columns: minmax(0, 1fr) var(--pw);
+      grid-template-rows:
+        calc(var(--k) * 107)
+        calc(var(--k) * 266 - var(--line))
+        var(--line)
+        var(--beam)
+        var(--line)
+        calc(var(--k) * 352 - var(--line));
+      grid-template-areas:
+        'ceiling up'
+        'gcopy up'
+        'gline up'
+        'beam beam'
+        'bline down'
+        'bcopy down';
+    }
+    .slice--up::after {
+      display: none;
+    }
+    /* A glass mullion where the page meets the photo. */
+    .slice--up::before {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      top: calc(var(--k) * 107);
+      bottom: 0;
+      width: 5px;
+      background: var(--mz-lamp);
+    }
+    .up-copy,
+    .down-copy,
+    .h1 {
+      padding-inline: var(--pad) 2rem;
+    }
+    .up-copy {
+      align-self: end;
+      padding-block: 0 1rem;
+    }
+    .up-line {
+      font-size: 1.0625rem;
+    }
+    .down-copy {
+      padding-block: calc(var(--k) * 22) 0;
+    }
+    .down-line {
+      font-size: 1.125rem;
+    }
+
+    /* The ceiling, with the studio's pendant lamps hanging in front of the glass. */
+    .ceiling {
+      display: block;
+      grid-area: ceiling;
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(to bottom, var(--mz-wall) 30%, #cfd4d0);
+    }
+    .lamp {
+      position: absolute;
+      left: var(--x);
+      top: 0;
+      width: calc(var(--k) * 64);
+      padding-top: calc(var(--drop) * var(--k));
+    }
+    .lamp::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 1.5px;
+      height: calc(var(--drop) * var(--k) + 2px);
+      background: var(--mz-lamp);
+    }
+    .lamp svg {
+      width: 100%;
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+    .lamp__glow {
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      width: 260%;
+      aspect-ratio: 1.6;
+      translate: -50% -38%;
+      background: radial-gradient(
+        closest-side,
+        rgb(255 240 210 / 0.55),
+        rgb(201 164 92 / 0.22) 45%,
+        transparent
+      );
+      pointer-events: none;
+    }
+  }
+
+  /* ---------- The one orchestrated moment: the lights come on ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .lamp__glow {
+      animation: lamp-on 0.9s var(--delay) both;
+    }
+    .lamp__lens {
+      animation: lens-on 0.9s var(--delay) both;
+    }
+    .beam__led {
+      animation: led-run 1.1s 0.8s var(--mz-ease) both;
+    }
+  }
+  @keyframes lamp-on {
+    0% { opacity: 0; }
+    20% { opacity: 0.7; }
+    28% { opacity: 0.15; }
+    45%, 100% { opacity: 1; }
+  }
+  @keyframes lens-on {
+    0% { fill: #3a3d40; }
+    20% { fill: #f4ecd8; }
+    28% { fill: #55585a; }
+    45%, 100% { fill: #f4ecd8; }
+  }
+  @keyframes led-run {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+</style>

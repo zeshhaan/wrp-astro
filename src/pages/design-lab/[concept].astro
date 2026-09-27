@@ -1,0 +1,14 @@
+---
+export const prerender = true;
+
+import { conceptComponents, type ConceptId } from '@/designs';
+import { conceptIds } from '@/designs/registry';
+
+export function getStaticPaths() {
+  return conceptIds.map((concept) => ({ params: { concept } }));
+}
+
+const Concept = conceptComponents[Astro.params.concept as ConceptId];
+---
+
+<Concept />

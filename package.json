@@ -7,6 +7,7 @@
 		"generate:llms": "node scripts/generate-llms.mjs",
 		"build": "node scripts/generate-llms.mjs && node scripts/generate-og-cards.mjs && node scripts/optimize-images.mjs && astro build && bun scripts/check-llms-coverage.ts",
 		"preview": "astro build && wrangler dev",
+		"preview:designs": "node scripts/preview-designs.mjs",
 		"astro": "astro",
 		"cf-typegen": "wrangler types",
 		"reddit:fetch": "node scripts/reddit_fetch.mjs docs/reddit_urls.txt",
@@ -47,6 +48,6 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@types/node": "^25.3.0",
 		"tw-animate-css": "^1.4.0",
-		"wrangler": "^4.68.1"
+		"wrangler": "^4.141.0"
 	}
 }

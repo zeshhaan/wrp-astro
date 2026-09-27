@@ -1,0 +1,49 @@
+---
+/**
+ * Responsive <picture> for the pre-optimised /public variants
+ * (`<base>-480w.avif`, `-800w.webp`, …).
+ */
+interface Props {
+  base: string;
+  alt: string;
+  sizes?: string;
+  widths?: number[];
+  width?: number;
+  height?: number;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+  imgClass?: string;
+  style?: string;
+}
+const {
+  base,
+  alt,
+  sizes = '100vw',
+  widths = [480, 800, 1200],
+  width = 1200,
+  height = 900,
+  loading = 'lazy',
+  fetchpriority,
+  class: className,
+  imgClass,
+  style,
+} = Astro.props;
+const set = (ext: string) => widths.map((w) => `${base}-${w}w.${ext} ${w}w`).join(', ');
+const fallback = `${base}-${widths.includes(800) ? 800 : widths[widths.length - 1]}w.webp`;
+---
+
+<picture class={className} style={style}>
+  <source type="image/avif" srcset={set('avif')} sizes={sizes} />
+  <source type="image/webp" srcset={set('webp')} sizes={sizes} />
+  <img
+    src={fallback}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    decoding={loading === 'eager' ? 'sync' : 'async'}
+    fetchpriority={fetchpriority}
+    class={imgClass}
+  />
+</picture>
