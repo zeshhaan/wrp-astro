@@ -1,0 +1,254 @@
+---
+import Said from './Said.astro';
+import { ask, depths, quotes } from './layers';
+import { pages } from '../data';
+
+const d = depths.colour;
+---
+
+<section
+  class="layer colour on-dark"
+  id="colour"
+  aria-labelledby="colour-title"
+  data-layer="colour"
+  data-um-from={d.from}
+  data-um-to={d.to}
+  data-um-name="in the colour"
+>
+  <div class="edge" aria-hidden="true"></div>
+  <div class="ly-wrap grid">
+    <div class="copy">
+      <p class="depth ly-note">{d.from} to {d.to} µm down</p>
+      <h2 class="ly-h2" id="colour-title">Change the colour, keep the paint underneath.</h2>
+      <p class="line">
+        The colour coat is typically 12 to 20 microns, thinner than a hair, and it’s the part everyone sees. A wrap
+        changes it from the outside: a matte black bonnet and spoiler, a black roof, a chrome delete. Take the film off
+        later and the factory colour is still there.
+      </p>
+      <dl class="offer">
+        <div><dt>Wrap & styling</dt><dd>Priced after we see the car</dd></div>
+      </dl>
+      <div class="actions">
+        <a class="btn-light" href={ask('a partial wrap')} target="_blank" rel="noopener">Ask about a wrap on WhatsApp</a>
+        <a class="ly-link" href={pages.contact}>Or send us a message</a>
+      </div>
+    </div>
+
+    <div class="side">
+      <figure class="swatch" data-wrap="off">
+        <div class="swatch__panel" aria-hidden="true">
+          <span class="swatch__paint"></span>
+          <span class="swatch__film"></span>
+        </div>
+        <div class="swatch__edge" aria-hidden="true">
+          <span class="e e--film"></span>
+          <span class="e e--clear"></span>
+          <span class="e e--colour"></span>
+          <span class="e e--primer"></span>
+        </div>
+        <figcaption>
+          <span class="say say--off">Factory paint, seen from above and at the cut edge.</span>
+          <span class="say say--on">Matte black film on top of the clear coat. The green underneath is untouched.</span>
+        </figcaption>
+        <div class="toggle" role="group" aria-label="Bonnet finish">
+          <button type="button" aria-pressed="true" data-wrap-set="off">Factory green</button>
+          <button type="button" aria-pressed="false" data-wrap-set="on">Matte black wrap</button>
+        </div>
+      </figure>
+      <Said q={quotes.wrap} />
+    </div>
+  </div>
+</section>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('.swatch')) {
+    const buttons = fig.querySelectorAll<HTMLButtonElement>('[data-wrap-set]');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        fig.dataset.wrap = b.dataset.wrapSet;
+        buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      }),
+    );
+  }
+</script>
+
+<style>
+  .colour {
+    background: var(--ly-green);
+    color: var(--ly-on-green);
+    padding-block: 0 clamp(3.5rem, 8vw, 6rem);
+  }
+  .edge {
+    height: 6px;
+    background: linear-gradient(180deg, #3d7349, var(--ly-green));
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .depth {
+    font-size: 1.0625rem;
+    color: #bcd6bd;
+    margin-bottom: 0.5rem;
+  }
+  .ly-h2 {
+    color: #fff;
+    max-width: 16ch;
+  }
+  .line {
+    margin-top: 1.25rem;
+    max-width: 52ch;
+    font-size: 1.0625rem;
+  }
+  .offer {
+    margin-top: 1.5rem;
+  }
+  .offer dt {
+    font-size: 0.875rem;
+    color: #bcd6bd;
+  }
+  .offer dd {
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+  .btn-light {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.7rem 1.35rem;
+    border-radius: 0.25rem;
+    background: var(--ly-paper);
+    color: var(--ly-green-deep);
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s;
+  }
+  .btn-light:hover {
+    background: #fff;
+  }
+  .actions :global(.ly-link) {
+    color: #fff;
+  }
+  .side {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+  }
+  .side :global(.ly-said) {
+    color: #fff;
+  }
+  .side :global(.ly-said footer) {
+    color: #bcd6bd;
+  }
+
+  /* ---------- The sample card ---------- */
+  .swatch {
+    background: var(--ly-paper);
+    color: var(--ly-ink);
+    border-radius: 4px;
+    padding: 1rem;
+  }
+  .swatch__panel {
+    position: relative;
+    display: block;
+    height: clamp(8rem, 18vw, 11rem);
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+  }
+  .swatch__paint,
+  .swatch__film {
+    position: absolute;
+    inset: 0;
+  }
+  .swatch__paint {
+    background:
+      radial-gradient(120% 60% at 30% 10%, rgb(255 255 255 / 0.45), transparent 55%),
+      linear-gradient(160deg, #4d8a5a, var(--ly-green) 45%, #1d3d25);
+  }
+  .swatch__film {
+    background:
+      radial-gradient(120% 70% at 30% 10%, rgb(255 255 255 / 0.06), transparent 60%),
+      #1f2123;
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+    transition: transform 0.55s var(--ly-ease);
+  }
+  .swatch__edge {
+    display: grid;
+    grid-template-rows: 0 0.9rem 0.45rem 0.7rem;
+    transition: grid-template-rows 0.4s var(--ly-ease);
+  }
+  .e--film { background: #2a2c2e; }
+  .e--clear { background: var(--ly-amber); }
+  .e--colour { background: var(--ly-green); }
+  .e--primer { background: var(--ly-primer); }
+  .swatch[data-wrap='on'] .swatch__film {
+    transform: none;
+  }
+  .swatch[data-wrap='on'] .swatch__edge {
+    grid-template-rows: 0.6rem 0.9rem 0.45rem 0.7rem;
+  }
+  .swatch figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    min-height: 2.9em;
+  }
+  .say--on,
+  .swatch[data-wrap='on'] .say--off {
+    display: none;
+  }
+  .swatch[data-wrap='on'] .say--on {
+    display: inline;
+  }
+  .toggle {
+    margin-top: 0.75rem;
+    display: inline-flex;
+    border: 1.5px solid var(--ly-ink);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .toggle button {
+    min-height: 2.75rem;
+    padding: 0.4rem 0.9rem;
+    border: 0;
+    background: transparent;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+  .toggle button + button {
+    border-inline-start: 1.5px solid var(--ly-ink);
+  }
+  .toggle button[aria-pressed='true'] {
+    background: var(--ly-ink);
+    color: var(--ly-paper);
+  }
+  .toggle button:focus-visible {
+    outline: 3px solid var(--ly-film-ink);
+    outline-offset: -4px;
+  }
+
+  @media (min-width: 56rem) {
+    .grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 4rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .swatch__film,
+    .swatch__edge {
+      transition: none;
+    }
+  }
+</style>

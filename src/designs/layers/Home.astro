@@ -1,6 +1,204 @@
 ---
+/**
+ * Layers: the page is a magnified cross-section through a car's paint.
+ * The hero is the cut, drawn to scale. Scroll down and you travel through it,
+ * layer by layer, each one a WRP service, with a micron gauge at the side.
+ * Then the other surfaces WRP works on (glass, leather, the whole car),
+ * proof, work, reviews, one short lounge section, and the visit.
+ */
 import DesignShell from '../shared/DesignShell.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Gauge from './Gauge.astro';
+import Ceramic from './Ceramic.astro';
+import Film from './Film.astro';
+import ClearCoat from './ClearCoat.astro';
+import Colour from './Colour.astro';
+import Metal from './Metal.astro';
+import Surfaces from './Surfaces.astro';
+import Process from './Process.astro';
+import Work from './Work.astro';
+import Reviews from './Reviews.astro';
+import Lounge from './Lounge.astro';
+import Visit from './Visit.astro';
+import Footer from './Footer.astro';
+import { heroCar } from './layers';
 ---
-<DesignShell concept="layers" title="WRP layers (in progress)" description="Round 2 concept in progress" fonts={['--font-inter']} themeColor="#000">
-  <main><h1>layers: in progress</h1></main>
+
+<DesignShell
+  concept="layers"
+  title="WRP Detailing, Dubai: paint protection film, ceramic coating and paint correction"
+  description="Paint protection film, ceramic coating, polish and paint correction, window film, upholstery and detailing in Al Qusais, Dubai. See what each layer does, what it costs, and send your car's details on WhatsApp."
+  fonts={['--font-archivo', '--font-fraunces', '--font-montserrat']}
+  themeColor="#E3E7EA"
+  preloadImage={{ base: heroCar.base, sizes: heroCar.sizes }}
+>
+  <div class="ly">
+    <Header />
+    <main id="main">
+      <Hero />
+      <Gauge />
+      <div class="journey" id="layers" data-journey>
+        <Ceramic />
+        <Film />
+        <ClearCoat />
+        <Colour />
+        <Metal />
+      </div>
+      <Surfaces />
+      <Process />
+      <Work />
+      <Reviews />
+      <Lounge />
+      <Visit />
+    </main>
+    <Footer />
+  </div>
 </DesignShell>
+
+<style is:global>
+  :root[data-concept='layers'] {
+    /* Above the surface: cool lab daylight */
+    --ly-day: #e3e7ea;
+    --ly-paper: #f3f5f6;
+    --ly-ink: #1b2026;
+    --ly-ink-2: #48515b;
+    --ly-rule: rgb(27 32 38 / 0.16);
+    /* The layers, each in its honest colour */
+    --ly-glass: #edf5f4; /* ceramic: clear glass, a cool white */
+    --ly-film: #c3d9e6; /* PPF: film-clear blue, seen edge-on */
+    --ly-film-bg: #d4e5ee;
+    --ly-film-ink: #1f4b68;
+    --ly-amber: #e2b056; /* clear coat, amber at the cut edge */
+    --ly-amber-bg: #ebcb84;
+    --ly-amber-ink: #5f410c;
+    --ly-green: #2f5d3a; /* colour coat: the hero car's own paint */
+    --ly-green-deep: #244a2e;
+    --ly-on-green: #e3efe2;
+    --ly-primer: #aab0a9;
+    --ly-metal: #66707a;
+    --ly-steel: #262d35; /* the underside of the panel: footer */
+    --ly-on-dark: #e6eaed;
+    --ly-on-dark-2: #b5bec6;
+
+    --ly-display: var(--font-archivo), 'Archivo', system-ui, sans-serif;
+    --ly-note: var(--font-fraunces), 'Fraunces', Georgia, serif;
+    --ly-mark: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+
+    --ly-hh: 3.5rem;
+    --ly-gut: 1rem;
+    --ly-max: 70rem;
+    --ly-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+    color-scheme: light;
+    scroll-padding-top: var(--ly-hh);
+    /* Lets the gauge (fixed, outside the journey) read the journey's view timeline. */
+    timeline-scope: --journey;
+  }
+  @media (min-width: 40rem) {
+    :root[data-concept='layers'] {
+      --ly-gut: 1.5rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    :root[data-concept='layers'] {
+      --ly-hh: 4rem;
+      /* keeps content clear of the micron gauge fixed at the left edge */
+      --ly-gut: 7rem;
+    }
+  }
+  :root[data-concept='layers'] body {
+    background: var(--ly-day);
+    color: var(--ly-ink);
+    font-family: var(--ly-display);
+    font-size: 1rem;
+    line-height: 1.55;
+    font-kerning: normal;
+  }
+  :where(:root[data-concept='layers'] a) {
+    color: inherit;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1.5px;
+  }
+  :where(:root[data-concept='layers'] :is(a, button, input, summary)):focus-visible {
+    outline: 3px solid var(--ly-film-ink);
+    outline-offset: 3px;
+  }
+  :where(:root[data-concept='layers'] :is(.on-dark, .on-dark *)):focus-visible {
+    outline-color: var(--ly-film);
+  }
+  :root[data-concept='layers'] ::selection {
+    background: var(--ly-film);
+    color: var(--ly-ink);
+  }
+
+  /* Shared building blocks (prefixed so they never collide with other concepts). */
+  :root[data-concept='layers'] .ly-wrap {
+    max-width: calc(var(--ly-max) + 2 * var(--ly-gut));
+    margin-inline: auto;
+    padding-inline: var(--ly-gut);
+  }
+  :root[data-concept='layers'] .ly-note {
+    font-family: var(--ly-note);
+    font-style: italic;
+    font-weight: 400;
+    font-variation-settings: 'opsz' 14;
+  }
+  :root[data-concept='layers'] .ly-h2 {
+    font-family: var(--ly-display);
+    font-weight: 800;
+    font-size: clamp(1.875rem, 1.2rem + 2.6vw, 3.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    max-width: 20ch;
+  }
+  :root[data-concept='layers'] .ly-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.7rem 1.35rem;
+    border-radius: 0.25rem;
+    background: var(--ly-green);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  :root[data-concept='layers'] .ly-btn:hover {
+    background: var(--ly-green-deep);
+  }
+  :root[data-concept='layers'] .ly-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  :root[data-concept='layers'] .ly-link:hover {
+    text-decoration-thickness: 3px;
+  }
+  /* A pull quote: the customer's words, in the annotation voice. */
+  :root[data-concept='layers'] .ly-said {
+    border-inline-start: 3px solid currentColor;
+    padding-inline-start: 1rem;
+    max-width: 38ch;
+  }
+  :root[data-concept='layers'] .ly-said p {
+    font-family: var(--ly-note);
+    font-style: italic;
+    font-size: 1.1875rem;
+    line-height: 1.4;
+  }
+  :root[data-concept='layers'] .ly-said footer {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+</style>

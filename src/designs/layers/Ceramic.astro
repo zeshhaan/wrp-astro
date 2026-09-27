@@ -1,0 +1,286 @@
+---
+import Said from './Said.astro';
+import { aed, ask, depths, paintLayers, quotes, svc } from './layers';
+
+const s = svc('ceramic-coating');
+const d = depths.ceramic;
+const film = paintLayers.find((l) => l.id === 'film')!;
+const ceramic = paintLayers.find((l) => l.id === 'ceramic')!;
+// At ×50 the film bar would be this tall, in 844px phone screens.
+const zoomScreens = Math.round((film.drawn * 1.2 * 50) / 844);
+---
+
+<section
+  class="layer ceramic"
+  id="ceramic"
+  aria-labelledby="ceramic-title"
+  data-layer="ceramic"
+  data-um-from={d.from}
+  data-um-to={d.to}
+  data-um-name="in the ceramic"
+>
+  <div class="edge" aria-hidden="true"></div>
+  <div class="ly-wrap grid">
+    <div class="copy">
+      <p class="depth ly-note">The top {d.to} µm</p>
+      <h2 class="ly-h2" id="ceramic-title">Ceramic coating keeps the gloss. It won’t stop a stone.</h2>
+      <p class="line">
+        {s.line} We use Adam’s professional ceramic systems, and we correct the paint first, because a coating locks
+        in whatever is underneath it.
+      </p>
+      <ul class="facts" role="list">
+        {s.facts.map((f) => <li>{f}</li>)}
+      </ul>
+      <dl class="offer">
+        <div><dt>From</dt><dd>{aed(s.from!)}</dd></div>
+        <div><dt>Your car stays</dt><dd>{s.time}</dd></div>
+      </dl>
+      <div class="actions">
+        <a class="ly-btn" href={ask('ceramic coating')} target="_blank" rel="noopener">Ask for a ceramic quote</a>
+        <a class="ly-link" href={s.href}>Ceramic packages and questions</a>
+      </div>
+    </div>
+
+    <div class="side">
+      <figure class="zoom" data-zoom="1">
+        <div class="zoom__stage" aria-hidden="true">
+          <div class="zoom__col">
+            <span class="zoom__bar zoom__bar--ceramic"></span>
+            <span class="zoom__cap">Ceramic</span>
+          </div>
+          <div class="zoom__col">
+            <span class="zoom__bar zoom__bar--film"><span class="zoom__tear"></span></span>
+            <span class="zoom__cap">Film</span>
+          </div>
+        </div>
+        <figcaption>
+          <span class="zoom__say zoom__say--1">
+            Same scale, side by side: {ceramic.typical} of ceramic against {film.typical} of film. The coating is
+            barely a line.
+          </span>
+          <span class="zoom__say zoom__say--50">
+            Magnified 50 times, the ceramic finally shows. The film bar would now be about {zoomScreens} phone screens
+            tall.
+          </span>
+        </figcaption>
+        <div class="zoom__toggle" role="group" aria-label="Scale">
+          <button type="button" aria-pressed="true" data-zoom-set="1">True scale</button>
+          <button type="button" aria-pressed="false" data-zoom-set="50">Magnify ×50</button>
+        </div>
+      </figure>
+      <Said q={quotes.ceramic} />
+    </div>
+  </div>
+</section>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('.zoom')) {
+    const buttons = fig.querySelectorAll<HTMLButtonElement>('[data-zoom-set]');
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        fig.dataset.zoom = b.dataset.zoomSet;
+        buttons.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+      }),
+    );
+  }
+</script>
+
+<style>
+  .ceramic {
+    position: relative;
+    background: var(--ly-glass);
+    padding-block: 0 clamp(3.5rem, 8vw, 6rem);
+  }
+  /* The layer's edge: a glassy hairline with a highlight, as it looks at the cut. */
+  .edge {
+    height: 6px;
+    background:
+      linear-gradient(90deg, transparent, rgb(255 255 255 / 0.95) 30%, transparent 60%),
+      linear-gradient(90deg, #ffffff, #dcf1ed 30%, #ffffff 55%, #e7e2f6 80%, #ffffff);
+    box-shadow: 0 1px 0 rgb(27 32 38 / 0.08);
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .depth {
+    font-size: 1.0625rem;
+    color: var(--ly-ink-2);
+    margin-bottom: 0.5rem;
+  }
+  .line {
+    margin-top: 1.25rem;
+    max-width: 52ch;
+    font-size: 1.0625rem;
+  }
+  .facts {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .facts li::before {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border: 1.5px solid var(--ly-ink);
+    border-radius: 50%;
+    background: #fff;
+  }
+  .offer {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2.5rem;
+  }
+  .offer dt {
+    font-size: 0.875rem;
+    color: var(--ly-ink-2);
+  }
+  .offer dd {
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+  .side {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+  }
+
+  /* ---------- The scale comparison ---------- */
+  .zoom {
+    --k: 1.2px;
+    background: #fff;
+    border: 1px solid var(--ly-rule);
+    border-radius: 4px;
+    padding: 1.25rem;
+  }
+  .zoom__stage {
+    height: calc(175 * var(--k) + 1.75rem);
+    display: flex;
+    align-items: flex-end;
+    gap: 2.5rem;
+    padding-inline: 0.5rem;
+    border-bottom: 1.5px solid var(--ly-ink);
+    overflow: hidden;
+  }
+  .zoom__col {
+    display: grid;
+    justify-items: center;
+    align-content: end;
+    gap: 0.4rem;
+    width: 5.5rem;
+    height: 100%;
+    position: relative;
+  }
+  .zoom__cap {
+    order: -1;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .zoom__bar {
+    display: block;
+    width: 100%;
+    transition: height 0.6s var(--ly-ease);
+  }
+  .zoom__bar--ceramic {
+    height: calc(2 * var(--k));
+    background: linear-gradient(90deg, #9fd2cb, #c8bdf0);
+    box-shadow: 0 0 0 0.5px rgb(27 32 38 / 0.4);
+  }
+  .zoom__bar--film {
+    position: relative;
+    height: calc(175 * var(--k));
+    background: var(--ly-film);
+    box-shadow: inset 0 0 0 1px rgb(31 75 104 / 0.3);
+  }
+  /* At ×50 the film runs off the top: a torn edge says so. */
+  .zoom__tear {
+    position: absolute;
+    inset: -1px 0 auto;
+    height: 10px;
+    background: linear-gradient(135deg, #fff 33%, transparent 34%) 0 0 / 10px 10px repeat-x,
+      linear-gradient(225deg, #fff 33%, transparent 34%) 0 0 / 10px 10px repeat-x;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  /* User-triggered and tiny, so height is fine to transition here. */
+  .zoom[data-zoom='50'] .zoom__bar--ceramic {
+    height: calc(2 * 50 * var(--k));
+  }
+  .zoom[data-zoom='50'] .zoom__tear {
+    opacity: 1;
+  }
+  .zoom figcaption {
+    margin-top: 0.9rem;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    min-height: 4.4em;
+  }
+  .zoom__say--50,
+  .zoom[data-zoom='50'] .zoom__say--1 {
+    display: none;
+  }
+  .zoom[data-zoom='50'] .zoom__say--50 {
+    display: inline;
+  }
+  .zoom__toggle {
+    margin-top: 0.75rem;
+    display: inline-flex;
+    border: 1.5px solid var(--ly-ink);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .zoom__toggle button {
+    min-height: 2.75rem;
+    padding: 0.4rem 0.9rem;
+    border: 0;
+    background: transparent;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+  .zoom__toggle button + button {
+    border-inline-start: 1.5px solid var(--ly-ink);
+  }
+  .zoom__toggle button[aria-pressed='true'] {
+    background: var(--ly-ink);
+    color: var(--ly-paper);
+  }
+  .zoom__toggle button:focus-visible {
+    outline-offset: -4px;
+    outline-color: var(--ly-film-ink);
+  }
+  .side :global(.ly-said) {
+    color: var(--ly-ink);
+  }
+
+  @media (min-width: 56rem) {
+    .grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .zoom__bar {
+      transition: none;
+    }
+  }
+</style>

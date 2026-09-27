@@ -1,0 +1,139 @@
+---
+import { proof } from '../data';
+import { said } from './layers';
+
+const lead = said(
+  'Azhar Pallikkal',
+  'The interior now looks and smells brand new, and I can see my reflection in the exterior paint.',
+);
+const more = [
+  said('Muhammad Nadir', 'Very happy with their work. Got complete interior detailing done along with exterior wash for better paint. Quick turn around time too!'),
+  said('Sunit Gonsalves', 'The team is really humble and professional, The quality of work is spot on and will definitely be going back for the detailed wash.'),
+  said('Michael Maninantan', 'My car looked like it had just rolled out of the showroom and even better, the pricing was very affordable…'),
+  said('Huzaifa Hamid', 'Give a drity car get it clean by 24 hours car washing including cleaning inside deep cleaning best service must recommend for suv and small cars'),
+];
+---
+
+<section class="reviews on-dark" id="reviews" aria-labelledby="reviews-title">
+  <div class="ly-wrap">
+    <div class="score">
+      <h2 class="score__h" id="reviews-title">
+        <span class="score__n">{proof.rating}</span>
+        <span class="score__t">on Google, from {proof.reviewCountDisplay} reviews</span>
+      </h2>
+      <p class="score__stars" aria-hidden="true">★★★★★</p>
+      <a class="ly-link" href={proof.reviewsUrl}>Read the reviews</a>
+    </div>
+
+    <blockquote class="lead">
+      <p>“{lead.text}”</p>
+      <footer>{lead.author}, after a full interior detail. Google review.</footer>
+    </blockquote>
+
+    <ul class="more" role="list">
+      {
+        more.map((q) => (
+          <li>
+            <blockquote>
+              <p>“{q.text}”</p>
+              <footer>{q.author}{q.when && `, ${q.when}`}</footer>
+            </blockquote>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    background: #222a31;
+    color: var(--ly-on-dark);
+    padding-block: clamp(4rem, 9vw, 7rem);
+  }
+  .score {
+    display: grid;
+    gap: 0.25rem;
+    justify-items: start;
+  }
+  .score__h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+    font-weight: 800;
+  }
+  .score__n {
+    font-weight: 900;
+    font-size: clamp(4.5rem, 3rem + 7vw, 8.5rem);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: var(--ly-film);
+  }
+  .score__t {
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    letter-spacing: -0.01em;
+    max-width: 14ch;
+    line-height: 1.1;
+  }
+  .score__stars {
+    color: #f1d38f;
+    letter-spacing: 0.12em;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+  }
+  .score :global(.ly-link) {
+    color: #fff;
+  }
+  .lead {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    max-width: 34rem;
+  }
+  .lead p {
+    font-family: var(--ly-note);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(1.625rem, 1.1rem + 2.2vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .lead footer {
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+    color: var(--ly-on-dark-2);
+  }
+  .more {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    display: grid;
+    gap: 2rem;
+  }
+  .more li {
+    border-top: 1px solid rgb(230 234 237 / 0.25);
+    padding-top: 1rem;
+  }
+  .more p {
+    font-size: 1.0625rem;
+    line-height: 1.45;
+  }
+  .more footer {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--ly-on-dark-2);
+  }
+  @media (min-width: 56rem) {
+    .reviews .ly-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      column-gap: 4rem;
+      align-items: start;
+    }
+    .lead {
+      margin-top: 0;
+    }
+    .more {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

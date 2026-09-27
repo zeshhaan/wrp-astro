@@ -1,0 +1,264 @@
+---
+/**
+ * The micron gauge: fixed at the left edge while you travel down through the
+ * paint. The track is a map of the journey, one coloured segment per layer,
+ * with the depth in microns where each layer starts.
+ *
+ * Needle: CSS scroll-driven animation on the journey's named view timeline
+ * (modern-web-guidance: scroll-progress-indicator), with a scroll-listener
+ * fallback. The readout number is data, not motion, so a small script computes
+ * it with the same mapping the needle uses.
+ */
+import { depths } from './layers';
+
+const stops = [
+  { id: 'ceramic', um: depths.ceramic.from, colour: 'var(--ly-glass)' },
+  { id: 'film', um: depths.film.from, colour: 'var(--ly-film)' },
+  { id: 'clear', um: depths.clear.from, colour: 'var(--ly-amber)' },
+  { id: 'colour', um: depths.colour.from, colour: 'var(--ly-green)' },
+  { id: 'metal', um: depths.primer.from, colour: 'var(--ly-metal)' },
+];
+---
+
+<aside class="gauge" aria-hidden="true" data-gauge>
+  <p class="gauge__read"><span data-depth-num>0</span><span class="gauge__u">µm</span></p>
+  <p class="gauge__name ly-note" data-depth-name>at the surface</p>
+  <div class="gauge__track">
+    {
+      stops.map((s, i) => (
+        <span class="gauge__seg" data-seg={s.id} style={`--at:${i / stops.length};--len:${1 / stops.length};--c:${s.colour}`}>
+          <b>{s.um}</b>
+        </span>
+      ))
+    }
+    <span class="gauge__run"><span class="gauge__needle"></span></span>
+  </div>
+</aside>
+
+<script>
+  const root = document.documentElement;
+  const journey = document.querySelector<HTMLElement>('[data-journey]');
+  const gauge = document.querySelector<HTMLElement>('[data-gauge]');
+  if (journey && gauge) {
+    const sections = Array.from(journey.querySelectorAll<HTMLElement>(':scope > [data-um-from]'));
+    const nums = document.querySelectorAll<HTMLElement>('[data-depth-num]');
+    const names = document.querySelectorAll<HTMLElement>('[data-depth-name]');
+    const run = gauge.querySelector<HTMLElement>('.gauge__run');
+    const native = CSS.supports('(animation-timeline: view()) and (animation-range: entry)');
+
+    let top = 0;
+    let height = 1;
+    let bounds: { start: number; end: number; from: number; to: number; name: string }[] = [];
+
+    const measure = () => {
+      const r = journey.getBoundingClientRect();
+      top = r.top + scrollY;
+      height = r.height;
+      bounds = sections.map((s) => {
+        const b = s.getBoundingClientRect();
+        return {
+          start: b.top + scrollY - top,
+          end: b.bottom + scrollY - top,
+          from: Number(s.dataset.umFrom),
+          to: Number(s.dataset.umTo),
+          name: s.dataset.umName ?? '',
+        };
+      });
+      // Place each track segment where its section sits in the journey.
+      for (const [i, b] of bounds.entries()) {
+        const seg = gauge.querySelector<HTMLElement>(`[data-seg="${sections[i].dataset.layer}"]`);
+        if (!seg) continue;
+        seg.style.setProperty('--at', String(b.start / height));
+        seg.style.setProperty('--len', String((b.end - b.start) / height));
+      }
+      update();
+    };
+
+    let lastNum = '';
+    let lastName = '';
+    let on = false;
+    const update = () => {
+      const vh = innerHeight;
+      const y = scrollY;
+      // The reading line is the middle of the viewport, the same mapping as the CSS range
+      // `cover 50vh cover calc(100% - 50vh)`: 0 when the journey's top crosses it, 1 at its bottom.
+      const at = Math.min(height - 1, Math.max(0, y + vh / 2 - top));
+      const p = at / height;
+      const b = bounds.find((s) => at >= s.start && at < s.end) ?? bounds[bounds.length - 1];
+      if (b) {
+        const t = Math.min(1, Math.max(0, (at - b.start) / Math.max(1, b.end - b.start)));
+        const um = String(Math.round(b.from + (b.to - b.from) * t));
+        if (um !== lastNum) {
+          nums.forEach((n) => (n.textContent = um));
+          lastNum = um;
+        }
+        if (b.name !== lastName) {
+          names.forEach((n) => (n.textContent = b.name));
+          lastName = b.name;
+        }
+      }
+      if (!native && run) run.style.transform = `translateY(${p * 100}%)`;
+      const r = journey.getBoundingClientRect();
+      const nowOn = r.top < vh * 0.55 && r.bottom > vh * 0.45;
+      if (nowOn !== on) {
+        on = nowOn;
+        root.dataset.lyDepth = on ? 'on' : 'off';
+      }
+    };
+
+    let queued = false;
+    addEventListener(
+      'scroll',
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          update();
+        });
+      },
+      { passive: true },
+    );
+    new ResizeObserver(measure).observe(journey);
+    addEventListener('load', measure);
+    measure();
+  }
+</script>
+
+<style>
+  .gauge {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .gauge {
+      display: grid;
+      justify-items: center;
+      gap: 0.35rem;
+      position: fixed;
+      z-index: 30;
+      left: 0.75rem;
+      top: calc(50% + var(--ly-hh) / 2);
+      translate: 0 -50%;
+      width: 5.25rem;
+      padding: 0.75rem 0.4rem 0.9rem;
+      background: rgb(243 245 246 / 0.94);
+      border: 1px solid var(--ly-rule);
+      border-radius: 4px;
+      box-shadow: 0 8px 24px -14px rgb(27 32 38 / 0.45);
+      opacity: 0;
+      translate: -0.5rem -50%;
+      pointer-events: none;
+      transition:
+        opacity 0.3s,
+        translate 0.3s var(--ly-ease);
+    }
+    :global(:root[data-ly-depth='on']) .gauge {
+      opacity: 1;
+      translate: 0 -50%;
+    }
+  }
+  .gauge__read {
+    font-weight: 900;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .gauge__u {
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin-inline-start: 0.1rem;
+  }
+  .gauge__name {
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--ly-ink-2);
+    min-height: 2.3em;
+  }
+  .gauge__track {
+    position: relative;
+    width: 100%;
+    height: min(46vh, 22rem);
+    margin-top: 0.35rem;
+  }
+  .gauge__seg {
+    position: absolute;
+    left: 0.9rem;
+    top: calc(var(--at) * 100%);
+    height: calc(var(--len) * 100%);
+    width: 0.5rem;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1px rgb(27 32 38 / 0.18);
+  }
+  .gauge__seg b {
+    position: absolute;
+    left: calc(100% + 0.45rem);
+    top: 0;
+    translate: 0 -50%;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .gauge__seg b::before {
+    content: '';
+    position: absolute;
+    right: calc(100% + 0.15rem);
+    top: 50%;
+    width: 0.3rem;
+    height: 1px;
+    background: var(--ly-ink);
+  }
+  .gauge__run {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .gauge__needle {
+    position: absolute;
+    left: 0.35rem;
+    top: -1px;
+    width: 1.6rem;
+    height: 2px;
+    background: var(--ly-ink);
+  }
+  .gauge__needle::before {
+    content: '';
+    position: absolute;
+    left: -0.3rem;
+    top: 50%;
+    translate: 0 -50%;
+    border: 0.3rem solid transparent;
+    border-left: 0.4rem solid var(--ly-ink);
+    border-right: 0;
+  }
+
+  /* Native scroll-driven needle; the script only moves it where this isn't supported. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports ((animation-timeline: view()) and (animation-range: entry)) {
+      .gauge__run {
+        animation: needle-run linear both;
+        animation-timeline: --journey;
+        animation-range: cover 50vh cover calc(100% - 50vh);
+      }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gauge__needle {
+      display: none;
+    }
+  }
+  @keyframes needle-run {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+  :global(.journey) {
+    view-timeline: --journey block;
+  }
+</style>

@@ -1,0 +1,611 @@
+---
+/**
+ * The hero is the cut. A real WRP car sits above the surface; below the cut line
+ * the paint is drawn to scale (one micron = --k pixels), from the hairline of
+ * ceramic coating to the metal. The headline lives inside the film, because the
+ * film is the one layer thick enough to hold it.
+ */
+import Picture from '../shared/Picture.astro';
+import { contact, proof } from '../data';
+import { asks, heroCar, paintLayers } from './layers';
+
+const L = Object.fromEntries(paintLayers.map((l) => [l.id, l]));
+const defaultText = 'Hi WRP, I’d like a quote for my car.';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <h1 class="h1" id="hero-title">The film is thicker than your paint.</h1>
+  <p class="sub">Clear, self-healing paint protection film takes the stone chips, so your paint never has to.</p>
+
+  <div class="panel">
+    <p class="lede">
+      Paint protection film, ceramic coating, paint correction, window tint, interiors and detailing. In Al Qusais,
+      Dubai.
+    </p>
+
+    <form class="quote" action={contact.whatsapp} method="get" target="_blank" data-quote>
+      <p class="quote__title" id="quote-title">Get a price for your car</p>
+      <div class="field">
+        <label for="quote-car">Your car</label>
+        <input id="quote-car" type="text" placeholder="e.g. Land Cruiser 2022" autocomplete="off" data-quote-car />
+      </div>
+      <fieldset class="needs">
+        <legend>What it needs</legend>
+        <div class="chips">
+          {
+            asks.map((a) => (
+              <label class="chip">
+                <input type="checkbox" value={a.words} data-quote-need />
+                <span>{a.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <input type="hidden" name="text" value={defaultText} data-quote-text />
+      <div class="quote__go">
+        <button class="ly-btn" type="submit">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              d="M12 3.2a8.6 8.6 0 0 0-7.4 13l-1.2 4.4 4.5-1.2A8.6 8.6 0 1 0 12 3.2Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"></path>
+            <path
+              d="M9.1 7.9c.3 0 .5.1.6.4l.7 1.6c.1.2 0 .5-.1.7l-.5.6c.6 1.2 1.6 2.2 2.9 2.9l.6-.5c.2-.2.5-.2.7-.1l1.6.7c.3.1.4.4.4.7-.1 1.1-1 1.9-2.1 1.8-3.3-.4-5.9-3-6.3-6.3-.1-1.1.7-2 1.9-2.1Z"
+              fill="currentColor"></path>
+          </svg>
+          Send it on WhatsApp
+        </button>
+        <p class="quote__preview">
+          <span class="ly-note">Your message:</span>
+          <span data-quote-preview>{defaultText}</span>
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <figure class="photo">
+    <Picture
+      base={heroCar.base}
+      alt={heroCar.alt}
+      sizes={heroCar.sizes}
+      width={1179}
+      height={2091}
+      loading="eager"
+      fetchpriority="high"
+      imgClass="photo__img"
+    />
+    <figcaption>{heroCar.caption}, at WRP</figcaption>
+  </figure>
+
+  <!-- The cut, drawn to scale. Bands are decoration; the labels carry the facts. -->
+  <div class="band band--ceramic" style="--i:0" aria-hidden="true"></div>
+  <div class="band band--film" style="--i:1" aria-hidden="true"></div>
+  <div class="band band--clear" style="--i:2" aria-hidden="true"></div>
+  <div class="band band--colour" style="--i:3" aria-hidden="true"></div>
+  <div class="band band--primer" style="--i:4" aria-hidden="true"></div>
+  <div class="band band--metal" style="--i:5" aria-hidden="true"></div>
+
+  <p class="lab lab--ceramic">
+    <span class="ly-note">That bright line is the</span> ceramic coating, <span class="nw">{L.ceramic.typical}</span>
+  </p>
+  <p class="lab lab--film"><span class="ly-note">Paint protection film,</span> <span class="nw">typically {L.film.typical}</span></p>
+  <p class="lab lab--clear"><span class="ly-note">Clear coat, where polish works,</span> <span class="nw">{L.clear.typical}</span></p>
+  <p class="lab lab--colour"><span class="ly-note">Colour coat,</span> <span class="nw">{L.colour.typical}</span></p>
+  <p class="lab lab--primer"><span class="ly-note">Primer,</span> <span class="nw">{L.primer.typical}</span></p>
+
+  <div class="metal">
+    <p class="scale">
+      <span class="scale__bar" aria-hidden="true"></span>
+      <span>50 µm at this scale</span>
+    </p>
+    <p class="metal__note ly-note">
+      Drawn to scale from typical thicknesses. Every car is different, so we measure yours before we start.
+    </p>
+    <a class="metal__rating" href={proof.reviewsUrl}>
+      <span class="stars" aria-hidden="true">★★★★★</span>
+      {proof.rating} on Google, {proof.reviewCountDisplay} reviews
+    </a>
+  </div>
+</section>
+
+<script>
+  // Vehicle-aware quote: the car and the jobs go into the WhatsApp message.
+  // Without JS the form still opens WhatsApp with a plain hello.
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-quote]')) {
+    const car = form.querySelector<HTMLInputElement>('[data-quote-car]');
+    const needs = Array.from(form.querySelectorAll<HTMLInputElement>('[data-quote-need]'));
+    const text = form.querySelector<HTMLInputElement>('[data-quote-text]');
+    const preview = form.querySelector<HTMLElement>('[data-quote-preview]');
+    const list = (items: string[]) =>
+      items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+    const compose = () => {
+      const c = car?.value.trim();
+      const n = needs.filter((i) => i.checked).map((i) => i.value);
+      let msg = 'Hi WRP, ';
+      msg += c ? `I have a ${c}. ` : '';
+      msg += n.length ? `I’d like a quote for ${list(n)}.` : c ? 'I’d like a quote for it.' : 'I’d like a quote for my car.';
+      if (text) text.value = msg;
+      if (preview) preview.textContent = msg;
+    };
+    form.addEventListener('input', compose);
+    form.addEventListener('change', compose);
+    form.addEventListener('submit', compose);
+    compose();
+  }
+</script>
+
+<style>
+  .hero {
+    /* One micron of paint, in pixels. */
+    --k: 1.2px;
+    --ceramic: max(3px, calc(2 * var(--k)));
+    display: grid;
+    grid-template-columns: var(--ly-gut) minmax(0, 1fr) var(--ly-gut);
+    grid-template-rows:
+      clamp(12rem, 34svh, 16rem)
+      var(--ceramic)
+      calc(175 * var(--k))
+      calc(45 * var(--k))
+      calc(16 * var(--k))
+      calc(30 * var(--k))
+      auto
+      auto
+      auto;
+    background: var(--ly-day);
+    overflow: clip;
+  }
+
+  /* ---------- Photo: the world above the surface ---------- */
+  .photo {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    position: relative;
+    overflow: hidden;
+    background: #cfd5d9;
+  }
+  .photo :global(picture),
+  .photo :global(.photo__img) {
+    width: 100%;
+    height: 100%;
+  }
+  .photo :global(.photo__img) {
+    object-fit: cover;
+    object-position: 50% 76%;
+  }
+  .photo figcaption {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    background: rgb(243 245 246 / 0.88);
+    color: var(--ly-ink);
+    font-size: 0.75rem;
+    border-radius: 2px;
+  }
+
+  /* ---------- The bands ---------- */
+  .band {
+    grid-column: 1 / -1;
+  }
+  .band--ceramic {
+    grid-row: 2;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(90deg, #fff 0 20%, #e3f4f1 35%, #fff 50%, #ebe6f7 68%, #fff 85%);
+    box-shadow:
+      0 0 0 0.5px rgb(255 255 255 / 0.9),
+      0 1px 6px rgb(255 255 255 / 0.7);
+    overflow: hidden;
+  }
+  /* The glint: light running once along the coating. */
+  .band--ceramic::after {
+    content: '';
+    position: absolute;
+    inset: -2px auto -2px 0;
+    width: 22%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255) 50%, transparent);
+    translate: -110% 0;
+  }
+  .band--film {
+    grid-row: 3;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.55), transparent 9%),
+      linear-gradient(100deg, transparent 55%, rgb(255 255 255 / 0.22) 62%, transparent 70%),
+      var(--ly-film);
+    box-shadow: inset 0 -1px 0 rgb(31 75 104 / 0.25);
+  }
+  .band--clear {
+    grid-row: 4;
+    background: linear-gradient(180deg, #edc983, var(--ly-amber));
+  }
+  .band--colour {
+    grid-row: 5;
+    background: var(--ly-green);
+  }
+  .band--primer {
+    grid-row: 6;
+    background: var(--ly-primer);
+  }
+  .band--metal {
+    grid-row: 7;
+    background:
+      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.035) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, #74808a, var(--ly-metal) 40%, #58626b);
+  }
+
+  /* ---------- Headline, inside the film ---------- */
+  .h1 {
+    grid-row: 3;
+    grid-column: 2;
+    align-self: center;
+    word-spacing: 0.04em;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding-block: 1.6rem 1.9rem;
+    font-family: var(--ly-display);
+    font-weight: 900;
+    font-size: clamp(2.125rem, 9.4vw, 2.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--ly-ink);
+    max-width: 11ch;
+    text-wrap: balance;
+  }
+
+  /* ---------- Labels on the cut ---------- */
+  .lab {
+    grid-column: 2;
+    justify-self: end;
+    position: relative;
+    z-index: 2;
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    font-weight: 500;
+    text-align: end;
+    max-width: 17rem;
+  }
+  .lab .ly-note {
+    font-size: 1.07em;
+  }
+  .lab--ceramic {
+    grid-row: 1;
+    align-self: end;
+    margin-bottom: 0.45rem;
+    padding: 0.25rem 0.5rem;
+    background: rgb(243 245 246 / 0.9);
+    border-radius: 2px;
+  }
+  /* A tick from the label down to the hairline. */
+  .lab--ceramic::after {
+    content: '';
+    position: absolute;
+    right: 1.25rem;
+    top: 100%;
+    width: 1.5px;
+    height: 0.45rem;
+    background: var(--ly-paper);
+  }
+  .lab--film {
+    grid-row: 3;
+    align-self: end;
+    margin-bottom: 0.4rem;
+    color: var(--ly-film-ink);
+  }
+  .lab--clear {
+    grid-row: 4;
+    align-self: center;
+    color: var(--ly-amber-ink);
+  }
+  .lab--colour {
+    grid-row: 5;
+    align-self: center;
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+  .lab--primer {
+    grid-row: 6;
+    align-self: center;
+    color: var(--ly-ink);
+  }
+
+  /* ---------- The metal: scale bar, caveat, rating ---------- */
+  .metal {
+    grid-row: 7;
+    grid-column: 2;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    padding-block: 0.85rem 1rem;
+    color: #fff;
+    font-size: 0.875rem;
+  }
+  .scale {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .scale__bar {
+    width: calc(50 * var(--k));
+    height: 0.5rem;
+    border: 1.5px solid #fff;
+    border-top: 0;
+  }
+  .metal__note {
+    flex: 1 1 18rem;
+    color: #eef1f3;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+  .metal__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .stars {
+    color: #f1d38f;
+    letter-spacing: 0.08em;
+  }
+
+  /* ---------- The panel: lede and the quote form ---------- */
+  .panel {
+    grid-row: 9;
+    grid-column: 2;
+    padding-block: 1.25rem 2.5rem;
+  }
+  .sub {
+    grid-row: 8;
+    grid-column: 2;
+    padding-top: 1.75rem;
+    font-size: 1.25rem;
+    line-height: 1.35;
+    font-weight: 500;
+    max-width: 30ch;
+  }
+  .nw {
+    white-space: nowrap;
+  }
+  .lede {
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    max-width: 44ch;
+    color: var(--ly-ink-2);
+  }
+  .quote {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    max-width: 34rem;
+  }
+  .quote__title {
+    font-weight: 800;
+    font-size: 1.1875rem;
+    letter-spacing: -0.01em;
+  }
+  .field {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .field label,
+  .needs legend {
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+  .field input {
+    min-height: 3rem;
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid rgb(27 32 38 / 0.45);
+    border-radius: 0.25rem;
+    background: var(--ly-paper);
+    font-size: 1rem;
+  }
+  .field input::placeholder {
+    color: #6b747d;
+  }
+  .field input:hover {
+    border-color: var(--ly-ink);
+  }
+  .field input:focus-visible {
+    outline: 3px solid var(--ly-film-ink);
+    outline-offset: 1px;
+    border-color: var(--ly-ink);
+  }
+  .needs {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .needs legend {
+    padding: 0;
+    margin-bottom: 0.4rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.85rem;
+    border: 1.5px solid rgb(27 32 38 / 0.3);
+    border-radius: 0.25rem;
+    background: var(--ly-paper);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .chip input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .chip:hover {
+    border-color: var(--ly-ink);
+  }
+  .chip:has(input:checked) {
+    background: var(--ly-film-ink);
+    border-color: var(--ly-film-ink);
+    color: #fff;
+  }
+  .chip:has(input:checked) span::before {
+    content: '✓ ';
+  }
+  .chip:has(input:focus-visible) {
+    outline: 3px solid var(--ly-film-ink);
+    outline-offset: 2px;
+  }
+  .quote__go {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+  }
+  .quote__preview {
+    font-size: 0.875rem;
+    color: var(--ly-ink-2);
+    max-width: 48ch;
+  }
+
+  /* ---------- Desktop: panel and photo side by side, the cut full width below ---------- */
+  @media (min-width: 64rem) {
+    .hero {
+      --k: 1.3px;
+      --pad: max(var(--ly-gut), calc((100% - var(--ly-max)) / 2));
+      --stack: calc(268 * var(--k) + 4.5rem);
+      grid-template-columns: var(--pad) minmax(0, 40fr) minmax(0, 60fr);
+      grid-template-rows:
+        max(25rem, calc(100svh - var(--ly-hh) - var(--stack)))
+        var(--ceramic)
+        calc(175 * var(--k))
+        calc(45 * var(--k))
+        calc(16 * var(--k))
+        calc(30 * var(--k))
+        auto;
+    }
+    .panel {
+      grid-row: 1;
+      grid-column: 2;
+      align-self: end;
+      padding: 1.5rem 2.5rem 1.75rem 0;
+    }
+    .lede {
+      font-size: 1.125rem;
+    }
+    .quote {
+      margin-top: 1rem;
+      gap: 0.75rem;
+    }
+    .quote__title {
+      display: none;
+    }
+    .quote__go {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 1rem;
+    }
+    .photo {
+      grid-column: 3;
+    }
+    .h1 {
+      grid-column: 2 / -1;
+      align-self: start;
+      padding-block: calc(14 * var(--k)) 0;
+      font-size: min(4.25rem, 4.75vw);
+      letter-spacing: -0.022em;
+      word-spacing: 0.04em;
+      max-width: 22ch;
+    }
+    .sub {
+      grid-row: 3;
+      grid-column: 2 / 4;
+      align-self: end;
+      padding: 0 0 calc(16 * var(--k));
+      font-size: 1.1875rem;
+      max-width: 60ch;
+      position: relative;
+      z-index: 1;
+    }
+    .lab {
+      grid-column: 3;
+      margin-inline-end: 2rem;
+      font-size: 0.875rem;
+      max-width: 26rem;
+    }
+    .lab--colour {
+      font-size: 0.8125rem;
+    }
+    .lab--ceramic {
+      margin-bottom: 0.6rem;
+    }
+    .lab--ceramic::after {
+      height: 0.6rem;
+    }
+    .metal {
+      grid-column: 2 / -1;
+      padding-inline-end: 2rem;
+      gap: 0.5rem 2.5rem;
+    }
+    .metal__note {
+      flex: 0 1 30rem;
+    }
+    .metal__rating {
+      margin-inline-start: auto;
+    }
+  }
+
+  /* ---------- The one orchestrated moment: the cut opens ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .band--film,
+    .band--clear,
+    .band--colour,
+    .band--primer,
+    .band--metal {
+      transform-origin: 50% 0;
+      animation: strata 0.7s calc(0.15s + var(--i) * 0.09s) var(--ly-ease) both;
+    }
+    .lab {
+      animation: lab-in 0.5s 0.75s ease-out both;
+    }
+    .band--ceramic::after {
+      animation: glint 1.4s 0.9s var(--ly-ease) both;
+    }
+  }
+  @keyframes strata {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes lab-in {
+    from {
+      opacity: 0;
+      translate: 0.5rem 0;
+    }
+  }
+  @keyframes glint {
+    to {
+      translate: 560% 0;
+    }
+  }
+</style>

@@ -1,0 +1,131 @@
+---
+import Picture from '../shared/Picture.astro';
+import { work, pages } from '../data';
+
+// Portrait photos cropped to a common frame; the car sits low in most of them.
+const focus: Record<string, string> = {
+  '/portfolio/porsche-boxster-spyder-gray': '50% 70%',
+  '/portfolio/green-porsche-911-showroom-event': '50% 72%',
+  '/portfolio/burgundy-lotus-showroom-display': '50% 80%',
+  '/portfolio/blue-subaru-wrx-sti-showroom': '50% 62%',
+  '/portfolio/black-lexus-lx-570-showroom': '50% 75%',
+  '/portfolio/lotus-toyota-supra-showroom-duo': '50% 75%',
+};
+---
+
+<section class="work" id="work" aria-labelledby="work-title">
+  <div class="ly-wrap">
+    <div class="head">
+      <h2 class="ly-h2" id="work-title">Finished surfaces</h2>
+      <a class="ly-link" href={pages.portfolio}>See the full portfolio</a>
+    </div>
+    <ul class="grid" role="list">
+      {
+        work.map((w, i) => (
+          <li class={`item item--${i + 1}`}>
+            <figure>
+              <Picture
+                base={w.image}
+                alt={`${w.title} at WRP after ${w.what.toLowerCase()}`}
+                sizes={i === 0 ? '(min-width: 56rem) 40rem, 100vw' : '(min-width: 56rem) 20rem, 50vw'}
+                imgClass="item__img"
+                style={`--pos:${focus[w.image] ?? '50% 70%'}`}
+              />
+              <figcaption>
+                <span class="item__car">{w.title}</span>
+                <span class="item__what ly-note">{w.what}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work {
+    background: var(--ly-day);
+    padding-block: clamp(4rem, 9vw, 7rem);
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .item--1,
+  .item--6 {
+    grid-column: 1 / -1;
+  }
+  .item--6 :global(.item__img) {
+    aspect-ratio: 16 / 9;
+  }
+  figure {
+    margin: 0;
+  }
+  .item :global(.item__img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: var(--pos);
+    border-radius: 3px;
+    background: #cfd5d9;
+  }
+  .item--1 :global(.item__img) {
+    aspect-ratio: 4 / 3;
+  }
+  figcaption {
+    display: grid;
+    padding-top: 0.5rem;
+    line-height: 1.25;
+  }
+  .item__car {
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+  .item__what {
+    font-size: 0.9375rem;
+    color: var(--ly-ink-2);
+  }
+  @media (min-width: 56rem) {
+    .grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+    .item--6 {
+      grid-column: auto;
+    }
+    .item--1 {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    .item :global(.item__img) {
+      aspect-ratio: 4 / 3;
+    }
+    .item--1 figure {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    /* Size containment: the tall portrait mustn't set the row height; the two items beside it do. */
+    .item--1 :global(picture) {
+      contain: size;
+      height: 100%;
+    }
+    .item--1 :global(.item__img) {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+    .item--1 figure {
+      height: 100%;
+    }
+  }
+
+</style>

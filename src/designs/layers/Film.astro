@@ -1,0 +1,614 @@
+---
+/**
+ * The film: the thickest layer, so the longest scroll. A sticky, magnified
+ * specimen of paint protection film reacts to four steps of copy
+ * (modern-web-guidance: scrollytelling, named view timelines + timeline-scope,
+ * IntersectionObserver fallback, nothing moves under reduced motion).
+ */
+import Said from './Said.astro';
+import { proof } from '../data';
+import { aed, ask, coverage, depths, quotes, svc } from './layers';
+
+const s = svc('paint-protection-film');
+const d = depths.film;
+
+const steps = [
+  {
+    title: 'It takes the hit',
+    body: 'Sand and stones thrown up on Sheikh Zayed Road hit the film, not your paint. The urethane body is thick and flexible enough to absorb the impact.',
+  },
+  {
+    title: 'Light scratches level out with heat',
+    body: 'The top coat is self-healing: fine scratches and wash marks flow back flat with warmth. In Dubai, a few hours of sun is usually enough.',
+  },
+  {
+    title: 'On the car, you can’t see it',
+    body: 'Gloss or matte. We wrap the edges into the panel gaps wherever the shape allows, so there’s no line to catch the eye.',
+  },
+  {
+    title: 'Years later, it comes off clean',
+    body: 'Remove it and the factory paint underneath is as it was. Already have film? We re-fit single panels and match the film that’s on the car.',
+  },
+];
+---
+
+<section
+  class="layer film"
+  id="film"
+  aria-labelledby="film-title"
+  data-layer="film"
+  data-um-from={d.from}
+  data-um-to={d.to}
+  data-um-name="in the film"
+>
+  <div class="edge" aria-hidden="true"></div>
+
+  <div class="ly-wrap head">
+    <p class="depth ly-note">{d.from} to {d.to} µm down: the thickest layer, and the one that matters most</p>
+    <h2 class="ly-h2" id="film-title">Paint protection film takes the hit, so your paint doesn’t.</h2>
+    <p class="line">
+      Clear, self-healing urethane film from Avery Dennison or STEK, cut for your car and fitted panel by panel in our
+      studio.
+    </p>
+  </div>
+
+  <div class="ly-wrap story" data-story>
+    <div class="stage" aria-hidden="true">
+      <div class="spec">
+        <div class="spec__air">
+          <span class="glow"></span>
+          <span class="stone"></span>
+        </div>
+        <div class="spec__film">
+          <div class="spec__top">
+            <span class="mark"><span class="mark__in"></span></span>
+          </div>
+          <div class="spec__body"></div>
+          <div class="spec__glue"></div>
+        </div>
+        <div class="spec__clear"></div>
+        <div class="spec__colour"></div>
+
+        <p class="tag tag--top"><span>Self-healing top coat</span></p>
+        <p class="tag tag--body"><span>Urethane film body</span></p>
+        <p class="tag tag--glue"><span>Adhesive</span></p>
+        <p class="tag tag--paint"><span>Your paint</span></p>
+      </div>
+      <p class="stage__note ly-note">The film, magnified. Not to scale.</p>
+    </div>
+
+    <ol class="steps" role="list">
+      {
+        steps.map((st) => (
+          <li class="step">
+            <h3>{st.title}</h3>
+            <p>{st.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="ly-wrap offer">
+    <div class="offer__deal">
+      <h3 class="offer__h">What it costs</h3>
+      <dl class="terms">
+        <div><dt>From</dt><dd>{aed(s.from!)}</dd></div>
+        <div><dt>Your car stays</dt><dd>{s.time}</dd></div>
+        <div><dt>Warranty</dt><dd>Up to 10 years</dd></div>
+      </dl>
+      <div class="films">
+        <p>Film from</p>
+        <ul role="list">
+          {
+            proof.films.map((f) => (
+              <li>
+                <img src={f.logo} alt={f.name} width={f.logo.includes('stek') ? 384 : 260} height={f.logo.includes('stek') ? 90 : 85} loading="lazy" decoding="async" />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="actions">
+        <a class="ly-btn" href={ask('paint protection film (PPF)')} target="_blank" rel="noopener">
+          Ask for a PPF quote
+        </a>
+        <a class="ly-link" href={s.href}>PPF coverage and questions</a>
+      </div>
+    </div>
+
+    <div class="offer__cover">
+      <h3 class="offer__h">Choose how much of the car</h3>
+      <ol class="cover" role="list">
+        {
+          coverage.map((c, i) => (
+            <li style={`--n:${i + 1}`}>
+              <span class="cover__meter" aria-hidden="true" />
+              <span class="cover__name">{c.name}</span>
+              <span class="cover__what">{c.covers}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="cover__note ly-note">Priced per car. Send us the model and we’ll price each option.</p>
+    </div>
+
+    <div class="offer__said">
+      <Said q={quotes.ppf} />
+      <Said q={quotes.reinstall} about="on a PPF re-install" />
+      <Said q={quotes.avery} />
+    </div>
+  </div>
+</section>
+
+<script>
+  // Fallback for browsers without scroll-driven animations: the same four states,
+  // switched by an IntersectionObserver. Skipped entirely under reduced motion.
+  const story = document.querySelector<HTMLElement>('[data-story]');
+  const native = CSS.supports('(animation-timeline: view()) and (animation-range: entry)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (story && !native && !calm) {
+    story.classList.add('is-fallback');
+    const steps = Array.from(story.querySelectorAll<HTMLElement>('.step'));
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) story.dataset.step = String(steps.indexOf(e.target as HTMLElement) + 1);
+        }
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    steps.forEach((s) => io.observe(s));
+  }
+</script>
+
+<style>
+  .film {
+    position: relative;
+    background: var(--ly-film-bg);
+    padding-block: 0 clamp(3.5rem, 8vw, 6rem);
+  }
+  .edge {
+    height: 10px;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.7), transparent),
+      var(--ly-film);
+    box-shadow: inset 0 -1px 0 rgb(31 75 104 / 0.2);
+    margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .depth {
+    font-size: 1.0625rem;
+    color: var(--ly-film-ink);
+    margin-bottom: 0.5rem;
+    max-width: 40ch;
+  }
+  .ly-h2 {
+    max-width: 18ch;
+  }
+  .line {
+    margin-top: 1.25rem;
+    max-width: 50ch;
+    font-size: 1.0625rem;
+  }
+
+  /* ---------- The story ---------- */
+  .story {
+    timeline-scope: --ppf-1, --ppf-2, --ppf-3, --ppf-4;
+    margin-top: 2rem;
+    display: grid;
+  }
+  .stage {
+    position: sticky;
+    top: var(--ly-hh);
+    z-index: 2;
+    background: var(--ly-film-bg);
+    padding-block: 0.75rem 0.5rem;
+  }
+  /* Soft edge so the steps slide under the specimen instead of being cut by it. */
+  .stage::after {
+    content: '';
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 1.5rem;
+    background: linear-gradient(var(--ly-film-bg), transparent);
+    pointer-events: none;
+  }
+  .spec {
+    position: relative;
+    display: grid;
+    grid-template-rows: 3.25rem 0.65rem 4.25rem 0.55rem 1.4rem 0.7rem;
+    grid-template-areas: 'air' 'film' 'film' 'film' 'clear' 'colour';
+    margin-inline-end: 9.5rem;
+    border-radius: 3px;
+  }
+  .spec__air {
+    grid-area: air;
+    position: relative;
+    overflow: visible;
+  }
+  .spec__film {
+    grid-row: 2 / 5;
+    grid-column: 1;
+    display: grid;
+    grid-template-rows: 0.65rem 1fr 0.55rem;
+    transform-origin: 0 100%;
+  }
+  .spec__top {
+    position: relative;
+    background: linear-gradient(180deg, #ffffff, #e7f1f7);
+    box-shadow: inset 0 0 0 1px rgb(31 75 104 / 0.25);
+  }
+  .spec__body {
+    background:
+      linear-gradient(100deg, transparent 50%, rgb(255 255 255 / 0.35) 58%, transparent 66%),
+      #a9c9dc;
+    box-shadow: inset 1px 0 0 rgb(31 75 104 / 0.25), inset -1px 0 0 rgb(31 75 104 / 0.25);
+  }
+  .spec__glue {
+    background: repeating-linear-gradient(90deg, #d7e6ef 0 6px, #c4d8e4 6px 12px);
+    box-shadow: inset 0 0 0 1px rgb(31 75 104 / 0.2);
+  }
+  .spec__clear {
+    grid-area: clear;
+    background: linear-gradient(180deg, #efcd8c, var(--ly-amber));
+  }
+  .spec__colour {
+    grid-area: colour;
+    background: var(--ly-green);
+  }
+  /* The stone and the mark it leaves in the top coat (not in the paint). */
+  .stone {
+    position: absolute;
+    left: 38%;
+    bottom: 0;
+    width: 1.1rem;
+    height: 0.95rem;
+    border-radius: 45% 55% 50% 40%;
+    background: radial-gradient(circle at 35% 30%, #b9b3a6, #6f685c);
+    opacity: 0;
+  }
+  .mark {
+    position: absolute;
+    left: calc(38% - 1.5rem);
+    top: 0;
+    width: 4.5rem;
+    height: 100%;
+    opacity: 0;
+  }
+  .mark__in {
+    position: absolute;
+    inset: 35% 0 auto;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #5c7f96 0 5px, transparent 5px 7px);
+    rotate: -3deg;
+  }
+  .glow {
+    position: absolute;
+    inset: -0.5rem 0 0;
+    background: radial-gradient(60% 120% at 40% 100%, rgb(241 196 108 / 0.75), transparent 70%);
+    opacity: 0;
+  }
+
+  .tag {
+    position: absolute;
+    right: -9.5rem;
+    width: 9rem;
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    font-weight: 500;
+    color: var(--ly-film-ink);
+    translate: 0 -50%;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .tag::before {
+    content: '';
+    flex: 0 0 0.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .tag--top {
+    top: calc(3.25rem + 0.325rem);
+  }
+  .tag--body {
+    top: calc(3.25rem + 0.65rem + 2.125rem);
+  }
+  .tag--glue {
+    top: calc(3.25rem + 0.65rem + 4.25rem + 0.275rem);
+  }
+  .tag--paint {
+    top: calc(3.25rem + 0.65rem + 4.25rem + 0.55rem + 1.05rem);
+    color: var(--ly-ink);
+  }
+  .stage__note {
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--ly-ink-2);
+  }
+
+  .steps {
+    display: grid;
+  }
+  .step {
+    min-height: 52svh;
+    display: grid;
+    align-content: center;
+    gap: 0.5rem;
+    padding-block: 2rem;
+    max-width: 34rem;
+  }
+  .step h3 {
+    font-weight: 800;
+    font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+  .step p {
+    font-size: 1.0625rem;
+    max-width: 44ch;
+  }
+  .step:nth-child(1) { view-timeline: --ppf-1 block; }
+  .step:nth-child(2) { view-timeline: --ppf-2 block; }
+  .step:nth-child(3) { view-timeline: --ppf-3 block; }
+  .step:nth-child(4) { view-timeline: --ppf-4 block; }
+
+  @media (min-width: 56rem) {
+    .story {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: 4rem;
+      margin-top: 1rem;
+    }
+    .stage {
+      top: calc(var(--ly-hh) + 18svh);
+      align-self: start;
+      padding: 0;
+      background: none;
+    }
+    .stage::after {
+      display: none;
+    }
+    .spec {
+      grid-template-rows: 7rem 1.1rem 9rem 1rem 3rem 1.4rem;
+      margin-inline-end: 11rem;
+    }
+    .spec__film {
+      grid-template-rows: 1.1rem 1fr 1rem;
+    }
+    .stone {
+      width: 1.9rem;
+      height: 1.6rem;
+    }
+    .mark {
+      width: 7rem;
+      left: calc(38% - 2.5rem);
+    }
+    .mark__in {
+      height: 3px;
+    }
+    .tag {
+      right: -11rem;
+      width: 10.5rem;
+      font-size: 0.9375rem;
+    }
+    .tag--top { top: calc(7rem + 0.55rem); }
+    .tag--body { top: calc(7rem + 1.1rem + 4.5rem); }
+    .tag--glue { top: calc(7rem + 1.1rem + 9rem + 0.5rem); }
+    .tag--paint { top: calc(7rem + 1.1rem + 9rem + 1rem + 2.2rem); }
+    .stage__note {
+      margin-top: 0.75rem;
+      font-size: 0.9375rem;
+    }
+    .step {
+      min-height: 72svh;
+    }
+  }
+
+  /* ---------- Scroll-driven story (native) ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports ((animation-timeline: view()) and (animation-range: entry)) {
+      .stone {
+        animation: stone-hit linear both;
+        animation-timeline: --ppf-1;
+        animation-range: cover 15% cover 45%;
+      }
+      .mark {
+        animation: fade-in linear both;
+        animation-timeline: --ppf-1;
+        animation-range: cover 42% cover 50%;
+      }
+      .mark__in {
+        animation: fade-out linear both;
+        animation-timeline: --ppf-2;
+        animation-range: cover 30% cover 60%;
+      }
+      .glow {
+        animation: glow linear both;
+        animation-timeline: --ppf-2;
+        animation-range: cover 15% cover 75%;
+      }
+      .spec__body {
+        animation: clear-up linear both;
+        animation-timeline: --ppf-3;
+        animation-range: cover 25% cover 55%;
+      }
+      .spec__film {
+        animation: peel linear both;
+        animation-timeline: --ppf-4;
+        animation-range: cover 25% cover 60%;
+      }
+    }
+  }
+  @keyframes stone-hit {
+    0% { opacity: 0; transform: translate(6rem, -4rem) rotate(-40deg); }
+    20% { opacity: 1; }
+    85% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-1.2rem, -1.5rem) rotate(25deg); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes glow {
+    0%, 100% { opacity: 0; }
+    45%, 60% { opacity: 1; }
+  }
+  @keyframes clear-up {
+    from { opacity: 1; }
+    to { opacity: 0.35; }
+  }
+  @keyframes peel {
+    from { transform: none; opacity: 1; }
+    to { transform: translateY(-3.5rem) rotate(-5deg); opacity: 0.55; }
+  }
+
+  /* ---------- Fallback states (IntersectionObserver) ---------- */
+  .is-fallback :is(.stone, .mark, .mark__in, .glow, .spec__body, .spec__film) {
+    transition:
+      opacity 0.5s,
+      transform 0.6s var(--ly-ease);
+  }
+  .is-fallback[data-step='1'] .mark {
+    opacity: 1;
+  }
+  .is-fallback[data-step='1'] .stone {
+    opacity: 1;
+  }
+  .is-fallback:is([data-step='2'], [data-step='3'], [data-step='4']) .mark {
+    opacity: 1;
+  }
+  .is-fallback:is([data-step='2'], [data-step='3'], [data-step='4']) .mark__in {
+    opacity: 0;
+  }
+  .is-fallback[data-step='2'] .glow {
+    opacity: 1;
+  }
+  .is-fallback:is([data-step='3'], [data-step='4']) .spec__body {
+    opacity: 0.35;
+  }
+  .is-fallback[data-step='4'] .spec__film {
+    transform: translateY(-3.5rem) rotate(-5deg);
+    opacity: 0.55;
+  }
+
+  /* ---------- The offer ---------- */
+  .offer {
+    margin-top: clamp(2rem, 5vw, 4rem);
+    display: grid;
+    gap: 2.5rem;
+  }
+  .offer__h {
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+  }
+  .offer__deal {
+    background: var(--ly-paper);
+    border-top: 4px solid var(--ly-film-ink);
+    padding: 1.5rem;
+  }
+  .terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+  }
+  .terms dt {
+    font-size: 0.875rem;
+    color: var(--ly-ink-2);
+  }
+  .terms dd {
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .films {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+  .films p {
+    font-size: 0.875rem;
+    color: var(--ly-ink-2);
+  }
+  .films ul {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+  .films img {
+    height: 1.75rem;
+    width: auto;
+  }
+  .actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+  .cover {
+    display: grid;
+    gap: 1rem;
+  }
+  .cover li {
+    display: grid;
+    grid-template-columns: 3.25rem 1fr;
+    grid-template-areas: 'm n' 'm w';
+    column-gap: 1rem;
+  }
+  /* Each option covers more of the car: a meter that fills in thirds. */
+  .cover__meter {
+    grid-area: m;
+    align-self: start;
+    margin-top: 0.3rem;
+    height: 0.75rem;
+    background:
+      linear-gradient(90deg, var(--ly-film-ink) calc(var(--n) / 3 * 100%), transparent 0),
+      #fff;
+    box-shadow: inset 0 0 0 1.5px var(--ly-film-ink);
+  }
+  .cover__name {
+    grid-area: n;
+    font-weight: 800;
+    font-size: 1.0625rem;
+  }
+  .cover__what {
+    grid-area: w;
+    font-size: 0.9375rem;
+    color: var(--ly-ink-2);
+  }
+  .cover__note {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: var(--ly-film-ink);
+  }
+  .offer__said {
+    display: grid;
+    gap: 1.75rem;
+    color: var(--ly-film-ink);
+  }
+  .offer__said :global(footer) {
+    color: var(--ly-ink-2);
+  }
+
+  @media (min-width: 56rem) {
+    .offer {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: 3.5rem;
+    }
+    .offer__said {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+  }
+</style>

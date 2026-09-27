@@ -1,0 +1,16 @@
+---
+/** A verbatim review excerpt, attributed the way Google shows the reviewer. */
+import type { Said } from './layers';
+interface Props {
+  q: Said;
+  /** What the review was about, when the surrounding copy doesn't say. */
+  about?: string;
+  class?: string;
+}
+const { q, about, class: cls } = Astro.props;
+---
+
+<blockquote class:list={['ly-said', cls]}>
+  <p>“{q.text}”</p>
+  <footer>{`${q.author}${about ? `, ${about}` : ''}${q.when ? `, ${q.when}` : ''}`.replace(/\.$/, '')}. Google review.</footer>
+</blockquote>
