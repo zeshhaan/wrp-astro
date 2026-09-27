@@ -1,10 +1,13 @@
 ---
-import { pickQuotes, proof } from '../data';
+import { freshQuotes, pickQuotes, proof } from '../data';
+import { shortName } from './building';
 
-// Verbatim review highlights; skip the ones that start mid-sentence.
-const quotes = pickQuotes(8)
-  .filter((q) => /^[A-Z]/.test(q.text))
-  .slice(0, 4);
+// Verbatim review highlights about the work; the lounge has its own section.
+const fresh = freshQuotes.find((q) => q.author === 'Sunit Gonsalves');
+const quotes = [
+  ...pickQuotes(10).filter((q) => /^[A-Z]/.test(q.text) && !/lounge|billiard|waiting|home|enthusiasm/i.test(q.text)).slice(0, 3),
+  ...(fresh ? [fresh] : []),
+].map((q) => ({ ...q, author: shortName(q.author) }));
 ---
 
 <section class="reviews" id="reviews" aria-labelledby="reviews-title">
@@ -12,9 +15,9 @@ const quotes = pickQuotes(8)
     <div class="score">
       <p class="score__num" aria-hidden="true">{proof.rating}</p>
       <h2 id="reviews-title">
-        <span class="visually-hidden">Rated {proof.rating} </span>on Google, from {proof.reviewCount} customer reviews
+        <span class="visually-hidden">Rated {proof.rating} </span>on Google, from {proof.reviewCountDisplay} customer reviews
       </h2>
-      <a class="all" href={proof.reviewsUrl}>Read all {proof.reviewCount} reviews</a>
+      <a class="all" href={proof.reviewsUrl}>Read the reviews</a>
     </div>
     <ul role="list" class="quotes">
       {
@@ -34,6 +37,14 @@ const quotes = pickQuotes(8)
 <style>
   .reviews {
     padding: 1rem var(--mz-gutter) 5rem;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .wrap {
     max-width: var(--mz-max);

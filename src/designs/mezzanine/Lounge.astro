@@ -1,6 +1,6 @@
 ---
 /**
- * The WRP Lounge, the climax of the page. A drawn floor plan of the first floor
+ * The WRP Lounge: the first floor, reached late, after the work. A drawn floor plan
  * sits beside the list of what's up there; pointing at either lights up the other.
  */
 import Picture from '../shared/Picture.astro';
@@ -15,9 +15,8 @@ const zoneFor: Record<string, string> = {
   'Materials room': 'materials',
   'Studio view': 'view',
 };
-const [tvPhoto, , materialsPhoto, fromBelowPhoto] = lounge.photos;
-const [bigQuote, ...otherQuotes] = lounge.quotes;
-const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
+const [tvPhoto] = lounge.photos;
+const [bigQuote] = lounge.quotes;
 ---
 
 <section class="lounge" id="lounge" aria-labelledby="lounge-title">
@@ -183,34 +182,14 @@ const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
     </div>
 
     <div class="gallery">
-      <figure class="shot shot--wide">
-        <Picture base={tvPhoto.base} alt={tvPhoto.alt} sizes="(min-width: 56rem) 44rem, 100vw" />
+      <figure class="shot">
+        <Picture base={tvPhoto.base} alt={tvPhoto.alt} sizes="(min-width: 56rem) 40rem, 100vw" />
         <figcaption>{tvPhoto.caption}</figcaption>
       </figure>
       <blockquote class="big-quote">
         <p>“{bigQuote.text}”</p>
         <footer>{bigQuote.author}, Google review</footer>
       </blockquote>
-      <figure class="shot">
-        <Picture base={materialsPhoto.base} alt={materialsPhoto.alt} sizes="(min-width: 56rem) 24rem, 50vw" />
-        <figcaption>{materialsPhoto.caption}</figcaption>
-      </figure>
-      <figure class="shot">
-        <Picture base={fromBelowPhoto.base} alt={fromBelowPhoto.alt} sizes="(min-width: 56rem) 24rem, 50vw" />
-        <figcaption>{fromBelowPhoto.caption}</figcaption>
-      </figure>
-      <ul role="list" class="small-quotes">
-        {
-          smallQuotes.map((q) => (
-            <li>
-              <blockquote>
-                <p>“{q.text}”</p>
-                <footer>{q.author}</footer>
-              </blockquote>
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </div>
 </section>
@@ -270,8 +249,8 @@ const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
   h2 {
     font-family: var(--mz-display);
     font-weight: 800;
-    font-size: clamp(3rem, 10vw, 7.5rem);
-    line-height: 0.88;
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    line-height: 0.95;
     letter-spacing: -0.045em;
     color: var(--mz-ink);
   }
@@ -437,7 +416,7 @@ const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
   .gallery {
     display: grid;
     gap: 1.5rem;
-    margin-block-start: 3.5rem;
+    margin-block-start: 2.5rem;
   }
   .shot :global(img) {
     width: 100%;
@@ -465,44 +444,20 @@ const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
     color: var(--mz-felt-ink);
     text-wrap: balance;
   }
-  .big-quote footer,
-  .small-quotes footer {
+  .big-quote footer {
     font-size: 0.9375rem;
     color: var(--mz-ink-2);
-  }
-  .small-quotes {
-    display: grid;
-    gap: 1.5rem;
-  }
-  .small-quotes blockquote {
-    display: grid;
-    gap: 0.4rem;
-    padding-inline-start: 1rem;
-    border-inline-start: 3px solid var(--mz-felt);
-  }
-  .small-quotes p {
-    font-size: 1.0625rem;
-    line-height: 1.45;
-  }
-
-  @media (min-width: 40rem) and (max-width: 55.99rem) {
-    .gallery {
-      grid-template-columns: 1fr 1fr;
-    }
-    .shot--wide,
-    .big-quote,
-    .small-quotes {
-      grid-column: 1 / -1;
-    }
   }
 
   @media (min-width: 56rem) {
     .lounge {
-      padding-block: 4.5rem 6rem;
+      padding-block: 3.5rem 5rem;
     }
     .intro {
-      gap: 1.5rem;
-      margin-block-end: 3.5rem;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: end;
+      gap: 3rem;
+      margin-block-end: 2.5rem;
     }
     .explore {
       grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
@@ -521,26 +476,10 @@ const smallQuotes = [otherQuotes[0], otherQuotes[2], otherQuotes[3]];
       display: block;
     }
     .gallery {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 2rem;
-      margin-block-start: 5rem;
-      align-items: start;
-    }
-    .shot--wide {
-      grid-column: 1 / 8;
-    }
-    .big-quote {
-      grid-column: 8 / 13;
-      align-self: center;
-    }
-    .shot:nth-of-type(2) {
-      grid-column: 1 / 5;
-    }
-    .shot:nth-of-type(3) {
-      grid-column: 5 / 9;
-    }
-    .small-quotes {
-      grid-column: 9 / 13;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 3rem;
+      margin-block-start: 3.5rem;
+      align-items: center;
     }
   }
   @media (prefers-reduced-motion: reduce) {

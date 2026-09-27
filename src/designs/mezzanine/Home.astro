@@ -1,7 +1,9 @@
 ---
 /**
  * Mezzanine: the page is the building.
- * Ground floor (the bays) -> first floor (the lounge) -> the street (visit).
+ * The hero is cut along the glass line: the finished car above, the craft below.
+ * Ground floor (the studio: bays, how a job runs, work, reviews) -> up the stairs
+ * to the first floor (the lounge) -> out to the street (visit).
  * A lift panel tracks which floor you are on.
  */
 import DesignShell from '../shared/DesignShell.astro';
@@ -9,36 +11,37 @@ import Header from './Header.astro';
 import Hero from './Hero.astro';
 import FloorSign from './FloorSign.astro';
 import Bays from './Bays.astro';
+import Route from './Route.astro';
 import Work from './Work.astro';
 import Lounge from './Lounge.astro';
 import Reviews from './Reviews.astro';
 import Visit from './Visit.astro';
 import Footer from './Footer.astro';
-import { heroPhoto } from './building';
+import { heroResult } from './building';
 ---
 
 <DesignShell
   concept="mezzanine"
-  title="WRP Detailing, Dubai: PPF, ceramic coating and a lounge upstairs"
-  description="Paint protection film, ceramic coating, window film and detailing in Al Qusais, Dubai. Wait in the WRP Lounge upstairs while we work on your car below."
+  title="WRP Detailing, Dubai: PPF, detailing, ceramic coating and window tint"
+  description="Paint protection film (Avery Dennison and STEK), detailing, polish, ceramic coating, upholstery and window tint in Al Qusais, Dubai. Starting prices, and photo updates while we work."
   fonts={['--font-bricolage', '--font-geist', '--font-montserrat']}
   themeColor="#E9EBE8"
-  preloadImage={{ base: heroPhoto.base, sizes: '(min-width: 60rem) 1200px, 150vw' }}
+  preloadImage={{ base: heroResult.base, sizes: '(min-width: 60rem) 52vw, 100vw' }}
 >
   <Header />
   <main id="main">
-    <Hero />
-
     <div class="floor floor--ground" id="ground-floor" data-floor="G">
-      <FloorSign code="G" name="Ground floor" tone="wall" />
+      <Hero />
+      <FloorSign code="G" name="Ground floor: the studio" tone="wall" />
       <Bays />
+      <Route />
       <Work />
+      <Reviews />
     </div>
 
     <div class="floor floor--first" id="first-floor" data-floor="1">
-      <FloorSign code="1" name="First floor" tone="beam" />
+      <FloorSign code="1" name="First floor, up the stairs" tone="beam" />
       <Lounge />
-      <Reviews />
     </div>
 
     <div class="floor floor--street" id="street" data-floor="S">

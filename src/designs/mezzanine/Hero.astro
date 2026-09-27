@@ -1,30 +1,36 @@
 ---
 /**
- * The hero is a cross-section of the building. Tariq Murad's photo is cut along
- * the mezzanine beam and the page's own beam replaces it, running the full width
- * of the screen: glass and lounge above, bays below. The headline is split by it.
+ * The hero is a cross-section of the studio, cut along the glass line.
+ * Above the line: the result, a finished car under the studio lamps, and a customer's words on the glass.
+ * Below the line: the craft, the team at work in the bay, and what we do.
+ * The headline is split by the beam: the result above, the promise below.
  */
 import Picture from '../shared/Picture.astro';
 import { proof } from '../data';
-import { heroPhoto, whatsappHello } from './building';
+import { heroCraft, heroQuote, heroResult, whatsappHello } from './building';
 
 const lamps = [
   { x: '14%', drop: 6, delay: 0.15 },
   { x: '47%', drop: 34, delay: 0.4 },
   { x: '80%', drop: 14, delay: 0.65 },
 ];
+const heroSizes = '(min-width: 60rem) 52vw, 100vw';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
-  <div class="slice slice--up">
+  <figure class="slice slice--up">
     <Picture
-      base={heroPhoto.base}
-      alt={heroPhoto.alt}
-      sizes="(min-width: 60rem) 1200px, 150vw"
+      base={heroResult.base}
+      alt={heroResult.alt}
+      sizes={heroSizes}
+      width={1200}
+      height={1269}
       loading="eager"
       fetchpriority="high"
+      style={`--pos:${heroResult.position}`}
     />
-  </div>
+    <figcaption class="tag">Finished: Lexus LX, full detail</figcaption>
+  </figure>
 
   <div class="ceiling" aria-hidden="true">
     {
@@ -43,62 +49,64 @@ const lamps = [
   <div class="glass" aria-hidden="true"></div>
 
   <div class="up-copy">
-    <p class="where">Upstairs: the WRP Lounge</p>
-    <p class="up-line">
-      Billiards, board games, karak and the match on a big screen, behind a glass wall that looks down on the bays.
-    </p>
+    <blockquote class="said">
+      <p>“{heroQuote.text}”</p>
+      <footer>{heroQuote.author}, Google review, {heroQuote.when}</footer>
+    </blockquote>
   </div>
 
   <h1 class="h1" id="hero-title">
-    <span class="h1__up">One floor up</span>
-    <span class="h1__down">from your car.</span>
+    <span class="h1__up">Looks brand new.</span>
+    <span class="h1__down">Stays that way.</span>
   </h1>
 
   <div class="beam" aria-hidden="true"><span class="beam__led"></span></div>
 
   <div class="down-copy">
     <p class="down-line">
-      Downstairs we fit paint protection film, ceramic coating and window film, and correct paint. In Al Qusais,
-      Dubai.
+      Paint protection film, detailing, polish, ceramic coating, upholstery and window tint, done by hand in Al
+      Qusais, Dubai. Films by Avery Dennison and STEK.
     </p>
     <div class="actions">
-      <a class="btn" href={whatsappHello} target="_blank" rel="noopener">Get a quote on WhatsApp</a>
-      <a class="text-link" href="#services">See services and prices</a>
+      <a class="btn" href="#quote">Price it for your car</a>
+      <a class="text-link" href={whatsappHello} target="_blank" rel="noopener">Or message us on WhatsApp</a>
     </div>
     <p class="rating">
-      <a href={proof.reviewsUrl}>Rated {proof.rating} on Google from {proof.reviewCount} reviews</a>
+      <a href={proof.reviewsUrl}>Rated {proof.rating} on Google from {proof.reviewCountDisplay} reviews</a>
     </p>
   </div>
 
-  <div class="slice slice--down">
-    <Picture base={heroPhoto.base} alt="" sizes="(min-width: 60rem) 1200px, 150vw" loading="eager" />
-    <p class="credit">Photo by customer Tariq Murad</p>
-  </div>
+  <figure class="slice slice--down">
+    <Picture
+      base={heroCraft.base}
+      alt={heroCraft.alt}
+      sizes={heroSizes}
+      width={1200}
+      height={1680}
+      loading="eager"
+      style={`--pos:${heroCraft.position}`}
+    />
+    <figcaption class="tag">In the bay: the team on a Lexus</figcaption>
+  </figure>
 </section>
 
 <style>
-  /*
-   * Geometry. --k is the size of one pixel of the 1200×900 source photo.
-   * The photo's beam sits at y 473–528, its glass starts at y≈207.
-   */
   .hero {
     container: hero / inline-size;
-    --k: min(calc(150vw / 1200), 0.8px);
-    --crop-up: 150; /* mobile: start the photo at the lamps */
-    --h1: clamp(2.25rem, calc((100cqi - 2rem) * 0.148), 4.5rem);
+    --h1: clamp(2rem, calc((100cqi - 2rem) * 0.118), 4.5rem);
     --line: calc(var(--h1) * 1.02);
-    --beam: calc(var(--k) * 55);
+    --beam: 2.25rem;
 
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows:
-      calc(var(--k) * (473 - var(--crop-up)))
+      min(58vw, 22rem)
       auto
       var(--line)
       var(--beam)
       var(--line)
       auto
-      calc(var(--k) * 352);
+      min(64vw, 24rem);
     grid-template-areas: 'up' 'gcopy' 'gline' 'beam' 'bline' 'bcopy' 'down';
     background: var(--mz-wall);
     overflow: clip;
@@ -108,6 +116,7 @@ const lamps = [
   .slice {
     position: relative;
     overflow: hidden;
+    margin: 0;
     background: var(--mz-smoke);
   }
   .slice--up {
@@ -117,40 +126,44 @@ const lamps = [
     grid-area: down;
     background: var(--mz-wall-2);
   }
+  .slice :global(picture) {
+    display: contents;
+  }
   .slice :global(img) {
     position: absolute;
-    left: 50%;
-    translate: -50% 0;
-    width: auto;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     max-width: none;
-    height: calc(var(--k) * 900);
+    object-fit: cover;
+    object-position: var(--pos, 50% 50%);
   }
-  .slice--up :global(img) {
-    top: calc(var(--k) * var(--crop-up) * -1);
-  }
-  .slice--down :global(img) {
-    top: calc(var(--k) * -528);
-  }
-  /* Mobile: the photo's glass melts into the smoked-glass panel below it. */
+  /* Mobile: the photo melts into the smoked-glass panel below it. */
   .slice--up::after {
     content: '';
     position: absolute;
     inset: auto 0 0;
-    height: 35%;
+    height: 30%;
     background: linear-gradient(to bottom, transparent, var(--mz-smoke));
   }
-  .credit {
+  .tag {
     position: absolute;
-    right: 0.5rem;
-    bottom: 0.5rem;
-    padding: 0.2rem 0.5rem;
+    z-index: 1;
+    left: 0.75rem;
+    top: 0.75rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 0.25rem;
-    background: rgb(21 23 26 / 0.72);
+    background: rgb(21 23 26 / 0.78);
     color: var(--mz-on-dark);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+  .slice--down .tag {
+    top: auto;
+    bottom: 0.75rem;
   }
 
-  /* ---------- Upstairs: smoked glass ---------- */
+  /* ---------- Above the line: smoked glass, and what a customer said ---------- */
   .ceiling {
     display: none;
   }
@@ -164,22 +177,26 @@ const lamps = [
   }
   .up-copy {
     grid-area: gcopy;
-    padding: 0.5rem 1rem 1.25rem;
+    padding: 0.25rem 1rem 1.25rem;
     color: var(--mz-on-dark);
     max-width: 38rem;
     position: relative;
   }
-  .where {
-    font-weight: 600;
-    font-size: 0.9375rem;
-    color: var(--mz-brass);
-    margin-block-end: 0.35rem;
+  .said {
+    display: grid;
+    gap: 0.4rem;
+    padding-inline-start: 0.9rem;
+    border-inline-start: 3px solid var(--mz-brass);
   }
-  .up-line {
-    color: #c9d3cf;
-    font-size: 1rem;
-    line-height: 1.5;
-    max-width: 34ch;
+  .said p {
+    color: #dfe6e3;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+    max-width: 40ch;
+  }
+  .said footer {
+    color: var(--mz-on-dark-2);
+    font-size: 0.875rem;
   }
 
   /* ---------- The headline, split by the beam ---------- */
@@ -217,7 +234,7 @@ const lamps = [
     color: var(--mz-ink);
   }
 
-  /* ---------- The beam ---------- */
+  /* ---------- The beam: the glass line ---------- */
   .beam {
     grid-area: beam;
     grid-column: 1 / -1;
@@ -235,7 +252,7 @@ const lamps = [
     transform-origin: left;
   }
 
-  /* ---------- Downstairs: the bays ---------- */
+  /* ---------- Below the line: the craft ---------- */
   .down-copy {
     grid-area: bcopy;
     padding: 1.25rem 1rem 1.75rem;
@@ -244,14 +261,14 @@ const lamps = [
   .down-line {
     font-size: 1.0625rem;
     color: var(--mz-ink-2);
-    max-width: 36ch;
+    max-width: 44ch;
   }
   .actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem 1.25rem;
-    margin-block: 1.25rem 1rem;
+    margin-block: 1.25rem 0.75rem;
   }
   .btn {
     display: inline-flex;
@@ -285,6 +302,9 @@ const lamps = [
     color: var(--mz-ink-2);
   }
   .rating a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     text-underline-offset: 0.25em;
   }
 
@@ -292,21 +312,20 @@ const lamps = [
   @media (min-width: 60rem) {
     .hero {
       --H: clamp(36rem, calc(100svh - var(--mz-hh)), 54rem);
-      --k: calc(var(--H) / 780);
-      --crop-up: 100;
-      --pw: min(52cqi, calc(var(--k) * 1200));
+      --pw: 50cqi;
+      --beam: calc(var(--H) * 0.065);
       /* Line the hero copy up with the page container below it. */
       --pad: max(var(--mz-gutter), calc((100cqi - var(--mz-max)) / 2));
-      --h1: min(calc((100cqi - var(--pw) - var(--pad) - 2rem) * 0.148), calc(var(--k) * 100));
+      --h1: min(calc((100cqi - var(--pw) - var(--pad) - 2.5rem) * 0.12), calc(var(--H) * 0.12));
 
       grid-template-columns: minmax(0, 1fr) var(--pw);
       grid-template-rows:
-        calc(var(--k) * 107)
-        calc(var(--k) * 266 - var(--line))
+        calc(var(--H) * 0.14)
+        calc(var(--H) * 0.33 - var(--line))
         var(--line)
         var(--beam)
         var(--line)
-        calc(var(--k) * 352 - var(--line));
+        calc(var(--H) * 0.465 - var(--line));
       grid-template-areas:
         'ceiling up'
         'gcopy up'
@@ -318,16 +337,23 @@ const lamps = [
     .slice--up::after {
       display: none;
     }
-    /* A glass mullion where the page meets the photo. */
+    /* A steel mullion where the page meets the photo. */
     .slice--up::before {
       content: '';
       position: absolute;
       z-index: 1;
       left: 0;
-      top: calc(var(--k) * 107);
+      top: calc(var(--H) * 0.14);
       bottom: 0;
       width: 5px;
       background: var(--mz-lamp);
+    }
+    .tag {
+      left: 1.25rem;
+      top: 1.25rem;
+    }
+    .slice--down .tag {
+      bottom: 1.25rem;
     }
     .up-copy,
     .down-copy,
@@ -336,13 +362,13 @@ const lamps = [
     }
     .up-copy {
       align-self: end;
-      padding-block: 0 1rem;
+      padding-block: 0 1.25rem;
     }
-    .up-line {
-      font-size: 1.0625rem;
+    .said p {
+      font-size: 1.125rem;
     }
     .down-copy {
-      padding-block: calc(var(--k) * 22) 0;
+      padding-block: calc(var(--H) * 0.03) 0;
     }
     .down-line {
       font-size: 1.125rem;
@@ -357,11 +383,12 @@ const lamps = [
       background: linear-gradient(to bottom, var(--mz-wall) 30%, #cfd4d0);
     }
     .lamp {
+      --u: calc(var(--H) / 780);
       position: absolute;
       left: var(--x);
       top: 0;
-      width: calc(var(--k) * 64);
-      padding-top: calc(var(--drop) * var(--k));
+      width: calc(var(--u) * 64);
+      padding-top: calc(var(--drop) * var(--u));
     }
     .lamp::before {
       content: '';
@@ -369,7 +396,7 @@ const lamps = [
       left: 50%;
       top: 0;
       width: 1.5px;
-      height: calc(var(--drop) * var(--k) + 2px);
+      height: calc(var(--drop) * var(--u) + 2px);
       background: var(--mz-lamp);
     }
     .lamp svg {
@@ -395,7 +422,7 @@ const lamps = [
     }
   }
 
-  /* ---------- The one orchestrated moment: the lights come on ---------- */
+  /* ---------- The one orchestrated moment: the studio lights come on ---------- */
   @media (prefers-reduced-motion: no-preference) {
     .lamp__glow {
       animation: lamp-on 0.9s var(--delay) both;

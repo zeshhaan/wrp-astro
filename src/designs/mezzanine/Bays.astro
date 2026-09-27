@@ -1,55 +1,109 @@
 ---
 /**
- * Services as the bays on the ground floor. Two rows of painted bays face each
- * other across the aisle; the films we fit sit in the aisle between them.
+ * Services as the bays on the studio floor. Two rows of painted bays face each other
+ * across the aisle; the quote desk stands in the aisle between them, and the wrap bay
+ * runs along the side wall. Every bay carries its starting price, how long the car
+ * stays, and one customer's words about that exact job.
  */
 import Car from './Car.astro';
-import { services, proof, type Service } from '../data';
+import { contact, proof, whatsappLink } from '../data';
+import { bays, washLevels, wrapBay, type Bay } from './building';
 
-const price = (s: Service) => (s.from === null ? null : `AED ${s.from.toLocaleString('en-US')}`);
-/** Short jobs you can wait for upstairs; longer ones are a drop-off. */
-const stay = (s: Service) => (s.minutes <= 5 * 60 ? `Wait upstairs, ${s.time}` : `Drop-off, ${s.time}`);
-const rows = [services.slice(0, 3), services.slice(3, 6)];
+const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
+const stay = (b: Bay) =>
+  b.service.minutes <= 5 * 60 ? `Ready in ${b.service.time}` : `With us ${b.service.time}`;
+const rows = [bays.slice(0, 3), bays.slice(3, 6)];
+const choices = [
+  ...bays.map((b) => ({ key: b.key, label: b.name, ask: b.ask })),
+  { key: wrapBay.key, label: wrapBay.name, ask: wrapBay.ask },
+  { key: 'unsure', label: 'Not sure yet', ask: '' },
+];
+const defaultText = 'Hi WRP, I’d like a quote for my car.';
 ---
 
 <section class="bays-section" id="services" aria-labelledby="bays-title">
   <div class="wrap">
     <div class="head">
-      <h2 id="bays-title">The bays</h2>
-      <p>
-        Your car stays down here while we work. Prices are starting prices; we confirm yours once we have seen the
-        car.
-      </p>
+      <div class="head__text">
+        <h2 id="bays-title">The bays</h2>
+        <p>
+          Starting prices, and how long the car stays with us. We confirm your price once we’ve seen the car, before
+          any work starts.
+        </p>
+      </div>
+      <div class="plate">
+        <ul role="list" class="plate__logos">
+          {
+            proof.films.map((f) => (
+              <li>
+                <img src={f.logo} alt={f.name} height="36" width={f.name === 'STEK' ? 154 : 110} loading="lazy" />
+              </li>
+            ))
+          }
+        </ul>
+        <p class="plate__note">
+          The films we fit. Self-healing paint protection film with up to a <strong>10-year warranty</strong>;
+          ceramic coatings with 2 to 7 years.
+        </p>
+      </div>
     </div>
 
     {
       rows.map((row, r) => (
         <>
           <ul role="list" class:list={['row', r === 0 ? 'row--back' : 'row--front']}>
-            {row.map((s, i) => (
-              <li class="bay">
+            {row.map((b, i) => (
+              <li class="bay" data-bay={b.key}>
                 <span class="bay__no" aria-hidden="true">
                   {r * 3 + i + 1}
                 </span>
                 <div class="bay__body">
-                  <Car service={s.slug} class="bay__car" />
+                  <Car service={b.service.slug} class="bay__car" />
                   <div class="bay__text">
                     <h3>
-                      <a class="bay__link" href={s.href}>
-                        {s.name}
+                      <a class="bay__link" href={b.service.href}>
+                        {b.name}
                       </a>
                     </h3>
-                    <p class="bay__line">{s.line}</p>
+                    <p class="bay__line">{b.line}</p>
+                    {b.key === 'detailing' && (
+                      <table class="levels">
+                        <caption class="visually-hidden">Wash and detail prices in AED, sedan and SUV</caption>
+                        <thead>
+                          <tr>
+                            <td />
+                            <th scope="col">Sedan</th>
+                            <th scope="col">SUV</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {washLevels.map((l) => (
+                            <tr>
+                              <th scope="row">{l.name}</th>
+                              <td>{l.sedan}</td>
+                              <td>{l.suv}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
                     <p class="bay__price">
-                      {price(s) ? (
+                      {b.service.from !== null ? (
                         <>
-                          From <strong>{price(s)}</strong>
+                          From <strong>{aed(b.service.from)}</strong>
                         </>
                       ) : (
                         <strong class="bay__quote">Priced after inspection</strong>
                       )}
+                      <span class="bay__stay">{stay(b)}</span>
                     </p>
-                    <p class="bay__stay">{stay(s)}</p>
+                    <blockquote class="bay__said">
+                      <p>“{b.quote.text}”</p>
+                      <footer>{b.quote.when ? `${b.quote.author}, ${b.quote.when}` : b.quote.author}</footer>
+                    </blockquote>
+                    <a class="pick" href="#quote" data-pick={b.key}>
+                      Price this for my car
+                    </a>
                   </div>
                 </div>
               </li>
@@ -57,40 +111,152 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
           </ul>
           {r === 0 && (
             <div class="aisle">
-              <div class="plate">
-                <p class="plate__title">The films we fit</p>
-                <ul role="list" class="plate__logos">
-                  {proof.films.map((f) => (
-                    <li>
-                      <img src={f.logo} alt={f.name} height="36" width={f.name === 'STEK' ? 154 : 110} loading="lazy" />
-                    </li>
-                  ))}
-                </ul>
-                <p class="plate__note">
-                  Up to a 10-year warranty on paint protection film. Handle the samples in the materials room
-                  upstairs before you choose.
-                </p>
-              </div>
+              <form
+                class="desk"
+                id="quote"
+                action={contact.whatsapp}
+                method="get"
+                target="_blank"
+                data-quote
+                aria-labelledby="desk-title"
+              >
+                <div class="desk__intro">
+                  <h3 id="desk-title">Price it for your car</h3>
+                  <p>Pick the work and tell us the car. WhatsApp opens with your message written, ready to send.</p>
+                </div>
+                <fieldset class="desk__need">
+                  <legend>What does it need?</legend>
+                  <div class="chips">
+                    {choices.map((c, i) => (
+                      <label class="chip">
+                        <input type="radio" name="need" value={c.key} data-ask={c.ask} checked={i === 0} />
+                        <span>{c.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                <div class="desk__car">
+                  <label for="quote-car">Your car</label>
+                  <input
+                    id="quote-car"
+                    name="car"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="e.g. 2024 Land Cruiser"
+                    maxlength="60"
+                  />
+                  <input type="hidden" name="text" value={defaultText} data-quote-text />
+                  <p class="desk__preview" aria-live="polite">
+                    <span class="visually-hidden">Your message: </span>
+                    <output data-quote-preview>{defaultText}</output>
+                  </p>
+                  <button type="submit" class="desk__send">
+                    Open WhatsApp with this message
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </>
       ))
     }
+
+    <div class="side-bay" data-bay={wrapBay.key}>
+      <span class="bay__no" aria-hidden="true">7</span>
+      <Car service="wrap" class="bay__car side-bay__car" />
+      <div class="side-bay__text">
+        <h3>
+          <a class="bay__link" href={wrapBay.href}>
+            {wrapBay.name}
+          </a>
+        </h3>
+        <p class="bay__line">{wrapBay.line}</p>
+        <p class="bay__price"><strong class="bay__quote">Priced after inspection</strong></p>
+      </div>
+      <blockquote class="bay__said side-bay__said">
+        <p>“{wrapBay.quote.text}”</p>
+        <footer>{wrapBay.quote.author}, {wrapBay.quote.when}</footer>
+      </blockquote>
+      <a class="pick" href="#quote" data-pick={wrapBay.key}>Price this for my car</a>
+    </div>
   </div>
 </section>
 
+<script>
+  // The quote desk: builds the WhatsApp message from the chosen work and the car,
+  // shows it before sending, and lets any bay preselect its service.
+  const form = document.querySelector<HTMLFormElement>('[data-quote]');
+  if (form) {
+    const base = form.action;
+    const car = form.querySelector<HTMLInputElement>('#quote-car')!;
+    const hidden = form.querySelector<HTMLInputElement>('[data-quote-text]')!;
+    const preview = form.querySelector<HTMLOutputElement>('[data-quote-preview]')!;
+    const radios = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="need"]'));
+
+    const message = () => {
+      const ask = radios.find((r) => r.checked)?.dataset.ask ?? '';
+      const model = car.value.trim().replace(/\s+/g, ' ');
+      const onCar = model ? `my ${model}` : 'my car';
+      return ask
+        ? `Hi WRP, I’d like a price for ${ask} on ${onCar}.`
+        : `Hi WRP, I’d like some advice on ${onCar}. Not sure yet what it needs.`;
+    };
+    const sync = () => {
+      const text = message();
+      hidden.value = text;
+      preview.value = text;
+    };
+    form.addEventListener('input', sync);
+    form.addEventListener('change', sync);
+    sync();
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      sync();
+      window.open(`${base}?text=${encodeURIComponent(hidden.value)}`, '_blank', 'noopener');
+    });
+
+    const smooth = matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-pick]')) {
+      link.addEventListener('click', (event) => {
+        const radio = radios.find((r) => r.value === link.dataset.pick);
+        if (!radio) return;
+        event.preventDefault();
+        radio.checked = true;
+        sync();
+        form.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
+        car.focus({ preventScroll: true });
+      });
+    }
+  }
+</script>
+
 <style>
   .bays-section {
-    padding: 2.5rem var(--mz-gutter) 4rem;
+    padding: 2rem var(--mz-gutter) 4rem;
   }
   .wrap {
     max-width: var(--mz-max);
     margin-inline: auto;
   }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------- Head: title, and the film plate ---------- */
   .head {
     display: grid;
-    gap: 0.75rem;
+    gap: 1.5rem;
     margin-block-end: 2rem;
+  }
+  .head__text {
+    display: grid;
+    gap: 0.75rem;
   }
   h2 {
     font-family: var(--mz-display);
@@ -99,10 +265,38 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     line-height: 0.95;
     letter-spacing: -0.035em;
   }
-  .head p {
-    max-width: 44ch;
+  .head__text p {
+    max-width: 46ch;
     color: var(--mz-ink-2);
     font-size: 1.0625rem;
+  }
+  .plate {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 1rem 1.25rem;
+    border: 1.5px solid rgb(21 23 26 / 0.18);
+    border-radius: 0.25rem;
+  }
+  .plate__logos {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+  .plate__logos img {
+    height: 2rem;
+    width: auto;
+    /* The logo files carry white backgrounds; let the wall show through. */
+    mix-blend-mode: multiply;
+  }
+  .plate__note {
+    color: var(--mz-ink-2);
+    font-size: 0.9375rem;
+    max-width: 44ch;
+  }
+  .plate__note strong {
+    color: var(--mz-ink);
+    font-weight: 600;
   }
 
   /* ---------- A row of bays: painted lines on the floor ---------- */
@@ -112,12 +306,14 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }
-  .bay {
+  .bay,
+  .side-bay {
     position: relative;
     isolation: isolate;
+  }
+  .bay {
     border-inline: var(--line-w) solid var(--paint);
     padding: 1.25rem 1.1rem 1.5rem;
-    transition: background-color 0.3s;
   }
   .row--back .bay:first-child {
     border-top: var(--line-w) solid var(--paint);
@@ -129,7 +325,8 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     border-bottom: var(--line-w) solid var(--paint);
   }
   /* A pendant lamp's pool of light when you point at a bay. */
-  .bay::before {
+  .bay::before,
+  .side-bay::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -139,21 +336,21 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     pointer-events: none;
     z-index: -1;
   }
-  .bay:hover::before,
-  .bay:has(.bay__link:focus-visible)::before {
+  :is(.bay, .side-bay):hover::before,
+  :is(.bay, .side-bay):has(.bay__link:focus-visible)::before {
     opacity: 1;
   }
-  .bay:has(.bay__link:focus-visible) {
+  :is(.bay, .side-bay):has(.bay__link:focus-visible) {
     outline: 3px solid var(--mz-felt);
     outline-offset: -3px;
   }
   .bay__no {
     position: absolute;
     right: 0.9rem;
-    bottom: 0.4rem;
+    top: 0.6rem;
     font-family: var(--mz-display);
     font-weight: 800;
-    font-size: 4.5rem;
+    font-size: 4rem;
     line-height: 1;
     color: transparent;
     -webkit-text-stroke: 1.5px rgb(21 23 26 / 0.3);
@@ -161,11 +358,8 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
   }
   .bay__body {
     display: grid;
-    gap: 1rem;
-  }
-  .bay__body {
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    gap: 1.1rem;
     align-items: start;
   }
   .bay :global(.bay__car) {
@@ -174,7 +368,7 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
   }
   .bay__text {
     display: grid;
-    gap: 0.4rem;
+    gap: 0.5rem;
     align-content: start;
   }
   h3 {
@@ -183,6 +377,7 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     font-size: 1.5rem;
     line-height: 1.1;
     letter-spacing: -0.02em;
+    padding-inline-end: 3.5rem;
   }
   .bay__link {
     text-decoration: none;
@@ -196,17 +391,21 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     inset: 0;
     z-index: 1;
   }
-  .bay:hover .bay__link {
+  :is(.bay, .side-bay):hover .bay__link {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.18em;
   }
   .bay__line {
     color: var(--mz-ink-2);
-    max-width: 40ch;
+    max-width: 42ch;
   }
   .bay__price {
-    margin-block-start: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    margin-block-start: 0.25rem;
     font-size: 0.9375rem;
   }
   .bay__price strong {
@@ -222,16 +421,66 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
   .bay__stay {
     font-size: 0.875rem;
     color: var(--mz-ink-2);
-    padding-inline-end: 4rem;
+  }
+  .levels {
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    width: min(100%, 17rem);
+  }
+  .levels th,
+  .levels td {
+    padding: 0.2rem 0.5rem 0.2rem 0;
+    text-align: start;
+    border-bottom: 1px solid rgb(21 23 26 / 0.12);
+  }
+  .levels thead th {
+    font-weight: 500;
+    color: var(--mz-ink-2);
+  }
+  .levels tbody th {
+    font-weight: 500;
   }
 
+  /* The customer's words, on the bay floor. */
+  .bay__said {
+    display: grid;
+    gap: 0.25rem;
+    margin-block-start: 0.5rem;
+    padding-inline-start: 0.8rem;
+    border-inline-start: 3px solid var(--mz-felt);
+  }
+  .bay__said p {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+    max-width: 40ch;
+  }
+  .bay__said footer {
+    font-size: 0.8125rem;
+    color: var(--mz-ink-2);
+  }
+  .pick {
+    position: relative;
+    z-index: 2;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    color: var(--mz-felt-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  .pick:hover {
+    text-decoration-thickness: 2.5px;
+  }
 
-  /* ---------- The aisle, with the films in it ---------- */
+  /* ---------- The aisle, with the quote desk in it ---------- */
   .aisle {
     position: relative;
-    padding-block: 2rem;
-    display: grid;
-    place-items: center;
+    padding-block: 1.75rem;
   }
   .aisle::before {
     content: '';
@@ -241,58 +490,177 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     top: 50%;
     height: 4px;
     translate: 0 -50%;
-    background: repeating-linear-gradient(
-      to right,
-      var(--mz-brass) 0 2.5rem,
-      transparent 2.5rem 4.25rem
-    );
+    background: repeating-linear-gradient(to right, var(--mz-brass) 0 2.5rem, transparent 2.5rem 4.25rem);
   }
-  .plate {
+  .desk {
     position: relative;
     display: grid;
-    justify-items: center;
-    gap: 0.75rem;
-    max-width: 34rem;
-    padding: 1.25rem 1.5rem;
-    background: var(--mz-wall);
-    text-align: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.1rem 1.4rem;
+    background: var(--mz-lamp);
+    color: var(--mz-on-dark);
+    border-radius: 0.375rem;
+    scroll-margin-block: calc(var(--mz-hh) + 1rem);
   }
-  .plate__title {
-    font-family: var(--mz-display);
-    font-weight: 600;
-    font-size: 1.25rem;
-    letter-spacing: -0.01em;
+  .desk h3 {
+    padding: 0;
+    font-size: 1.625rem;
   }
-  .plate__logos {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+  .desk__intro {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
   }
-  .plate__logos img {
-    height: 2.25rem;
-    width: auto;
-    /* The logo files carry white backgrounds; let the plate show through. */
-    mix-blend-mode: multiply;
-  }
-  .plate__note {
-    color: var(--mz-ink-2);
+  .desk__intro p {
+    color: var(--mz-on-dark-2);
     font-size: 0.9375rem;
-    max-width: 42ch;
+    max-width: 38ch;
+  }
+  .desk__need {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+  .desk legend,
+  .desk__car label {
+    display: block;
+    margin-block-end: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9375rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+  }
+  .chip input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1.5px solid rgb(185 199 194 / 0.4);
+    font-size: 0.9375rem;
+    transition:
+      background-color 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .chip:hover span {
+    border-color: var(--mz-glass);
+  }
+  .chip input:checked + span {
+    background: var(--mz-glass);
+    border-color: var(--mz-glass);
+    color: var(--mz-ink);
+    font-weight: 500;
+  }
+  .chip input:focus-visible + span {
+    outline: 3px solid var(--mz-brass);
+    outline-offset: 2px;
+  }
+  .desk__car {
+    display: grid;
+    align-content: start;
+  }
+  .desk__car input[type='text'] {
+    min-height: 3rem;
+    padding: 0.6rem 0.9rem;
+    border: 1.5px solid rgb(185 199 194 / 0.5);
+    border-radius: 0.375rem;
+    background: #22262b;
+    color: var(--mz-on-dark);
+    font: inherit;
+    font-size: 1rem;
+  }
+  .desk__car input[type='text']::placeholder {
+    color: #8f9c97;
+  }
+  .desk__car input[type='text']:focus-visible {
+    outline: 3px solid var(--mz-brass);
+    outline-offset: 1px;
+    border-color: transparent;
+  }
+  .desk__preview {
+    margin-block: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--mz-on-dark-2);
+    min-height: 2.6em;
+  }
+  .desk__preview output {
+    color: #dfe6e3;
+  }
+  .desk__send {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    padding: 0.7rem 1.35rem;
+    border-radius: 999px;
+    background: var(--mz-felt);
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.15s;
+  }
+  .desk__send:hover {
+    background: #257a5b;
+  }
+  .desk__send:focus-visible {
+    outline: 3px solid var(--mz-brass);
+    outline-offset: 3px;
+  }
+
+  /* ---------- Bay 7: the side bay along the wall ---------- */
+  .side-bay {
+    display: grid;
+    grid-template-columns: 3.75rem minmax(0, 1fr);
+    gap: 0.5rem 1.1rem;
+    margin-block-start: 1.75rem;
+    padding: 1.25rem 1.1rem 1rem;
+    border: 5px solid var(--mz-lamp);
+    border-style: solid dashed solid solid;
+  }
+  .side-bay :global(.side-bay__car) {
+    grid-row: 1 / span 3;
+    width: 100%;
+    height: auto;
+  }
+  .side-bay__text {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+  }
+  .side-bay__said,
+  .side-bay .pick {
+    grid-column: 2;
   }
 
   /* ---------- Desktop: three bays a row, facing each other ---------- */
   @media (min-width: 56rem) {
     .bays-section {
-      padding-block: 3rem 5rem;
+      padding-block: 2.5rem 5rem;
     }
     .head {
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
       align-items: end;
       gap: 3rem;
       margin-block-end: 2.5rem;
-    }
-    .head p {
-      justify-self: end;
     }
     .row {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -300,7 +668,7 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     .row .bay {
       border: 0;
       border-inline-start: var(--line-w) solid var(--paint);
-      padding: 1.5rem 1.5rem 5rem;
+      padding: 1.5rem 1.5rem 1.75rem;
     }
     .row .bay:last-child {
       border-inline-end: var(--line-w) solid var(--paint);
@@ -309,22 +677,10 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     .row--back .bay {
       border-top: var(--line-w) solid var(--paint);
     }
-    .row--back .bay__no {
-      bottom: 0.25rem;
-      right: auto;
-      left: 1.5rem;
-    }
     /* Front row mirrors it: open to the aisle at the top, back line at the bottom,
        and the cars park nose-in the other way. */
     .row--front .bay {
       border-bottom: var(--line-w) solid var(--paint);
-      padding: 5rem 1.5rem 1.5rem;
-    }
-    .row--front .bay__no {
-      top: 0.25rem;
-      bottom: auto;
-      right: auto;
-      left: 1.5rem;
     }
     .row--front :global(.bay__car) {
       rotate: 180deg;
@@ -332,30 +688,68 @@ const rows = [services.slice(0, 3), services.slice(3, 6)];
     .row--front .bay::before {
       background: radial-gradient(60% 55% at 50% 100%, rgb(255 246 226 / 0.9), transparent);
     }
+    .bay__no {
+      font-size: 4.5rem;
+      right: 1.25rem;
+      top: 1rem;
+    }
     .bay__body {
       grid-template-columns: minmax(0, 1fr);
-      gap: 1.5rem;
+      grid-template-rows: auto 1fr;
+      gap: 1.25rem;
+      height: 100%;
     }
     .bay :global(.bay__car) {
-      width: 5.75rem;
-      justify-self: center;
+      width: 4.75rem;
     }
-    .bay__no {
-      font-size: 5rem;
+    .bay__text {
+      height: 100%;
+      grid-template-rows: auto auto auto 1fr auto;
     }
-    .bay__price .bay__quote {
-    font-size: 1.125rem;
-  }
-  .bay__stay {
-      padding-inline-end: 0;
+    .bay[data-bay='detailing'] .bay__text {
+      grid-template-rows: auto auto auto auto 1fr auto;
+    }
+    .bay__said {
+      align-self: end;
     }
     .aisle {
       padding-block: 2.5rem;
     }
+    .desk {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 2rem;
+      padding: 1.75rem 2rem 2rem;
+      margin-inline: 1.5rem;
+    }
+    .side-bay {
+      grid-template-columns: 4.75rem minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      align-items: start;
+      gap: 0.25rem 3rem;
+      padding: 1.5rem 7rem 1.25rem 1.5rem;
+      margin-block-start: 2.5rem;
+    }
+    .side-bay :global(.side-bay__car) {
+      grid-row: 1 / span 2;
+    }
+    .side-bay__said {
+      grid-column: 3;
+      grid-row: 1;
+      margin-block-start: 0.35rem;
+    }
+    .side-bay .pick {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    .side-bay .bay__no {
+      right: 1.5rem;
+      top: 1rem;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
-    .bay,
-    .bay::before {
+    .bay::before,
+    .side-bay::before,
+    .chip span {
       transition: none;
     }
   }

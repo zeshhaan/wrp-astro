@@ -1,6 +1,6 @@
 ---
 /**
- * A car seen from the mezzanine above, drawn like the lounge floor plan.
+ * A car seen from above, drawn like an architect's plan.
  * Each service marks the part of the car it works on.
  */
 interface Props {
@@ -31,6 +31,7 @@ const drops = [
 
   <g clip-path={`url(#${id})`}>
     {service === 'paint-protection-film' && <rect x="0" y="0" width="120" height="72" class="c-film" />}
+    {service === 'wrap' && <path d="M0 0H120V70Q60 60 0 70Z" class="c-matte" />}
     {
       service === 'ceramic-coating' && (
         <>
@@ -82,6 +83,7 @@ const drops = [
     )
   }
 
+  {service === 'wrap' && <rect x="18" y="222" width="84" height="9" rx="3" class="c-matte" />}
   {
     service === 'premium-car-wash' && (
       <g class="c-drops">
@@ -148,6 +150,10 @@ const drops = [
   }
   .c-film-solid {
     fill: #1f6b4f;
+  }
+  /* Wrap: a matte-black bonnet and spoiler. */
+  .c-matte {
+    fill: #2b2f33;
   }
   /* Ceramic: a glassy layer over everything. */
   .c-coat {
