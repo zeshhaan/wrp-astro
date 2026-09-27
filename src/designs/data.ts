@@ -239,14 +239,17 @@ export const studio = {
 
 const business = getBusiness();
 /**
- * Live Google Maps figures, read 27 Sep 2026 (Firecrawl maps-google-com).
- * data/google-reviews.json is the February scrape (68 reviews); the newest 60
- * on Maps (7 Mar to 26 Sep 2026) are all 5-star and 59 of them are new names,
- * so the listing has at least 127. "120+" is the honest floor.
+ * Live Google Maps figures, read 27 Sep 2026: 5.0 from 130 reviews (TinyFish
+ * read of the listing; Firecrawl's newest-60 pull agrees, all 5-star).
+ * data/google-reviews.json is the older February scrape (68 reviews).
+ * "120+" stays as the display so the copy doesn't date as reviews arrive.
+ * Google's topic chips: professional team 23, car detailing 12, attention to
+ * work 9, interior cleaning 7, window tint 5, detailed wash 4, polite team 4,
+ * clear explanations 3, ceramic coating 2, showroom shine 2.
  */
 export const proof = {
   rating: business.rating.toFixed(1),
-  reviewCount: 127,
+  reviewCount: 130,
   reviewCountDisplay: '120+',
   reviewsUrl: '/reviews/',
   films: [
