@@ -1,0 +1,46 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+import { polishConditions } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+---
+
+<Screen id="polish" title="Polish & correction" eyebrow="Step 3 of 6 · Details" lede="How does the paint look in the sun? Pick the closest.">
+  <fieldset class="q-field">
+    <legend class="visually-hidden">Paint condition</legend>
+    <div class="q-grid q-grid--2">
+      {
+        polishConditions.map((c) => (
+          <label class="q-card q-cond">
+            <input class="visually-hidden" type="radio" name="polishCondition" value={c.id} />
+            <span class:list={['q-cond__swatch', `q-cond__swatch--${c.id}`]} aria-hidden="true" />
+            <span class="q-card__title">{c.label}</span>
+            <span class="q-card__hint">{c.hint}</span>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  {
+    catalog.polish.packages.map((p, i) => (
+      <div class="q-detail q-suggest" data-q-polish-pkg={i} hidden>
+        <p class="q-eyebrow">Likely for your paint</p>
+        <p class="q-detail__title">{p.name}</p>
+        <ul class="q-ticks" role="list">
+          {p.features.map((f) => <li><QIcon name="check" size={16} />{f}</li>)}
+        </ul>
+      </div>
+    ))
+  }
+  <div class="q-detail q-suggest" data-q-polish-pkg="-1" hidden>
+    <p class="q-eyebrow">We’ll measure first</p>
+    <p class="q-detail__title">Paint inspection</p>
+    <p class="q-help">We check the paint depth with a gauge and look under inspection lights, then tell you whether single, two or multi-stage correction makes sense.</p>
+  </div>
+  <p class="q-note"><QIcon name="tag" size={18} /> Priced after inspection. We measure the paint depth before we quote.</p>
+</Screen>

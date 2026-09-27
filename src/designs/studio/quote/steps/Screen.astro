@@ -1,0 +1,29 @@
+---
+/**
+ * One screen of the quote flow. Each screen is its own <form> so Enter moves
+ * on (the submit is intercepted and becomes "Next"); the Review screen passes
+ * form={false} because it holds the real enquiry form.
+ */
+interface Props {
+  id: string;
+  title: string;
+  lede?: string;
+  eyebrow?: string;
+  form?: boolean;
+  class?: string;
+}
+const { id, title, lede, eyebrow = '', form = true, class: className } = Astro.props;
+const Wrap = form ? 'form' : 'div';
+const wrapProps = form ? { id: `q-f-${id}`, 'data-step-form': '', novalidate: true, 'aria-labelledby': `q-h-${id}` } : {};
+---
+
+<section class:list={["q-screen", className]} data-screen={id}>
+  <Wrap class="q-form" {...wrapProps}>
+    <header class="q-head">
+      <p class="q-eyebrow" data-q-eyebrow>{eyebrow}</p>
+      <h1 id={`q-h-${id}`} class="q-h1" tabindex="-1">{title}</h1>
+      {lede && <p class="q-lede" set:html={lede} />}
+    </header>
+    <slot />
+  </Wrap>
+</section>

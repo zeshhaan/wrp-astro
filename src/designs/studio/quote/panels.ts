@@ -128,6 +128,13 @@ export interface CarViewerOptions {
   /** Paint colour as a CSS hex, to match the customer's car. */
   paint?: string;
   onToggle?: (id: PanelId) => void;
+  /**
+   * Additive (quote flow): which glass carries film in mode 'tint'.
+   * Default: side and rear glass, not the windscreen.
+   */
+  tintGlass?: ReadonlySet<GlassId>;
+  /** Additive (quote flow): colour of wrapped parts in mode 'wrap'. Default matte black. */
+  wrapColor?: string;
 }
 
 export interface CarViewerHandle {

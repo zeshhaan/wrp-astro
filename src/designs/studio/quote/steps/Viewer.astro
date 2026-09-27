@@ -1,0 +1,66 @@
+---
+/**
+ * Car viewer slot. app.ts mounts CarViewer2D here when the screen shows (and
+ * CarViewer3D if the customer switches and it's available). The panel list is
+ * the accessible, precise alternative to tapping the drawing.
+ */
+import { panels, wrapParts } from '../panels';
+
+interface Props {
+  id: string;
+  mode: 'ppf' | 'wrap' | 'tint';
+  legend: string;
+}
+const { id, mode, legend } = Astro.props;
+const groups = [
+  { id: 'front', label: 'Front' },
+  { id: 'side', label: 'Sides' },
+  { id: 'top', label: 'Roof & pillars' },
+  { id: 'rear', label: 'Rear' },
+] as const;
+const list = mode === 'wrap' ? panels.filter((p) => wrapParts.includes(p.id)) : panels;
+---
+
+<div class="q-viewer" data-q-viewer-wrap={id}>
+  <div class="q-viewer__stage">
+    <div class="q-viewer__canvas" data-q-viewer={mode}></div>
+    <div class="q-viewer__tools">
+      <span class="q-viewer__front" aria-hidden="true">Front ›</span>
+      <button type="button" class="q-viewer__3d" data-q-3d hidden aria-pressed="false">3D</button>
+    </div>
+  </div>
+  <p class="q-viewer__legend">{legend}</p>
+  {
+    mode === 'wrap' ? (
+      <div class="q-chips q-chips--parts" role="group" aria-label="Parts to wrap">
+        {list.map((p) => (
+          <button type="button" class="q-chip q-toggle" data-q-panel={p.id} aria-pressed="false">
+            <span class="q-toggle__box" aria-hidden="true" />
+            {p.label}
+          </button>
+        ))}
+      </div>
+    ) : mode === 'ppf' ? (
+      <details class="q-more q-panels">
+        <summary>
+          Edit panels one by one <span class="q-count" data-q-panel-count />
+        </summary>
+        {groups.map((g) => (
+          <div class="q-panels__group" role="group" aria-label={g.label}>
+            <p class="q-panels__label" aria-hidden="true">{g.label}</p>
+            <div class="q-chips">
+              {list
+                .filter((p) => p.group === g.id)
+                .map((p) => (
+                  <button type="button" class="q-chip q-toggle" data-q-panel={p.id} aria-pressed="false">
+                    <span class="q-toggle__box" aria-hidden="true" />
+                    {p.label}
+                  </button>
+                ))}
+            </div>
+          </div>
+        ))}
+      </details>
+    ) : null
+  }
+</div>

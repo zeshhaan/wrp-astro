@@ -1,0 +1,57 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+import { aed } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+---
+
+<Screen id="services" title="What it needs" eyebrow="Step 2 of 6" lede="Tap everything you’re interested in. You can pick more than one.">
+  <p class="q-note q-note--brass" data-q-suggested hidden>
+    <QIcon name="check" size={18} /> Suggested from your answers. Change anything you like.
+  </p>
+  <fieldset class="q-field">
+    <legend class="visually-hidden">Services</legend>
+    <div class="q-grid q-grid--tiles">
+      {
+        catalog.services.map((s) => (
+          <label class="q-card q-tile">
+            <input class="visually-hidden" type="checkbox" name="services" value={s.id} />
+            <span class="q-tile__icon"><QIcon name={s.id} size={26} /></span>
+            <span class="q-card__title">{s.name}</span>
+            <span class="q-card__hint">{s.line}</span>
+            <span class="q-price">{s.id === 'wash' ? `From ${aed(s.from ?? 0)}` : s.from ? `From ${aed(s.from)}` : 'Priced after inspection'}</span>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+      <button type="button" class="q-card q-tile q-tile--help" data-q-go="helper">
+        <span class="q-tile__icon"><QIcon name="help" size={26} /></span>
+        <span class="q-card__title">Not sure? Help me choose</span>
+        <span class="q-card__hint">Three quick questions and we’ll suggest.</span>
+      </button>
+    </div>
+  </fieldset>
+</Screen>
+
+<Screen id="helper" title="Help me choose" eyebrow="Step 2 of 6 · 3 quick questions" lede="Answer what you can. We’ll tick the services that fit; you can change them after.">
+  {
+    [
+      { name: 'chips', q: 'Worried about stone chips and scratches from the road?', hint: 'Highway driving, new car, or a colour you love.' },
+      { name: 'swirls', q: 'Does the paint look swirly, scratched or dull?', hint: 'Fine circles in the sun, or faded colour.' },
+      { name: 'heat', q: 'Is the cabin too hot, or the sun too bright?', hint: 'Seats and steering wheel too hot to touch.' },
+    ].map((x) => (
+      <fieldset class="q-field q-yesno">
+        <legend class="q-legend">{x.q}</legend>
+        <p class="q-help">{x.hint}</p>
+        <div class="q-seg q-seg--2">
+          <label class="q-segbtn"><input class="visually-hidden" type="radio" name={`help-${x.name}`} value="yes" />Yes</label>
+          <label class="q-segbtn"><input class="visually-hidden" type="radio" name={`help-${x.name}`} value="no" />No</label>
+        </div>
+      </fieldset>
+    ))
+  }
+  <p class="q-help">No to all three? A proper detail is probably what you want, and we’ll suggest that.</p>
+</Screen>

@@ -1,0 +1,143 @@
+---
+/**
+ * Studio: dedicated quote request page (/design-lab/studio/quote/).
+ *
+ * One screen per question, a sticky thumb-zone action bar with the running
+ * estimate, a bottom-sheet summary, back-gesture support (History API), and a
+ * draft that survives refreshes. Built so it works one-handed on a phone.
+ * Facts and prices come from data.ts and the service .mdx (see catalog.ts).
+ */
+import DesignShell from '../../shared/DesignShell.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import QIcon from './steps/QIcon.astro';
+import StepCar from './steps/StepCar.astro';
+import StepServices from './steps/StepServices.astro';
+import StepPpf from './steps/StepPpf.astro';
+import StepCeramic from './steps/StepCeramic.astro';
+import StepPolish from './steps/StepPolish.astro';
+import StepWash from './steps/StepWash.astro';
+import StepTint from './steps/StepTint.astro';
+import StepInterior from './steps/StepInterior.astro';
+import StepWrap from './steps/StepWrap.astro';
+import StepWhen from './steps/StepWhen.astro';
+import StepYou from './steps/StepYou.astro';
+import StepReview from './steps/StepReview.astro';
+import { buildCatalog } from './catalog';
+import { mainSteps } from './state';
+import './quote.css';
+
+const catalog = await buildCatalog();
+---
+
+<DesignShell
+  concept="studio"
+  title="Get a quote · WRP Detailing Dubai"
+  description="Tell us your car and what it needs: PPF, ceramic coating, polish, detailing, window tint, upholstery or wrap. See starting prices and send your request on WhatsApp."
+  fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
+  themeColor="#0c0d0f"
+  colorScheme="dark"
+>
+  <Header />
+  <main id="main" class="q" data-quote tabindex="-1">
+    <div class="q-top" data-q-top>
+      <div class="st-wrap q-top__inner">
+        <button type="button" class="q-iconbtn" data-q-back aria-label="Back" hidden>
+          <QIcon name="back" size={22} />
+        </button>
+        <nav class="q-progress" aria-label="Quote steps">
+          <p class="q-progress__label" data-q-steplabel>Step 1 of 6 · Your car</p>
+          <ol class="q-progress__list" role="list">
+            {
+              mainSteps.map((s) => (
+                <li>
+                  <button type="button" class="q-progress__seg" data-q-step={s.n} disabled>
+                    <span class="visually-hidden">
+                      Step {s.n}: {s.label}
+                      <span data-q-stepstate />
+                    </span>
+                    <span class="q-progress__name" aria-hidden="true">{s.short}</span>
+                  </button>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+        <a class="q-iconbtn q-iconbtn--wa" href={catalog.contact.whatsappHello} target="_blank" rel="noopener" aria-label="Ask us on WhatsApp">
+          <QIcon name="whatsapp" size={22} />
+        </a>
+      </div>
+    </div>
+
+    <div class="st-wrap q-layout">
+      <div class="q-screens" data-q-screens>
+        <StepCar />
+        <StepServices catalog={catalog} />
+        <StepPpf catalog={catalog} />
+        <StepCeramic catalog={catalog} />
+        <StepPolish catalog={catalog} />
+        <StepWash catalog={catalog} />
+        <StepTint catalog={catalog} />
+        <StepInterior />
+        <StepWrap catalog={catalog} />
+        <StepWhen catalog={catalog} />
+        <StepYou />
+        <StepReview catalog={catalog} />
+      </div>
+      <script is:inline>
+        // Show the screen named in the URL before first paint (refresh keeps your place);
+        // app.ts then checks it against the saved draft.
+        (function () {
+          var id = location.hash.slice(1);
+          var el = id && document.querySelector('[data-screen="' + id.replace(/[^a-z-]/g, '') + '"]');
+          (el || document.querySelector('[data-screen="car"]')).setAttribute('data-active', '');
+        })();
+      </script>
+
+      <aside class="q-side" aria-label="Your quote">
+        <div class="q-side__panel">
+          <h2 class="q-h2 q-side__title">Your quote</h2>
+          <div class="q-summary" data-q-summary="side"></div>
+        </div>
+        <div class="q-bar" data-q-bar>
+          <p class="q-bar__msg" data-q-barmsg role="alert" hidden></p>
+          <button type="button" class="q-bar__sum" data-q-sheet-open aria-haspopup="dialog" aria-controls="q-sheet">
+            <span class="q-bar__count" data-q-count>Nothing chosen yet</span>
+            <span class="q-bar__total" data-q-total>Start with your car</span>
+          </button>
+          <button type="button" class="st-btn st-btn--gold q-bar__next" data-q-next>
+            <span data-q-next-label>Next</span>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+          </button>
+          <div class="q-bar__send" data-q-send-actions hidden>
+            <a class="st-btn st-btn--gold q-bar__wa" data-q-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener">
+              <QIcon name="whatsapp" size={20} />Send on WhatsApp
+            </a>
+            <button type="submit" form="q-send-form" class="st-btn st-btn--light q-bar__submit">Send request</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <dialog class="q-sheet" id="q-sheet" closedby="any" aria-labelledby="q-sheet-title">
+    <div class="q-sheet__grip" aria-hidden="true"></div>
+    <div class="q-sheet__head">
+      <h2 id="q-sheet-title" class="q-h2">Your quote so far</h2>
+      <form method="dialog">
+        <button class="q-iconbtn" aria-label="Close summary"><QIcon name="close" size={22} /></button>
+      </form>
+    </div>
+    <div class="q-summary" data-q-summary="sheet"></div>
+  </dialog>
+
+  <p class="visually-hidden" aria-live="polite" data-q-live></p>
+
+  <Footer />
+
+  <script type="application/json" id="q-catalog" set:html={JSON.stringify(catalog).replace(/</g, '\\u003c')} />
+  <script>
+    import { start } from './app';
+    start();
+  </script>
+</DesignShell>
