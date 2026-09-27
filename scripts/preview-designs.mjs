@@ -7,6 +7,11 @@
  *   node scripts/preview-designs.mjs              # all concepts + the lab
  *   node scripts/preview-designs.mjs --only gloss,menu
  *   node scripts/preview-designs.mjs --dry-run    # print the commands only
+ *   node scripts/preview-designs.mjs --ci         # Workers Builds deploy command
+ *
+ * --ci is for a Workers Builds Preview whose build command already ran
+ * `bun run build`: it first publishes that build as the branch's own Preview
+ * (the Design Lab), then rebuilds and publishes one Preview per concept.
  *
  * Needs Wrangler >= 4.135 (Worker Previews) and a logged-in `wrangler`
  * (or CLOUDFLARE_API_TOKEN). Production is never touched: `wrangler preview`
@@ -18,6 +23,7 @@ import { readFileSync } from 'node:fs';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
+const ci = args.includes('--ci');
 const onlyArg = args.find((a) => a.startsWith('--only'));
 const only = onlyArg
   ? (onlyArg.includes('=') ? onlyArg.split('=')[1] : args[args.indexOf(onlyArg) + 1]).split(',')
@@ -49,21 +55,24 @@ function run(cmd, cmdArgs, env = {}) {
   }).toString();
 }
 
-function deploy(name, designEnv) {
+function deploy(name, designEnv, { build = true } = {}) {
   // `astro build` alone: the full `bun run build` also regenerates llms/OG/images,
   // which the committed files already cover and a design preview doesn't need.
-  run('npx', ['astro', 'build'], designEnv);
-  const out = run('npx', ['wrangler', 'preview', '--name', name, '--message', `Design Lab ${name} @ ${commit}`, '--json']);
+  if (build) run('npx', ['astro', 'build'], designEnv);
+  // No name: Wrangler targets the Preview for the current git branch.
+  const nameArgs = name ? ['--name', name] : [];
+  const out = run('npx', ['wrangler', 'preview', ...nameArgs, '--message', `Design Lab ${name ?? 'branch'} @ ${commit}`, '--json']);
   if (dryRun) return null;
   const json = safe(() => JSON.parse(out.slice(out.indexOf('{'))), null);
   return json?.preview_url ?? json?.url ?? out.match(/https:\/\/\S+workers\.dev\S*/)?.[0] ?? '(see output above)';
 }
 
 const results = [];
+if (ci) results.push(['branch (lab)', deploy(null, {}, { build: false })]);
 for (const id of concepts) {
   results.push([`design-${id}`, deploy(`design-${id}`, { PUBLIC_WRP_DESIGN: id })]);
 }
-if (!only) results.push(['design-lab', deploy('design-lab', { PUBLIC_WRP_DESIGN: '' })]);
+if (!only && !ci) results.push(['design-lab', deploy('design-lab', { PUBLIC_WRP_DESIGN: '' })]);
 
 console.log('\nDesign Lab Previews');
 for (const [name, url] of results) console.log(`  ${name.padEnd(18)} ${url ?? '(dry run)'}`);

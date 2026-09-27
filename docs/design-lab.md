@@ -28,7 +28,7 @@ at `/`, exactly as it would be on wrpdetailing.ae:
 | `design-gloss` | Gloss at `/` |
 | `design-menu` | The Menu at `/` |
 | `design-paddock` | Paddock at `/` |
-| `design-lab` | All four under `/design-lab/` |
+| the branch's own Preview | All four under `/design-lab/` |
 
 URLs follow `https://<preview>-wrp-astro.<subdomain>.workers.dev`. They update on
 every push to the branch they track.
@@ -45,10 +45,12 @@ every push to the branch they track.
 
 ## Deploying Previews
 
-**Workers Builds (automatic).** Each design Preview is a Workers Builds Preview
-tracking the feature branch, with `PUBLIC_WRP_DESIGN` set as a build variable and
-deploy command `npx wrangler preview --name design-<id>`. Pushing the branch
-rebuilds all of them.
+**Workers Builds (automatic).** The Worker uses Worker Previews for every
+non-`main` branch (deploy command `npx wrangler preview`). The Design Lab
+branch's Preview overrides its deploy command to
+`node scripts/preview-designs.mjs --ci`, which publishes the branch build as the
+branch Preview, then rebuilds with each `PUBLIC_WRP_DESIGN` and publishes
+`design-<id>`. Every push to the branch refreshes all five.
 
 **By hand.** With `wrangler login` (Wrangler ≥ 4.135):
 
