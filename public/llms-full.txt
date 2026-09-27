@@ -38,6 +38,7 @@
 - [احمِ](https://wrpdetailing.ae/ar/protect/): صفحة احمِ العربية.
 - [الخصوصية](https://wrpdetailing.ae/ar/privacy/): سياسة الخصوصية باللغة العربية.
 - [الشروط والأحكام](https://wrpdetailing.ae/ar/terms/): الشروط والأحكام باللغة العربية.
+- [الاعتمادات](https://wrpdetailing.ae/ar/credits/): النماذج ثلاثية الأبعاد وصور العملاء والخطوط والبرمجيات مفتوحة المصدر المستخدمة في الموقع.
 
 ---
 

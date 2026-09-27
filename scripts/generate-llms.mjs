@@ -42,6 +42,7 @@ const STATIC_AR_PAGES = [
   { title: 'احمِ', url: `${SITE_URL}/ar/protect/`, description: 'صفحة احمِ العربية.' },
   { title: 'الخصوصية', url: `${SITE_URL}/ar/privacy/`, description: 'سياسة الخصوصية باللغة العربية.' },
   { title: 'الشروط والأحكام', url: `${SITE_URL}/ar/terms/`, description: 'الشروط والأحكام باللغة العربية.' },
+  { title: 'الاعتمادات', url: `${SITE_URL}/ar/credits/`, description: 'النماذج ثلاثية الأبعاد وصور العملاء والخطوط والبرمجيات مفتوحة المصدر المستخدمة في الموقع.' },
 ];
 
 // Drop inline HTML anchor tags (e.g. the `data-contact-modal` contact trigger)
