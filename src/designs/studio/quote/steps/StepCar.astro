@@ -2,7 +2,6 @@
 import Screen from './Screen.astro';
 import QIcon from './QIcon.astro';
 import { bodyTypes } from '../panels';
-import { carSilhouette } from '../viewer/CarViewer2D';
 import { carModels } from '../models';
 import { paintChips } from '../state';
 
@@ -26,7 +25,9 @@ const years = Array.from({ length: thisYear + 1 - 1995 }, (_, i) => String(thisY
         bodyTypes.map((b) => (
           <label class="q-card q-body">
             <input class="visually-hidden" type="radio" name="body" value={b.id} required />
-            <span class="q-body__sil" set:html={carSilhouette(b.id)} />
+            <span class="q-body__sil">
+              <img src={`/models/cars/thumbs/${b.id}.webp`} alt="" width="960" height="420" decoding="async" />
+            </span>
             <span class="q-card__title">{b.label}</span>
             <span class="q-card__hint">{b.hint}</span>
             <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>

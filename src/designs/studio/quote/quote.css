@@ -513,27 +513,24 @@ body:has(main.q) .foot {
   margin-block-end: 0.35rem;
   padding-inline-end: 1.4rem;
 }
-.q-body__sil .sil {
+/* Stills of the 3D models (scripts/cars/render-thumbs.mjs), bottom-aligned so the
+   four cars share a ground line whatever their height. */
+.q-body__sil img {
+  display: block;
   inline-size: 100%;
   block-size: auto;
+  aspect-ratio: 960 / 420;
+  object-fit: contain;
+  object-position: 50% 100%;
+  opacity: 0.78;
+  transition: opacity 0.2s;
 }
-.q .sil-body path {
-  fill: #2a2e33;
-  stroke: #767d85;
-  stroke-width: 2;
-  stroke-linejoin: round;
+.q-body:hover .q-body__sil img,
+.q-body:has(input:checked) .q-body__sil img {
+  opacity: 1;
 }
-.q .sil-body .sil-glass {
-  fill: #101418;
-}
-.q .sil-wheel {
-  fill: #0b0c0e;
-  stroke: #767d85;
-  stroke-width: 2;
-}
-.q-body:has(input:checked) .sil-body path:not(.sil-glass) {
-  fill: #5c4a26;
-  stroke: var(--st-gold);
+.q-bodies .q-help {
+  margin-block-start: 0.75rem;
 }
 
 /* Service tiles */

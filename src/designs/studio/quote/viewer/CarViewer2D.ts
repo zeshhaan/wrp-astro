@@ -12,8 +12,7 @@
  *
  * The drawing is pointer-only by design: the host always renders an accessible
  * list of panel toggle buttons next to it, so nobody depends on precise taps.
- * No DOM access at module top level, so the Astro server can import
- * carSilhouette() to draw the body-type cards.
+ * No DOM access at module top level, so it is safe to import on the server.
  */
 import { panels, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId } from '../panels';
 
@@ -258,18 +257,6 @@ function svgMarkup(body: BodyType, mode: CarViewerOptions['mode'], uid: string) 
     </linearGradient>
   </defs>`;
   return { markup: defs + inner, viewBox: `0 0 ${VIEW_W} ${h}` };
-}
-
-/** Static side-profile silhouette for the body-type cards (server-safe). */
-export function carSilhouette(body: BodyType): string {
-  const g = geos[body];
-  const piece = sidePiece(g, 'l');
-  const paths = piece.panels.map(([id, d]) => `<path d="${d}"${id.toString().startsWith('side-glass') ? ' class="sil-glass"' : ''}/>`).join('');
-  const wy = g.sh - g.wheelR;
-  const wheels = [g.xr, g.xf].map((cx) => `<circle class="sil-wheel" cx="${cx}" cy="${wy}" r="${g.wheelR - 3}"/>`).join('');
-  // Fixed viewBox height (the tallest body) so the cards line up and sizes compare honestly.
-  const H = 116;
-  return `<svg viewBox="-4 ${g.sh - H} ${L + 8} ${H + 2}" class="sil" aria-hidden="true" focusable="false"><g class="sil-body">${paths}</g>${wheels}</svg>`;
 }
 
 const STYLE_ID = 'cv2d-style';
