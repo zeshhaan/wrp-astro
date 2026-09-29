@@ -29,10 +29,12 @@ interface Props {
   themeColor: string;
   /** Hero image to preload for LCP, as a responsive base path. */
   preloadImage?: { base: string; sizes: string; widths?: number[] };
+  /** Other LCP images to preload, e.g. per-viewport hero posters (`media` picks one). */
+  preloads?: { href: string; type: string; media?: string }[];
   colorScheme?: 'light' | 'dark' | 'light dark';
 }
 
-const { concept, title, description, fonts, themeColor, preloadImage, colorScheme = 'light' } = Astro.props;
+const { concept, title, description, fonts, themeColor, preloadImage, preloads = [], colorScheme = 'light' } = Astro.props;
 const meta = getConcept(concept);
 const widths = preloadImage?.widths ?? [480, 800, 1200];
 ---
@@ -63,6 +65,7 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
         />
       )
     }
+    {preloads.map((p) => <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} fetchpriority="high" />)}
     {fonts.map((f, i) => <Font cssVariable={f} preload={i < 2} />)}
     <style is:global>
       /* Shared reset only. All look-and-feel lives in each concept. */

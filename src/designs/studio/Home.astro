@@ -22,7 +22,7 @@ import Blog from './Blog.astro';
 import Contact from './Contact.astro';
 import Footer from './Footer.astro';
 import FloatingContact from './FloatingContact.astro';
-import { heroImage } from './content';
+import { heroVideo } from './heroVideo';
 ---
 
 <DesignShell
@@ -32,7 +32,10 @@ import { heroImage } from './content';
   fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
   themeColor="#0c0d0f"
   colorScheme="dark"
-  preloadImage={{ base: heroImage.base, sizes: '100vw' }}
+  preloads={[
+    { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
+    { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
+  ]}
 >
   <Header />
   <main id="main">

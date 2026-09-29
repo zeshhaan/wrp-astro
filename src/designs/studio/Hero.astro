@@ -1,18 +1,43 @@
 ---
-import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
-import { heroImage, proof, whatsappQuote } from './content';
+import { proof, whatsappQuote } from './content';
+import { heroVideo as hv } from './heroVideo';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
-  <Picture
-    base={heroImage.base}
-    alt={heroImage.alt}
-    sizes="100vw"
-    loading="eager"
-    fetchpriority="high"
-    class="hero__bg"
-  />
+  <!--
+    Background, back to front: an inlined ~30px blurred frame (paints with the HTML, no request),
+    the sharp poster (the LCP image), then the video, which only starts downloading after the
+    page has loaded and fades in once it is actually playing. Phones get a 9:16 crop.
+  -->
+  <div class="hero__media" style={`--ph-wide:url(${hv.placeholder.wide});--ph-tall:url(${hv.placeholder.tall})`} aria-hidden="true">
+    <picture>
+      <source media={hv.tallMedia} type="image/avif" srcset={hv.poster.tall.avif} />
+      <source media={hv.tallMedia} type="image/webp" srcset={hv.poster.tall.webp} />
+      <source media={hv.tallMedia} srcset={hv.poster.tall.jpg} width="720" height="1280" />
+      <source type="image/avif" srcset={hv.poster.wide.avif} />
+      <source type="image/webp" srcset={hv.poster.wide.webp} />
+      <img class="hero__poster" src={hv.poster.wide.jpg} alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+    </picture>
+    <video
+      class="hero__video"
+      data-hero-video
+      data-wide-av1={hv.video.wide.av1}
+      data-wide-h264={hv.video.wide.h264}
+      data-tall-av1={hv.video.tall.av1}
+      data-tall-h264={hv.video.tall.h264}
+      data-tall-media={hv.tallMedia}
+      muted
+      loop
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      tabindex="-1"></video>
+  </div>
+  <button type="button" class="hero__pause" data-hero-pause aria-pressed="false" hidden>
+    <span class="visually-hidden" data-hero-pause-label>Pause background video</span>
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path class="i-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /><path class="i-play" d="M8 5.5v13l10.5-6.5z" /></svg>
+  </button>
   <div class="st-wrap hero__inner">
     <div class="hero__main">
       <p class="st-eyebrow">Al Qusais, Dubai</p>
@@ -53,16 +78,69 @@ import { heroImage, proof, whatsappQuote } from './content';
     background: var(--st-black);
     overflow: hidden;
   }
-  .hero :global(.hero__bg) {
+  .hero__media {
     position: absolute;
     inset: 0;
     z-index: -2;
+    background: var(--st-black);
   }
-  .hero :global(.hero__bg img) {
+  /* Layer 1: the inlined blurred frame, scaled a touch so blurred edges stay off-screen. */
+  .hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ph-wide) center / cover no-repeat;
+    filter: blur(24px);
+    transform: scale(1.1) translateZ(0);
+  }
+  .hero__poster,
+  .hero__video {
+    position: absolute;
+    inset: 0;
     inline-size: 100%;
     block-size: 100%;
     object-fit: cover;
-    object-position: 50% 60%;
+  }
+  .hero__video {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .hero__video.is-playing {
+    opacity: 1;
+  }
+  @media (max-width: 40rem) {
+    .hero__media::before {
+      background-image: var(--ph-tall);
+    }
+  }
+  .hero__pause {
+    position: absolute;
+    /* Top corner: the bottom one belongs to the floating WhatsApp/call buttons. */
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 50%;
+    background: rgb(12 13 15 / 0.45);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .hero__pause[hidden] {
+    display: none;
+  }
+  .hero__pause path {
+    fill: currentColor;
+  }
+  .hero__pause .i-play,
+  .hero__pause[aria-pressed='true'] .i-pause {
+    display: none;
+  }
+  .hero__pause[aria-pressed='true'] .i-play {
+    display: block;
   }
   .hero::before {
     content: '';
@@ -137,3 +215,8 @@ import { heroImage, proof, whatsappQuote } from './content';
     }
   }
 </style>
+
+<script>
+  import { startHeroVideo } from './heroVideoClient';
+  startHeroVideo();
+</script>

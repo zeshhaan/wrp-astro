@@ -29,3 +29,11 @@
 /*.woff2
   Cache-Control: public, max-age=31536000, immutable
 
+
+# Hero video (fixed filenames: a week fresh, then revalidated in the background)
+/video/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+# 3D car models (requested with ?v=MODEL_VERSION, so a new version is a new URL)
+/models/cars/*.glb
+  Cache-Control: public, max-age=31536000, immutable

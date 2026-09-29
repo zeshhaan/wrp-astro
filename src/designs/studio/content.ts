@@ -7,11 +7,6 @@ import { contact, freshQuotes, proof, services, whatsappLink, type Service } fro
 
 export const whatsappQuote = whatsappLink('Hi WRP, I would like a quote for my car.');
 
-export const heroImage = {
-  base: '/review-images/tariq_murad_3',
-  alt: 'Cars in the WRP studio in Al Qusais under black pendant lights, beside the WRP logo wall',
-};
-
 export const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
 
 export type Card = {
