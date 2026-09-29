@@ -1,0 +1,287 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { contact, serviceOptions, whatsappQuote } from './content';
+---
+
+<section class="contact st-section st-black" id="contact" aria-labelledby="contact-title">
+  <div class="st-wrap contact__grid">
+    <div class="contact__info">
+      <p class="st-eyebrow">Contact us</p>
+      <h2 id="contact-title" class="st-h2">Get a quick quote</h2>
+      <p class="contact__lede">
+        Send us your car and the service you want, and we will come back to you with a price and a time by phone,
+        email or WhatsApp, whichever you prefer.
+      </p>
+      <ul class="details" role="list">
+        <li>
+          <Icon name="whatsapp" />
+          <div><span class="details__label">WhatsApp</span><a href={whatsappQuote} target="_blank" rel="noopener">Message us on WhatsApp</a></div>
+        </li>
+        <li>
+          <Icon name="phone" />
+          <div><span class="details__label">Call</span><a href={contact.phoneHref}>{contact.phoneDisplay}</a></div>
+        </li>
+        <li>
+          <Icon name="mail" />
+          <div><span class="details__label">Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></div>
+        </li>
+        <li>
+          <Icon name="pin" />
+          <div><span class="details__label">Studio</span><span>{contact.address.join(', ')}</span></div>
+        </li>
+        <li>
+          <Icon name="clock" />
+          <div><span class="details__label">Hours</span><span>{contact.hours}. {contact.closed}.</span></div>
+        </li>
+      </ul>
+      <a class="mapcard" href={contact.mapsUrl} target="_blank" rel="noopener">
+        <Picture
+          base="/review-images/tariq_murad_3"
+          alt="Inside the WRP studio, Al Qusais Industrial Area 1"
+          sizes="(min-width: 60rem) 40vw, 100vw"
+        />
+        <span class="mapcard__label"><Icon name="map" size={18} />Open in Google Maps</span>
+      </a>
+    </div>
+
+    <form class="form" id="quote" data-demo-form aria-labelledby="form-title">
+      <h3 id="form-title" class="form__title">Tell us about your car</h3>
+      <div class="form__grid">
+        <label class="field">
+          <span>Name</span>
+          <input name="name" type="text" autocomplete="name" required />
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+        </label>
+        <label class="field">
+          <span>Email <small>(optional)</small></span>
+          <input name="email" type="email" autocomplete="email" />
+        </label>
+        <label class="field">
+          <span>Vehicle make, model, year</span>
+          <input name="vehicle" type="text" placeholder="e.g. Toyota Land Cruiser 2022" required />
+        </label>
+        <label class="field field--wide">
+          <span>Service</span>
+          <select name="service" required>
+            <option value="">Choose a service</option>
+            {serviceOptions.map((o) => <option>{o}</option>)}
+          </select>
+        </label>
+        <label class="field field--wide">
+          <span>Anything else we should know? <small>(optional)</small></span>
+          <textarea name="message" rows="4" placeholder="Coverage, timing, colour, current marks or damage"></textarea>
+        </label>
+      </div>
+      <button class="st-btn st-btn--gold form__submit" type="submit">Send my quote request</button>
+      <p class="form__note">Prefer to chat? <a href={whatsappQuote} target="_blank" rel="noopener">Message us on WhatsApp</a> instead.</p>
+      <p class="form__status" data-demo-status hidden role="status"></p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact__grid {
+    display: grid;
+    gap: 3rem 4rem;
+    align-items: start;
+  }
+  .contact__info {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .contact__lede {
+    color: var(--st-on-dark);
+    max-inline-size: 34rem;
+  }
+  .details {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0.5rem 0 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .details li {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+  .details li > :global(svg) {
+    flex: none;
+    margin-block-start: 0.2rem;
+    color: var(--st-gold);
+  }
+  .details div {
+    display: grid;
+  }
+  .details__label {
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--st-mute);
+  }
+  .details a {
+    color: var(--st-white);
+    text-decoration: underline;
+    text-decoration-color: var(--st-gold);
+    text-underline-offset: 3px;
+    padding-block: 0.55rem;
+  }
+  .details a:hover {
+    color: var(--st-gold);
+  }
+  .mapcard {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    color: var(--st-white);
+    text-decoration: none;
+    border: 1px solid var(--st-line-dark);
+  }
+  .mapcard :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    filter: grayscale(0.6) brightness(0.7);
+    transition: filter 0.3s;
+  }
+  .mapcard:hover :global(img) {
+    filter: none;
+  }
+  .mapcard__label {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-end: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding-inline: 1rem;
+    background: var(--st-white);
+    color: var(--st-black);
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.9375rem;
+  }
+
+  /* Form */
+  .form {
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    background: var(--st-coal);
+    border: 1px solid var(--st-line-dark);
+    border-block-start: 3px solid var(--st-gold);
+  }
+  .form__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+  .form__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .field--wide {
+      grid-column: 1 / -1;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .field > span {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .field small {
+    font-weight: 400;
+    color: var(--st-mute);
+  }
+  .field :is(input, select, textarea) {
+    inline-size: 100%;
+    min-block-size: 2.9rem;
+    padding: 0.65rem 0.8rem;
+    background: var(--st-black);
+    color: var(--st-white);
+    border: 1px solid #3a3e44;
+    border-radius: 0;
+    font-size: 1rem;
+    accent-color: var(--st-gold);
+  }
+  .field select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--st-gold) 50%),
+      linear-gradient(135deg, var(--st-gold) 50%, transparent 50%);
+    background-position: calc(100% - 1.15rem) 55%, calc(100% - 0.8rem) 55%;
+    background-size: 0.35rem 0.35rem;
+    background-repeat: no-repeat;
+    padding-inline-end: 2.25rem;
+  }
+  .field select option {
+    background: var(--st-coal);
+    color: var(--st-white);
+  }
+  .field textarea {
+    resize: vertical;
+  }
+  .field ::placeholder {
+    color: #8a8f96;
+  }
+  .field :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--st-gold);
+    outline-offset: 1px;
+    border-color: var(--st-gold);
+  }
+  /* Only flag invalid fields after the visitor has interacted with them. */
+  .field :is(input, select, textarea):user-invalid {
+    border-color: #ff8a80;
+  }
+  .form__submit {
+    justify-self: stretch;
+    min-block-size: 3.25rem;
+    font-size: 1.05rem;
+  }
+  .form__note {
+    font-size: 0.875rem;
+    color: var(--st-mute);
+  }
+  .form__note a {
+    color: var(--st-white);
+    text-underline-offset: 3px;
+  }
+  .form__status {
+    padding: 0.9rem 1rem;
+    background: var(--st-black);
+    border-inline-start: 3px solid var(--st-gold);
+    font-size: 0.9375rem;
+  }
+  @media (min-width: 60rem) {
+    .contact__grid {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+  }
+  /* Desktop: the form stays in view while the details and map scroll past.
+     Only when the whole form fits under the header, so the submit button is
+     never stuck below the fold on short laptop screens. */
+  @media (min-width: 60rem) and (min-height: 48rem) {
+    .form {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 1rem);
+    }
+    .mapcard :global(img) {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

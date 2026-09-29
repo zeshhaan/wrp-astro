@@ -1,0 +1,88 @@
+---
+import Icon from './Icon.astro';
+import { whyPoints } from './content';
+---
+
+<section class="why st-section st-light" id="why" aria-labelledby="why-title">
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <p class="st-eyebrow st-eyebrow--dark">In our customers’ words</p>
+      <h2 id="why-title" class="st-h2">Why choose WRP</h2>
+      <p class="st-intro">The four things our customers mention most in their Google reviews.</p>
+    </header>
+    <ul class="points" role="list">
+      {
+        whyPoints.map((p) => (
+          <li class="point">
+            <span class="point__icon">
+              <Icon name={p.icon} size={28} />
+            </span>
+            <h3 class="point__title">{p.title}</h3>
+            <p class="point__body">{p.body}</p>
+            <blockquote class="point__quote">
+              <p>“{p.quote}”</p>
+              <footer>{p.author}, Google review</footer>
+            </blockquote>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .points {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .point {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    background: var(--st-white);
+    border: 1px solid var(--st-line-light);
+  }
+  .point__icon {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 3.75rem;
+    block-size: 3.75rem;
+    border: 1.5px solid var(--st-gold);
+    color: var(--st-ink);
+  }
+  .point__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .point__body {
+    color: var(--st-ink-2);
+    font-size: 0.9375rem;
+  }
+  .point__quote {
+    margin: 0.25rem 0 0;
+    padding-block-start: 0.9rem;
+    border-block-start: 1px solid var(--st-line-light);
+    font-size: 0.875rem;
+    color: var(--st-ink);
+    inline-size: 100%;
+  }
+  .point__quote p {
+    font-style: italic;
+  }
+  .point__quote footer {
+    margin-block-start: 0.35rem;
+    color: var(--st-gold-deep);
+    font-weight: 600;
+    font-size: 0.8125rem;
+  }
+</style>

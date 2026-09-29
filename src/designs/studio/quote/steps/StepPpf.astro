@@ -1,0 +1,104 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import Viewer from './Viewer.astro';
+import type { Catalog } from '../state';
+import { aed } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+const svc = catalog.services.find((s) => s.id === 'ppf')!;
+const shortName: Record<string, string> = { 'front-end': 'Front end', track: 'Track', 'full-body': 'Full body' };
+---
+
+<Screen id="ppf" title="Paint protection film" eyebrow="Step 3 of 6 · Details" lede={`Choose how much of the car to cover. <span class="q-price">From ${aed(svc.from ?? 0)}</span>, priced for your car.`}>
+  <Viewer id="ppf" mode="ppf" legend="Brass shows the film. Tap a panel on the car to add or remove it." />
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Coverage</legend>
+    <div class="q-seg q-seg--3" data-q-presets>
+      {
+        catalog.ppf.presets.map((p) => (
+          <label class="q-segbtn">
+            <input class="visually-hidden" type="radio" name="ppfPreset" value={p.id} />
+            {shortName[p.id] ?? p.name}
+          </label>
+        ))
+      }
+    </div>
+    <p class="q-custom" data-q-custom hidden><QIcon name="edit" size={16} /> <span>Custom coverage</span></p>
+    {
+      catalog.ppf.presets.map((p) => (
+        <div class="q-detail" data-q-preset-detail={p.id} hidden>
+          <p class="q-detail__title">{p.name}</p>
+          <p class="q-help">{p.note}</p>
+          <ul class="q-ticks" role="list">
+            {p.features.map((f) => <li><QIcon name="check" size={16} />{f}</li>)}
+          </ul>
+        </div>
+      ))
+    }
+  </fieldset>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Finish</legend>
+    <div class="q-seg q-seg--2">
+      <label class="q-segbtn"><input class="visually-hidden" type="radio" name="ppfFinish" value="gloss" />Gloss <small>invisible</small></label>
+      <label class="q-segbtn"><input class="visually-hidden" type="radio" name="ppfFinish" value="matte" />Matte <small>satin look</small></label>
+    </div>
+  </fieldset>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Film</legend>
+    <div class="q-grid q-grid--3 q-films">
+      {
+        catalog.ppf.films.map((f, i) => (
+          <label class="q-card q-film">
+            <input class="visually-hidden" type="radio" name="ppfFilm" value={i === 0 ? 'avery' : 'stek'} />
+            <span class="q-film__logo"><img src={f.logo} alt="" width="120" height="40" loading="lazy" decoding="async" /></span>
+            <span class="q-card__title">{f.name}</span>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+      <label class="q-card q-film">
+        <input class="visually-hidden" type="radio" name="ppfFilm" value="recommend" />
+        <span class="q-film__logo q-film__logo--text">?</span>
+        <span class="q-card__title">Recommend for me</span>
+        <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+      </label>
+    </div>
+    <p class="q-help">We fit both, with up to a 10-year warranty on PPF. Not sure? We’ll explain the difference for your car.</p>
+  </fieldset>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Add-on</legend>
+    <label class="q-card q-check">
+      <input type="checkbox" name="ppfCeramic" />
+      <span>
+        <span class="q-card__title">Ceramic coating on top of the film</span>
+        <span class="q-card__hint">Adds gloss and makes the film easier to clean. Priced with your film.</span>
+        <span class="q-card__hint" data-q-if-service="ceramic" hidden>You’ve also picked ceramic coating: we’ll plan both together.</span>
+      </span>
+    </label>
+  </fieldset>
+
+  <details class="q-more">
+    <summary>More about PPF</summary>
+    <ul class="q-ticks" role="list">
+      {catalog.ppf.facts.map((f) => <li><QIcon name="check" size={16} />{f}</li>)}
+      <li><QIcon name="clock" size={16} />Usually {svc.time} with us.</li>
+    </ul>
+    <p class="q-help">{catalog.ppf.ceramicOnFilm}</p>
+    <p><a href={svc.href}>Read the full PPF page</a></p>
+  </details>
+
+  {
+    catalog.quotes.ppf && (
+      <figure class="q-quote">
+        <blockquote><p>“{catalog.quotes.ppf.text}”</p></blockquote>
+        <figcaption>{catalog.quotes.ppf.author}, Google review</figcaption>
+      </figure>
+    )
+  }
+</Screen>

@@ -1,0 +1,61 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+import { slots } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+---
+
+<Screen id="when" title="When & how" eyebrow="Step 4 of 6" lede="Pick a day and a rough time. We confirm the exact time with you.">
+  <fieldset class="q-field">
+    <legend class="q-legend">Day <span class="q-month" data-q-month></span></legend>
+    <div class="q-days" data-q-days>
+      <p class="q-help">Loading the next three weeks…</p>
+    </div>
+    <p class="q-help">Open {catalog.contact.hoursShort}. {catalog.contact.closed}. Dubai time.</p>
+  </fieldset>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Time of day</legend>
+    <div class="q-grid q-grid--3 q-slots">
+      {
+        slots.map((s) => (
+          <label class="q-card q-slot">
+            <input class="visually-hidden" type="radio" name="slot" value={s.id} />
+            <span class="q-card__title">{s.label}</span>
+            <span class="q-card__hint">{s.range}</span>
+            <span class="q-slot__gone" data-q-gone>Gone for today</span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Getting the car to us</legend>
+    <div class="q-stack q-stack--tight">
+      <label class="q-card q-check q-radio">
+        <input type="radio" name="handover" value="drop" />
+        <span>
+          <span class="q-card__title">I’ll drop it off</span>
+          <span class="q-card__hint">{catalog.contact.address}. Easy parking.</span>
+        </span>
+      </label>
+      <label class="q-card q-check q-radio">
+        <input type="radio" name="handover" value="collect" />
+        <span>
+          <span class="q-card__title">Please collect my car</span>
+          <span class="q-card__hint">Pickup and delivery on request; we’ll confirm when we reply.</span>
+        </span>
+      </label>
+    </div>
+    <div class="q-input q-reveal" data-q-when="handover=collect" hidden>
+      <label for="q-area">Where from? <span class="q-opt">optional</span></label>
+      <input id="q-area" name="area" type="text" autocomplete="address-level2" enterkeyhint="next" placeholder="e.g. JLT, Dubai Hills, Al Nahda" />
+    </div>
+  </fieldset>
+
+  <div class="q-duration" data-q-duration></div>
+</Screen>

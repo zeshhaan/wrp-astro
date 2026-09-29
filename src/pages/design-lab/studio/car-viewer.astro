@@ -1,0 +1,461 @@
+---
+/**
+ * Design Lab test bench for the Studio quote flow's 3D car viewer.
+ * Exercises CarViewer3D (three.js + the converted car pack GLBs) with every body,
+ * mode, PPF preset, tint and paint colour. Internal only (noindex via DesignShell).
+ */
+export const prerender = true;
+
+import DesignShell from '@/designs/shared/DesignShell.astro';
+import { bodyTypes, panels, ppfPresets, tintOptions, wrapParts } from '@/designs/studio/quote/panels';
+
+const paints = [
+  { name: 'Studio grey', hex: '#8d9299' },
+  { name: 'Pearl white', hex: '#e9e9e4' },
+  { name: 'Obsidian black', hex: '#15171a' },
+  { name: 'Racing red', hex: '#9c1b1f' },
+  { name: 'Deep blue', hex: '#1e3553' },
+  { name: 'Nardo', hex: '#6f7478' },
+];
+---
+
+<DesignShell
+  concept="studio"
+  title="Car viewer test bench · Studio"
+  description="Internal test page for the 3D quote-flow car viewer."
+  fonts={['--font-oswald', '--font-inter']}
+  themeColor="#0c0d0f"
+  colorScheme="dark"
+>
+  <main class="cv">
+    <header class="cv__head">
+      <p class="cv__eyebrow">Design Lab · Studio quote flow</p>
+      <h1>Car viewer</h1>
+      <p class="cv__lede">
+        Comrade1280's car pack split into panels at build time, three.js at runtime. Drag sideways to turn, pinch to zoom, tap a panel to toggle it,
+        double-tap to reset.
+      </p>
+    </header>
+
+    <div class="cv__stage">
+      <div class="cv__viewer" id="viewer" data-allow-software-gl></div>
+      <p class="cv__status" id="status" role="status">Loading 3D viewer…</p>
+    </div>
+
+
+    <form class="cv__controls" id="controls" onsubmit="return false">
+      <fieldset>
+        <legend>Body</legend>
+        <div class="cv__row">
+          {
+            bodyTypes.map((b, i) => (
+              <label class="cv__chip">
+                <input type="radio" name="body" value={b.id} checked={i === 0} />
+                <span>{b.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Mode</legend>
+        <div class="cv__row">
+          {
+            [
+              ['ppf', 'PPF'],
+              ['wrap', 'Wrap'],
+              ['tint', 'Tint'],
+              ['look', 'Look'],
+            ].map(([id, label], i) => (
+              <label class="cv__chip">
+                <input type="radio" name="mode" value={id} checked={i === 0} />
+                <span>{label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <fieldset data-for="ppf">
+        <legend>PPF preset</legend>
+        <select name="preset" id="preset">
+          <option value="">Custom</option>
+          {ppfPresets.map((p) => <option value={p.id}>{p.name}</option>)}
+        </select>
+      </fieldset>
+
+      <fieldset data-for="tint">
+        <legend>Window film</legend>
+        <div class="cv__row">
+          {
+            tintOptions.map((t) => (
+              <button type="button" class="cv__chip cv__chip--btn" data-vlt={t.vlt}>
+                {t.name} · {t.vlt}%
+              </button>
+            ))
+          }
+        </div>
+        <label class="cv__range">
+          <span>VLT <output id="vltOut">50</output>%</span>
+          <input type="range" name="vlt" min="5" max="90" value="50" />
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Paint</legend>
+        <div class="cv__row">
+          {
+            paints.map((p) => (
+              <button type="button" class="cv__swatch" data-paint={p.hex} style={`--c:${p.hex}`} aria-label={p.name} title={p.name} />
+            ))
+          }
+          <input type="color" name="paint" value="#8d9299" aria-label="Custom paint colour" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Panels <span class="cv__hint">(the flow's accessible buttons)</span></legend>
+        <div class="cv__panels">
+          {
+            panels.map((p) => (
+              <label class="cv__panel">
+                <input type="checkbox" name="panel" value={p.id} />
+                <span>{p.label}</span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+
+      <p class="cv__log" id="log" aria-live="polite"></p>
+    </form>
+
+    <p class="cv__credit">
+      <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">"Generic passenger car pack"</a> by Comrade1280,
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Split into
+      panels by WRP.
+    </p>
+  </main>
+
+  <script define:vars={{ presets: ppfPresets, wrapDefault: ['bonnet', 'roof', 'mirror-l', 'mirror-r', 'spoiler'], wrapParts }}>
+    window.__carViewerData = { presets, wrapDefault, wrapParts };
+  </script>
+  <script>
+    import type { BodyType, CarViewerHandle, PanelId, ViewerMode } from '@/designs/studio/quote/panels';
+
+    type Data = { presets: { id: string; panels: PanelId[]; partial?: PanelId[] }[]; wrapDefault: PanelId[] };
+    const data = (window as unknown as { __carViewerData: Data }).__carViewerData;
+    const events: string[] = [];
+    (window as unknown as { __carViewerEvents: string[] }).__carViewerEvents = events;
+
+    const form = document.getElementById('controls') as HTMLFormElement;
+    const viewerEl = document.getElementById('viewer')!;
+    const status = document.getElementById('status')!;
+    const log = document.getElementById('log')!;
+    const vltOut = document.getElementById('vltOut')!;
+
+    const state = {
+      body: 'sedan' as BodyType,
+      mode: 'ppf' as ViewerMode,
+      selected: new Set<PanelId>(data.presets[0].panels),
+      partial: new Set<PanelId>(data.presets[0].partial ?? []),
+      tintVlt: 50,
+      paint: '#8d9299',
+    };
+    const url = new URL(location.href);
+    for (const k of ['body', 'mode'] as const) {
+      const v = url.searchParams.get(k);
+      if (v) (state as Record<string, unknown>)[k] = v;
+    }
+    const presetParam = url.searchParams.get('preset');
+    if (presetParam !== null) applyPreset(presetParam);
+    if (url.searchParams.get('vlt')) state.tintVlt = Number(url.searchParams.get('vlt'));
+    if (url.searchParams.get('paint')) state.paint = '#' + url.searchParams.get('paint');
+    if (state.mode === 'wrap' && presetParam === null) {
+      state.selected = new Set(data.wrapDefault);
+      state.partial = new Set();
+    }
+
+    function applyPreset(id: string) {
+      const p = data.presets.find((x) => x.id === id);
+      state.selected = new Set(p ? p.panels : []);
+      state.partial = new Set(p?.partial ?? []);
+    }
+
+    function syncForm() {
+      (form.querySelector(`input[name=body][value="${state.body}"]`) as HTMLInputElement).checked = true;
+      (form.querySelector(`input[name=mode][value="${state.mode}"]`) as HTMLInputElement).checked = true;
+      (form.elements.namedItem('vlt') as HTMLInputElement).value = String(state.tintVlt);
+      vltOut.textContent = String(state.tintVlt);
+      (form.elements.namedItem('paint') as HTMLInputElement).value = state.paint;
+      for (const box of form.querySelectorAll<HTMLInputElement>('input[name=panel]')) {
+        box.checked = state.selected.has(box.value as PanelId);
+        box.indeterminate = !box.checked && state.partial.has(box.value as PanelId);
+      }
+      for (const fs of form.querySelectorAll<HTMLElement>('fieldset[data-for]')) fs.hidden = fs.dataset.for !== state.mode;
+    }
+
+    let viewer: CarViewerHandle | null = null;
+    const push = () => viewer?.update({ ...state });
+
+    form.addEventListener('change', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.name === 'body') state.body = t.value as BodyType;
+      if (t.name === 'mode') {
+        state.mode = t.value as ViewerMode;
+        if (state.mode === 'wrap') {
+          state.selected = new Set(data.wrapDefault);
+          state.partial = new Set();
+        } else if (state.mode === 'ppf') applyPreset((form.elements.namedItem('preset') as HTMLSelectElement).value || 'front-end');
+      }
+      if (t.name === 'preset') applyPreset(t.value);
+      if (t.name === 'panel') {
+        const id = t.value as PanelId;
+        if (t.checked) state.selected.add(id);
+        else state.selected.delete(id);
+        state.partial.delete(id);
+      }
+      if (t.name === 'paint') state.paint = t.value;
+      syncForm();
+      push();
+    });
+    form.addEventListener('input', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.name === 'vlt') {
+        state.tintVlt = Number(t.value);
+        vltOut.textContent = t.value;
+        push();
+      }
+    });
+    form.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      if (b.dataset.vlt) state.tintVlt = Number(b.dataset.vlt);
+      if (b.dataset.paint) state.paint = b.dataset.paint;
+      syncForm();
+      push();
+    });
+
+    syncForm();
+    let generation = 0;
+    function start() {
+      const gen = ++generation;
+      viewer?.destroy();
+      viewer = null;
+      status.dataset.ready = '';
+      status.textContent = 'Loading 3D viewer…';
+      const t0 = performance.now();
+      import('@/designs/studio/quote/viewer/CarViewer3D')
+      .then(async (m) => {
+        if (!m.isSupported()) throw new Error('isSupported() is false');
+        const v = await m.mount(viewerEl, {
+          ...state,
+          onToggle(id) {
+            if (state.selected.has(id)) state.selected.delete(id);
+            else state.selected.add(id);
+            state.partial.delete(id);
+            events.push(id);
+            log.textContent = `Tapped: ${id} (${state.selected.has(id) ? 'on' : 'off'})`;
+            (form.elements.namedItem('preset') as HTMLSelectElement).value = '';
+            syncForm();
+            viewer?.update({ selected: state.selected, partial: state.partial });
+          },
+        });
+        if (gen !== generation) {
+          v.destroy();
+          return;
+        }
+        viewer = v;
+        status.textContent = `3D ready in ${Math.round(performance.now() - t0)} ms`;
+        status.dataset.ready = 'true';
+        (window as unknown as { __carViewer: CarViewerHandle }).__carViewer = viewer;
+      })
+      .catch((err) => {
+        status.textContent = `3D unavailable, the flow would show 2D: ${err.message}`;
+        status.dataset.ready = 'error';
+      });
+    }
+    start();
+  </script>
+</DesignShell>
+
+<style>
+  :global(body) {
+    background: #0c0d0f;
+    color: #d4d7db;
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  }
+  .cv {
+    max-width: 76rem;
+    margin: 0 auto;
+    padding: 1.25rem 1rem 4rem;
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 60rem) {
+    .cv {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+      padding-top: 2rem;
+    }
+    .cv__head {
+      grid-column: 1 / -1;
+    }
+  }
+  .cv__eyebrow {
+    color: #c9a45c;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-family: var(--font-oswald), 'Oswald', 'Arial Narrow', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    text-transform: uppercase;
+    color: #f4f4f2;
+  }
+  .cv__lede {
+    color: #a3a8ae;
+    max-width: 44rem;
+    font-size: 0.95rem;
+  }
+  .cv__stage {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 50% 38%, #26292e 0%, #17191c 55%, #0c0d0f 100%);
+    border: 1px solid #2c3035;
+  }
+  .cv__viewer {
+    /* Roughly the space the quote flow gives the viewer on a phone. */
+    height: clamp(16rem, 78vw, 34rem);
+  }
+  .cv__viewer :global(canvas:focus-visible) {
+    outline: 2px solid #c9a45c;
+    outline-offset: -4px;
+  }
+  .cv__credit {
+    font-size: 0.75rem;
+    color: var(--muted, #6b6b6b);
+    margin: 2rem 0 0;
+  }
+  .cv__credit a { color: inherit; }
+  .cv__status {
+    position: absolute;
+    left: 0.75rem;
+    bottom: 0.6rem;
+    font-size: 0.72rem;
+    color: #8a8f96;
+    pointer-events: none;
+  }
+  .cv__controls {
+    display: grid;
+    gap: 1rem;
+  }
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  fieldset[hidden] {
+    display: none;
+  }
+  legend {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a8f96;
+    margin-bottom: 0.4rem;
+  }
+  .cv__hint {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .cv__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .cv__chip {
+    position: relative;
+    display: inline-flex;
+  }
+  .cv__chip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+  }
+  .cv__chip span,
+  .cv__chip--btn {
+    border: 1px solid #2c3035;
+    background: #17191c;
+    color: #d4d7db;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .cv__chip input:checked + span {
+    border-color: #c9a45c;
+    color: #f4f4f2;
+    background: #2a2418;
+  }
+  .cv__chip input:focus-visible + span {
+    outline: 2px solid #c9a45c;
+    outline-offset: 2px;
+  }
+  select {
+    background: #17191c;
+    color: #f4f4f2;
+    border: 1px solid #2c3035;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+  .cv__range {
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+  }
+  .cv__range input {
+    accent-color: #c9a45c;
+  }
+  .cv__swatch {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid #2c3035;
+    background: var(--c);
+    cursor: pointer;
+  }
+  input[type='color'] {
+    width: 2.4rem;
+    height: 2rem;
+    background: none;
+    border: 0;
+  }
+  .cv__panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem 0.75rem;
+    font-size: 0.82rem;
+  }
+  .cv__panel {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .cv__panel input {
+    accent-color: #c9a45c;
+  }
+  .cv__log {
+    font-size: 0.8rem;
+    color: #c9a45c;
+    min-height: 1.2em;
+  }
+</style>

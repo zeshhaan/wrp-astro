@@ -1,0 +1,168 @@
+---
+export const prerender = true;
+
+import DesignShell from '@/designs/shared/DesignShell.astro';
+import { concepts } from '@/designs/registry';
+---
+
+<DesignShell
+  concept="lab"
+  title="WRP Design Lab"
+  description="Three homepage directions for the WRP redesign, for the team to compare."
+  fonts={['--font-geist', '--font-montserrat']}
+  themeColor="#f3f3f1"
+>
+  <main class="lab">
+    <header class="lab__head">
+      <p class="lab__mark">WRP.</p>
+      <h1>Three directions for the new wrpdetailing.ae</h1>
+      <p class="lab__lede">
+        Round three. Each one is a complete homepage built on the same facts: real prices, the latest Google
+        reviews and real studio photos. Services lead; the WRP Lounge has its own section further down. Open
+        each, scroll to the end on your phone and on a laptop, then pick the one that feels most like WRP.
+        Details from the others can be borrowed.
+      </p>
+    </header>
+
+    <ol class="lab__list" role="list">
+      {
+        concepts.map((c, i) => (
+          <li class="card" style={`--c1:${c.palette[0]};--c2:${c.palette[1]};--c3:${c.palette[2]}`}>
+            <a class="card__link" href={`/design-lab/${c.id}/`}>
+              <span class="card__swatches" aria-hidden="true">
+                {c.palette.map((hex) => (
+                  <span style={`background:${hex}`} />
+                ))}
+              </span>
+              <span class="card__num">Concept {i + 1}</span>
+              <h2 class="card__name">{c.name}</h2>
+              <p class="card__idea">{c.idea}</p>
+              <dl class="card__meta">
+                <div>
+                  <dt>Signature moment</dt>
+                  <dd>{c.signature}</dd>
+                </div>
+                <div>
+                  <dt>Strongest for</dt>
+                  <dd>{c.bestFor}</dd>
+                </div>
+                <div>
+                  <dt>Trade-off</dt>
+                  <dd>{c.risk}</dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{c.fonts}</dd>
+                </div>
+              </dl>
+              <span class="card__open">Open {c.name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+
+    <footer class="lab__foot">
+      <p>
+        Preview builds only. Forms here are not connected, and nothing on these pages is indexed. The live
+        site is unchanged until a direction is chosen and rolled out to every page.
+      </p>
+      <p><a href="/">Current homepage</a></p>
+    </footer>
+  </main>
+</DesignShell>
+
+<style>
+  :root {
+    --paper: #f3f3f1;
+    --ink: #161616;
+    --muted: #5d5d5a;
+    --line: #d9d9d4;
+    color-scheme: light;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-geist), system-ui, sans-serif;
+  }
+  .lab {
+    max-width: 76rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2.5rem) 6rem;
+  }
+  .lab__mark {
+    font: 900 italic 1.25rem/1 var(--font-montserrat, system-ui), system-ui;
+    letter-spacing: -0.02em;
+    margin-block-end: 2.5rem;
+  }
+  h1 {
+    font-size: clamp(2rem, 1.2rem + 3.5vw, 3.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    max-width: 18ch;
+  }
+  .lab__lede {
+    margin-block-start: 1.25rem;
+    max-width: 60ch;
+    color: var(--muted);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .lab__list {
+    margin-block-start: clamp(2rem, 5vw, 3.5rem);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
+    gap: 1rem;
+  }
+  .card__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s, translate 0.2s;
+  }
+  .card__link:hover { border-color: var(--ink); }
+  .card__link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .card__link:hover { translate: 0 -2px; }
+  }
+  .card__swatches { display: flex; gap: 4px; }
+  .card__swatches span {
+    flex: 1;
+    height: 3.5rem;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+  }
+  .card__num { color: var(--muted); font-size: 0.875rem; margin-block-start: 0.5rem; }
+  .card__name { font-size: 1.75rem; letter-spacing: -0.02em; font-weight: 600; line-height: 1.1; }
+  .card__idea { font-size: 1.0625rem; line-height: 1.5; }
+  .card__meta { display: grid; gap: 0.75rem; margin-block: 0.5rem 0; font-size: 0.9375rem; line-height: 1.5; }
+  .card__meta dt { color: var(--muted); font-size: 0.8125rem; }
+  .card__meta dd { margin: 0; }
+  .card__open {
+    margin-block-start: auto;
+    padding-block-start: 1rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lab__foot {
+    margin-block-start: 3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--line);
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    justify-content: space-between;
+    font-size: 0.9375rem;
+  }
+  .lab__foot a { color: var(--ink); }
+</style>

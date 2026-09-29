@@ -1,0 +1,386 @@
+---
+import { floors, navLinks, whatsappHello } from './building';
+---
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar__inner">
+    <a class="mark" href="#main" aria-label="WRP, back to top">WRP.</a>
+    <nav class="bar__nav" aria-label="Sections">
+      <ul role="list">
+        {navLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="cta" href={whatsappHello} target="_blank" rel="noopener">
+      <svg class="cta__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M12 3.2a8.6 8.6 0 0 0-7.4 13l-1.2 4.4 4.5-1.2A8.6 8.6 0 1 0 12 3.2Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"></path>
+        <path
+          d="M9.1 7.9c.3 0 .5.1.6.4l.7 1.6c.1.2 0 .5-.1.7l-.5.6c.6 1.2 1.6 2.2 2.9 2.9l.6-.5c.2-.2.5-.2.7-.1l1.6.7c.3.1.4.4.4.7-.1 1.1-1 1.9-2.1 1.8-3.3-.4-5.9-3-6.3-6.3-.1-1.1.7-2 1.9-2.1Z"
+          fill="currentColor"></path>
+      </svg>
+      <span class="cta__long">Get a quote on WhatsApp</span>
+      <span class="cta__short">WhatsApp</span>
+    </a>
+  </div>
+</header>
+
+<!-- The lift: which floor of the building you are reading. -->
+<nav class="lift" aria-label="Floors" data-lift>
+  <p class="lift__display" aria-hidden="true"><span class="lift__code"></span></p>
+  <ol role="list" class="lift__buttons">
+    {
+      floors.map((f) => (
+        <li>
+          <a href={`#${f.id}`} data-code={f.code}>
+            <span class="lift__btn">{f.code}</span>
+            <span class="lift__name">{f.name}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script>
+  // Scrollspy for the lift panel (modern-web-guidance: ui-components/scrollspy).
+  // Native: scroll-target-group + :target-current, with aria-current synced on scrollend.
+  // Fallback: IntersectionObserver toggles a `:target-current` class.
+  const lift = document.querySelector<HTMLElement>('[data-lift]');
+  if (lift) {
+    const links = Array.from(lift.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    const native = CSS.supports('scroll-target-group: auto');
+    const setCurrent = (current: HTMLAnchorElement | null) => {
+      for (const link of links) {
+        const on = link === current;
+        link.setAttribute('aria-current', on ? 'true' : 'false');
+        if (!native) link.classList.toggle(':target-current', on);
+      }
+      document.documentElement.dataset.mzFloor = current?.dataset.code ?? '';
+    };
+
+    if (native) {
+      const sync = () => setCurrent(lift.querySelector<HTMLAnchorElement>('a:target-current'));
+      sync();
+      if ('onscrollend' in window) {
+        document.addEventListener('scrollend', sync);
+      } else {
+        let t = 0;
+        document.addEventListener('scroll', () => {
+          clearTimeout(t);
+          t = window.setTimeout(sync, 120);
+        }, { passive: true });
+      }
+    } else {
+      const byId = new Map(links.map((l) => [l.hash.slice(1), l]));
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) setCurrent(byId.get(entry.target.id) ?? null);
+          }
+        },
+        { rootMargin: '-50% 0px -50% 0px', threshold: 0 },
+      );
+      for (const id of byId.keys()) {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+      }
+    }
+  }
+</script>
+
+<style>
+  .skip {
+    position: fixed;
+    left: 1rem;
+    top: 0.75rem;
+    z-index: 60;
+    padding: 0.75rem 1rem;
+    background: var(--mz-lamp);
+    color: var(--mz-on-dark);
+    border-radius: 0.5rem;
+    translate: 0 -200%;
+  }
+  .skip:focus-visible {
+    translate: 0 0;
+  }
+
+  /* ---------- Header: the ceiling ---------- */
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    container: bar / scroll-state;
+  }
+  .bar__inner {
+    height: var(--mz-hh);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-inline: var(--mz-gutter-bar, 1rem);
+    background: var(--mz-wall);
+    transition: box-shadow 0.2s;
+  }
+  /* Progressive enhancement: a shadow only once the header is stuck. */
+  @container bar scroll-state(stuck: top) {
+    .bar__inner {
+      box-shadow: 0 1px 0 rgb(21 23 26 / 0.12);
+    }
+  }
+  .mark {
+    font-family: var(--mz-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.625rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-decoration: none;
+    color: var(--mz-ink);
+    padding-block: 0.6rem;
+  }
+  .bar__nav {
+    display: none;
+    margin-inline-start: auto;
+  }
+  .bar__nav ul {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .bar__nav a {
+    display: block;
+    padding: 0.7rem 0.75rem;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    border-radius: 0.375rem;
+  }
+  .bar__nav a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+  .cta {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    background: var(--mz-felt);
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s;
+  }
+  .cta:hover {
+    background: #185740;
+  }
+  .cta__long {
+    display: none;
+  }
+  @media (max-width: 26rem) {
+    .cta__short {
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+    }
+  }
+  @media (min-width: 60rem) {
+    .bar__inner {
+      --mz-gutter-bar: 2rem;
+    }
+    .bar__nav {
+      display: block;
+    }
+    .cta {
+      margin-inline-start: 0.5rem;
+      padding-inline: 1.1rem 1.25rem;
+    }
+    .cta__long {
+      display: inline;
+    }
+    .cta__short {
+      display: none;
+    }
+  }
+
+  /* ---------- The lift panel ---------- */
+  .lift {
+    position: fixed;
+    z-index: 45;
+    /* Mobile: sits in the middle of the header bar. */
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    height: var(--mz-hh);
+    display: flex;
+    align-items: center;
+    scroll-target-group: auto;
+  }
+  .lift__display {
+    display: none;
+  }
+  .lift__buttons {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: var(--mz-wall-2);
+  }
+  .lift a {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    text-decoration: none;
+    color: var(--mz-ink);
+  }
+  .lift__btn {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1.5px solid rgb(21 23 26 / 0.35);
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: 0.9375rem;
+    line-height: 1;
+    transition:
+      background-color 0.25s,
+      border-color 0.25s,
+      color 0.25s,
+      box-shadow 0.25s;
+  }
+  .lift__name {
+    position: absolute;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .lift a:hover .lift__btn {
+    border-color: var(--mz-ink);
+  }
+  /* The lit floor. :is() keeps the rule valid where :target-current is unknown. */
+  .lift a:is(:target-current, .\:target-current) .lift__btn {
+    background: var(--mz-felt);
+    border-color: var(--mz-felt);
+    color: #fff;
+  }
+
+  @media (min-width: 60rem) {
+    .lift {
+      top: 50%;
+      left: auto;
+      right: 1.25rem;
+      translate: 0 -50%;
+      height: auto;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 1.75rem;
+      background: var(--mz-lamp);
+      box-shadow: 0 10px 30px -12px rgb(21 23 26 / 0.5);
+    }
+    /* The floor readout above the buttons, like a real lift. */
+    .lift__display {
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 0.875rem 0.875rem 0.375rem 0.375rem;
+      background: #0d0f11;
+      color: var(--mz-brass);
+      font-family: var(--mz-display);
+      font-weight: 800;
+      font-size: 1.375rem;
+      line-height: 1;
+      text-shadow: 0 0 10px rgb(201 164 92 / 0.55);
+    }
+    .lift__code::after {
+      content: '·';
+    }
+    .lift:has(a[href='#first-floor']:is(:target-current, .\:target-current)) .lift__code::after {
+      content: '1';
+    }
+    .lift:has(a[href='#ground-floor']:is(:target-current, .\:target-current)) .lift__code::after {
+      content: 'G';
+    }
+    .lift:has(a[href='#street']:is(:target-current, .\:target-current)) .lift__code::after {
+      content: 'S';
+    }
+    .lift__buttons {
+      flex-direction: column;
+      background: none;
+      padding: 0;
+      gap: 0.375rem;
+    }
+    .lift__btn {
+      color: var(--mz-on-dark);
+      border-color: rgb(185 199 194 / 0.45);
+    }
+    .lift a {
+      color: var(--mz-on-dark);
+    }
+    .lift a:hover .lift__btn {
+      border-color: var(--mz-glass);
+    }
+    .lift a:is(:target-current, .\:target-current) .lift__btn {
+      background: transparent;
+      border: 2px solid var(--mz-brass);
+      color: var(--mz-brass);
+      box-shadow:
+        0 0 0 3px rgb(201 164 92 / 0.18),
+        0 0 14px rgb(201 164 92 / 0.45);
+    }
+    /* Floor name slides out to the left on hover, focus, or when lit. */
+    .lift__name {
+      clip: auto;
+      clip-path: none;
+      width: auto;
+      height: auto;
+      right: calc(100% + 0.875rem);
+      top: 50%;
+      translate: 0.5rem -50%;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.375rem;
+      background: var(--mz-lamp);
+      color: var(--mz-on-dark);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity 0.2s,
+        translate 0.25s var(--mz-ease);
+    }
+    .lift a:is(:hover, :focus-visible) .lift__name {
+      opacity: 1;
+      translate: 0 -50%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lift__btn,
+    .lift__name {
+      transition: none;
+    }
+  }
+</style>

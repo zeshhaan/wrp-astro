@@ -47,7 +47,32 @@
 				"work.zeeshan@gmail.com"
 			]
 		}
-	]
+	],
+	/**
+	 * Worker Previews (`npx wrangler preview`, or Workers Builds on any
+	 * non-main branch). Previews do NOT inherit the settings above.
+	 * Docs: https://developers.cloudflare.com/workers/previews/
+	 *
+	 * The production D1 database (DB) and the EMAIL binding are deliberately
+	 * left out, so a Preview can never write a real lead or email a customer:
+	 * /api/contact returns its normal 500 error there. Bind a staging D1 here
+	 * if a Preview ever needs a working form.
+	 *
+	 * The Astro adapter adds SESSION (KV) and IMAGES bindings to this block at
+	 * build time. Previews don't auto-provision KV, so SESSION points at a
+	 * preview-only namespace, kept apart from production's.
+	 */
+	"previews": {
+		"vars": {
+			"ENVIRONMENT": "preview"
+		},
+		"kv_namespaces": [
+			{
+				"binding": "SESSION",
+				"id": "1699339660f84d6b90ba9268a8018e76"
+			}
+		]
+	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

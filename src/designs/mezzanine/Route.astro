@@ -1,0 +1,168 @@
+---
+/**
+ * How a job runs, gate to handover, painted on the studio floor as a route.
+ * It is a real sequence, so the stops are numbered. Every stop is something
+ * customers describe in their Google reviews, with their words beside it.
+ */
+import { route } from './building';
+---
+
+<section class="route" aria-labelledby="route-title">
+  <div class="wrap">
+    <div class="head">
+      <h2 id="route-title">While we have your car</h2>
+    </div>
+    <ol role="list" class="stops">
+      {
+        route.map((s, i) => (
+          <li class="stop">
+            <span class="stop__mark" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3>{s.title}</h3>
+            <p class="stop__body">{s.body}</p>
+            <blockquote>
+              <p>“{s.quote}”</p>
+              <footer>{s.author}, Google review</footer>
+            </blockquote>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .route {
+    padding: 1rem var(--mz-gutter) 4.5rem;
+  }
+  .wrap {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+  }
+  .head {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-end: 2rem;
+  }
+  h2 {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .head p {
+    color: var(--mz-ink-2);
+    font-size: 1.0625rem;
+    max-width: 46ch;
+  }
+
+  /* Mobile: the route runs down the left, a dashed brass floor line. */
+  .stops {
+    --mark: 2.25rem;
+    position: relative;
+    display: grid;
+    gap: 2rem;
+  }
+  .stops::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--mark) / 2 - 2px);
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 4px;
+    background: repeating-linear-gradient(to bottom, var(--mz-brass) 0 1.5rem, transparent 1.5rem 2.5rem);
+  }
+  .stop {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    padding-inline-start: calc(var(--mark) + 1rem);
+  }
+  .stop__mark {
+    position: absolute;
+    left: 0;
+    top: -0.2rem;
+    display: grid;
+    place-items: center;
+    width: var(--mark);
+    height: var(--mark);
+    border-radius: 50%;
+    background: var(--mz-lamp);
+    color: var(--mz-brass);
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: 0.9375rem;
+  }
+  h3 {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: 1.3125rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+  .stop__body {
+    color: var(--mz-ink-2);
+    max-width: 40ch;
+  }
+  blockquote {
+    display: grid;
+    gap: 0.25rem;
+    margin-block-start: 0.25rem;
+  }
+  blockquote p {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--mz-felt-ink);
+    max-width: 40ch;
+  }
+  blockquote footer {
+    font-size: 0.8125rem;
+    color: var(--mz-ink-2);
+  }
+
+  /* Desktop: the route runs across the floor, left to right. */
+  @media (min-width: 56rem) {
+    .route {
+      padding-block: 1.5rem 5.5rem;
+    }
+    .head {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: end;
+      gap: 3rem;
+      margin-block-end: 2.5rem;
+    }
+    .head p {
+      justify-self: end;
+    }
+    .stops {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+    .stops::before {
+      left: 0.5rem;
+      right: 0.5rem;
+      top: calc(var(--mark) / 2 - 2px);
+      bottom: auto;
+      width: auto;
+      height: 4px;
+      background: repeating-linear-gradient(to right, var(--mz-brass) 0 2.5rem, transparent 2.5rem 4.25rem);
+    }
+    .stop {
+      padding-inline-start: 0;
+      padding-block-start: calc(var(--mark) + 1rem);
+      align-content: start;
+    }
+    .stop__mark {
+      top: 0;
+    }
+    .stop blockquote {
+      padding-block-start: 0.75rem;
+      border-top: 1px solid rgb(21 23 26 / 0.15);
+      margin-block-start: 0.5rem;
+    }
+  }
+</style>

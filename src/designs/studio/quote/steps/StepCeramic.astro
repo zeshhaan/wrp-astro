@@ -1,0 +1,50 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+import { aed } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+const svc = catalog.services.find((s) => s.id === 'ceramic')!;
+---
+
+<Screen id="ceramic" title="Ceramic coating" eyebrow="Step 3 of 6 · Details" lede={`Adam’s professional coatings. <span class="q-price">From ${aed(svc.from ?? 0)}</span>, priced for your car and its paint.`}>
+  <fieldset class="q-field">
+    <legend class="q-legend">Package</legend>
+    <div class="q-stack">
+      {
+        catalog.ceramic.packages.map((p) => (
+          <label class="q-card q-pkg">
+            <input class="visually-hidden" type="radio" name="ceramicPkg" value={p.id} />
+            <span class="q-card__title">{p.name}</span>
+            <ul class="q-ticks q-ticks--tight" role="list">
+              {p.features.map((f) => <li><QIcon name="check" size={15} />{f}</li>)}
+            </ul>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+      <label class="q-card q-pkg">
+        <input class="visually-hidden" type="radio" name="ceramicPkg" value="recommend" />
+        <span class="q-card__title">Recommend for me</span>
+        <span class="q-card__hint">We look at the paint and how you use the car, then suggest one.</span>
+        <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset class="q-field" data-q-show="ceramic-addon">
+    <legend class="q-legend">Add-on</legend>
+    <label class="q-card q-check">
+      <input type="checkbox" name="ceramicWheels" />
+      <span>
+        <span class="q-card__title">Coat the wheels and glass too</span>
+        <span class="q-card__hint">Already included in Gold and Platinum Shield.</span>
+      </span>
+    </label>
+  </fieldset>
+
+  <p class="q-note"><QIcon name="polish" size={18} /> Every package starts with paint correction: a coating locks in whatever is underneath.</p>
+  <p class="q-note" data-q-if-service="ppf" hidden><QIcon name="ppf" size={18} /> With your PPF: film on the parts that take the chips, ceramic on the rest. They work best together.</p>
+</Screen>

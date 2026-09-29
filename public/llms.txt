@@ -24,6 +24,7 @@
 - [Protect](https://wrpdetailing.ae/protect/): Protect pillar page for long-term vehicle protection positioning.
 - [Privacy Policy](https://wrpdetailing.ae/privacy/): Privacy policy.
 - [Terms and Conditions](https://wrpdetailing.ae/terms/): Terms and conditions.
+- [Credits](https://wrpdetailing.ae/credits/): 3D models, customer photos, fonts and open-source software used on this site.
 - [RSS Feed (English)](https://wrpdetailing.ae/rss.xml): RSS feed for English blog posts.
 - [RSS Feed (Arabic)](https://wrpdetailing.ae/ar/rss.xml): RSS feed for Arabic blog posts.
 - [LLMS Short Context](https://wrpdetailing.ae/llms.txt): Machine-readable short context for AI systems and agents.
@@ -83,6 +84,7 @@
 - [احمِ](https://wrpdetailing.ae/ar/protect/): صفحة احمِ العربية.
 - [الخصوصية](https://wrpdetailing.ae/ar/privacy/): سياسة الخصوصية باللغة العربية.
 - [الشروط والأحكام](https://wrpdetailing.ae/ar/terms/): الشروط والأحكام باللغة العربية.
+- [الاعتمادات](https://wrpdetailing.ae/ar/credits/): النماذج ثلاثية الأبعاد وصور العملاء والخطوط والبرمجيات مفتوحة المصدر المستخدمة في الموقع.
 - [طلاء السيراميك](https://wrpdetailing.ae/ar/services/ceramic-coating/): تقنية السيراميك النانوية تُشكّل درعاً متيناً طارداً للماء، يمنح سيارتك لمعاناً وحماية تدوم طويلاً
 - [الجلود والتنجيد](https://wrpdetailing.ae/ar/services/leather-upholstery/): أغطية مقاعد مخصّصة، ودعّاسات فاخرة، وتنجيد كامل للمقاعد للسيارات الفاخرة في دبي. خيارات من الجلد الطبيعي والجلد الصناعي والأقمشة مُفصّلة حسب سيارتك.
 - [فيلم حماية الطلاء (PPF)](https://wrpdetailing.ae/ar/services/paint-protection-film/): حماية بمواصفات عسكرية تحافظ على طلاء سيارتك النقي ضد أقسى عوامل دبي المناخية

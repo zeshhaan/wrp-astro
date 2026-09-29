@@ -19,6 +19,7 @@ export const translations = {
     'nav.contact': 'Contact',
     'nav.privacy': 'Privacy',
     'nav.terms': 'Terms',
+    'nav.credits': 'Credits',
     'nav.requestEstimate': 'REQUEST ESTIMATE',
     'nav.hours': 'Sat\u2013Thu 9 AM \u2013 9:30 PM',
 
@@ -295,6 +296,7 @@ export const translations = {
     'nav.contact': 'اتصل بنا',
     'nav.privacy': 'الخصوصية',
     'nav.terms': 'الشروط',
+    'nav.credits': 'الاعتمادات',
     'nav.requestEstimate': 'اطلب تقدير سعر',
     'nav.hours': 'السبت–الخميس ٩ ص – ٩:٣٠ م',
 

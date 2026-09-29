@@ -1,0 +1,1194 @@
+---
+/**
+ * The Menu, round 2: services first.
+ * The hero IS the menu: every service with its starting price, set like a printed
+ * carte beside a photo of the team at work. The full menu below is the order form
+ * (Planner), with a margin note from a customer beside each dish. The lounge gets
+ * one short section after the work and the reviews.
+ */
+import DesignShell from '../shared/DesignShell.astro';
+import Picture from '../shared/Picture.astro';
+import Planner from './Planner.astro';
+import { contact, whatsappLink, work, lounge, studio, proof, pickQuotes, services, pages } from '../data';
+import { dishes, aed, heroQuote, promises } from './menu';
+
+const hero = {
+  base: '/portfolio/team-detailing-black-lexus-hood',
+  sizes: '(min-width: 64rem) 34rem, calc(100vw - 2rem)',
+};
+const main = dishes.filter((d) => !d.side);
+const side = dishes.filter((d) => d.side);
+const quotes = pickQuotes(6);
+const serviceName = (slug?: string) => services.find((s) => s.slug === slug)?.name;
+const year = new Date().getFullYear();
+const hello = whatsappLink("Hello WRP, I'd like a quote for my car.");
+const nav = [
+  { label: 'Services', href: '#plan' },
+  { label: 'Work', href: '#work' },
+  { label: 'Reviews', href: '#reviews' },
+  { label: 'Lounge', href: '#lounge' },
+  { label: 'Visit', href: '#visit' },
+];
+const loungeQuote = lounge.quotes[0];
+---
+
+<DesignShell
+  concept="menu"
+  title="WRP Detailing, Dubai: PPF, detailing, ceramic and tint, priced up front"
+  description="Paint protection film, detailing, paint correction, ceramic coating, upholstery, window tint and hand washes in Al Qusais, Dubai. See starting prices, build a plan for your car and send it on WhatsApp."
+  fonts={['--font-instrument-serif', '--font-instrument-sans', '--font-montserrat']}
+  themeColor="#F6F6F3"
+  preloadImage={hero}
+>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-wa" viewBox="0 0 24 24">
+      <path
+        d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.28-.2-.57-.35M12.05 21.78h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.8 11.8 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.9 11.9 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.9 0-3.17-1.24-6.16-3.48-8.41"
+      ></path>
+    </symbol>
+  </svg>
+
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="masthead">
+    <nav aria-label="Main" class="mast-nav">
+      <ul role="list">
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="wordmark" href="/" aria-label="WRP home">WRP.</a>
+    <div class="mast-end">
+      <a class="mast-hours" href="#visit">Sat to Thu, 9 AM to 9:30 PM</a>
+      <a class="btn btn-ink mast-cta" href={hello} target="_blank" rel="noopener">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+        <span>WhatsApp</span>
+      </a>
+    </div>
+  </header>
+
+  <main id="content" tabindex="-1">
+    <!-- Hero: the menu itself, beside the team at work -->
+    <section class="hero" id="services" aria-labelledby="hero-title">
+      <div class="hero-grid">
+        <div class="carte">
+          <a class="seal" href={proof.reviewsUrl} aria-label={`Rated ${proof.rating} on Google from ${proof.reviewCountDisplay} reviews`}>
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <path id="seal-ring" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"></path>
+              </defs>
+              <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="1.4"></circle>
+              <circle cx="60" cy="60" r="35" fill="none" stroke="currentColor" stroke-width="0.9"></circle>
+              <text class="seal-ring" textLength="280" lengthAdjust="spacing">
+                <textPath href="#seal-ring">RATED {proof.rating} ON GOOGLE ✦ {proof.reviewCountDisplay} REVIEWS ✦</textPath>
+              </text>
+              <text class="seal-num" x="60" y="66" text-anchor="middle">{proof.rating}</text>
+              <text class="seal-stars" x="60" y="80" text-anchor="middle">★★★★★</text>
+            </svg>
+          </a>
+
+          <h1 id="hero-title"><span>Brand new,</span> <span>inside and out.</span></h1>
+          <p class="carte-credit">
+            {heroQuote.author}’s words after his detail in {heroQuote.when?.split(' ')[0]}. “Brand new” comes up
+            in review after review.
+          </p>
+
+          <ol class="carte-list" role="list">
+            {
+              main.map((d, i) => (
+                <li class="carte-row" style={`--i:${i}`}>
+                  <a href={d.href} class="carte-name">
+                    {d.short}
+                  </a>
+                  <span class="leader" aria-hidden="true" />
+                  <span class="carte-price">
+                    {d.sedan ? (
+                      <>
+                        <i>from</i> {aed(d.sedan)}
+                      </>
+                    ) : (
+                      <i>after inspection</i>
+                    )}
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+          {
+            side.map((d) => (
+              <p class="carte-side" style={`--i:${main.length}`}>
+                <span>Also</span>
+                <a href={d.href}>{d.name}</a>
+                <span class="leader" aria-hidden="true" />
+                <i>after inspection</i>
+              </p>
+            ))
+          }
+
+          <div class="carte-actions">
+            <a class="btn btn-ink" href="#plan">Build your plan and price</a>
+            <a class="btn btn-line" href={hello} target="_blank" rel="noopener">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+              Ask on WhatsApp
+            </a>
+          </div>
+          <p class="carte-foot">Starting prices in dirhams, for a sedan. Al Qusais Industrial Area 1, Dubai.</p>
+        </div>
+
+        <figure class="hero-photo">
+          <Picture
+            base={hero.base}
+            alt="Two WRP detailers working on a black Lexus LX in the studio, under the WRP logo"
+            sizes={hero.sizes}
+            width={1200}
+            height={1680}
+            loading="eager"
+            fetchpriority="high"
+            imgClass="hero-img"
+          />
+        </figure>
+      </div>
+
+      <ul class="promises" role="list" aria-label="With every job">
+        {
+          promises.map((p) => (
+            <li>
+              <p class="p-title">{p.title}</p>
+              <p class="p-proof">
+                {p.proof}{' '}<span>{p.who}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <Planner />
+
+    <!-- Work -->
+    <section class="work" id="work" aria-labelledby="work-title">
+      <header class="sec-head">
+        <h2 id="work-title">Recent work</h2>
+        <p>Cars photographed on the studio floor before they went home.</p>
+      </header>
+      <ul role="list" class="work-grid">
+        {
+          work.map((w) => (
+            <li>
+              <figure>
+                <Picture
+                  base={w.image}
+                  alt={`${w.title}: ${w.what.toLowerCase()}`}
+                  width={1200}
+                  height={1600}
+                  sizes="(min-width: 60rem) 22rem, 50vw"
+                  imgClass="work-img"
+                />
+                <figcaption>
+                  <span class="work-title">{w.title}</span>
+                  <span class="work-what">{w.what}</span>
+                </figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="more"><a class="btn btn-line" href={pages.portfolio}>See the portfolio</a></p>
+    </section>
+
+    <!-- Guest book -->
+    <section class="guests" id="reviews" aria-labelledby="guests-title">
+      <header class="sec-head">
+        <h2 id="guests-title">The guest book</h2>
+        <p>
+          Rated {proof.rating} out of 5 on Google, from {proof.reviewCountDisplay} reviews. A few of them, word for
+          word.
+        </p>
+      </header>
+      <div class="book">
+        {
+          [quotes.slice(0, 3), quotes.slice(3, 6)].map((pg) => (
+            <ul role="list" class="page">
+              {pg.map((q) => (
+                <li>
+                  <figure>
+                    <blockquote>
+                      <p>“{q.text}”</p>
+                    </blockquote>
+                    <figcaption>
+                      <span class="g-name">{q.author}</span>
+                      {serviceName(q.service) && <span class="g-for">{serviceName(q.service)}</span>}
+                    </figcaption>
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+      <p class="more"><a class="btn btn-line" href={proof.reviewsUrl}>Read all {proof.reviewCountDisplay} reviews</a></p>
+    </section>
+
+    <!-- The lounge: one short, quiet section -->
+    <section class="lounge" id="lounge" aria-labelledby="lounge-title">
+      <div class="lounge-inner">
+        <figure class="lounge-photo">
+          <Picture
+            base={lounge.photos[0].base}
+            alt={lounge.photos[0].alt}
+            sizes="(min-width: 60rem) 34rem, calc(100vw - 2rem)"
+          />
+          <figcaption>Photo by customer Venkat K.</figcaption>
+        </figure>
+        <div class="lounge-text">
+          <h2 id="lounge-title">{lounge.name}</h2>
+          <p class="lounge-where">Upstairs, while we work</p>
+          <p>
+            If you’d rather wait, there’s a room above the bays: billiards, board games, coffee and karak, a big
+            screen and a sofa, air-conditioned all year, with a glass wall over the studio. The materials room is up
+            there too, so you can feel the leathers and films before you choose.
+          </p>
+          <figure class="lounge-quote">
+            <blockquote><p>“{loungeQuote.text}”</p></blockquote>
+            <figcaption>{loungeQuote.author}, Google review</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reservations -->
+    <section class="visit" id="visit" aria-labelledby="visit-title">
+      <div class="visit-inner">
+        <div class="visit-text">
+          <h2 id="visit-title">Reservations</h2>
+          <p class="visit-lede">
+            Message or call to book a day. Tell us whether you’ll wait, drop the car off, or want us to collect it.
+            We confirm the price once we’ve seen the car.
+          </p>
+          <p class="status" data-status hidden></p>
+          <dl class="details">
+            <div>
+              <dt>Hours</dt>
+              <dd>{contact.hours}.<br />{contact.closed}.</dd>
+            </div>
+            <div>
+              <dt>Address</dt>
+              <dd>
+                {contact.address[0]},<br />{contact.address[1]}<br />
+                <a href={contact.mapsUrl} target="_blank" rel="noopener">Open in Google Maps</a>
+              </dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd><a href={contact.phoneHref}>{contact.phoneDisplay}</a></dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+            </div>
+            <div>
+              <dt>Instagram</dt>
+              <dd><a href={contact.instagram} target="_blank" rel="noopener">{contact.instagramHandle}</a></dd>
+            </div>
+          </dl>
+          <div class="visit-actions">
+            <a class="btn btn-ink" href={hello} target="_blank" rel="noopener">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><use href="#i-wa"></use></svg>
+              Message us on WhatsApp
+            </a>
+            <a class="btn btn-line" href={contact.phoneHref}>Call {contact.phoneDisplay}</a>
+          </div>
+        </div>
+        <figure class="arch-night">
+          <Picture
+            base={studio.night.base}
+            alt={studio.night.alt}
+            sizes="(min-width: 60rem) 30rem, calc(100vw - 2rem)"
+            imgClass="arch-img"
+          />
+          <figcaption>After dark, look for the lit sign. Photo by customer Mark Ban.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-inner">
+      <p class="foot-brand"><span class="wordmark">WRP.</span> Wrap, reinforce, protect.</p>
+      <nav aria-label="Footer">
+        <ul role="list">
+          <li><a href={pages.blog}>Blog</a></li>
+          <li><a href={pages.portfolio}>Portfolio</a></li>
+          <li><a href={pages.reviews}>Reviews</a></li>
+          <li><a href={pages.about}>About WRP</a></li>
+          <li><a href={pages.contact}>Contact</a></li>
+          <li><a href={pages.privacy}>Privacy</a></li>
+          <li><a href={pages.terms}>Terms</a></li>
+          <li><a href={pages.credits}>Credits</a></li>
+          <li><a href={pages.arabic} lang="ar" dir="rtl">العربية</a></li>
+        </ul>
+      </nav>
+      <p class="foot-legal">© {year} WRP Detailing Solutions, Al Qusais Industrial Area 1, Dubai</p>
+    </div>
+  </footer>
+</DesignShell>
+
+<script>
+  // "Open now" status in Dubai time. Rendered client-side because the page is prerendered.
+  const el = document.querySelector<HTMLElement>('[data-status]');
+  if (el) {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Dubai',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    const mins = Number(get('hour')) * 60 + Number(get('minute'));
+    const open = 9 * 60;
+    const close = 21 * 60 + 30;
+    let text: string;
+    let state: 'open' | 'closed';
+    if (day !== 5 && mins >= open && mins < close) {
+      state = 'open';
+      text = close - mins <= 60 ? 'Open now, closing at 9:30 PM' : 'Open now, until 9:30 PM';
+    } else {
+      state = 'closed';
+      const opensToday = day !== 5 && mins < open;
+      const nextDay = opensToday ? 'today' : day === 4 || day === 5 ? 'Saturday' : 'tomorrow';
+      text = `Closed now. We open ${nextDay} at 9 AM`;
+    }
+    el.textContent = text;
+    el.dataset.state = state;
+    el.hidden = false;
+  }
+</script>
+
+<style is:global>
+  /* Scoped to this concept: the lab route imports every concept's styles. */
+  :root[data-concept='menu'] {
+    --cloth: #f6f6f3;
+    --paper: #fdfdfb;
+    --ink: #2b1b2e;
+    --ink-soft: #5e5061;
+    --plum: #6d4a7a;
+    --plum-wash: #efe9f0;
+    --brass: #9a7744;
+    --brass-light: #c4a26b;
+    --linen: #d9d4cc;
+    --linen-strong: #b9b0ba;
+    /* Paper grain: fractal noise, tinted aubergine, a few percent opaque. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .1 0 0 0 0 .18 .07 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --serif: var(--font-instrument-serif), 'Iowan Old Style', Georgia, serif;
+    --sans: var(--font-instrument-sans), system-ui, sans-serif;
+    --step-h1: clamp(3rem, 1.6rem + 4.2vw, 5.75rem);
+    --step-h2: clamp(2.5rem, 1.9rem + 2.6vw, 4.5rem);
+    --step-h3: clamp(1.6rem, 1.4rem + 0.8vw, 2.1rem);
+    color-scheme: light;
+  }
+  :root[data-concept='menu'] body {
+    background: var(--cloth);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    accent-color: var(--plum);
+  }
+  :root[data-concept='menu'] ::selection {
+    background: var(--plum);
+    color: var(--cloth);
+  }
+</style>
+
+<style>
+  /* ---------- Shared bits ---------- */
+  .skip {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 10;
+    padding: 0.75rem 1rem;
+    background: var(--ink);
+    color: var(--cloth);
+    border-radius: 0.25rem;
+  }
+  .skip:focus {
+    top: 1rem;
+  }
+  main:focus {
+    outline: none;
+  }
+  a {
+    color: inherit;
+  }
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 3rem;
+    padding: 0.6rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .btn svg {
+    fill: currentColor;
+    flex: none;
+  }
+  .btn-ink {
+    background: var(--ink);
+    color: var(--cloth);
+  }
+  .btn-ink:hover {
+    background: var(--plum);
+  }
+  .btn-line {
+    border: 1px solid var(--plum);
+    color: var(--plum);
+  }
+  .btn-line:hover {
+    background: var(--plum);
+    color: var(--cloth);
+  }
+  .btn:focus-visible {
+    border-radius: 999px;
+  }
+  .wordmark {
+    font-family: var(--font-montserrat), system-ui, sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .sec-head {
+    text-align: center;
+    max-width: 38rem;
+    margin-inline: auto;
+  }
+  .sec-head h2,
+  .visit h2,
+  .lounge h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h2);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .sec-head p {
+    margin-block-start: 1rem;
+    color: var(--ink-soft);
+  }
+  .more {
+    text-align: center;
+    margin-block-start: 2.5rem;
+  }
+
+  /* ---------- Masthead: one row, wordmark centred like a menu cover ---------- */
+  .masthead {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    max-width: 84rem;
+    margin-inline: auto;
+    padding: 0.9rem 1rem;
+    border-block-end: 1px solid var(--linen);
+  }
+  .mast-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: clamp(0.25rem, 1.5vw, 1.25rem);
+    margin: 0;
+    padding: 0;
+  }
+  .mast-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.4rem;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+  .mast-nav a:hover {
+    color: var(--plum);
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+  .masthead .wordmark {
+    font-size: 2.25rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+  }
+  .mast-end {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .mast-hours {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .mast-hours:hover {
+    color: var(--plum);
+    text-decoration: underline;
+  }
+  .mast-cta {
+    min-height: 2.75rem;
+    padding-inline: 1.1rem;
+    font-size: 0.9375rem;
+  }
+  @media (max-width: 71.99rem) {
+    .mast-hours {
+      display: none;
+    }
+  }
+  @media (max-width: 47.99rem) {
+    .masthead {
+      grid-template-columns: auto 1fr;
+      row-gap: 0.25rem;
+      padding-block-end: 0;
+    }
+    .masthead .wordmark {
+      grid-row: 1;
+      grid-column: 1;
+      padding-inline: 0;
+    }
+    .mast-end {
+      grid-row: 1;
+      grid-column: 2;
+    }
+    .mast-nav {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      border-block-start: 1px solid var(--linen);
+      margin-inline: -0.25rem;
+    }
+    .mast-nav ul {
+      justify-content: space-between;
+    }
+  }
+
+  /* ---------- Hero: the carte ---------- */
+  .hero {
+    padding: clamp(1.25rem, 0.5rem + 2.5vw, 2.5rem) 1rem 0;
+  }
+  .hero-grid {
+    max-width: 82rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 64rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(1.5rem, 2.5vw, 2.5rem);
+    }
+  }
+  .carte {
+    position: relative;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.25rem) clamp(1.25rem, 0.5rem + 3.5vw, 3.75rem)
+      clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--paper) var(--grain);
+    border: 1px solid var(--plum);
+    outline: 1px solid var(--linen-strong);
+    outline-offset: -8px;
+    box-shadow: 0 2rem 3rem -2.5rem rgb(43 27 46 / 0.45);
+  }
+  .carte h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: var(--step-h1);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .carte h1 span {
+    display: block;
+  }
+  .carte-credit {
+    margin-block-start: 0.9rem;
+    max-width: 30rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  /* The seal: brass, pressed into the corner, inked with the paper's grain. */
+  .seal {
+    position: absolute;
+    /* Pressed over the card's corner, the way a seal overlaps the edge of a page. */
+    inset-block-start: calc(-1 * clamp(0.6rem, 0.2rem + 1.2vw, 1.5rem));
+    inset-inline-end: calc(-1 * clamp(0.4rem, -0.2rem + 1.6vw, 1.5rem));
+    width: clamp(6.5rem, 5rem + 4vw, 9rem);
+    aspect-ratio: 1;
+    color: var(--brass);
+    rotate: -12deg;
+    border-radius: 50%;
+    text-decoration: none;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 0 0 0 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 0 0 0 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    -webkit-mask-size: 120px;
+    mask-size: 120px;
+    transition: color 0.2s ease;
+  }
+  .seal:hover {
+    color: var(--plum);
+  }
+  .seal:focus-visible {
+    border-radius: 50%;
+  }
+  .seal svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .seal text {
+    fill: currentColor;
+  }
+  .seal-ring {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 9.5px;
+  }
+  .seal-num {
+    font-family: var(--serif);
+    font-size: 27px;
+  }
+  .seal-stars {
+    font-size: 7.5px;
+    letter-spacing: 1px;
+  }
+
+  .carte-list {
+    margin: clamp(1.5rem, 1rem + 1.5vw, 2.25rem) 0 0;
+    padding: 0;
+    border-block-start: 1px solid var(--linen);
+  }
+  .carte-row,
+  .carte-side {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-family: var(--serif);
+  }
+  .carte-row {
+    padding-block: 0.4rem;
+    border-block-end: 1px solid var(--linen);
+    font-size: clamp(1.4rem, 1.15rem + 0.9vw, 1.9rem);
+    line-height: 1.2;
+  }
+  .carte-name {
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) left 100% / 0 1px no-repeat;
+    transition: background-size 0.3s ease;
+  }
+  .carte-name:hover {
+    color: var(--plum);
+    background-size: 100% 1px;
+  }
+  .carte .leader {
+    flex: 1 1 1.5rem;
+    min-width: 1.5rem;
+    height: 4px;
+    background: radial-gradient(circle, var(--linen-strong) 1.1px, transparent 1.5px) left bottom / 8px 4px repeat-x;
+    transition: background-image 0.2s;
+  }
+  .carte-row:has(.carte-name:hover) .leader {
+    background-image: radial-gradient(circle, var(--plum) 1.1px, transparent 1.5px);
+  }
+  .carte-price {
+    white-space: nowrap;
+  }
+  .carte-price i,
+  .carte-side i {
+    font-size: 0.8em;
+    color: var(--ink-soft);
+  }
+  .carte-side {
+    margin-block-start: 0.75rem;
+    font-size: clamp(1.1rem, 1rem + 0.35vw, 1.3rem);
+  }
+  .carte-side > span:first-child {
+    font-style: italic;
+    color: var(--plum);
+  }
+  .carte-side a {
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--linen-strong);
+  }
+  .carte-side a:hover {
+    color: var(--plum);
+  }
+  .carte-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  }
+  .carte-foot {
+    margin-block-start: 1rem;
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  /* The signature: on arrival the dot leaders run out from each name to its price, then the seal is pressed. */
+  @media (prefers-reduced-motion: no-preference) {
+    .carte .leader {
+      animation: run 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+      animation-delay: calc(0.2s + var(--i, 0) * 0.08s);
+    }
+    .carte-price,
+    .carte-side i {
+      animation: ink 0.5s ease both;
+      animation-delay: calc(0.6s + var(--i, 0) * 0.08s);
+    }
+    .seal {
+      animation: stamp 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) 1.35s both;
+    }
+  }
+  @keyframes run {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes ink {
+    from {
+      opacity: 0;
+      translate: 0.35rem 0;
+    }
+  }
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      scale: 1.35;
+    }
+  }
+
+  /* Photo: an arched window onto the studio floor. */
+  .hero-photo {
+    margin: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+  .hero-photo :global(picture) {
+    display: block;
+    min-height: 0;
+  }
+  .hero-photo :global(.hero-img) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 40% 60%;
+    border-radius: 50% 50% 0.25rem 0.25rem / 26% 26% 0.25rem 0.25rem;
+  }
+  @media (min-width: 64rem) {
+    .hero-photo :global(.hero-img) {
+      aspect-ratio: auto;
+      min-height: 30rem;
+    }
+  }
+  .hero-photo figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  /* Promises: the operational proof, straight under the offer. */
+  .promises {
+    max-width: 82rem;
+    margin: clamp(2rem, 1.5rem + 2vw, 3rem) auto 0;
+    padding: 1.5rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(9.5rem, 100%), 1fr));
+    gap: 1.25rem clamp(1rem, 3vw, 2rem);
+    border-block-start: 1px solid var(--linen);
+  }
+  .p-title {
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.45rem);
+    line-height: 1.15;
+    display: flex;
+    gap: 0.55rem;
+    align-items: baseline;
+  }
+  .p-title::before {
+    content: '';
+    flex: none;
+    width: 0.7rem;
+    height: 0.38rem;
+    border-inline-start: 2px solid var(--brass);
+    border-block-end: 2px solid var(--brass);
+    rotate: -45deg;
+    translate: 0 -0.25rem;
+  }
+  .p-proof {
+    padding-inline-start: 1.25rem;
+  }
+  .p-proof {
+    margin-block-start: 0.3rem;
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .p-proof span {
+    font-style: normal;
+    white-space: nowrap;
+  }
+
+  /* ---------- Work ---------- */
+  .work {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    border-block-start: 1px solid var(--linen);
+  }
+  .work-grid {
+    max-width: 72rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1rem;
+  }
+  @media (min-width: 60rem) {
+    .work-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3rem 2rem;
+    }
+  }
+  .work-grid :global(.work-img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 0.25rem;
+  }
+  .work-grid figcaption {
+    display: grid;
+    margin-block-start: 0.75rem;
+  }
+  .work-title {
+    font-family: var(--serif);
+    font-size: 1.375rem;
+    line-height: 1.2;
+  }
+  .work-what {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Guest book ---------- */
+  .guests {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    border-block-start: 1px solid var(--linen);
+  }
+  .book {
+    max-width: 64rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) auto 0;
+    background: var(--paper) var(--grain);
+    border: 1px solid var(--linen);
+    border-radius: 0.25rem;
+    box-shadow: 0 1.5rem 3rem -2rem rgb(43 27 46 / 0.35);
+    display: grid;
+  }
+  @media (min-width: 48rem) {
+    .book {
+      grid-template-columns: 1fr 1fr;
+      background:
+        linear-gradient(
+            to right,
+            transparent calc(50% - 2.5rem),
+            rgb(43 27 46 / 0.07) calc(50% - 1px),
+            rgb(43 27 46 / 0.14) 50%,
+            rgb(43 27 46 / 0.07) calc(50% + 1px),
+            transparent calc(50% + 2.5rem)
+          ),
+        var(--grain),
+        var(--paper);
+    }
+  }
+  .page {
+    margin: 0;
+    padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    display: grid;
+    align-content: start;
+  }
+  .page li + li {
+    margin-block-start: 1.75rem;
+    padding-block-start: 1.75rem;
+    border-block-start: 1px solid var(--linen);
+  }
+  @media (max-width: 47.99rem) {
+    .page + .page {
+      padding-block-start: 0;
+    }
+    .page + .page li:first-child {
+      padding-block-start: 1.75rem;
+      border-block-start: 1px solid var(--linen);
+    }
+  }
+  .page blockquote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+    line-height: 1.2;
+  }
+  .page figcaption {
+    margin-block-start: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.9375rem;
+  }
+  .g-name {
+    font-weight: 600;
+  }
+  .g-for {
+    color: var(--ink-soft);
+  }
+
+  /* ---------- Lounge: brief ---------- */
+  .lounge {
+    background: var(--ink);
+    color: var(--cloth);
+    padding: clamp(3.5rem, 2.5rem + 4vw, 6rem) 1rem;
+  }
+  .lounge-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 2rem clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .lounge-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .lounge-photo {
+    margin: 0;
+  }
+  .lounge-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+  }
+  .lounge-photo figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--linen);
+    text-align: center;
+  }
+  .lounge-where {
+    margin-block-start: 0.5rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.375rem;
+    color: var(--brass-light);
+  }
+  .lounge-where + p {
+    margin-block-start: 1rem;
+    color: var(--linen);
+    max-width: 34rem;
+  }
+  .lounge-quote {
+    margin: 1.75rem 0 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 2px solid var(--brass-light);
+  }
+  .lounge-quote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.8rem);
+    line-height: 1.2;
+  }
+  .lounge-quote figcaption {
+    margin-block-start: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--brass-light);
+  }
+  .lounge a:focus-visible {
+    outline-color: var(--brass-light);
+  }
+
+  /* ---------- Reservations ---------- */
+  .visit {
+    padding: clamp(4.5rem, 3rem + 5vw, 8rem) 1rem;
+    background: var(--plum-wash);
+  }
+  .visit-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .visit-inner {
+      grid-template-columns: 1fr minmax(0, 28rem);
+      gap: 5rem;
+    }
+  }
+  .visit-lede {
+    margin-block-start: 1rem;
+    max-width: 34rem;
+    color: var(--ink-soft);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: 1.5rem;
+    font-weight: 500;
+  }
+  .status::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--ink-soft);
+  }
+  .status[data-state='open']::before {
+    background: #2f6b3f;
+    box-shadow: 0 0 0 3px rgb(47 107 63 / 0.18);
+  }
+  .status[hidden] {
+    display: none;
+  }
+  .details {
+    margin: 2rem 0 0;
+    display: grid;
+    border-block-start: 1px solid var(--linen-strong);
+  }
+  .details > div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--linen-strong);
+  }
+  .details dt {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: var(--plum);
+  }
+  .details dd {
+    margin: 0;
+  }
+  .details a {
+    color: var(--ink);
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--plum);
+    display: inline-block;
+    padding-block: 0.35rem;
+  }
+  .details a:hover {
+    color: var(--plum);
+  }
+  .visit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 2rem;
+  }
+  .arch-night {
+    margin: 0;
+    width: 100%;
+    max-width: 28rem;
+    justify-self: center;
+  }
+  .arch-night :global(.arch-img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 100% 50%;
+    border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+  }
+  .arch-night figcaption {
+    margin-block-start: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  @media (max-width: 30rem) {
+    .details > div {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    background: var(--cloth);
+    border-block-start: 1px solid var(--linen);
+    padding: 3rem 1rem calc(3rem + 64px);
+  }
+  .foot-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+    display: grid;
+    gap: 1.5rem;
+    justify-items: center;
+    text-align: center;
+  }
+  .foot-brand {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+  .foot-brand .wordmark {
+    font-size: 1.75rem;
+  }
+  .foot nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 1.25rem;
+    margin: 0;
+    padding: 0;
+  }
+  .foot nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.25rem;
+    font-size: 0.9375rem;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--linen-strong);
+  }
+  .foot nav a:hover {
+    color: var(--plum);
+  }
+  .foot-legal {
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carte-name,
+    .btn,
+    .seal {
+      transition: none;
+    }
+  }
+</style>

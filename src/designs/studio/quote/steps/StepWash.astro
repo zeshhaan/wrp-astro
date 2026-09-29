@@ -1,0 +1,38 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+import { aed } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+const svc = catalog.services.find((s) => s.id === 'wash')!;
+---
+
+<Screen id="wash" title="Detailing & wash" eyebrow="Step 3 of 6 · Details" lede="Hand wash only, filtered rinse water. Three levels; prices for <span data-q-class-label>your car</span>.">
+  <fieldset class="q-field">
+    <legend class="visually-hidden">Level</legend>
+    <div class="q-stack">
+      {
+        catalog.wash.levels.map((l) => (
+          <label class="q-card q-pkg">
+            <input class="visually-hidden" type="radio" name="washLevel" value={String(l.level)} />
+            <span class="q-pkg__top">
+              <span class="q-card__title">{l.name} <span class="q-card__sub">{l.tagline}</span></span>
+              <span class="q-price q-price--lg">
+                <span class="q-only-sedan">{aed(l.sedan)}</span>
+                <span class="q-only-suv">{aed(l.suv)}</span>
+              </span>
+            </span>
+            <span class="q-card__hint q-both">Sedan {aed(l.sedan)} · SUV {aed(l.suv)}</span>
+            <ul class="q-ticks q-ticks--tight" role="list">
+              {l.features.map((f) => <li><QIcon name="check" size={15} />{f}</li>)}
+            </ul>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <p class="q-note"><QIcon name="sofa" size={18} /> Usually {svc.time}. Wait upstairs in the lounge, or leave the car with us.</p>
+</Screen>

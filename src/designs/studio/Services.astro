@@ -1,0 +1,160 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { serviceCards } from './content';
+---
+
+<section class="services st-section st-dark" id="services" aria-labelledby="services-title">
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <p class="st-eyebrow">Our services</p>
+      <h2 id="services-title" class="st-h2">What we offer</h2>
+      <p class="st-intro">
+        Protection, detailing and interior work for daily drivers, family SUVs and weekend cars. Starting prices are
+        shown; we confirm the final price when we see the car.
+      </p>
+    </header>
+    <ul class="grid" role="list">
+      {
+        serviceCards.map((c) => (
+          <li class="card">
+            <div class="card__media">
+              <Picture
+                base={c.image}
+                alt={c.alt}
+                sizes="(min-width: 72rem) 300px, (min-width: 40rem) 45vw, 100vw"
+                width={c.width}
+                height={c.height}
+              />
+              <h3 class="card__name">{c.name}</h3>
+            </div>
+            <div class="card__body">
+              <p class="card__line">{c.line}</p>
+              <p class="card__price">{c.price}</p>
+              <a class="card__link" href={c.href} aria-label={c.linkLabel}>
+                Learn more <Icon name="arrow-right" size={16} />
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 36rem) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 60rem) {
+    .grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    background: var(--st-card-dark);
+    border-block-end: 3px solid var(--st-gold);
+    position: relative;
+  }
+  .card__media {
+    position: relative;
+    overflow: hidden;
+  }
+  .card__media :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  @media (max-width: 39.99rem) {
+    .card__media :global(img) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+  .card__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(12 13 15 / 0) 45%, rgb(12 13 15 / 0.88) 100%);
+  }
+  .card__name {
+    position: absolute;
+    inset-inline: 1.1rem;
+    inset-block-end: 0.9rem;
+    z-index: 1;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--st-white);
+  }
+  .card__body {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    gap: 0.75rem;
+    padding: 1.1rem 1.1rem 1rem;
+  }
+  .card__line {
+    color: var(--st-mute);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .card__price {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--st-gold);
+  }
+  .card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-self: start;
+    min-block-size: 2.75rem;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.9375rem;
+    color: var(--st-white);
+    text-decoration: none;
+  }
+  /* The whole card is clickable; the link stays the accessible target. */
+  .card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .card__link:hover {
+    color: var(--st-gold);
+  }
+  .card:hover .card__media :global(img) {
+    transform: scale(1.04);
+  }
+  .card:has(.card__link:focus-visible) {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 3px;
+  }
+  .card__link:focus-visible {
+    outline: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card__media :global(img) {
+      transition: none;
+    }
+  }
+</style>

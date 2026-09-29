@@ -1,0 +1,121 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { getReviewsWithImages } from '@/lib/reviews';
+
+export const prerender = true;
+
+const breadcrumbs = [
+  { name: 'Home', url: 'https://wrpdetailing.ae/' },
+  { name: 'Credits', url: 'https://wrpdetailing.ae/credits/' },
+];
+
+/**
+ * Third-party 3D models shown on this site. CC BY models must stay listed here
+ * for as long as they are served, with the exact attribution the author asks for.
+ * Only CC0 or CC BY (no NC, no ND) models are allowed.
+ */
+const models: { name: string; author: string; source: string; licence: string; licenceUrl: string; changes: string }[] = [
+  {
+    name: '"Generic passenger car pack"',
+    author: 'Comrade1280',
+    source: 'https://skfb.ly/6sUFy',
+    licence: 'CC BY 4.0',
+    licenceUrl: 'https://creativecommons.org/licenses/by/4.0/',
+    changes: 'Modified by WRP: four bodies re-oriented, split into paintable panels and recompressed for the web.',
+  },
+];
+
+const software: { name: string; licence: string; url: string }[] = [
+  { name: 'Astro', licence: 'MIT', url: 'https://github.com/withastro/astro' },
+  { name: 'React', licence: 'MIT', url: 'https://github.com/facebook/react' },
+  { name: 'Alpine.js', licence: 'MIT', url: 'https://github.com/alpinejs/alpine' },
+  { name: 'Tailwind CSS', licence: 'MIT', url: 'https://github.com/tailwindlabs/tailwindcss' },
+  { name: 'Radix UI', licence: 'MIT', url: 'https://github.com/radix-ui/primitives' },
+  { name: 'Lucide icons', licence: 'ISC', url: 'https://github.com/lucide-icons/lucide' },
+  { name: 'three.js', licence: 'MIT', url: 'https://github.com/mrdoob/three.js' },
+  { name: 'glTF Transform', licence: 'MIT', url: 'https://github.com/donmccurdy/glTF-Transform' },
+  { name: 'meshoptimizer', licence: 'MIT', url: 'https://github.com/zeux/meshoptimizer' },
+  { name: 'Yet Another React Lightbox', licence: 'MIT', url: 'https://github.com/igordanchenko/yet-another-react-lightbox' },
+  { name: 'sharp', licence: 'Apache-2.0', url: 'https://github.com/lovell/sharp' },
+];
+
+const fonts = ['Playfair Display', 'Inter', 'Montserrat', 'Noto Naskh Arabic', 'IBM Plex Sans Arabic'];
+
+const photographers = [...new Set(getReviewsWithImages().map((r) => r.reviewerName.trim()))].sort((a, b) =>
+  a.localeCompare(b),
+);
+---
+
+<BaseLayout
+  title="Credits | WRP Detailing Solutions"
+  description="The people, 3D models, fonts and open-source software behind the WRP Detailing Solutions website."
+  noindex={false}
+>
+  <Breadcrumbs crumbs={breadcrumbs} className="container mx-auto px-6 pt-28" />
+
+  <section class="py-20 px-6">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="font-serif text-4xl md:text-5xl font-bold mb-6">Credits</h1>
+      <p class="text-muted-foreground leading-relaxed mb-12">
+        This website is built with work shared by other people. Thank you to everyone listed here. If you see your
+        work on this site and it is not credited correctly, email
+        <a href="mailto:info@wrpdetailing.ae" class="text-foreground font-semibold hover:underline">info@wrpdetailing.ae</a>
+        and we will fix it.
+      </p>
+
+      <h2 class="font-serif text-2xl font-bold mt-12 mb-4">3D car models</h2>
+      <ul class="space-y-4 mb-6">
+        {
+          models.map((m) => (
+            <li class="text-muted-foreground leading-relaxed">
+              <strong class="text-foreground">{m.name}</strong> by {m.author}.{' '}
+              {m.licenceUrl ? (
+                <a href={m.licenceUrl} target="_blank" rel="noopener noreferrer" class="text-foreground hover:underline">{m.licence}</a>
+              ) : (
+                m.licence
+              )}
+              {m.source && (
+                <>
+                  {' '}·{' '}
+                  <a href={m.source} target="_blank" rel="noopener noreferrer" class="text-foreground hover:underline">Source</a>
+                </>
+              )}
+              <br />
+              <span class="text-sm">{m.changes}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Customer photos</h2>
+      <p class="text-muted-foreground leading-relaxed mb-4">
+        Some photos of our studio, lounge and finished cars were shared by customers in their Google reviews. Thank you to:
+      </p>
+      <p class="text-muted-foreground leading-relaxed mb-6">{photographers.join(', ')}.</p>
+
+      <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Fonts</h2>
+      <p class="text-muted-foreground leading-relaxed mb-6">
+        {fonts.join(', ')}, all under the
+        <a href="https://openfontlicense.org/" target="_blank" rel="noopener noreferrer" class="text-foreground hover:underline">SIL Open Font License 1.1</a>.
+      </p>
+
+      <h2 class="font-serif text-2xl font-bold mt-12 mb-4">Open-source software</h2>
+      <ul class="list-disc pl-6 text-muted-foreground space-y-2 mb-6">
+        {
+          software.map((s) => (
+            <li>
+              <a href={s.url} target="_blank" rel="noopener noreferrer" class="text-foreground hover:underline">{s.name}</a> ({s.licence})
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="text-sm text-muted-foreground mt-12">
+        Car makes and models named on this site belong to their owners and are mentioned only to describe the cars we work on.
+        See also our <a href="/privacy/" class="text-foreground hover:underline">Privacy Policy</a> and
+        <a href="/terms/" class="text-foreground hover:underline">Terms</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

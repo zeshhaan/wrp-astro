@@ -1,0 +1,77 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import Viewer from './Viewer.astro';
+import type { Catalog } from '../state';
+import { aed } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+const svc = catalog.services.find((s) => s.id === 'tint')!;
+// Driver's-seat view: the scene is drawn once; film overlays sit on each opening.
+const side = '4,44 60,22 84,112 4,124';
+const front = '74,20 322,20 346,112 96,112';
+---
+
+<Screen id="tint" title="Window tint" eyebrow="Step 3 of 6 · Details" lede={`Nano-ceramic film, signal safe. <span class="q-price">From ${aed(svc.from ?? 0)}</span>. See how dark each one looks.`}>
+  <div class="q-seg q-seg--2 q-seg--small" role="group" aria-label="Preview">
+    <button type="button" class="q-segbtn" data-q-tintview="inside" aria-pressed="true">From the driver’s seat</button>
+    <button type="button" class="q-segbtn" data-q-tintview="outside" aria-pressed="false">From outside</button>
+  </div>
+
+  <figure class="q-tintfig" data-q-tintpane="inside">
+    <svg viewBox="0 0 360 200" class="q-cabin" role="img" aria-labelledby="q-tint-cap" data-q-cabin>
+      <defs>
+        <linearGradient id="q-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#5fa6d8" /><stop offset=".62" stop-color="#cfe3ee" /><stop offset=".63" stop-color="#e8d7b4" /><stop offset="1" stop-color="#cdb58a" />
+        </linearGradient>
+        <radialGradient id="q-sun"><stop offset="0" stop-color="#fffbe8" /><stop offset=".35" stop-color="#fff2c2" /><stop offset="1" stop-color="#fff2c2" stop-opacity="0" /></radialGradient>
+      </defs>
+      <rect width="360" height="200" fill="url(#q-sky)" />
+      <circle cx="270" cy="38" r="34" fill="url(#q-sun)" />
+      <g fill="#8fa3b3">
+        <path d="M206 112V58l3-10 2-16 2 16 3 10v54Z" />
+        <rect x="150" y="80" width="14" height="32" /><rect x="168" y="70" width="12" height="42" /><rect x="224" y="76" width="16" height="36" />
+        <rect x="246" y="88" width="20" height="24" /><rect x="118" y="90" width="18" height="22" /><rect x="286" y="84" width="12" height="28" />
+      </g>
+      <path d="M150 112 120 200h120l-30-88Z" fill="#6f6a62" opacity=".55" />
+      <polygon class="q-tintfilm" data-film="side" points={side} />
+      <polygon class="q-tintfilm" data-film="front" points={front} />
+      <path fill="#0d0e10" fill-rule="evenodd" d={`M0 0H360V200H0Z M${side.replaceAll(' ', ' L')}Z M${front.replaceAll(' ', ' L')}Z`} />
+      <path d="M60 22 96 112" stroke="#26292e" stroke-width="10" />
+      <path d="M92 118h268" stroke="#2b2f35" stroke-width="3" />
+      <rect x="196" y="26" width="58" height="16" rx="5" fill="#1a1c20" stroke="#3a3f46" />
+      <rect x="200" y="29" width="50" height="10" rx="3" fill="url(#q-sky)" />
+      <rect class="q-tintfilm" data-film="rear" x="200" y="29" width="50" height="10" rx="3" />
+      <circle cx="170" cy="182" r="54" fill="none" stroke="#202328" stroke-width="12" />
+      <path d="M118 182h104M170 182v28" stroke="#202328" stroke-width="10" />
+    </svg>
+    <figcaption id="q-tint-cap" class="q-help" data-q-tint-cap>Choose a film to preview it.</figcaption>
+  </figure>
+
+  <div data-q-tintpane="outside" hidden>
+    <Viewer id="tint" mode="tint" legend="Brass outline: glass that gets film. Darker glass lets less light through." />
+  </div>
+
+  <fieldset class="q-field">
+    <legend class="q-legend">Film</legend>
+    <div class="q-stack">
+      {
+        catalog.tint.options.map((o) => (
+          <label class="q-card q-pkg">
+            <input class="visually-hidden" type="radio" name="tintOption" value={o.id} />
+            <span class="q-pkg__top">
+              <span class="q-card__title">{o.name}</span>
+              <span class="q-vlt" style={`--vlt:${o.vlt}`} aria-hidden="true"><span /></span>
+            </span>
+            <span class="q-card__hint"><strong>{o.vlt}% VLT</strong> · {o.heat}</span>
+            <span class="q-card__hint">{o.note}</span>
+            <span class="q-card__tick" aria-hidden="true"><QIcon name="check" size={16} /></span>
+          </label>
+        ))
+      }
+    </div>
+    <p class="q-help">VLT is the share of light the glass lets through: lower is darker. We confirm a legal shade for your car before we fit it.</p>
+  </fieldset>
+  <p class="q-note"><QIcon name="clock" size={18} /> About {svc.time}. Wait in the lounge upstairs, or leave the car with us.</p>
+</Screen>

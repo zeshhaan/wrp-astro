@@ -1,0 +1,59 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import type { Catalog } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+---
+
+<Screen id="review" title="Review & send" eyebrow="Step 6 of 6" form={false} lede="Check it over, then send it the way you like. This is a request, not a booking: nothing is charged.">
+  <div class="q-review" data-q-review></div>
+
+  <section class="q-next" aria-labelledby="q-next-h">
+    <h2 id="q-next-h" class="q-h2">What happens next</h2>
+    <ol class="q-steps" role="list">
+      <li><span class="q-steps__n">1</span><span>We reply with a price for your car and confirm the time, on {`WhatsApp or by phone`}.</span></li>
+      <li><span class="q-steps__n">2</span><span>You drop the car off, or we collect it if we’ve arranged that.</span></li>
+      <li><span class="q-steps__n">3</span><span>We send photo and video updates while we work.</span></li>
+      <li><span class="q-steps__n">4</span><span>Your car is ready at the time we agreed.</span></li>
+    </ol>
+    <figure class="q-quote">
+      <blockquote><p>“{catalog.quotes.updates.text}”</p></blockquote>
+      <figcaption>{catalog.quotes.updates.author}, Google review</figcaption>
+    </figure>
+  </section>
+
+  <form id="q-send-form" class="q-sendform" method="post" action="/api/contact" data-demo-form aria-label="Send quote request">
+    <input type="hidden" name="name" />
+    <input type="hidden" name="phone" />
+    <input type="hidden" name="email" />
+    <input type="hidden" name="vehicle" />
+    <input type="hidden" name="service" />
+    <input type="hidden" name="service_interest" />
+    <input type="hidden" name="message" />
+    <input type="hidden" name="locale" value="en" />
+    <p class="q-help q-sendform__help">WhatsApp opens with your request typed out; just press send. “Send request” sends it to our team and we reply by {`WhatsApp or phone`}.</p>
+    <p class="q-status" data-demo-status role="status" hidden></p>
+  </form>
+</Screen>
+
+<Screen id="done" title="Request sent" eyebrow="Thank you" form={false}>
+  <div class="q-done">
+    <p class="q-lede" data-q-done-lede>We’ll reply with a price and a time.</p>
+    <p class="q-status" data-q-done-status hidden></p>
+    <div class="q-detail">
+      <p class="q-detail__title">Your request</p>
+      <p class="q-help" data-q-done-sum></p>
+    </div>
+    <ul class="q-ticks" role="list">
+      <li><QIcon name="clock" size={16} />Open {catalog.contact.hoursShort}. {catalog.contact.closed}.</li>
+      <li><QIcon name="phone" size={16} />In a hurry? Call <a href={catalog.contact.phoneHref}>{catalog.contact.phoneDisplay}</a></li>
+    </ul>
+    <div class="q-done__actions">
+      <a class="st-btn st-btn--gold" data-q-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener"><QIcon name="whatsapp" size={20} />Open WhatsApp</a>
+      <a class="st-btn st-btn--ghost" href="/design-lab/studio/">Back to the homepage</a>
+      <button type="button" class="q-textbtn" data-q-restart>Start a new quote</button>
+    </div>
+  </div>
+</Screen>

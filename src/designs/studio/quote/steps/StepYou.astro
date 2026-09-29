@@ -1,0 +1,41 @@
+---
+import Screen from './Screen.astro';
+---
+
+<Screen id="you" title="Your details" eyebrow="Step 5 of 6" lede="So we can send you the price and confirm the time.">
+  <div class="q-input">
+    <label for="q-name">Name</label>
+    <input id="q-name" name="name" type="text" autocomplete="name" autocapitalize="words" enterkeyhint="next" required maxlength="100" aria-describedby="q-name-err" />
+    <p class="q-fielderr" id="q-name-err" data-q-fielderr>Please tell us your name.</p>
+  </div>
+  <div class="q-input">
+    <label for="q-phone">Mobile</label>
+    <input id="q-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" enterkeyhint="next" required maxlength="20" placeholder="050 123 4567" aria-describedby="q-phone-hint q-phone-err" />
+    <p class="q-hint" id="q-phone-hint">UAE number, or add your country code (+971 is assumed).</p>
+    <p class="q-fielderr" id="q-phone-err" data-q-fielderr>Please enter a mobile number we can reach, e.g. 050 123 4567.</p>
+  </div>
+  <div class="q-input">
+    <label for="q-email">Email <span class="q-opt">optional</span></label>
+    <input id="q-email" name="email" type="email" autocomplete="email" inputmode="email" enterkeyhint="next" maxlength="120" aria-describedby="q-email-err" />
+    <p class="q-fielderr" id="q-email-err" data-q-fielderr>That email doesn’t look complete, e.g. name@example.com.</p>
+  </div>
+  <fieldset class="q-field">
+    <legend class="q-legend">Best way to reach you</legend>
+    <div class="q-seg q-seg--2">
+      <label class="q-segbtn"><input class="visually-hidden" type="radio" name="contactPref" value="whatsapp" />WhatsApp</label>
+      <label class="q-segbtn"><input class="visually-hidden" type="radio" name="contactPref" value="call" />Phone call</label>
+    </div>
+  </fieldset>
+  <div class="q-input">
+    <label for="q-notes">Anything else? <span class="q-opt">optional</span></label>
+    <textarea id="q-notes" name="notes" rows="3" maxlength="1000" placeholder="Existing marks, dents, a deadline, a question…"></textarea>
+  </div>
+  <label class="q-card q-check q-consent">
+    <input type="checkbox" name="consent" required aria-describedby="q-consent-err" />
+    <span>
+      <span class="q-card__title">WRP may contact me about this quote</span>
+      <span class="q-card__hint">By WhatsApp, phone or email. See our <a href="/privacy/" target="_blank" rel="noopener">privacy policy</a>.</span>
+    </span>
+  </label>
+  <p class="q-fielderr" id="q-consent-err" data-q-fielderr>Please tick this so we can reply to you.</p>
+</Screen>

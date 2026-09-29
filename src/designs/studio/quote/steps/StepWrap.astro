@@ -1,0 +1,43 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import Viewer from './Viewer.astro';
+import type { Catalog } from '../state';
+import { wrapFinishes } from '../state';
+
+interface Props { catalog: Catalog }
+const { catalog } = Astro.props;
+---
+
+<Screen id="wrap" title="Wrap & styling" eyebrow="Step 3 of 6 · Details" lede="Tap the parts you want wrapped. Priced after inspection.">
+  <Viewer id="wrap" mode="wrap" legend="Tap the bonnet, roof, mirrors, spoiler, boot or pillars on the car, or use the buttons." />
+  <fieldset class="q-field">
+    <legend class="q-legend">Finish</legend>
+    <div class="q-grid q-grid--2 q-grid--tight">
+      {
+        wrapFinishes.map((f) => (
+          <label class="q-chip q-chip--big q-paint">
+            <input class="visually-hidden" type="radio" name="wrapFinish" value={f.id} />
+            <span class:list={['q-paint__dot', `q-paint__dot--${f.id}`]} style={`--dot:${f.hex}`} aria-hidden="true" />
+            {f.label}
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <label class="q-card q-check q-switch">
+    <input type="checkbox" name="wrapChrome" role="switch" />
+    <span>
+      <span class="q-card__title">Chrome delete</span>
+      <span class="q-card__hint">Window trim, badges and grille chrome in black.</span>
+    </span>
+  </label>
+  {
+    catalog.quotes.wrap && (
+      <figure class="q-quote">
+        <blockquote><p>“{catalog.quotes.wrap.text}”</p></blockquote>
+        <figcaption>{catalog.quotes.wrap.author}, Google review</figcaption>
+      </figure>
+    )
+  }
+</Screen>

@@ -1,0 +1,164 @@
+---
+import Icon from './Icon.astro';
+import { pages } from '../data';
+import { contact, serviceCards, whatsappQuote } from './content';
+
+const siteLinks = [
+  { label: 'Portfolio', href: pages.portfolio },
+  { label: 'Reviews', href: pages.reviews },
+  { label: 'Blog', href: pages.blog },
+  { label: 'About WRP', href: pages.about },
+  { label: 'Contact us', href: pages.contact },
+  { label: 'The WRP Lounge', href: '#lounge' },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="st-wrap foot__grid">
+    <div class="foot__brand">
+      <span class="foot__mark">WRP.</span>
+      <p>
+        Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais,
+        Dubai. Wrap, Reinforce, Protect.
+      </p>
+      <ul class="foot__social" role="list">
+        <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{contact.instagramHandle}</a></li>
+        <li><a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a></li>
+      </ul>
+    </div>
+    <nav class="foot__col" aria-labelledby="foot-services">
+      <h2 id="foot-services" class="foot__h">Services</h2>
+      <ul role="list">
+        {serviceCards.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+      </ul>
+    </nav>
+    <nav class="foot__col" aria-labelledby="foot-links">
+      <h2 id="foot-links" class="foot__h">Site links</h2>
+      <ul role="list">
+        {siteLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="foot__col">
+      <h2 class="foot__h">Visit us</h2>
+      <ul role="list">
+        <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+        <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{contact.address[0]},<br />{contact.address[1]}</a></li>
+        <li class="foot__hours">{contact.hours}<br />{contact.closed}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="st-wrap foot__base">
+    <p>© {year} WRP Detailing Solutions. All rights reserved.</p>
+    <ul role="list">
+      <li><a href={pages.privacy}>Privacy</a></li>
+      <li><a href={pages.terms}>Terms</a></li>
+      <li><a href={pages.credits}>Credits</a></li>
+      <li><a href={pages.arabic} lang="ar" hreflang="ar">العربية</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--st-black);
+    color: var(--st-mute);
+    border-block-start: 1px solid var(--st-line-dark);
+    padding-block: 4rem 6rem;
+    font-size: 0.9375rem;
+  }
+  .foot__grid {
+    display: grid;
+    gap: 2.5rem 3rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .foot__brand,
+  .foot__grid > :last-child {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 40rem) and (max-width: 63.99rem) {
+    .foot__grid > :last-child {
+      grid-column: auto;
+    }
+    .foot__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .foot__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    }
+    .foot__brand,
+    .foot__grid > :last-child {
+      grid-column: auto;
+    }
+  }
+  .foot__brand {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+  .foot__mark {
+    font-family: var(--st-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 2.25rem;
+    line-height: 1;
+    color: var(--st-white);
+  }
+  .foot__brand p {
+    max-inline-size: 22rem;
+  }
+  .foot ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .foot__social {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .foot a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.5rem;
+    color: var(--st-on-dark);
+    text-decoration: none;
+  }
+  .foot a:hover {
+    color: var(--st-gold);
+  }
+  .foot__h {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--st-white);
+    padding-block-end: 0.75rem;
+    margin-block-end: 0.75rem;
+    border-block-end: 2px solid var(--st-gold);
+    inline-size: fit-content;
+    min-inline-size: 60%;
+  }
+  .foot__hours {
+    padding-block: 0.5rem;
+  }
+  .foot__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem 2rem;
+    margin-block-start: 3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--st-line-dark);
+    font-size: 0.8125rem;
+  }
+  .foot__base ul {
+    display: flex;
+    gap: 1.25rem;
+  }
+</style>

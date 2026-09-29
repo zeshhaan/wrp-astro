@@ -62,6 +62,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
+      // Design Lab concepts are review-only previews, never indexable pages.
+      filter: (page) => !page.includes('/design-lab/'),
       customPages: [
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',
@@ -143,6 +145,53 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['arabic'],
       fallbacks: ['system-ui', 'sans-serif'],
+    },
+    // ── Design Lab concept fonts (src/designs/*). Loaded only by the concept
+    // pages that ask for them via <Font>, so production pages are unaffected.
+    {
+      name: 'Bricolage Grotesque',
+      cssVariable: '--font-bricolage',
+      provider: fontProviders.google(),
+      weights: [400, 600, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Geist',
+      cssVariable: '--font-geist',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Instrument Serif',
+      cssVariable: '--font-instrument-serif',
+      provider: fontProviders.google(),
+      weights: [400],
+      styles: ['normal', 'italic'],
+      subsets: ['latin'],
+      fallbacks: ['Georgia', 'serif'],
+    },
+    {
+      name: 'Instrument Sans',
+      cssVariable: '--font-instrument-sans',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['system-ui', 'sans-serif'],
+    },
+    {
+      name: 'Oswald',
+      cssVariable: '--font-oswald',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Arial Narrow', 'sans-serif'],
     },
   ],
 });

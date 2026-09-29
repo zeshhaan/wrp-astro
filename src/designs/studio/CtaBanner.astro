@@ -1,0 +1,75 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { contact } from './content';
+---
+
+<section class="cta" aria-labelledby="cta-title">
+  <Picture
+    base="/review-images/mark_ban_1"
+    alt=""
+    sizes="100vw"
+    class="cta__bg"
+  />
+  <div class="st-wrap cta__inner">
+    <p class="st-eyebrow">Visit the studio in Al Qusais</p>
+    <h2 id="cta-title" class="st-h2">Your car, done properly and ready on time</h2>
+    <p class="cta__text">
+      Tell us the car and what you want done. We’ll reply with a price and a time, and keep you updated until you
+      collect it.
+    </p>
+    <div class="cta__actions">
+      <a class="st-btn st-btn--gold" href="/design-lab/studio/quote/">Get a quick quote</a>
+      <a class="st-btn st-btn--ghost" href={contact.mapsUrl} target="_blank" rel="noopener">
+        <Icon name="pin" />Get directions
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(4rem, 3rem + 5vw, 7rem);
+    color: var(--st-white);
+    background: var(--st-black);
+    text-align: center;
+  }
+  .cta :global(.cta__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .cta :global(.cta__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(12 13 15 / 0.72);
+  }
+  .cta__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .cta__text {
+    max-inline-size: 38rem;
+    color: var(--st-on-dark);
+    font-size: 1.0625rem;
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-block-start: 0.75rem;
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import Picture from '../shared/Picture.astro';
+import { work, pages } from '../data';
+---
+
+<section class="work" id="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <div class="head">
+      <h2 id="work-title">Recently in the bays</h2>
+      <a class="all" href={pages.portfolio}>See the full portfolio</a>
+    </div>
+    <ul role="list" class="cars">
+      {
+        work.map((w) => (
+          <li class="car">
+            <Picture
+              base={w.image}
+              alt={`${w.title}: ${w.what.toLowerCase()} at WRP`}
+              sizes="(min-width: 56rem) 24rem, 72vw"
+              width={1200}
+              height={1500}
+            />
+            <p class="car__title">{w.title}</p>
+            <p class="car__what">{w.what}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .work {
+    padding: 1rem var(--mz-gutter) 5rem;
+  }
+  .wrap {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    margin-block-end: 1.5rem;
+  }
+  h2 {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .all {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 500;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  .all:hover {
+    text-decoration-thickness: 2.5px;
+  }
+
+  /* Mobile: a sideways row that snaps, with the next car peeking in. */
+  .cars {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 72%;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--mz-gutter);
+    margin-inline: calc(var(--mz-gutter) * -1);
+    padding-inline: var(--mz-gutter);
+    padding-block-end: 0.5rem;
+    scrollbar-width: thin;
+  }
+  .cars:focus-visible {
+    outline: 3px solid var(--mz-felt);
+    outline-offset: 2px;
+  }
+  .car {
+    scroll-snap-align: start;
+  }
+  .car :global(img) {
+    width: 100%;
+    aspect-ratio: 5 / 6;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .car__title {
+    margin-block-start: 0.7rem;
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+  }
+  .car__what {
+    color: var(--mz-ink-2);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 56rem) {
+    .cars {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      gap: 2.5rem 1.5rem;
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+  }
+</style>

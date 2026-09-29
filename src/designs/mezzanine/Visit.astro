@@ -1,0 +1,263 @@
+---
+import Picture from '../shared/Picture.astro';
+import { contact, studio } from '../data';
+import { whatsappHello } from './building';
+
+const { open, close, closedDays, timeZone } = contact.schedule;
+---
+
+<section class="visit" id="visit" aria-labelledby="visit-title">
+  <div class="wrap">
+    <figure class="night">
+      <Picture
+        base={studio.night.base}
+        alt={studio.night.alt}
+        sizes="(min-width: 56rem) 40rem, 100vw"
+      />
+      <figcaption>The studio at night. Photo by customer Mark Ban.</figcaption>
+    </figure>
+
+    <div class="info">
+      <h2 id="visit-title">Find us in Al&nbsp;Qusais</h2>
+
+      <p
+        class="status"
+        data-open-status
+        data-open={open}
+        data-close={close}
+        data-closed-days={closedDays.join(',')}
+        data-tz={timeZone}
+        hidden
+      >
+        <span class="status__dot" aria-hidden="true"></span>
+        <span class="status__text"></span>
+      </p>
+
+      <dl class="facts">
+        <div>
+          <dt>Address</dt>
+          <dd>{contact.address[0]}<br />{contact.address[1]}</dd>
+        </div>
+        <div>
+          <dt>Hours</dt>
+          <dd>{contact.hours}.<br />{contact.closed}.</dd>
+        </div>
+      </dl>
+
+      <div class="actions">
+        <a class="btn btn--felt" href={whatsappHello} target="_blank" rel="noopener">Message us on WhatsApp</a>
+        <a class="btn btn--line" href={contact.phoneHref}>Call {contact.phoneDisplay}</a>
+        <a class="btn btn--line" href={contact.mapsUrl} target="_blank" rel="noopener">Get directions in Google Maps</a>
+      </div>
+
+      <p class="more">
+        Or email <a href={`mailto:${contact.email}`}>{contact.email}</a>, or see what’s in the bays this week on
+        Instagram at <a href={contact.instagram} target="_blank" rel="noopener">{contact.instagramHandle}</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  // Live "open now" status in Dubai time. Uses Temporal where the browser has it
+  // (js/model-partial-time-concepts), and Intl.DateTimeFormat everywhere else.
+  const el = document.querySelector<HTMLElement>('[data-open-status]');
+  if (el) {
+    const tz = el.dataset.tz ?? 'Asia/Dubai';
+    const toMin = (hhmm: string) => {
+      const [h, m] = hhmm.split(':').map(Number);
+      return h * 60 + m;
+    };
+    const open = toMin(el.dataset.open ?? '09:00');
+    const close = toMin(el.dataset.close ?? '21:30');
+    const closed = (el.dataset.closedDays ?? '').split(',').filter(Boolean).map(Number);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const clock = (min: number) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return `${((h + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+    };
+
+    const now = (): { day: number; min: number } => {
+      const T = (globalThis as any).Temporal;
+      if (T?.Now?.zonedDateTimeISO) {
+        const z = T.Now.zonedDateTimeISO(tz);
+        return { day: z.dayOfWeek % 7, min: z.hour * 60 + z.minute };
+      }
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date());
+      const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+      const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+      return { day, min: Number(get('hour')) * 60 + Number(get('minute')) };
+    };
+
+    const render = () => {
+      const { day, min } = now();
+      const openToday = !closed.includes(day);
+      let text: string;
+      let isOpen = false;
+      if (openToday && min >= open && min < close) {
+        isOpen = true;
+        text = close - min <= 60 ? `Open now, closing soon at ${clock(close)}` : `Open now, until ${clock(close)}`;
+      } else if (openToday && min < open) {
+        text = `Closed now. Opens today at ${clock(open)}`;
+      } else {
+        let ahead = 1;
+        while (closed.includes((day + ahead) % 7) && ahead < 7) ahead++;
+        const when = ahead === 1 ? 'tomorrow' : days[(day + ahead) % 7];
+        text = `${openToday ? 'Closed now' : `Closed on ${days[day]}s`}. Opens ${when} at ${clock(open)}`;
+      }
+      el.querySelector('.status__text')!.textContent = text;
+      el.classList.toggle('is-open', isOpen);
+      el.hidden = false;
+    };
+
+    render();
+    // Re-check on the minute, and when the tab comes back.
+    const msToMinute = 60_000 - (Date.now() % 60_000);
+    window.setTimeout(() => {
+      render();
+      window.setInterval(render, 60_000);
+    }, msToMinute);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') render();
+    });
+  }
+</script>
+
+<style>
+  .visit {
+    padding: 3rem var(--mz-gutter) 4rem;
+  }
+  .wrap {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+    display: grid;
+    gap: 2rem;
+  }
+  .night {
+    margin-inline: calc(var(--mz-gutter) * -1);
+  }
+  .night :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .night figcaption {
+    padding: 0.5rem var(--mz-gutter) 0;
+    font-size: 0.875rem;
+    color: var(--mz-on-dark-2);
+  }
+  .info {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  h2 {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    color: var(--mz-on-dark);
+  }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+    font-size: 1.0625rem;
+    color: var(--mz-on-dark);
+  }
+  .status[hidden] {
+    display: none;
+  }
+  .status__dot {
+    flex: none;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #6f7a76;
+  }
+  .status.is-open .status__dot {
+    background: var(--mz-brass);
+    box-shadow: 0 0 0 4px rgb(201 164 92 / 0.2), 0 0 12px rgb(201 164 92 / 0.7);
+  }
+  .facts {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+  }
+  dt {
+    font-size: 0.875rem;
+    color: var(--mz-on-dark-2);
+    margin-block-end: 0.15rem;
+  }
+  dd {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+  .actions {
+    display: grid;
+    gap: 0.625rem;
+    justify-items: start;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.7rem 1.35rem;
+    border-radius: 999px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+      background-color 0.15s,
+      border-color 0.15s;
+  }
+  .btn--felt {
+    background: var(--mz-felt);
+    color: #fff;
+  }
+  .btn--felt:hover {
+    background: #257a5b;
+  }
+  .btn--line {
+    border: 1.5px solid rgb(233 235 232 / 0.4);
+    color: var(--mz-on-dark);
+  }
+  .btn--line:hover {
+    border-color: var(--mz-on-dark);
+  }
+  .more {
+    color: var(--mz-on-dark-2);
+    max-width: 44ch;
+  }
+  .more a {
+    color: var(--mz-on-dark);
+    text-underline-offset: 0.25em;
+  }
+
+  @media (min-width: 56rem) {
+    .visit {
+      padding-block: 4.5rem 5rem;
+    }
+    .wrap {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: 3.5rem;
+      align-items: center;
+    }
+    .night {
+      margin-inline: 0;
+    }
+    .night figcaption {
+      padding-inline: 0;
+    }
+  }
+</style>

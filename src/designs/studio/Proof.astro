@@ -1,0 +1,149 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { proof, stats, whatsappQuote } from './content';
+---
+
+<section class="proof st-section st-dark" aria-labelledby="proof-title">
+  <div class="st-wrap proof__grid">
+    <figure class="proof__media">
+      <Picture
+        base="/review-images/venkat_k_3"
+        alt="WRP materials room with STEK film boxes, leather seat samples and floor mat samples"
+        sizes="(min-width: 60rem) 45vw, 100vw"
+      />
+      <figcaption>The materials room: film, leather and mat samples you can see before you choose.</figcaption>
+    </figure>
+    <div class="proof__text">
+      <p class="st-eyebrow">Films and warranties</p>
+      <h2 id="proof-title" class="st-h2">Protection you can check</h2>
+      <p>
+        We fit paint protection film from two makers we trust, Avery Dennison and STEK. The film is self-healing
+        and carries up to a 10-year warranty. Ask to see the samples before you decide.
+      </p>
+      <ul class="films" role="list" aria-label="Film brands">
+        {
+          proof.films.map((f) => (
+            <li>
+              <img src={f.logo} alt={f.name} width="160" height="48" loading="lazy" decoding="async" />
+            </li>
+          ))
+        }
+      </ul>
+      <dl class="stats">
+        {
+          stats.map((s) => (
+            <div class="stat">
+              <dt>{s.label}</dt>
+              <dd>{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="proof__actions">
+        <a class="st-btn st-btn--gold" href="/design-lab/studio/quote/">Get a quick quote</a>
+        <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .proof__grid {
+    display: grid;
+    gap: 2.5rem 4rem;
+    align-items: center;
+  }
+  .proof__media :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .proof__media figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  .proof__text {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .proof__text > p:not(.st-eyebrow) {
+    color: var(--st-on-dark);
+    max-inline-size: 36rem;
+  }
+  .films {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .films li {
+    display: grid;
+    place-items: center;
+    padding: 0.75rem 1.1rem;
+    background: var(--st-white);
+    min-inline-size: 9rem;
+  }
+  .films img {
+    block-size: 2rem;
+    inline-size: auto;
+    max-inline-size: 9rem;
+    object-fit: contain;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin: 0.5rem 0 0;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: 0.2rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--st-gold);
+  }
+  .stat dd {
+    margin: 0;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 1;
+    color: var(--st-white);
+  }
+  .stat dt {
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--st-mute);
+  }
+  .proof__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+  @media (min-width: 40rem) {
+    .stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  @media (min-width: 60rem) {
+    .proof__grid {
+      grid-template-columns: 1fr 1.1fr;
+    }
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 80rem) {
+    .stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

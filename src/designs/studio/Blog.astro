@@ -1,0 +1,176 @@
+---
+import { getCollection } from 'astro:content';
+import Picture from '../shared/Picture.astro';
+import { scrimStops } from '../shared/easedGradient';
+import Icon from './Icon.astro';
+import { blogIds } from './content';
+
+const all = await getCollection('blog');
+const posts = blogIds
+  .map((id) => all.find((p) => p.id === id))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+/** '/foo.jpg' → '/foo' for the pre-optimised variants (Picture adds -480w.avif etc.). */
+const coverBase = (src: string) => src.replace(/\.(jpe?g|png|webp)$/i, '');
+// Eased scrim: clear over the top of the photo, dark under the text.
+const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 18, to: 78, max: 0.94 })}, rgb(12 13 15 / 0.94) 100%)`;
+---
+
+{
+  posts.length > 0 && (
+    <section class="blog st-section st-white" id="blog" aria-labelledby="blog-title">
+      <div class="st-wrap">
+        <div class="blog__head">
+          <header class="st-head">
+            <p class="st-eyebrow st-eyebrow--dark">From the blog</p>
+            <h2 id="blog-title" class="st-h2">Guides and advice</h2>
+          </header>
+          <a class="st-btn st-btn--dark" href="/blog/">All articles</a>
+        </div>
+        <ul class="posts" role="list">
+          {posts.map((p) => {
+            const date = p.data.updatedDate ?? p.data.pubDate;
+            return (
+              <li class="post" style={`--scrim:${scrim}`}>
+                {p.data.heroImage && (
+                  <Picture
+                    base={coverBase(p.data.heroImage)}
+                    alt=""
+                    sizes="(min-width: 60rem) 30vw, (min-width: 40rem) 50vw, 100vw"
+                    widths={[480, 800]}
+                    width={800}
+                    height={450}
+                    class="post__cover"
+                  />
+                )}
+                <p class="post__date">
+                  <time datetime={date.toISOString().slice(0, 10)}>{fmt.format(date)}</time>
+                </p>
+                <h3 class="post__title">
+                  <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+                </h3>
+                <p class="post__desc">{p.data.description}</p>
+                <span class="post__more" aria-hidden="true">
+                  Read the guide <Icon name="arrow-right" size={16} />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .blog__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-block-end: 2rem;
+  }
+  .blog__head .st-head {
+    margin-block-end: 0;
+  }
+  .posts {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  }
+  /* Cover photo with an eased scrim; text sits on the dark end. */
+  .post {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-content: end;
+    gap: 0.6rem;
+    min-block-size: 27rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    color: var(--st-white);
+    background: var(--st-black);
+    border-block-start: 3px solid var(--st-gold);
+  }
+  .post :global(.post__cover) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .post :global(.post__cover img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .post::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--scrim);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .post:hover :global(.post__cover img) {
+      transform: scale(1.04);
+    }
+  }
+  .post__date {
+    font-size: 0.8125rem;
+    color: var(--st-on-dark);
+  }
+  .post__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.45rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .post__title a {
+    color: var(--st-white);
+    text-decoration: none;
+  }
+  .post__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .post__title a:focus-visible {
+    outline: none;
+  }
+  .post:has(a:focus-visible) {
+    outline: 3px solid var(--st-gold-deep);
+    outline-offset: 3px;
+  }
+  .post__desc {
+    color: var(--st-on-dark);
+    font-size: 0.9375rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+  .post__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-block-start: 0.4rem;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.9375rem;
+    color: var(--st-gold);
+  }
+  .post:hover .post__title a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--st-gold);
+  }
+</style>

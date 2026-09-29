@@ -1,0 +1,121 @@
+---
+import { freshQuotes, pickQuotes, proof } from '../data';
+import { shortName } from './building';
+
+// Verbatim review highlights about the work; the lounge has its own section.
+const fresh = freshQuotes.find((q) => q.author === 'Sunit Gonsalves');
+const quotes = [
+  ...pickQuotes(10).filter((q) => /^[A-Z]/.test(q.text) && !/lounge|billiard|waiting|home|enthusiasm/i.test(q.text)).slice(0, 3),
+  ...(fresh ? [fresh] : []),
+].map((q) => ({ ...q, author: shortName(q.author) }));
+---
+
+<section class="reviews" id="reviews" aria-labelledby="reviews-title">
+  <div class="wrap">
+    <div class="score">
+      <p class="score__num" aria-hidden="true">{proof.rating}</p>
+      <h2 id="reviews-title">
+        <span class="visually-hidden">Rated {proof.rating} </span>on Google, from {proof.reviewCountDisplay} customer reviews
+      </h2>
+      <a class="all" href={proof.reviewsUrl}>Read the reviews</a>
+    </div>
+    <ul role="list" class="quotes">
+      {
+        quotes.map((q) => (
+          <li>
+            <blockquote>
+              <p>“{q.text}”</p>
+              <footer>{q.author}</footer>
+            </blockquote>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    padding: 1rem var(--mz-gutter) 5rem;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .wrap {
+    max-width: var(--mz-max);
+    margin-inline: auto;
+    display: grid;
+    gap: 2.5rem;
+    padding-block-start: 3rem;
+    border-top: 5px solid var(--mz-lamp);
+  }
+  .score {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+  .score__num {
+    font-family: var(--mz-display);
+    font-weight: 800;
+    font-size: clamp(6rem, 18vw, 12rem);
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    color: var(--mz-felt-ink);
+  }
+  h2 {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 18ch;
+  }
+  .all {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    width: fit-content;
+    font-weight: 500;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.3em;
+  }
+  .all:hover {
+    text-decoration-thickness: 2.5px;
+  }
+  .quotes {
+    display: grid;
+    gap: 2rem;
+  }
+  blockquote {
+    display: grid;
+    gap: 0.5rem;
+  }
+  blockquote p {
+    font-family: var(--mz-display);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2vw, 1.625rem);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    max-width: 30ch;
+  }
+  footer {
+    color: var(--mz-ink-2);
+    font-size: 0.9375rem;
+  }
+  @media (min-width: 56rem) {
+    .wrap {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 4rem;
+      padding-block-start: 4rem;
+    }
+    .quotes {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem 2.5rem;
+    }
+  }
+</style>

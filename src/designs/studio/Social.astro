@@ -1,0 +1,71 @@
+---
+import Icon from './Icon.astro';
+import { contact, whatsappQuote } from './content';
+---
+
+<section class="social" aria-labelledby="social-title">
+  <div class="st-wrap social__inner">
+    <h2 id="social-title" class="social__title">Follow the work on Instagram {contact.instagramHandle}</h2>
+    <ul class="social__links" role="list">
+      <li>
+        <a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />Instagram</a>
+      </li>
+      <li>
+        <a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .social {
+    background: var(--st-gold);
+    color: var(--st-black);
+    padding-block: 1.75rem;
+  }
+  .social__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+  }
+  .social__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .social__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .social__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding-inline: 1.1rem;
+    border: 1.5px solid var(--st-black);
+    color: var(--st-black);
+    text-decoration: none;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.9375rem;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .social__links a:hover {
+    background: var(--st-black);
+    color: var(--st-gold);
+  }
+  .social__links a:focus-visible {
+    outline-color: var(--st-black);
+  }
+</style>

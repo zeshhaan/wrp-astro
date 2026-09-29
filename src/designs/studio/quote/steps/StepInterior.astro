@@ -1,0 +1,39 @@
+---
+import Screen from './Screen.astro';
+import QIcon from './QIcon.astro';
+import { interiorItems, interiorMaterials } from '../state';
+---
+
+<Screen id="interior" title="Seats, upholstery & mats" eyebrow="Step 3 of 6 · Details" lede="Tick what you’d like. Priced after we see the car and you choose the material.">
+  <fieldset class="q-field">
+    <legend class="visually-hidden">Interior work</legend>
+    <div class="q-stack q-stack--tight">
+      {
+        interiorItems.map((i) => (
+          <label class="q-card q-check">
+            <input type="checkbox" name="interiorItems" value={i.id} />
+            <span>
+              <span class="q-card__title">{i.label}</span>
+              <span class="q-card__hint">{i.note}</span>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <fieldset class="q-field">
+    <legend class="q-legend">Material <span class="q-opt">optional</span></legend>
+    <div class="q-chips">
+      {
+        interiorMaterials.map((m) => (
+          <label class="q-chip">
+            <input class="visually-hidden" type="radio" name="interiorMaterial" value={m.id} />
+            {m.label}
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <p class="q-note"><QIcon name="camera" size={18} /> Have a photo of the seats or the damage? Send it on WhatsApp after this; it helps us price it.</p>
+  <p class="q-note"><QIcon name="sofa" size={18} /> Touch the leather and mat samples in our materials room before you decide.</p>
+</Screen>
