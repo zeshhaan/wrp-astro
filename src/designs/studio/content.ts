@@ -195,7 +195,8 @@ export const aboutChecklist = [
 ];
 
 /** Blog posts to feature (ids in src/content/blog); only ones that exist are shown. */
-export const blogIds = ['is-ppf-worth-it-dubai', 'ppf-vs-ceramic-coating', 'window-tinting-dubai-legal-heat-guide'];
+// One each of PPF, tint and ceramic, with distinct cover photos.
+export const blogIds = ['is-ppf-worth-it-dubai', 'window-tinting-dubai-legal-heat-guide', 'ceramic-coating-dubai-guide'];
 
 export const loungeList = ['Billiards', 'Board games', 'Coffee & karak', 'Big-screen TV', 'Air-conditioned', 'Glass wall over the bays'];
 
