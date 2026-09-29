@@ -17,8 +17,9 @@ export const heroVideo = {
     wide: { avif: `${dir}/poster-1080.avif`, webp: `${dir}/poster-1080.webp`, jpg: `${dir}/poster-1080.jpg` },
     tall: { avif: `${dir}/poster-720x1280.avif`, webp: `${dir}/poster-720x1280.webp`, jpg: `${dir}/poster-720x1280.jpg` },
   },
+  /** Played through src/pages/media/hero-video/[name].ts, which answers Range requests (Safari needs 206). */
   video: {
-    wide: { av1: `${dir}/hero-1080.av1.mp4`, h264: `${dir}/hero-1080.h264.mp4` },
-    tall: { av1: `${dir}/hero-720x1280.av1.mp4`, h264: `${dir}/hero-720x1280.h264.mp4` },
+    wide: { av1: '/media/hero-video/hero-1080.av1/', h264: '/media/hero-video/hero-1080.h264/' },
+    tall: { av1: '/media/hero-video/hero-720x1280.av1/', h264: '/media/hero-video/hero-720x1280.h264/' },
   },
 };

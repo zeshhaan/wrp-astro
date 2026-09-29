@@ -30,8 +30,9 @@
   Cache-Control: public, max-age=31536000, immutable
 
 
-# Hero video (fixed filenames: a week fresh, then revalidated in the background)
-/video/*
+# Hero video files (fixed names: a week fresh, then revalidated in the background).
+# The page plays them via /media/hero-video/<name>/, which adds byte-range support.
+/video/hero/*.mp4
   Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
 
 # 3D car models (requested with ?v=MODEL_VERSION, so a new version is a new URL)
