@@ -195,8 +195,9 @@ export const aboutChecklist = [
 ];
 
 /** Blog posts to feature (ids in src/content/blog); only ones that exist are shown. */
-// One each of PPF, tint and ceramic, with distinct cover photos.
-export const blogIds = ['is-ppf-worth-it-dubai', 'window-tinting-dubai-legal-heat-guide', 'ceramic-coating-dubai-guide'];
+// Chosen for their covers (bright, subject clear of the text, three different kinds of shot):
+// PPF in the WRP studio, window film being fitted, and a leather interior.
+export const blogIds = ['what-makes-a-premium-ppf-installation-different', 'professional-window-film-installation', 'leather-upholstery-care-dubai-guide'];
 
 export const loungeList = ['Billiards', 'Board games', 'Coffee & karak', 'Big-screen TV', 'Air-conditioned', 'Glass wall over the bays'];
 
