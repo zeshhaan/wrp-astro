@@ -272,4 +272,16 @@ import { contact, serviceOptions, whatsappQuote } from './content';
       grid-template-columns: 0.9fr 1.1fr;
     }
   }
+  /* Desktop: the form stays in view while the details and map scroll past.
+     Only when the whole form fits under the header, so the submit button is
+     never stuck below the fold on short laptop screens. */
+  @media (min-width: 60rem) and (min-height: 48rem) {
+    .form {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 1rem);
+    }
+    .mapcard :global(img) {
+      aspect-ratio: 4 / 3;
+    }
+  }
 </style>
