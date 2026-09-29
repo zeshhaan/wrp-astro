@@ -144,9 +144,10 @@ export function freshState(): QuoteState {
 
 const KEY = 'wrp-studio-quote-v1';
 
-export function loadDraft(): QuoteState | null {
+/** `key` lets the one-page quote keep its own draft beside the step-by-step flow's. */
+export function loadDraft(key = KEY): QuoteState | null {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<QuoteState>;
     if (parsed.v !== 1) return null;
@@ -166,17 +167,17 @@ export function loadDraft(): QuoteState | null {
   }
 }
 
-export function saveDraft(s: QuoteState) {
+export function saveDraft(s: QuoteState, key = KEY) {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...s, savedAt: Date.now() }));
+    localStorage.setItem(key, JSON.stringify({ ...s, savedAt: Date.now() }));
   } catch {
     /* private mode or storage full: the flow still works, it just won't resume */
   }
 }
 
-export function clearDraft() {
+export function clearDraft(key = KEY) {
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(key);
   } catch {
     /* ignore */
   }
