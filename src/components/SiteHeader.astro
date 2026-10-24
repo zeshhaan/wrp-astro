@@ -1,0 +1,680 @@
+---
+/**
+ * Site-wide header in the Studio redesign's style (src/designs/studio/Header.astro):
+ * a thin contact bar over a dark bar with the logo, page links and a gold quote
+ * button, plus a slide-in drawer on small screens.
+ *
+ * Self-contained: it carries its own colour tokens and styles, so it renders the
+ * same on top of the current Tailwind pages. The whole header is fixed and
+ * 7rem tall (2.5rem contact bar + 4.5rem bar); pages start their content below
+ * it with pt-32 on the breadcrumbs. The contact bar slides away once the page scrolls.
+ */
+import { getCollection } from 'astro:content';
+import Icon from '@/components/Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { getLocale, localizeUrl, toLocalNum } from '../i18n/utils';
+import { t } from '../i18n/translations';
+import type { Locale } from '../i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+
+const locale = getLocale(Astro.props.locale ?? Astro.currentLocale);
+const isArabic = locale === 'ar';
+
+const services = (await getCollection('services'))
+  .filter((s) => (isArabic ? s.id.startsWith('ar/') : !s.id.startsWith('ar/')))
+  .map((s) => ({
+    name: s.data.title,
+    href: localizeUrl(`/services/${s.id.replace(/^ar\//, '')}/`, locale),
+    last: s.id.endsWith('premium-car-wash'),
+  }))
+  // Car wash last, as in the old navigation.
+  .sort((a, b) => Number(a.last) - Number(b.last));
+
+const links = [
+  { label: t(locale, 'nav.about'), href: localizeUrl('/more-about-wrp/', locale) },
+  { label: t(locale, 'nav.reviews'), href: localizeUrl('/reviews/', locale) },
+  { label: t(locale, 'nav.ourWork'), href: localizeUrl('/portfolio/', locale) },
+  { label: t(locale, 'nav.blog'), href: localizeUrl('/blog/', locale) },
+  { label: t(locale, 'nav.contact'), href: localizeUrl('/contact-us/', locale) },
+];
+
+// Same tracked short links as the old trust bar and the WhatsApp button.
+const contact = {
+  phone: toLocalNum('+971 54 717 3000', locale),
+  phoneHref: 'https://dub.sh/wrp-phone',
+  whatsapp: 'https://dub.sh/wrp-wa',
+  maps: 'https://dub.sh/wrp-map',
+  email: 'info@wrpdetailing.ae',
+  instagram: 'https://www.instagram.com/wrp_ae/',
+};
+
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(href) && !href.includes('/services/'));
+const inServices = services.some((s) => path === s.href);
+---
+
+<div class="sh sh-fixed" data-site-header>
+  <div class="sh-topbar">
+    <div class="sh-wrap sh-topbar__inner">
+      <ul class="sh-topbar__list" role="list">
+        <li><a href={contact.phoneHref}><Icon name="lucide:phone" width="15" height="15" aria-hidden="true" /><bdo dir="ltr">{contact.phone}</bdo></a></li>
+        <li class="sh-topbar__email"><a href={`mailto:${contact.email}`}><Icon name="lucide:mail" width="15" height="15" aria-hidden="true" />{contact.email}</a></li>
+        <li class="sh-topbar__addr"><a href={contact.maps} target="_blank" rel="noopener"><Icon name="lucide:map-pin" width="15" height="15" aria-hidden="true" />{t(locale, 'home.contact.address1')}</a></li>
+        <li class="sh-topbar__hours"><span><Icon name="lucide:clock" width="15" height="15" aria-hidden="true" />{t(locale, 'nav.hours')} · {t(locale, 'nav.closed')}</span></li>
+      </ul>
+      <ul class="sh-topbar__social" role="list">
+        <li><LanguageSwitcher locale={locale} class="sh-topbar__lang" /></li>
+        <li>
+          <a class="sh-topbar__icon" href={contact.instagram} target="_blank" rel="noopener" aria-label="Instagram @wrp_ae">
+            <Icon name="lucide:instagram" width="17" height="17" aria-hidden="true" />
+          </a>
+        </li>
+        <li>
+          <a class="sh-topbar__icon" href={contact.whatsapp} target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.2a8.6 8.6 0 0 0-7.4 13l-1.2 4.4 4.5-1.2A8.6 8.6 0 1 0 12 3.2Z" />
+              <path d="M9.1 7.9c.3 0 .5.1.6.4l.7 1.6c.1.2 0 .5-.1.7l-.5.6c.6 1.2 1.6 2.2 2.9 2.9l.6-.5c.2-.2.5-.2.7-.1l1.6.7c.3.1.4.4.4.7-.1 1.1-1 1.9-2.1 1.8-3.3-.4-5.9-3-6.3-6.3-.1-1.1.7-2 1.9-2.1Z" fill="currentColor" stroke="none" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <header class="sh-head">
+    <div class="sh-wrap sh-head__inner">
+      <a class="sh-logo" href={localizeUrl('/', locale)} aria-label="WRP by YACO Automotive">
+        <WrpLogo class="sh-logo__mark" />
+      </a>
+      <nav class="sh-nav" aria-label="Main">
+        <ul role="list">
+          <li class="sh-nav__services" data-services>
+            <button class="sh-nav__link" type="button" aria-expanded="false" aria-controls="sh-services" aria-current={inServices ? 'page' : undefined} data-services-toggle>
+              {t(locale, 'nav.services')}
+              <Icon name="lucide:chevron-down" width="16" height="16" aria-hidden="true" />
+            </button>
+            <ul class="sh-nav__menu" id="sh-services" role="list">
+              {
+                services.map((s) => (
+                  <li>
+                    <a href={s.href} aria-current={path === s.href ? 'page' : undefined}>{s.name}</a>
+                  </li>
+                ))
+              }
+            </ul>
+          </li>
+          {
+            links.map((l) => (
+              <li>
+                <a class="sh-nav__link" href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <button class="sh-btn sh-btn--gold sh-head__cta" type="button" data-contact-modal>{t(locale, 'nav.quickQuote')}</button>
+      <button
+        class="sh-head__menu"
+        type="button"
+        commandfor="sh-drawer"
+        command="show-modal"
+        aria-controls="sh-drawer"
+        aria-expanded="false"
+        data-drawer-open
+      >
+        <Icon name="lucide:menu" width="24" height="24" aria-hidden="true" />
+        <span class="sh-sr">{t(locale, 'nav.menu')}</span>
+      </button>
+    </div>
+  </header>
+</div>
+
+<dialog class="sh sh-drawer" id="sh-drawer" aria-label={t(locale, 'nav.menu')}>
+  <div class="sh-drawer__top">
+    <WrpLogo class="sh-logo__mark" label="WRP by YACO Automotive" />
+    <button class="sh-drawer__close" type="button" commandfor="sh-drawer" command="close" data-drawer-close>
+      <Icon name="lucide:x" width="24" height="24" aria-hidden="true" />
+      <span class="sh-sr">{t(locale, 'nav.closeMenu')}</span>
+    </button>
+  </div>
+  <nav aria-label="Main (mobile)">
+    <p class="sh-drawer__label">{t(locale, 'nav.services')}</p>
+    <ul role="list" class="sh-drawer__services">
+      {
+        services.map((s) => (
+          <li>
+            <a href={s.href} aria-current={path === s.href ? 'page' : undefined}>{s.name}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <ul role="list" class="sh-drawer__links">
+      {
+        links.map((l) => (
+          <li>
+            <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>{l.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="sh-drawer__actions">
+    <button class="sh-btn sh-btn--gold" type="button" data-contact-modal data-drawer-close-on-click>{t(locale, 'nav.quickQuote')}</button>
+    <a class="sh-btn sh-btn--light" href={contact.whatsapp} target="_blank" rel="noopener">{t(locale, 'nav.whatsapp')}</a>
+    <a class="sh-drawer__phone" href={contact.phoneHref}><Icon name="lucide:phone" width="18" height="18" aria-hidden="true" /><bdo dir="ltr">{contact.phone}</bdo></a>
+    <p class="sh-drawer__hours">{t(locale, 'nav.hours')}. {t(locale, 'nav.closed')}.</p>
+    <LanguageSwitcher locale={locale} class="sh-drawer__lang" />
+  </div>
+</dialog>
+
+<script>
+  // The bar scrolls the contact strip away once the page moves. Bound once:
+  // the header is re-rendered on every view-transition navigation.
+  const onScroll = () => {
+    document.querySelector('[data-site-header]')?.toggleAttribute('data-scrolled', window.scrollY > 40);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Re-bind per page: the ClientRouter swaps the header's DOM on navigation.
+  document.addEventListener('astro:page-load', () => {
+    onScroll();
+
+    // Services dropdown (desktop): a disclosure button; Escape or a click outside closes it.
+    const services = document.querySelector<HTMLElement>('[data-services]');
+    const toggle = services?.querySelector<HTMLButtonElement>('[data-services-toggle]');
+    if (services && toggle) {
+      const set = (open: boolean) => toggle.setAttribute('aria-expanded', String(open));
+      toggle.addEventListener('click', () => set(toggle.getAttribute('aria-expanded') !== 'true'));
+      services.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+          set(false);
+          toggle.focus();
+        }
+      });
+      services.addEventListener('focusout', (event) => {
+        if (!services.contains(event.relatedTarget as Node | null)) set(false);
+      });
+      document.addEventListener('click', (event) => {
+        if (!services.contains(event.target as Node)) set(false);
+      });
+    }
+
+    // Mobile menu: a modal <dialog> opened with Invoker Commands, with a
+    // manual fallback for browsers without `commandfor`.
+    const dialog = document.getElementById('sh-drawer') as HTMLDialogElement | null;
+    const opener = document.querySelector<HTMLButtonElement>('[data-drawer-open]');
+    if (!dialog || !opener) return;
+    if (!('commandForElement' in HTMLButtonElement.prototype)) {
+      opener.addEventListener('click', () => dialog.showModal());
+      dialog.querySelector('[data-drawer-close]')?.addEventListener('click', () => dialog.close());
+    }
+    const sync = () => opener.setAttribute('aria-expanded', String(dialog.open));
+    dialog.addEventListener('close', sync);
+    new MutationObserver(sync).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+    // Light dismiss: a click on the backdrop lands on the dialog element itself.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    // The quote button opens the contact modal, which must not sit under the drawer.
+    dialog.querySelector('[data-drawer-close-on-click]')?.addEventListener('click', () => dialog.close());
+  });
+</script>
+
+<style>
+  .sh {
+    --sh-black: #0c0d0f;
+    --sh-coal: #17191c;
+    --sh-white: #ffffff;
+    --sh-paper: #f4f4f2;
+    --sh-mute: #a3a8ae;
+    --sh-gold: #c9a45c;
+    --sh-line: #2c3035;
+    --sh-font: var(--font-oswald), 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+    --sh-body: var(--font-inter), 'Inter', system-ui, sans-serif;
+    --sh-track: 0.04em;
+    font-family: var(--sh-body);
+  }
+  :global([dir='rtl']) .sh {
+    /* Arabic: no Oswald glyphs, and letter-spacing breaks the joined script. */
+    --sh-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --sh-body: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --sh-track: 0;
+  }
+  .sh-wrap {
+    max-inline-size: 76rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 48rem) {
+    .sh-wrap {
+      padding-inline: 2rem;
+    }
+  }
+  .sh-sr {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    block-size: 1px;
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+  .sh :focus-visible {
+    outline: 3px solid var(--sh-gold);
+    outline-offset: 2px;
+  }
+
+  /* Fixed shell: 2.5rem contact bar + 4.5rem bar = 7rem. */
+  .sh-fixed {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    transition: transform 0.3s ease;
+  }
+  .sh-fixed[data-scrolled] {
+    transform: translateY(-2.5rem);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sh-fixed {
+      transition: none;
+    }
+  }
+
+  /* Thin contact bar */
+  .sh-topbar {
+    background: var(--sh-black);
+    color: var(--sh-mute);
+    font-size: 0.8125rem;
+    border-block-end: 1px solid var(--sh-line);
+  }
+  .sh-topbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    block-size: 2.5rem;
+  }
+  .sh-topbar__list,
+  .sh-topbar__social {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sh-topbar__social {
+    gap: 0.25rem;
+  }
+  .sh-topbar a,
+  .sh-topbar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .sh-topbar a:hover {
+    color: var(--sh-white);
+  }
+  .sh-topbar__list :global(svg) {
+    color: var(--sh-gold);
+    flex-shrink: 0;
+  }
+  .sh-topbar__icon {
+    justify-content: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+  }
+  .sh-topbar :global(.sh-topbar__lang) {
+    padding-inline: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--sh-white);
+  }
+  .sh-topbar__email,
+  .sh-topbar__addr,
+  .sh-topbar__hours {
+    display: none;
+  }
+  @media (min-width: 48rem) {
+    .sh-topbar__email,
+    .sh-topbar__addr {
+      display: list-item;
+    }
+  }
+  @media (min-width: 72rem) {
+    .sh-topbar__hours {
+      display: list-item;
+    }
+  }
+
+  /* Bar */
+  .sh-head {
+    background: color-mix(in srgb, var(--sh-coal) 94%, transparent);
+    backdrop-filter: blur(8px);
+    border-block-end: 1px solid var(--sh-line);
+    color: var(--sh-white);
+  }
+  .sh-head__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    block-size: 4.5rem;
+  }
+  .sh-logo {
+    display: flex;
+    align-items: center;
+    margin-inline-end: auto;
+    min-block-size: 2.75rem;
+  }
+  .sh-logo__mark {
+    /* Inline lockup in currentColor (white here), YACO stays brand red. */
+    block-size: 2.75rem;
+    inline-size: auto;
+    color: var(--sh-white);
+  }
+  .sh-nav {
+    display: none;
+  }
+  .sh-nav > ul {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sh-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-block-size: 2.75rem;
+    padding-inline: 0.7rem;
+    background: none;
+    border: 0;
+    font-family: var(--sh-font);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    text-transform: uppercase;
+    letter-spacing: var(--sh-track);
+    color: var(--sh-white);
+    text-decoration: none;
+    position: relative;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sh-nav__link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.7rem;
+    inset-block-end: 0.45rem;
+    block-size: 2px;
+    background: var(--sh-gold);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+  .sh-nav__link:hover::after,
+  .sh-nav__link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .sh-nav__link :global(svg) {
+    transition: transform 0.2s ease;
+  }
+  .sh-nav__link[aria-expanded='true'] :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  /* Services dropdown */
+  .sh-nav__services {
+    position: relative;
+  }
+  .sh-nav__menu {
+    display: none;
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    min-inline-size: 16rem;
+    margin: 0;
+    padding: 0.5rem 0;
+    list-style: none;
+    background: var(--sh-coal);
+    border: 1px solid var(--sh-line);
+    box-shadow: 0 1rem 2rem rgb(0 0 0 / 0.35);
+  }
+  [aria-expanded='true'] + .sh-nav__menu {
+    display: block;
+  }
+  @media (hover: hover) {
+    .sh-nav__services:hover .sh-nav__menu {
+      display: block;
+    }
+  }
+  .sh-nav__menu a {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1rem;
+    color: var(--sh-white);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+  .sh-nav__menu a:hover,
+  .sh-nav__menu a[aria-current='page'] {
+    color: var(--sh-gold);
+  }
+
+  /* Buttons */
+  .sh-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-block-size: 3rem;
+    padding: 0.6rem 1.35rem;
+    border: 1.5px solid transparent;
+    font-family: var(--sh-font);
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  :global([dir='rtl']) .sh-btn {
+    letter-spacing: 0;
+  }
+  .sh-btn--gold {
+    background: var(--sh-gold);
+    border-color: var(--sh-gold);
+    color: var(--sh-black);
+  }
+  .sh-btn--gold:hover {
+    background: #dcbb78;
+    border-color: #dcbb78;
+  }
+  .sh-btn--light {
+    background: var(--sh-white);
+    border-color: var(--sh-white);
+    color: var(--sh-black);
+  }
+  .sh-btn--light:hover {
+    background: var(--sh-paper);
+  }
+  .sh-head__cta {
+    display: none;
+  }
+  .sh-head__menu {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 1px solid var(--sh-line);
+    color: var(--sh-white);
+    cursor: pointer;
+  }
+  @media (min-width: 24rem) {
+    .sh-head__cta {
+      display: inline-flex;
+      min-block-size: 2.75rem;
+      padding-inline: 1rem;
+    }
+  }
+  @media (max-width: 29.99rem) {
+    .sh-head__inner {
+      gap: 0.75rem;
+    }
+    .sh-logo .sh-logo__mark {
+      block-size: 2.25rem;
+    }
+    .sh-head__cta {
+      font-size: 0.875rem;
+      padding-inline: 0.75rem;
+    }
+  }
+  @media (min-width: 70rem) {
+    .sh-nav {
+      display: block;
+    }
+    .sh-head__menu {
+      display: none;
+    }
+  }
+
+  /* Drawer */
+  .sh-drawer {
+    margin: 0;
+    margin-inline-start: auto;
+    inline-size: min(22rem, 86vw);
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    padding: 1rem 1.25rem 5.5rem;
+    border: 0;
+    background: var(--sh-coal);
+    color: var(--sh-white);
+    overflow-y: auto;
+  }
+  .sh-drawer::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sh-drawer[open] {
+      animation: sh-drawer-in 0.25s ease-out;
+    }
+    :global([dir='rtl']) .sh-drawer[open] {
+      animation-name: sh-drawer-in-rtl;
+    }
+    @keyframes sh-drawer-in {
+      from {
+        transform: translateX(100%);
+      }
+    }
+    @keyframes sh-drawer-in-rtl {
+      from {
+        transform: translateX(-100%);
+      }
+    }
+  }
+  .sh-drawer__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 1rem;
+  }
+  .sh-drawer__close {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 1px solid var(--sh-line);
+    color: inherit;
+    cursor: pointer;
+  }
+  .sh-drawer__label {
+    margin: 0;
+    padding-block: 0.75rem 0.25rem;
+    border-block-start: 1px solid var(--sh-line);
+    font-family: var(--sh-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--sh-gold);
+  }
+  .sh-drawer__services,
+  .sh-drawer__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sh-drawer__services {
+    padding-block-end: 0.5rem;
+  }
+  .sh-drawer__services a {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    color: var(--sh-white);
+    text-decoration: none;
+  }
+  .sh-drawer__links {
+    border-block-start: 1px solid var(--sh-line);
+  }
+  .sh-drawer__links a {
+    display: flex;
+    align-items: center;
+    min-block-size: 3.25rem;
+    border-block-end: 1px solid var(--sh-line);
+    font-family: var(--sh-font);
+    font-size: 1.25rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--sh-track);
+    color: inherit;
+    text-decoration: none;
+  }
+  .sh-drawer a:hover,
+  .sh-drawer a[aria-current='page'] {
+    color: var(--sh-gold);
+  }
+  .sh-drawer__actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-start: 1.5rem;
+  }
+  .sh-drawer__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    color: var(--sh-white);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .sh-drawer__phone :global(svg) {
+    color: var(--sh-gold);
+  }
+  .sh-drawer__hours {
+    margin: 0;
+    color: var(--sh-mute);
+    font-size: 0.875rem;
+  }
+  .sh-drawer :global(.sh-drawer__lang) {
+    justify-self: start;
+    min-block-size: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--sh-white);
+  }
+</style>

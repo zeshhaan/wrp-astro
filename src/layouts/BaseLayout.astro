@@ -1,5 +1,5 @@
 ---
-import Navigation from '../components/Navigation.astro';
+import SiteHeader from '../components/SiteHeader.astro';
 import WRPFooter from '../components/WRPFooter.astro';
 import Schema from '../components/Schema.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
@@ -184,6 +184,7 @@ const extendMeta = [
     <Font cssVariable="--font-playfair" preload />
     <Font cssVariable="--font-inter" preload />
     <Font cssVariable="--font-montserrat" />
+    <Font cssVariable="--font-oswald" />
     {isArabic && (
       <>
         <Font cssVariable="--font-noto-naskh" preload />
@@ -237,7 +238,7 @@ const extendMeta = [
     </script>
   </head>
   <body>
-    {showNav && <Navigation locale={locale} />}
+    {showNav && <SiteHeader locale={locale} />}
 
     <LanguageBanner locale={locale} />
 

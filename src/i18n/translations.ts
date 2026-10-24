@@ -30,6 +30,12 @@ export const translations = {
     'nav.service.windowFilm': 'WINDOW FILM',
     'nav.service.polish': 'CAR POLISH',
     'nav.service.upholstery': 'UPHOLSTERY',
+    'nav.ourWork': 'Our work',
+    'nav.quickQuote': 'Get a quick quote',
+    'nav.whatsapp': 'WhatsApp us',
+    'nav.closed': 'Closed Friday',
+    'nav.menu': 'Menu',
+    'nav.closeMenu': 'Close menu',
 
     // Footer
     'footer.rights': 'All rights reserved.',
@@ -307,6 +313,12 @@ export const translations = {
     'nav.service.windowFilm': 'تظليل زجاج',
     'nav.service.polish': 'تلميع وتصحيح',
     'nav.service.upholstery': 'الجلود والتنجيد',
+    'nav.ourWork': 'أعمالنا',
+    'nav.quickQuote': 'احصل على عرض سعر سريع',
+    'nav.whatsapp': 'راسلنا على واتساب',
+    'nav.closed': 'الجمعة مغلق',
+    'nav.menu': 'القائمة',
+    'nav.closeMenu': 'إغلاق القائمة',
 
     // Footer
     'footer.rights': 'جميع الحقوق محفوظة.',
