@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
 import { pages } from '../data';
 import { contact, serviceCards, whatsappQuote } from './content';
 
@@ -17,7 +18,7 @@ const year = new Date().getFullYear();
 <footer class="foot">
   <div class="st-wrap foot__grid">
     <div class="foot__brand">
-      <span class="foot__mark">WRP.</span>
+      <WrpLogo class="foot__mark" label="WRP by YACO Automotive" />
       <p>
         Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais,
         Dubai. Wrap, Reinforce, Protect.
@@ -100,11 +101,9 @@ const year = new Date().getFullYear();
     align-content: start;
   }
   .foot__mark {
-    font-family: var(--st-mark);
-    font-weight: 900;
-    font-style: italic;
-    font-size: 2.25rem;
-    line-height: 1;
+    display: block;
+    block-size: 4rem;
+    inline-size: auto;
     color: var(--st-white);
   }
   .foot__brand p {
