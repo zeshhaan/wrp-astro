@@ -1,7 +1,7 @@
 ---
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
-import { proof, whyPoints } from './content';
+import { proof, whyPhotos, whyPoints } from './content';
 ---
 
 <section class="why st-section st-light" id="why" aria-labelledby="why-title">
@@ -22,15 +22,30 @@ import { proof, whyPoints } from './content';
         </span>
         <Icon name="arrow-right" size={20} class="rating__arrow" />
       </a>
-      <figure class="why__photo">
-        <Picture
-          base="/review-images/leno_thomas_2"
-          widths={[480, 800]}
-          alt="Grey Toyota FJ Cruiser with a fresh ceramic coating, front view in the WRP studio"
-          sizes="(min-width: 60rem) 34vw, 100vw"
-        />
-        <figcaption>Leno Thomas’s FJ Cruiser after its ceramic coating, as posted with the Google review.</figcaption>
-      </figure>
+      <div class="why__photos" data-fader>
+        <ul class="why__slides" role="list">
+          {
+            whyPhotos.map((ph, i) => (
+              <li class="why__slide" data-slide aria-hidden={i === 0 ? undefined : 'true'}>
+                <figure>
+                  <Picture
+                    base={ph.base}
+                    widths={[480, 800]}
+                    alt={ph.alt}
+                    sizes="(min-width: 60rem) 34vw, 100vw"
+                  />
+                  <figcaption>{ph.caption} Photo from the customer’s Google review.</figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+        <button class="why__toggle" type="button" data-toggle hidden>
+          <span data-pause-icon><Icon name="pause" size={16} /></span>
+          <span data-play-icon hidden><Icon name="play" size={16} /></span>
+          <span class="visually-hidden" data-toggle-label>Pause photos</span>
+        </button>
+      </div>
     </div>
 
     <ol class="points" role="list">
@@ -56,6 +71,48 @@ import { proof, whyPoints } from './content';
     </ol>
   </div>
 </section>
+
+<script>
+  // Crossfade the customer photos every few seconds. Off for reduced motion;
+  // pauses off-screen, on hover/focus, and with the pause button.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fader]')) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
+    if (slides.length < 2 || !toggle || matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    const label = toggle.querySelector('[data-toggle-label]')!;
+    const pauseIcon = toggle.querySelector<HTMLElement>('[data-pause-icon]')!;
+    const playIcon = toggle.querySelector<HTMLElement>('[data-play-icon]')!;
+    let current = 0;
+    let timer = 0;
+    let paused = false;
+    let visible = false;
+    let hovered = false;
+    root.classList.add('is-fading');
+    slides[0].classList.add('is-active');
+    const show = (n: number) => {
+      slides[current].classList.remove('is-active');
+      slides[current].setAttribute('aria-hidden', 'true');
+      current = n % slides.length;
+      slides[current].classList.add('is-active');
+      slides[current].removeAttribute('aria-hidden');
+    };
+    const sync = () => {
+      clearInterval(timer);
+      if (!paused && visible && !hovered) timer = window.setInterval(() => show(current + 1), 4500);
+    };
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      label.textContent = paused ? 'Play photos' : 'Pause photos';
+      pauseIcon.hidden = paused;
+      playIcon.hidden = !paused;
+      sync();
+    });
+    root.addEventListener('pointerenter', () => { hovered = true; sync(); });
+    root.addEventListener('pointerleave', () => { hovered = false; sync(); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }).observe(root);
+  }
+</script>
 
 <style>
   .why__grid {
@@ -120,19 +177,65 @@ import { proof, whyPoints } from './content';
     color: var(--st-black);
   }
 
-  .why__photo {
+  .why__photos {
     display: none;
+    position: relative;
+  }
+  .why__slides {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .why__slide {
+    grid-area: 1 / 1;
+  }
+  /* Before the script runs (or without it), only the first photo shows. */
+  .why__slide:not(:first-child) {
+    visibility: hidden;
+  }
+  .is-fading .why__slide {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity 1.2s ease, visibility 0s 1.2s;
+  }
+  .is-fading .why__slide.is-active {
+    opacity: 1;
+    transition: opacity 1.2s ease, visibility 0s;
+  }
+  .why__slide figure {
     margin: 0;
   }
-  .why__photo :global(img) {
+  .why__slide :global(img) {
     inline-size: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
   }
-  .why__photo figcaption {
+  .why__slide figcaption {
     margin-block-start: 0.6rem;
+    padding-inline-end: 3rem;
     font-size: 0.8125rem;
     color: var(--st-ink-2);
+  }
+  .why__toggle {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    background: rgb(12 13 15 / 0.75);
+    color: var(--st-white);
+    border: 0;
+    cursor: pointer;
+  }
+  .why__toggle:hover {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .why__toggle[hidden], .why__toggle [hidden] {
+    display: none;
   }
 
   /* The four points: label row, the customer's words large, then our promise */
@@ -215,7 +318,7 @@ import { proof, whyPoints } from './content';
   }
 
   @media (min-width: 40rem) {
-    .why__photo {
+    .why__photos {
       display: block;
     }
   }

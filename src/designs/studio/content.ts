@@ -175,6 +175,30 @@ export const whyPoints = [
   },
 ] as const;
 
+/** Customer photos for the why-us crossfade, each from the customer's own Google review. */
+export const whyPhotos = [
+  {
+    base: '/review-images/leno_thomas_2',
+    alt: 'Grey Toyota FJ Cruiser with a fresh ceramic coating, front view in the WRP studio',
+    caption: 'Leno Thomas’s FJ Cruiser after its ceramic coating.',
+  },
+  {
+    base: '/review-images/nasar_ck_1',
+    alt: 'Black Cadillac Escalade under the studio lights at WRP',
+    caption: 'Nasar CK’s Cadillac Escalade.',
+  },
+  {
+    base: '/review-images/sujith_prasad_1',
+    alt: 'Blue Subaru WRX STI in front of the WRP logo wall',
+    caption: 'Sujith Prasad’s Subaru WRX STI.',
+  },
+  {
+    base: '/review-images/ritha_farzana_1',
+    alt: 'Red Nissan SUV in the WRP studio',
+    caption: 'Ritha Farzana’s Nissan.',
+  },
+];
+
 /** Only figures we can stand behind. */
 export const stats = [
   { value: proof.rating, label: 'Google rating' },

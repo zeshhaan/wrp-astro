@@ -3,7 +3,7 @@
 interface Props {
   name:
     | 'phone' | 'mail' | 'pin' | 'clock' | 'instagram' | 'whatsapp' | 'check' | 'star'
-    | 'camera' | 'shield' | 'tag' | 'arrow-left' | 'arrow-right' | 'menu' | 'close' | 'map';
+    | 'camera' | 'shield' | 'tag' | 'arrow-left' | 'arrow-right' | 'menu' | 'close' | 'map' | 'pause' | 'play';
   size?: number;
   class?: string;
   label?: string;
@@ -43,6 +43,8 @@ const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'tr
     )
   }
   {name === 'check' && <path d="m5 12.5 4.5 4.5L19 7.5" />}
+  {name === 'pause' && <path d="M9 5.5v13M15 5.5v13" />}
+  {name === 'play' && <path d="M8 5.5v13l10-6.5Z" />}
   {name === 'star' && <path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8Z" fill="currentColor" stroke="none" />}
   {name === 'camera' && <><path d="M4 8h3l1.6-2.5h6.8L17 8h3v11H4Z" /><circle cx="12" cy="13" r="3.4" /></>}
   {name === 'shield' && <><path d="M12 3 5 6v5.5c0 4.4 3 7.8 7 9.5 4-1.7 7-5.1 7-9.5V6Z" /><path d="m9 12 2.2 2.2L15.5 10" /></>}
