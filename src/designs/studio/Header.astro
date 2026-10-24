@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
 import { contact, whatsappQuote } from './content';
 
 const links = [
@@ -32,9 +33,8 @@ const links = [
 
 <header class="head">
   <div class="st-wrap head__inner">
-    <a class="logo" href="#main" aria-label="WRP Detailing, back to top">
-      <span class="logo__mark">WRP.</span>
-      <span class="logo__sub">Wrap · Reinforce · Protect</span>
+    <a class="logo" href="#main" aria-label="WRP by YACO Automotive, back to top">
+      <WrpLogo class="logo__mark" />
     </a>
     <nav class="head__nav" aria-label="Main">
       <ul role="list">
@@ -58,7 +58,7 @@ const links = [
 
 <dialog class="drawer" id="st-drawer" aria-label="Menu">
   <div class="drawer__top">
-    <span class="logo__mark">WRP.</span>
+    <WrpLogo class="logo__mark" label="WRP by YACO Automotive" />
     <button class="drawer__close" type="button" commandfor="st-drawer" command="close" data-drawer-close>
       <Icon name="close" size={24} />
       <span class="visually-hidden">Close menu</span>
@@ -197,31 +197,22 @@ const links = [
   }
   .logo {
     display: grid;
-    gap: 0.1rem;
     color: var(--st-white);
     text-decoration: none;
     margin-inline-end: auto;
     align-content: center;
     min-block-size: 2.75rem;
   }
+  /* The lockup's "BY YACO AUTOMOTIVE" line is about an eighth of its height, so
+     the mark is sized off that line staying legible rather than off the wordmark. */
   .logo__mark {
-    font-family: var(--st-mark);
-    font-weight: 900;
-    font-style: italic;
-    font-size: 1.85rem;
-    line-height: 1;
-    letter-spacing: -0.02em;
+    display: block;
+    block-size: 2.75rem;
+    inline-size: auto;
   }
-  .logo__sub {
-    font-family: var(--st-head-font);
-    font-size: 0.625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--st-gold);
-  }
-  @media (max-width: 29.99rem) {
-    .logo__sub {
-      display: none;
+  @media (min-width: 64rem) {
+    .logo__mark {
+      block-size: 3rem;
     }
   }
   .head__nav {
