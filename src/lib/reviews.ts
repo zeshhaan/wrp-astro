@@ -38,10 +38,10 @@ export function getBusiness(): ReviewBusiness {
   return reviewsData.business as ReviewBusiness;
 }
 
-/** Marketing-friendly review count (rounded up to nearest 10+) */
+/** Marketing-friendly review count (rounded down to nearest 10, e.g. 134 -> "130+") */
 export function getDisplayCount(): string {
   const total = getBusiness().totalReviews;
-  const rounded = Math.ceil(total / 10) * 10;
+  const rounded = Math.floor(total / 10) * 10;
   return `${rounded}+`;
 }
 
