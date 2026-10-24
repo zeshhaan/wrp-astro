@@ -1,12 +1,12 @@
 /**
- * Shared content for the Design Lab concepts.
+ * Shared content for the Studio design (the chosen homepage direction) and its
+ * quote flows.
  *
- * Every concept renders the same facts so the team compares layouts, not copy.
  * Prices come from the `startingPrice` fields in src/content/services/*.mdx and
  * the lounge details from verified Google reviews (data/google-reviews.json).
  * Where a service has no published starting price we say so rather than invent one.
  */
-import { getAllReviews, getBusiness, type Review } from '@/lib/reviews';
+import { getBusiness } from '@/lib/reviews';
 
 export const contact = {
   phoneDisplay: '+971 54 717 3000',
@@ -136,17 +136,6 @@ export const services: Service[] = [
   },
 ];
 
-export const pillars = [
-  { name: 'Wrap', line: 'Film and fabric, fitted to the millimetre.' },
-  { name: 'Reinforce', line: 'Correction and coatings that harden the finish.' },
-  { name: 'Protect', line: 'Care that keeps it that way, wash after wash.' },
-] as const;
-
-/** Responsive image helper for the pre-optimised /public variants. */
-export function srcset(base: string, widths: number[] = [480, 800, 1200], ext: 'avif' | 'webp' = 'webp') {
-  return widths.map((w) => `${base}-${w}w.${ext} ${w}w`).join(', ');
-}
-
 export const work = [
   { title: 'Porsche Boxster Spyder', what: 'Full paint protection', image: '/portfolio/porsche-boxster-spyder-gray' },
   { title: 'Porsche 911', what: 'Ceramic coating & detailing', image: '/portfolio/green-porsche-911-showroom-event' },
@@ -155,15 +144,6 @@ export const work = [
   { title: 'Lexus LX 570', what: 'Full detailing package', image: '/portfolio/black-lexus-lx-570-showroom' },
   { title: 'Toyota Supra & Lotus', what: 'Showroom detailing', image: '/portfolio/lotus-toyota-supra-showroom-duo' },
 ];
-
-/** Portfolio car paint colours, sampled from the photos, for concepts that want them. */
-export const paintColours = {
-  porscheGreen: '#2f5d3a',
-  lotusBurgundy: '#5e1622',
-  subaruBlue: '#1d3f8a',
-  boxsterGrey: '#8a8d90',
-  lexusBlack: '#0a0a0a',
-};
 
 /**
  * The WRP Lounge. Replaces the old "Signature Fleet" logo wall.
@@ -228,15 +208,6 @@ export const lounge = {
   ],
 };
 
-/** Photos of the studio itself, for heroes and backdrops. */
-export const studio = {
-  night: { base: '/review-images/mark_ban_1', alt: 'WRP studio at night, the illuminated Wrap · Reinforce · Protect sign over two cars' },
-  floor: { base: '/review-images/tariq_murad_3', alt: 'Cars in the WRP studio under black pendant lights' },
-  bays: { base: '/review-images/venkat_k_2', alt: 'Supercars lined up inside the WRP studio' },
-  logoWall: { base: '/review-images/sujith_prasad_2', alt: 'WRP logo wall in the studio' },
-  craftsman: { base: '/luxury-car-detailing-craftsman-working-black-and-w', alt: 'Detailer polishing a car panel by hand' },
-};
-
 const business = getBusiness();
 /**
  * Live Google Maps figures, read 27 Sep 2026: 5.0 from 130 reviews (TinyFish
@@ -272,32 +243,6 @@ export const freshQuotes: (Quote & { when: string })[] = [
   { text: 'The team is really humble and professional, The quality of work is spot on and will definitely be going back for the detailed wash.', author: 'Sunit Gonsalves', service: 'premium-car-wash', when: 'July 2026' },
   { text: 'Give a drity car get it clean by 24 hours car washing including cleaning inside deep cleaning best service must recommend for suv and small cars', author: 'Huzaifa Hamid', service: 'premium-car-wash', when: 'July 2026' },
   { text: 'Nice work done quickly and professionally. Detailing and ceramic coating polish works done efficiently!', author: 'James Daniel', service: 'ceramic-coating', when: 'July 2026' },
-];
-
-/** A handful of strong, short, verbatim review quotes. */
-export function pickQuotes(count = 6): Quote[] {
-  const reviews = getAllReviews();
-  const withHighlight = reviews.filter((r: Review) => r.highlightQuote && r.stars === 5);
-  const chosen = withHighlight.length >= count ? withHighlight : reviews.filter((r) => r.text.length > 60);
-  return chosen.slice(0, count).map((r) => ({
-    text: r.highlightQuote || firstSentence(r.text),
-    author: r.reviewerName,
-    service: r.serviceTags?.[0],
-    photo: r.localImages?.[0] ? '/' + r.localImages[0].replace(/\.jpg$/, '') : undefined,
-  }));
-}
-
-function firstSentence(text: string): string {
-  const s = text.split(/(?<=[.!?])\s/)[0] ?? text;
-  return s.length > 180 ? s.slice(0, 177) + '…' : s;
-}
-
-export const nav = [
-  { label: 'Services', href: '#services' },
-  { label: 'Lounge', href: '#lounge' },
-  { label: 'Work', href: '#work' },
-  { label: 'Reviews', href: '#reviews' },
-  { label: 'Visit', href: '#visit' },
 ];
 
 export const pages = {

@@ -2,70 +2,68 @@
 export const prerender = true;
 
 import DesignShell from '@/designs/shared/DesignShell.astro';
-import { concepts } from '@/designs/registry';
+
+const pages = [
+  {
+    href: '/design-lab/studio/',
+    name: 'Homepage',
+    line: 'Video hero, services and prices, why WRP, reviews, work, the lounge, blog and the contact form.',
+  },
+  {
+    href: '/design-lab/studio/quote/',
+    name: 'Quote: step by step',
+    line: 'One question per screen with a running estimate. Built to be easy one-handed on a phone.',
+  },
+  {
+    href: '/design-lab/studio/quote/one-page/',
+    name: 'Quote: one page',
+    line: 'Everything in one panel beside a live 3D car. Same prices and the same request as the step-by-step flow.',
+  },
+  {
+    href: '/design-lab/studio/car-viewer/',
+    name: '3D car viewer (test page)',
+    line: 'Every car, mode and colour of the quote viewer, for checking the 3D models.',
+  },
+];
 ---
 
 <DesignShell
   concept="lab"
-  title="WRP Design Lab"
-  description="Three homepage directions for the WRP redesign, for the team to compare."
-  fonts={['--font-geist', '--font-montserrat']}
-  themeColor="#f3f3f1"
+  title="WRP Design Lab: Studio"
+  description="The Studio redesign of wrpdetailing.ae, page by page, for review before it goes live."
+  fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
+  themeColor="#0c0d0f"
+  colorScheme="dark"
 >
   <main class="lab">
     <header class="lab__head">
       <p class="lab__mark">WRP.</p>
-      <h1>Three directions for the new wrpdetailing.ae</h1>
+      <p class="lab__eyebrow">Design Lab</p>
+      <h1>The Studio redesign</h1>
       <p class="lab__lede">
-        Round three. Each one is a complete homepage built on the same facts: real prices, the latest Google
-        reviews and real studio photos. Services lead; the WRP Lounge has its own section further down. Open
-        each, scroll to the end on your phone and on a laptop, then pick the one that feels most like WRP.
-        Details from the others can be borrowed.
+        Studio is the chosen direction for the new wrpdetailing.ae. These are its pages, for review on a phone and a
+        laptop before it goes live.
       </p>
     </header>
 
-    <ol class="lab__list" role="list">
+    <ul class="lab__list" role="list">
       {
-        concepts.map((c, i) => (
-          <li class="card" style={`--c1:${c.palette[0]};--c2:${c.palette[1]};--c3:${c.palette[2]}`}>
-            <a class="card__link" href={`/design-lab/${c.id}/`}>
-              <span class="card__swatches" aria-hidden="true">
-                {c.palette.map((hex) => (
-                  <span style={`background:${hex}`} />
-                ))}
-              </span>
-              <span class="card__num">Concept {i + 1}</span>
-              <h2 class="card__name">{c.name}</h2>
-              <p class="card__idea">{c.idea}</p>
-              <dl class="card__meta">
-                <div>
-                  <dt>Signature moment</dt>
-                  <dd>{c.signature}</dd>
-                </div>
-                <div>
-                  <dt>Strongest for</dt>
-                  <dd>{c.bestFor}</dd>
-                </div>
-                <div>
-                  <dt>Trade-off</dt>
-                  <dd>{c.risk}</dd>
-                </div>
-                <div>
-                  <dt>Type</dt>
-                  <dd>{c.fonts}</dd>
-                </div>
-              </dl>
-              <span class="card__open">Open {c.name}</span>
+        pages.map((p) => (
+          <li>
+            <a class="card" href={p.href}>
+              <span class="card__name">{p.name}</span>
+              <span class="card__line">{p.line}</span>
+              <span class="card__path">{p.href}</span>
             </a>
           </li>
         ))
       }
-    </ol>
+    </ul>
 
     <footer class="lab__foot">
       <p>
-        Preview builds only. Forms here are not connected, and nothing on these pages is indexed. The live
-        site is unchanged until a direction is chosen and rolled out to every page.
+        Preview build only. Forms here are not connected, and nothing on these pages is indexed. The live site is
+        unchanged until this branch is merged.
       </p>
       <p><a href="/">Current homepage</a></p>
     </footer>
@@ -74,95 +72,105 @@ import { concepts } from '@/designs/registry';
 
 <style>
   :root {
-    --paper: #f3f3f1;
-    --ink: #161616;
-    --muted: #5d5d5a;
-    --line: #d9d9d4;
-    color-scheme: light;
+    --ink: #0c0d0f;
+    --coal: #17191c;
+    --line: #2c3035;
+    --text: #d4d7db;
+    --mute: #a3a8ae;
+    --gold: #c9a45c;
+    color-scheme: dark;
   }
   body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-geist), system-ui, sans-serif;
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
   }
   .lab {
-    max-width: 76rem;
+    max-width: 64rem;
     margin-inline: auto;
     padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2.5rem) 6rem;
   }
   .lab__mark {
     font: 900 italic 1.25rem/1 var(--font-montserrat, system-ui), system-ui;
     letter-spacing: -0.02em;
+    color: #fff;
     margin-block-end: 2.5rem;
   }
+  .lab__eyebrow {
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
   h1 {
-    font-size: clamp(2rem, 1.2rem + 3.5vw, 3.75rem);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
+    font-family: var(--font-oswald), 'Oswald', 'Arial Narrow', sans-serif;
     font-weight: 600;
-    max-width: 18ch;
+    font-size: clamp(2.2rem, 1.4rem + 3.5vw, 3.75rem);
+    line-height: 1.02;
+    text-transform: uppercase;
+    color: #fff;
+    margin-block-start: 0.5rem;
   }
   .lab__lede {
-    margin-block-start: 1.25rem;
-    max-width: 60ch;
-    color: var(--muted);
+    margin-block-start: 1rem;
+    max-width: 52ch;
+    color: var(--mute);
     font-size: 1.0625rem;
     line-height: 1.6;
   }
   .lab__list {
-    margin-block-start: clamp(2rem, 5vw, 3.5rem);
+    margin-block-start: clamp(2rem, 5vw, 3rem);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
-    gap: 1rem;
-  }
-  .card__link {
-    display: flex;
-    flex-direction: column;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
     gap: 0.75rem;
+  }
+  .card {
+    display: grid;
+    gap: 0.5rem;
     height: 100%;
-    padding: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    background: var(--coal);
     border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    background: #fff;
+    border-block-start: 3px solid var(--gold);
     color: inherit;
     text-decoration: none;
-    transition: border-color 0.2s, translate 0.2s;
+    transition: border-color 0.2s;
   }
-  .card__link:hover { border-color: var(--ink); }
-  .card__link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-  @media (prefers-reduced-motion: no-preference) {
-    .card__link:hover { translate: 0 -2px; }
+  .card:hover {
+    border-color: var(--gold);
   }
-  .card__swatches { display: flex; gap: 4px; }
-  .card__swatches span {
-    flex: 1;
-    height: 3.5rem;
-    border-radius: 0.5rem;
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+  .card:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
   }
-  .card__num { color: var(--muted); font-size: 0.875rem; margin-block-start: 0.5rem; }
-  .card__name { font-size: 1.75rem; letter-spacing: -0.02em; font-weight: 600; line-height: 1.1; }
-  .card__idea { font-size: 1.0625rem; line-height: 1.5; }
-  .card__meta { display: grid; gap: 0.75rem; margin-block: 0.5rem 0; font-size: 0.9375rem; line-height: 1.5; }
-  .card__meta dt { color: var(--muted); font-size: 0.8125rem; }
-  .card__meta dd { margin: 0; }
-  .card__open {
-    margin-block-start: auto;
-    padding-block-start: 1rem;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+  .card__name {
+    font-family: var(--font-oswald), 'Oswald', 'Arial Narrow', sans-serif;
+    font-weight: 500;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .card__line {
+    line-height: 1.5;
+  }
+  .card__path {
+    margin-block-start: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--gold);
   }
   .lab__foot {
     margin-block-start: 3rem;
     padding-block-start: 1.5rem;
     border-block-start: 1px solid var(--line);
-    color: var(--muted);
+    color: var(--mute);
     display: flex;
     flex-wrap: wrap;
     gap: 1rem 2rem;
     justify-content: space-between;
     font-size: 0.9375rem;
   }
-  .lab__foot a { color: var(--ink); }
+  .lab__foot a {
+    color: #fff;
+  }
 </style>

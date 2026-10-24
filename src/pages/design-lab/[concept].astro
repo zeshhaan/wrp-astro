@@ -8,7 +8,7 @@ export function getStaticPaths() {
   return conceptIds.map((concept) => ({ params: { concept } }));
 }
 
-const Concept = conceptComponents[Astro.params.concept as ConceptId];
+const Page = conceptComponents[Astro.params.concept as ConceptId];
 ---
 
-<Concept />
+<Page />

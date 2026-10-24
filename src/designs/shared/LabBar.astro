@@ -1,22 +1,20 @@
 ---
 /**
- * Floating switcher so reviewers can hop between concepts in one Preview.
- * Isolated styles (all under .wrp-lab) so it never borrows a concept's look.
+ * Floating bar on Design Lab pages so reviewers can hop between the Studio
+ * pages in one Preview. Isolated styles (all under .wrp-lab) so it never
+ * borrows the page's look.
  */
-import { concepts } from '../registry';
-
-interface Props { current: string }
-const { current } = Astro.props;
-const i = concepts.findIndex((c) => c.id === current);
-const prev = concepts[(i - 1 + concepts.length) % concepts.length];
-const next = concepts[(i + 1) % concepts.length];
+const links = [
+  { href: '/design-lab/studio/', label: 'Home' },
+  { href: '/design-lab/studio/quote/', label: 'Quote' },
+  { href: '/design-lab/studio/quote/one-page/', label: 'One-page quote' },
+];
+const path = Astro.url.pathname.replace(/\/?$/, '/');
 ---
 
-<nav class="wrp-lab" aria-label="Design Lab concepts" data-lab-bar>
+<nav class="wrp-lab" aria-label="Design Lab pages" data-lab-bar>
   <a class="wrp-lab__home" href="/design-lab/">Design Lab</a>
-  <a class="wrp-lab__step" href={`/design-lab/${prev.id}/`} aria-label={`Previous concept: ${prev.name}`}>‹</a>
-  <span class="wrp-lab__name">{i + 1}/{concepts.length} · {concepts[i].name}</span>
-  <a class="wrp-lab__step" href={`/design-lab/${next.id}/`} aria-label={`Next concept: ${next.name}`}>›</a>
+  {links.map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
   <button type="button" class="wrp-lab__hide" aria-label="Hide the Design Lab bar" data-lab-hide>×</button>
 </nav>
 
@@ -64,7 +62,6 @@ const next = concepts[(i + 1) % concepts.length];
   .wrp-lab a:hover, .wrp-lab button:hover { background: rgb(255 255 255 / 0.12); }
   .wrp-lab a:focus-visible, .wrp-lab button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
   .wrp-lab__home { opacity: 0.7; }
-  .wrp-lab__step { font-size: 16px; padding-inline: 12px; }
-  .wrp-lab__name { padding-inline: 4px; }
+  .wrp-lab a[aria-current='page'] { background: rgb(255 255 255 / 0.16); }
   @media print { .wrp-lab { display: none; } }
 </style>

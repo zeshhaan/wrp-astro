@@ -1,45 +1,48 @@
-# Design Lab: choosing the new homepage
+# Design Lab: the Studio redesign
 
-Three complete homepage directions for the WRP redesign (round 3). They all use the
-same real content: prices from `src/content/services`, live Google reviews (5.0,
-120+ reviews, read 27 Sep 2026) and real customer photos. Services lead every
-page; the WRP Lounge (billiards, board games, coffee, the glass wall over the
-bays) has one section further down, replacing the old "Signature Fleet" logo wall.
+**Studio** is the chosen direction for the new wrpdetailing.ae (October 2026): a
+conventional detailing-studio site, modelled on the structure of Apex Detail
+Studio (Dubai). It uses the real content: prices from `src/content/services`,
+live Google reviews (5.0, 120+ reviews) and real customer and studio photos.
+Services lead; the WRP Lounge has one section further down, replacing the old
+"Signature Fleet" logo wall.
 
-| Concept | The idea | Signature moment |
-| --- | --- | --- |
-| **Mezzanine** | The page is the building: the studio floor where the work happens, the glass mezzanine above. | A glass line splits the hero into two floors, with a lift-style floor indicator. |
-| **The Menu** | Services laid out like a fine-dining menu with honest starting prices. | "Plan your visit": pick services and your car, see the starting total and time, send it on WhatsApp. |
-| **Studio** | A conventional detailing-studio site, modelled on the structure of Apex Detail Studio (Dubai). | Nothing unusual on purpose: it should feel instantly familiar. |
-
-Earlier rounds also had Gloss, Paddock, Layers and Diagnosis; the owner dropped them.
+The other directions (Mezzanine and The Menu in round 3; Gloss, Paddock, Layers
+and Diagnosis before that) were dropped and their code removed. They remain in
+the git history of this branch.
 
 ## Where to look
 
-Every build has a review hub at `/design-lab/` and each concept at
-`/design-lab/<id>/`, with a floating switcher to hop between them. These pages
-are `noindex`, excluded from the sitemap, and their forms never send leads.
+Every build has a review hub at `/design-lab/` linking to each Studio page:
 
-Each concept also has its own Cloudflare **Worker Preview** where it is served
-at `/`, exactly as it would be on wrpdetailing.ae:
+| Page | Path |
+| --- | --- |
+| Homepage | `/design-lab/studio/` |
+| Quote, step by step | `/design-lab/studio/quote/` |
+| Quote, one page (beside a 3D car) | `/design-lab/studio/quote/one-page/` |
+| 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
+
+A floating bar links between them. These pages are `noindex`, excluded from the
+sitemap, and their forms never send leads.
+
+Studio also has its own Cloudflare **Worker Preview** where it is served at `/`,
+exactly as it would be on wrpdetailing.ae:
 
 | Preview | Serves |
 | --- | --- |
-| `design-mezzanine` | Mezzanine at `/` |
-| `design-menu` | The Menu at `/` |
 | `design-studio` | Studio at `/` |
-| the branch's own Preview | All three under `/design-lab/` |
+| the branch's own Preview | the Design Lab under `/design-lab/` |
 
 URLs follow `https://<preview>-wrp-astro.<subdomain>.workers.dev`. They update on
 every push to the branch they track.
 
 ## How it works
 
-- `src/designs/<id>/Home.astro`: each concept, self-contained (own styles and fonts,
-  no Tailwind or global.css). Shared content in `src/designs/data.ts`, shell in
+- `src/designs/studio/Home.astro`: the Studio homepage, self-contained (own styles and
+  fonts, no Tailwind or global.css); its quote flows live in `src/designs/studio/quote/`. Shared content in `src/designs/data.ts`, shell in
   `src/designs/shared/`.
 - `PUBLIC_WRP_DESIGN=<id>` at build time makes `src/pages/index.astro` rewrite `/`
-  to that concept. Unset in production, so the live homepage is unchanged.
+  to that design. Unset in production, so the live homepage is unchanged.
 - `wrangler.jsonc` has a `previews` block. It deliberately omits the production
   D1 database and email binding, so a Preview cannot create a real lead.
 
@@ -49,21 +52,21 @@ every push to the branch they track.
 non-`main` branch (deploy command `npx wrangler preview`). The Design Lab
 branch's Preview overrides its deploy command to
 `node scripts/preview-designs.mjs --ci`, which publishes the branch build as the
-branch Preview, then rebuilds with each `PUBLIC_WRP_DESIGN` and publishes
-`design-<id>`. Every push to the branch refreshes all of them.
+branch Preview, then rebuilds with `PUBLIC_WRP_DESIGN=studio` and publishes
+`design-studio`. Every push to the branch refreshes both.
 
 **By hand.** With `wrangler login` (Wrangler ≥ 4.135):
 
 ```sh
-bun run preview:designs                 # every concept + the lab
-bun run preview:designs -- --only menu  # one concept
+bun run preview:designs                 # design-studio + the lab
 bun run preview:designs -- --dry-run    # print the commands
 ```
 
 Delete a Preview with `npx wrangler preview delete --name design-<id>`.
 
-## After the team decides
+## Next: going live
 
-Roll the chosen direction out to every page (services, blog, portfolio, reviews,
-contact, and the Arabic site), then delete `src/designs/`, `src/pages/design-lab/`
-and the design Previews.
+Roll Studio out to every page (services, blog, portfolio, reviews, contact, and
+the Arabic site) and make it the homepage, then delete `src/designs/`,
+`src/pages/design-lab/` and the design Previews. Choose between the two quote
+flows before then, or keep both.

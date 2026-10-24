@@ -146,44 +146,8 @@ export default defineConfig({
       subsets: ['arabic'],
       fallbacks: ['system-ui', 'sans-serif'],
     },
-    // ── Design Lab concept fonts (src/designs/*). Loaded only by the concept
-    // pages that ask for them via <Font>, so production pages are unaffected.
-    {
-      name: 'Bricolage Grotesque',
-      cssVariable: '--font-bricolage',
-      provider: fontProviders.google(),
-      weights: [400, 600, 800],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      name: 'Geist',
-      cssVariable: '--font-geist',
-      provider: fontProviders.google(),
-      weights: [400, 500, 600],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
-    {
-      name: 'Instrument Serif',
-      cssVariable: '--font-instrument-serif',
-      provider: fontProviders.google(),
-      weights: [400],
-      styles: ['normal', 'italic'],
-      subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
-    },
-    {
-      name: 'Instrument Sans',
-      cssVariable: '--font-instrument-sans',
-      provider: fontProviders.google(),
-      weights: [400, 500, 600],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
-    },
+    // ── Studio redesign fonts (src/designs/studio). Loaded only by the Design
+    // Lab pages that ask for them via <Font>, so production pages are unaffected.
     {
       name: 'Oswald',
       cssVariable: '--font-oswald',

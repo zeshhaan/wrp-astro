@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Deploy the Design Lab to Cloudflare Worker Previews: one Preview per homepage
- * concept (the concept is served at `/`), plus one "design-lab" Preview with
- * every concept under /design-lab/.
+ * Deploy the Design Lab to Cloudflare Worker Previews: one Preview per design
+ * in src/designs/registry.ts (now just Studio, served at `/` as design-studio),
+ * plus one "design-lab" Preview with every page under /design-lab/.
  *
- *   node scripts/preview-designs.mjs              # all concepts + the lab
- *   node scripts/preview-designs.mjs --only gloss,menu
+ *   node scripts/preview-designs.mjs              # every design + the lab
+ *   node scripts/preview-designs.mjs --only studio
  *   node scripts/preview-designs.mjs --dry-run    # print the commands only
  *   node scripts/preview-designs.mjs --ci         # Workers Builds deploy command
  *

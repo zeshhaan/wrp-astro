@@ -1,24 +1,19 @@
 ---
 /**
- * Minimal document shell for Design Lab concepts.
+ * Minimal document shell for Design Lab pages (the Studio redesign).
  *
- * Deliberately does NOT import src/styles/global.css: each concept owns its
- * whole visual system in scoped styles, so the comparison is honest. Concepts
- * pass the font variables they need; only those are loaded.
+ * Deliberately does NOT import src/styles/global.css: Studio owns its whole
+ * visual system in its own styles. Pages pass the font variables they need;
+ * only those are loaded.
  */
 import { Font } from 'astro:assets';
 import LabBar from './LabBar.astro';
 import { getConcept } from '../registry';
 
 type FontVar =
-  | '--font-bricolage'
-  | '--font-geist'
   | '--font-inter'
-  | '--font-instrument-serif'
-  | '--font-instrument-sans'
   | '--font-oswald'
-  | '--font-montserrat'
-  | '--font-playfair';
+  | '--font-montserrat';
 
 interface Props {
   concept: string;
@@ -93,7 +88,7 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
   </head>
   <body>
     <slot />
-    {meta && <LabBar current={meta.id} />}
+    {meta && <LabBar />}
     <script>
       // Concept forms are mock-ups: never send real leads from a design preview.
       document.addEventListener('submit', (event) => {
@@ -104,7 +99,7 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
         if (status) {
           status.hidden = false;
           status.textContent =
-            'Design preview: this form is not connected yet. It will post to the live enquiry API once a concept is chosen.';
+            'Design preview: this form is not connected yet. It will post to the live enquiry API when the redesign goes live.';
         }
       });
     </script>
