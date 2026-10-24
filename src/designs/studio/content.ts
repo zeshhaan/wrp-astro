@@ -150,28 +150,24 @@ export const reviews: Review[] = [
 /** Why choose WRP: each point is backed by what customers wrote. */
 export const whyPoints = [
   {
-    icon: 'camera',
     title: 'Photo & video updates',
     body: 'We send pictures and videos while we work, so you can see the progress without driving over.',
     quote: 'Kept me updated throughout the process with pictures and videos.',
     author: 'Leno Thomas',
   },
   {
-    icon: 'clock',
     title: 'Ready when we say',
     body: 'We give you a handover time before we start, and we keep to it.',
     quote: 'Car was delivered exactly on the promised time.',
     author: 'Leno Thomas',
   },
   {
-    icon: 'shield',
     title: 'Proper films, real warranties',
     body: 'Avery Dennison and STEK paint protection film with up to 10 years of warranty. Ceramic coatings carry 2 to 7 years.',
     quote: 'I choose avery dennison ppf for my car.',
     author: 'Salim Sali',
   },
   {
-    icon: 'tag',
     title: 'Fair prices, no pressure',
     body: 'Starting prices are on this page. We explain the options and you choose; we don’t push extras.',
     quote: 'Didn’t try to push any unnecessary extras.',
