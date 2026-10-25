@@ -14,11 +14,11 @@ const path = Astro.url.pathname.replace(/\/?$/, '/');
 
 // On the header candidates, the bar switches between the candidates and between
 // English and Arabic instead.
-const header = path.match(/^\/design-lab\/studio\/headers\/([adef])\/(ar\/)?$/);
+const header = path.match(/^\/design-lab\/studio\/headers\/([adefgh])\/(ar\/)?$/);
 const lang = header?.[2] ? 'ar/' : '';
 const headerLinks = header
   ? [
-      ...['a', 'd', 'e', 'f'].map((id) => ({ href: `/design-lab/studio/headers/${id}/${lang}`, label: `Header ${id.toUpperCase()}` })),
+      ...['a', 'd', 'e', 'f', 'g', 'h'].map((id) => ({ href: `/design-lab/studio/headers/${id}/${lang}`, label: `Header ${id.toUpperCase()}` })),
       { href: `/design-lab/studio/headers/${header[1]}/${lang ? '' : 'ar/'}`, label: lang ? 'English' : 'العربية' },
     ]
   : undefined;

@@ -6,27 +6,36 @@
  * offering is visible without opening anything. Point at a service and a
  * photo card of it drops down. The pages (Portfolio, Reviews, About, Blog,
  * Contact) move up into the thin bar above, and the quote button hangs below
- * the bar's corner like a tag. On phones the services become a 3×2 grid of
- * buttons under the logo.
+ * the bar's corner like a tag.
+ *
+ * Phones have three layouts, picked with `phone`: 'grid' puts the services in
+ * a 3×2 grid of buttons under the logo; 'showroom' is header A's phone layout
+ * (logo, quote and menu over the hero, and a menu of swipeable photo cards);
+ * 'filmstrip' runs header F's photo frames under the logo as an endless
+ * carousel.
  *
  * Every destination is a plain <a href> in the server HTML. The services
- * appear twice (the bar on wide screens, the grid on phones); only one of the
- * two is shown at a time.
+ * appear twice (the bar on wide screens, and the grid, menu or carousel on
+ * phones); only one of the two is shown at a time.
  */
 import Icon from '../Icon.astro';
 import Picture from '../../shared/Picture.astro';
 import WrpLogo from '@/components/WrpLogo.astro';
 import Strip from './parts/Strip.astro';
 import MenuSheet from './parts/MenuSheet.astro';
+import ShowroomSheet from './parts/ShowroomSheet.astro';
+import FilmCarousel from './parts/FilmCarousel.astro';
 import type { HeaderNav } from './nav';
 
 interface Props {
   nav: HeaderNav;
   altHref: string;
   quoteHref: string;
+  /** The phone layout; wide screens are the same in all three. */
+  phone?: 'grid' | 'showroom' | 'filmstrip';
 }
 
-const { nav, altHref, quoteHref } = Astro.props;
+const { nav, altHref, quoteHref, phone = 'grid' } = Astro.props;
 const w = nav.words;
 const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
 ---
@@ -36,12 +45,16 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
 <div class="sf" dir={nav.dir} lang={nav.locale}>
   <Strip nav={nav} altHref={altHref} end="pages" />
 
-  <header class="sf-bar">
+  <header class="sf-bar" data-phone={phone} data-sf-bar>
     <div class="st-wrap sf-bar__inner">
-      <button class="sf-sq sf-narrow" type="button" commandfor="sf-menu" command="show-modal" aria-controls="sf-menu">
-        <Icon name="menu" size={22} />
-        <span class="visually-hidden">{w.menu}</span>
-      </button>
+      {
+        phone !== 'showroom' && (
+          <button class="sf-sq sf-narrow" type="button" commandfor="sf-menu" command="show-modal" aria-controls="sf-menu">
+            <Icon name="menu" size={22} />
+            <span class="visually-hidden">{w.menu}</span>
+          </button>
+        )
+      }
 
       {
         sides.map((side, i) => (
@@ -69,10 +82,22 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
         <WrpLogo class="sf-logo__mark" />
       </a>
 
-      <button class="sf-sq sf-narrow" type="button" data-contact-modal>
-        <Icon name="whatsapp" size={22} />
-        <span class="visually-hidden">{w.whatsapp}</span>
-      </button>
+      {
+        phone === 'showroom' ? (
+          <div class="sf-acts sf-narrow">
+            <a class="st-btn st-btn--gold sf-acts__quote" href={quoteHref}>{w.quote}</a>
+            <button class="sf-sq sf-sq--clear" type="button" commandfor="sf-sheet" command="show-modal" aria-controls="sf-sheet">
+              <Icon name="menu" size={24} />
+              <span class="visually-hidden">{w.menu}</span>
+            </button>
+          </div>
+        ) : (
+          <button class="sf-sq sf-narrow" type="button" data-contact-modal>
+            <Icon name="whatsapp" size={22} />
+            <span class="visually-hidden">{w.whatsapp}</span>
+          </button>
+        )
+      }
     </div>
     <a class="sf-tag" href={quoteHref}>
       {w.quote}
@@ -80,20 +105,39 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
     </a>
   </header>
 
-  <nav class="sf-grid" aria-label={`${nav.servicesLabel} (mobile)`}>
-    <ul role="list">
-      {
-        nav.services.map((s) => (
-          <li>
-            <a href={s.href}>{s.short}</a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
+  {
+    phone === 'grid' && (
+      <nav class="sf-grid" aria-label={`${nav.servicesLabel} (mobile)`}>
+        <ul role="list">
+          {nav.services.map((s) => (
+            <li>
+              <a href={s.href}>{s.short}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+  {phone === 'filmstrip' && <FilmCarousel nav={nav} class="sf-film" />}
 </div>
 
-<MenuSheet id="sf-menu" nav={nav} altHref={altHref} quoteHref={quoteHref} />
+{
+  phone === 'showroom' ? (
+    <ShowroomSheet id="sf-sheet" nav={nav} altHref={altHref} quoteHref={quoteHref} />
+  ) : (
+    <MenuSheet id="sf-menu" nav={nav} altHref={altHref} quoteHref={quoteHref} />
+  )
+}
+
+<script>
+  // A's phone layout: clear over the hero at the top of the page, solid once it scrolls.
+  const bar = document.querySelector<HTMLElement>('[data-sf-bar][data-phone="showroom"]');
+  if (bar) {
+    const onScroll = () => bar.toggleAttribute('data-solid', window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>
 
 <style>
   .skip {
@@ -166,6 +210,57 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
   .sf-side,
   .sf-tag {
     display: none;
+  }
+  .sf-acts {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .sf-acts__quote {
+    display: none;
+  }
+  @media (min-width: 26rem) {
+    .sf-acts__quote {
+      display: inline-flex;
+      min-block-size: 2.75rem;
+      padding-inline: 1rem;
+      font-family: var(--sf-font);
+      letter-spacing: var(--sf-track);
+      text-transform: var(--sf-case);
+    }
+  }
+
+  /* A's phone layout: logo at the start, clear over the hero until the page scrolls. */
+  @media (max-width: 71.99rem) {
+    .sf-bar[data-phone='showroom'] {
+      margin-block-end: calc(-1 * var(--st-head));
+      background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent);
+      backdrop-filter: none;
+      border-block-end-color: transparent;
+      transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+    }
+    .sf-bar[data-phone='showroom'][data-solid] {
+      background: color-mix(in srgb, var(--st-coal) 96%, transparent);
+      backdrop-filter: blur(10px);
+      border-block-end-color: var(--st-line-dark);
+    }
+    .sf-bar[data-phone='showroom'] .sf-bar__inner {
+      grid-template-columns: 1fr auto;
+      justify-items: start;
+      min-block-size: var(--st-head);
+    }
+    .sf-bar[data-phone='showroom'] .sf-logo__mark {
+      block-size: 2.75rem;
+    }
+    .sf-bar[data-phone='showroom'] .sf-acts {
+      justify-self: end;
+    }
+    .sf-sq--clear {
+      border-color: rgb(255 255 255 / 0.3);
+      background: rgb(0 0 0 / 0.2);
+    }
   }
 
   /* Phones: the services as a 3×2 grid of buttons under the bar. */

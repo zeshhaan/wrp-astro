@@ -6,9 +6,10 @@
  * Round 1 (25 Oct 2026) had A, B and C; Shereef kept A and dropped B (too
  * rounded) and C. Round 2 (D, E, F) follows his notes: the logo centred, square
  * corners, a secondary bar on top, and every service visible without a hover
- * or a click.
+ * or a click. Shereef liked E for wide screens and A on phones, and asked to
+ * also see E with F's frames as an endless carousel on phones: G and H.
  */
-export type HeaderVariantId = 'a' | 'd' | 'e' | 'f';
+export type HeaderVariantId = 'a' | 'd' | 'e' | 'f' | 'g' | 'h';
 
 export const headerVariants: { id: HeaderVariantId; name: string; idea: string }[] = [
   {
@@ -30,5 +31,15 @@ export const headerVariants: { id: HeaderVariantId; name: string; idea: string }
     id: 'f',
     name: 'Filmstrip',
     idea: 'A centred masthead over six photo frames, one per service. Point at one and it opens wider to say what it does. As you scroll the frames fold into a slim row of names, so the services never leave the screen.',
+  },
+  {
+    id: 'g',
+    name: 'Storefront, A on phones',
+    idea: 'E on laptops and desktops. On phones it switches to A: the logo, the quote button and the menu over the hero, and a menu that opens on swipeable photo cards of the services.',
+  },
+  {
+    id: 'h',
+    name: 'Storefront, filmstrip carousel on phones',
+    idea: 'E on laptops and desktops. On phones the photo frames from F drift past under the logo in an endless loop. Touch to stop it and swipe; it carries on a few seconds after you let go.',
   },
 ];

@@ -42,7 +42,15 @@ interface Props {
 
 const { header, locale = 'en', altHref = '/' } = Astro.props;
 const nav = header ? await getHeaderNav(locale) : undefined;
-const Candidate = header ? { a: HeaderShowroom, d: HeaderArrivals, e: HeaderStorefront, f: HeaderFilmstrip }[header] : undefined;
+const candidates = {
+  a: { Candidate: HeaderShowroom, props: {} },
+  d: { Candidate: HeaderArrivals, props: {} },
+  e: { Candidate: HeaderStorefront, props: {} },
+  f: { Candidate: HeaderFilmstrip, props: {} },
+  g: { Candidate: HeaderStorefront, props: { phone: 'showroom' } },
+  h: { Candidate: HeaderStorefront, props: { phone: 'filmstrip' } },
+} as const;
+const { Candidate, props: candidateProps } = header ? candidates[header] : { Candidate: undefined, props: {} };
 const quoteHref = '/design-lab/studio/quote/';
 ---
 
@@ -58,7 +66,7 @@ const quoteHref = '/design-lab/studio/quote/';
     { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
   ]}
 >
-  {Candidate && nav ? <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} /> : <Header />}
+  {Candidate && nav ? <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} /> : <Header />}
   <main id="main">
     <Hero />
     <About />

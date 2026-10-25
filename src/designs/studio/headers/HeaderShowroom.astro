@@ -13,6 +13,7 @@
 import Icon from '../Icon.astro';
 import Picture from '../../shared/Picture.astro';
 import WrpLogo from '@/components/WrpLogo.astro';
+import ShowroomSheet from './parts/ShowroomSheet.astro';
 import type { HeaderNav } from './nav';
 
 interface Props {
@@ -108,7 +109,7 @@ const first = nav.services[0];
       </nav>
 
       <a class="st-btn st-btn--gold sr-cta" href={quoteHref}>{w.quote}</a>
-      <button class="sr-menu" type="button" commandfor="sr-sheet" command="show-modal" aria-controls="sr-sheet" data-sr-open>
+      <button class="sr-menu" type="button" commandfor="sr-sheet" command="show-modal" aria-controls="sr-sheet">
         <Icon name="menu" size={24} />
         <span class="visually-hidden">{w.menu}</span>
       </button>
@@ -116,52 +117,7 @@ const first = nav.services[0];
   </header>
 </div>
 
-<dialog class="sr-sheet" id="sr-sheet" dir={nav.dir} lang={nav.locale} aria-label={w.menu}>
-  <div class="sr-sheet__top">
-    <WrpLogo class="sr-logo__mark" label="WRP by YACO Automotive" />
-    <button class="sr-sheet__close" type="button" commandfor="sr-sheet" command="close" data-sr-close>
-      <Icon name="close" size={24} />
-      <span class="visually-hidden">{w.close}</span>
-    </button>
-  </div>
-  <nav aria-label="Main (mobile)">
-    <p class="sr-sheet__label">{nav.servicesLabel}</p>
-    <ul role="list" class="sr-sheet__cards">
-      {
-        nav.services.map((s) => (
-          <li>
-            <a class="sr-card" href={s.href}>
-              <Picture base={s.image} alt="" sizes="16rem" widths={[480]} class="sr-card__img" />
-              <span class="sr-card__name">{s.name}</span>
-              <span class="sr-card__price">{s.price}</span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-    <ul role="list" class="sr-sheet__links">
-      {
-        nav.pages.map((p) => (
-          <li>
-            <a href={p.href}>
-              {p.label}
-              <Icon name="arrow-right" size={20} class="sr-arrow" />
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
-  <div class="sr-sheet__actions">
-    <a class="st-btn st-btn--gold" href={quoteHref}>{w.quote}</a>
-    <button type="button" class="st-btn st-btn--light" data-contact-modal data-sr-close-first><Icon name="whatsapp" />{w.whatsapp}</button>
-    <p class="sr-sheet__meta">
-      <a href={nav.phone.href}><Icon name="phone" size={16} /><bdo dir="ltr">{nav.phone.display}</bdo></a>
-      <a href={altHref} hreflang={nav.locale === 'ar' ? 'en' : 'ar'}>{nav.langLabel}</a>
-    </p>
-    <p class="sr-sheet__hours">{nav.hours} · {w.closed}</p>
-  </div>
-</dialog>
+<ShowroomSheet id="sr-sheet" nav={nav} altHref={altHref} quoteHref={quoteHref} />
 
 <script>
   const bar = document.querySelector<HTMLElement>('[data-sr-bar]');
@@ -219,22 +175,6 @@ const first = nav.services[0];
       item.addEventListener('focus', () => show(item.dataset.srItem ?? ''));
     });
   }
-
-  // Phone menu: a modal <dialog> with Invoker Commands and a manual fallback.
-  const sheet = document.getElementById('sr-sheet') as HTMLDialogElement | null;
-  const opener = document.querySelector<HTMLButtonElement>('[data-sr-open]');
-  if (sheet && opener) {
-    if (!('commandForElement' in HTMLButtonElement.prototype)) {
-      opener.addEventListener('click', () => sheet.showModal());
-      sheet.querySelector('[data-sr-close]')?.addEventListener('click', () => sheet.close());
-    }
-    const sync = () => opener.setAttribute('aria-expanded', String(sheet.open));
-    sync();
-    sheet.addEventListener('close', sync);
-    new MutationObserver(sync).observe(sheet, { attributes: true, attributeFilter: ['open'] });
-    // The contact modal must not open underneath the sheet.
-    sheet.querySelector('[data-sr-close-first]')?.addEventListener('click', () => sheet.close());
-  }
 </script>
 
 <style>
@@ -256,14 +196,12 @@ const first = nav.services[0];
   .sr {
     display: contents;
   }
-  .sr,
-  .sr-sheet {
+  .sr {
     --sr-font: var(--st-head-font);
     --sr-track: 0.05em;
     --sr-case: uppercase;
   }
-  .sr:lang(ar),
-  .sr-sheet:lang(ar) {
+  .sr:lang(ar) {
     /* No Oswald glyphs for Arabic, and letter-spacing breaks the joined script. */
     --sr-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
     --sr-track: 0;
@@ -615,164 +553,5 @@ const first = nav.services[0];
     .sr-menu {
       display: none;
     }
-  }
-
-  /* Phone sheet */
-  .sr-sheet {
-    inset: 0;
-    margin: 0;
-    inline-size: 100%;
-    max-inline-size: none;
-    block-size: 100dvh;
-    max-block-size: none;
-    padding: 0.75rem 0 6rem;
-    border: 0;
-    background: var(--st-black);
-    color: var(--st-white);
-    overflow-y: auto;
-  }
-  .sr-sheet::backdrop {
-    background: rgb(0 0 0 / 0.6);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .sr-sheet[open] {
-      animation: sr-in 0.3s ease-out;
-    }
-    @keyframes sr-in {
-      from {
-        opacity: 0;
-        translate: 0 1rem;
-      }
-    }
-  }
-  .sr-sheet__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-inline: var(--st-pad);
-    min-block-size: 3.5rem;
-  }
-  .sr-sheet__close {
-    display: inline-grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border: 1px solid var(--st-line-dark);
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-  .sr-sheet__label {
-    margin: 1.5rem var(--st-pad) 0.75rem;
-    color: var(--st-gold);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-  .sr-sheet__cards {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 13.5rem;
-    gap: 0.75rem;
-    margin: 0;
-    padding: 0 var(--st-pad) 0.5rem;
-    list-style: none;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--st-pad);
-    scrollbar-width: none;
-  }
-  .sr-sheet__cards > li {
-    scroll-snap-align: start;
-  }
-  .sr-card {
-    position: relative;
-    display: grid;
-    align-content: end;
-    gap: 0.2rem;
-    block-size: 16rem;
-    padding: 1rem;
-    overflow: hidden;
-    color: var(--st-white);
-    text-decoration: none;
-    isolation: isolate;
-  }
-  .sr-card :global(.sr-card__img) {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-  .sr-card :global(.sr-card__img img) {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-  }
-  .sr-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(to top, rgb(0 0 0 / 0.85) 15%, transparent 65%);
-  }
-  .sr-card__name {
-    font-family: var(--sr-font);
-    font-size: 1.25rem;
-    line-height: 1.15;
-    letter-spacing: var(--sr-track);
-    text-transform: var(--sr-case);
-  }
-  .sr-card__price {
-    color: var(--st-gold);
-    font-size: 0.8125rem;
-  }
-  .sr-sheet__links {
-    margin: 1.75rem var(--st-pad) 0;
-    padding: 0;
-    list-style: none;
-    border-block-start: 1px solid var(--st-line-dark);
-  }
-  .sr-sheet__links a {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-block-size: 3.5rem;
-    border-block-end: 1px solid var(--st-line-dark);
-    color: inherit;
-    font-family: var(--sr-font);
-    font-size: 1.5rem;
-    letter-spacing: var(--sr-track);
-    text-transform: var(--sr-case);
-    text-decoration: none;
-  }
-  .sr-sheet__links :global(.sr-arrow) {
-    color: var(--st-gold);
-  }
-  .sr-sheet__actions {
-    display: grid;
-    gap: 0.75rem;
-    margin: 1.75rem var(--st-pad) 0;
-  }
-  .sr-sheet__meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-block-start: 0.5rem;
-  }
-  .sr-sheet__meta a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-block-size: 2.75rem;
-    color: var(--st-white);
-    font-weight: 600;
-    text-decoration: none;
-  }
-  .sr-sheet__meta :global(svg) {
-    color: var(--st-gold);
-  }
-  .sr-sheet__hours {
-    color: var(--st-mute);
-    font-size: 0.875rem;
   }
 </style>
