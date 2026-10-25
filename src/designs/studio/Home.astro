@@ -23,21 +23,41 @@ import Contact from './Contact.astro';
 import Footer from './Footer.astro';
 import FloatingContact from './FloatingContact.astro';
 import { heroVideo } from './heroVideo';
+import HeaderShowroom from './headers/HeaderShowroom.astro';
+import HeaderPitLane from './headers/HeaderPitLane.astro';
+import HeaderPillars from './headers/HeaderPillars.astro';
+import { getHeaderNav } from './headers/nav';
+import type { HeaderVariantId } from './headers/variants';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  /** One of the header candidates (/design-lab/studio/headers/) instead of the current header. */
+  header?: HeaderVariantId;
+  /** Language of the header candidate. The rest of the page is English either way. */
+  locale?: Locale;
+  /** The same page in the other language, for the header's language switch. */
+  altHref?: string;
+}
+
+const { header, locale = 'en', altHref = '/' } = Astro.props;
+const nav = header ? await getHeaderNav(locale) : undefined;
+const Candidate = header ? { a: HeaderShowroom, b: HeaderPitLane, c: HeaderPillars }[header] : undefined;
+const quoteHref = '/design-lab/studio/quote/';
 ---
 
 <DesignShell
   concept="studio"
   title="WRP Detailing Dubai: PPF, ceramic coating, detailing and window tint"
   description="Paint protection film (Avery Dennison and STEK), ceramic coating, detailing, polish, window tint and upholstery in Al Qusais, Dubai. 5.0 on Google. Get a quick quote."
-  fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
-  themeColor="#0c0d0f"
+  fonts={['--font-oswald', '--font-inter', '--font-montserrat', ...(locale === 'ar' ? (['--font-ibm-plex-arabic'] as const) : [])]}
+  themeColor={header === 'c' ? '#f4f4f2' : '#0c0d0f'}
   colorScheme="dark"
   preloads={[
     { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
     { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
   ]}
 >
-  <Header />
+  {Candidate && nav ? <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} /> : <Header />}
   <main id="main">
     <Hero />
     <About />
@@ -53,7 +73,7 @@ import { heroVideo } from './heroVideo';
     <Contact />
   </main>
   <Footer />
-  <FloatingContact />
+  <FloatingContact fab={header === 'b' ? 'wide' : 'always'} />
 </DesignShell>
 
 <style is:global>

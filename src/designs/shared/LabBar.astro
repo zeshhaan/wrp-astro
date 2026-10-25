@@ -8,13 +8,25 @@ const links = [
   { href: '/design-lab/studio/', label: 'Home' },
   { href: '/design-lab/studio/quote/', label: 'Quote' },
   { href: '/design-lab/studio/quote/one-page/', label: 'One-page quote' },
+  { href: '/design-lab/studio/headers/', label: 'Headers' },
 ];
 const path = Astro.url.pathname.replace(/\/?$/, '/');
+
+// On the header candidates, the bar switches between A, B and C and between
+// English and Arabic instead.
+const header = path.match(/^\/design-lab\/studio\/headers\/([abc])\/(ar\/)?$/);
+const lang = header?.[2] ? 'ar/' : '';
+const headerLinks = header
+  ? [
+      ...['a', 'b', 'c'].map((id) => ({ href: `/design-lab/studio/headers/${id}/${lang}`, label: `Header ${id.toUpperCase()}` })),
+      { href: `/design-lab/studio/headers/${header[1]}/${lang ? '' : 'ar/'}`, label: lang ? 'English' : 'العربية' },
+    ]
+  : undefined;
 ---
 
-<nav class="wrp-lab" aria-label="Design Lab pages" data-lab-bar>
-  <a class="wrp-lab__home" href="/design-lab/">Design Lab</a>
-  {links.map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
+<nav class:list={['wrp-lab', header?.[1] === 'b' && 'wrp-lab--lift']} aria-label="Design Lab pages" data-lab-bar>
+  <a class="wrp-lab__home" href={header ? '/design-lab/studio/headers/' : '/design-lab/'}>{header ? 'Headers' : 'Design Lab'}</a>
+  {(headerLinks ?? links).map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
   <button type="button" class="wrp-lab__hide" aria-label="Hide the Design Lab bar" data-lab-hide>×</button>
 </nav>
 
@@ -49,6 +61,10 @@ const path = Astro.url.pathname.replace(/\/?$/, '/');
     white-space: nowrap;
   }
   .wrp-lab[hidden] { display: none; }
+  /* Header B docks its navigation at the bottom of phones: sit above it. */
+  @media (max-width: 63.99rem) {
+    .wrp-lab--lift { inset-block-end: calc(5.25rem + env(safe-area-inset-bottom)); }
+  }
   .wrp-lab a, .wrp-lab button {
     color: inherit;
     text-decoration: none;

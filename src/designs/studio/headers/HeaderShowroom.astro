@@ -1,0 +1,778 @@
+---
+/**
+ * Header variant A, "Showroom": the bar sits clear over the hero and turns solid
+ * once the page scrolls. Services opens a full-width showroom panel: the six
+ * services as a price list on one side and a large photo of the one under the
+ * pointer on the other. On phones the menu is a full-screen sheet that leads
+ * with swipeable photo cards of the services.
+ *
+ * Every destination is a plain <a href> in the server HTML (the panel and the
+ * sheet are only hidden with CSS), so crawlers see the same links whether a
+ * menu is open or not.
+ */
+import Icon from '../Icon.astro';
+import Picture from '../../shared/Picture.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import type { HeaderNav } from './nav';
+
+interface Props {
+  nav: HeaderNav;
+  /** The same page in the other language. */
+  altHref: string;
+  quoteHref: string;
+}
+
+const { nav, altHref, quoteHref } = Astro.props;
+const w = nav.words;
+const first = nav.services[0];
+---
+
+<a class="skip" href="#main">{w.skip}</a>
+
+<div class="sr" dir={nav.dir} lang={nav.locale} data-hdr="showroom">
+  <div class="sr-strip">
+    <div class="st-wrap sr-strip__inner">
+      <a class="sr-strip__rating" href={nav.rating.href}>
+        <span class="sr-strip__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={12} />)}</span>
+        <strong>{nav.rating.value}</strong>
+        <span>{nav.rating.count} {w.reviews}</span>
+      </a>
+      <ul class="sr-strip__list" role="list">
+        <li><a href={nav.phone.href}><Icon name="phone" size={14} /><bdo dir="ltr">{nav.phone.display}</bdo></a></li>
+        <li class="sr-strip__wide"><a href={nav.maps.href} target="_blank" rel="noopener"><Icon name="pin" size={14} />{nav.maps.label}</a></li>
+        <li class="sr-strip__wide"><span><Icon name="clock" size={14} />{nav.hours} · {w.closed}</span></li>
+        <li><a class="sr-strip__lang" href={altHref} hreflang={nav.locale === 'ar' ? 'en' : 'ar'}>{nav.langLabel}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <header class="sr-bar" data-sr-bar>
+    <div class="st-wrap sr-bar__inner">
+      <a class="sr-logo" href={nav.home} aria-label={w.home}>
+        <WrpLogo class="sr-logo__mark" />
+      </a>
+
+      <nav class="sr-nav" aria-label="Main">
+        <ul role="list" class="sr-nav__list">
+          <li class="sr-nav__svc" data-sr-svc>
+            <button class="sr-nav__link" type="button" aria-expanded="false" aria-controls="sr-mega" data-sr-toggle>
+              {nav.servicesLabel}
+              <Icon name="chevron-down" size={16} class="sr-nav__chev" />
+            </button>
+            <div class="sr-mega" id="sr-mega" data-sr-mega>
+              <div class="st-wrap sr-mega__grid">
+                <ul role="list" class="sr-mega__list">
+                  {
+                    nav.services.map((s, i) => (
+                      <li>
+                        <a class="sr-mega__item" href={s.href} data-sr-item={s.slug} aria-current={i === 0 ? 'true' : undefined}>
+                          <span class="sr-mega__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                          <span class="sr-mega__name">{s.name}</span>
+                          <span class="sr-mega__price">{s.price}</span>
+                          <Icon name="arrow-right" size={18} class="sr-arrow" />
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+                <div class="sr-mega__stage" aria-hidden="true">
+                  {
+                    nav.services.map((s) => (
+                      <figure class="sr-mega__shot" data-sr-shot={s.slug} data-on={s.slug === first.slug ? '' : undefined}>
+                        <Picture base={s.image} alt="" sizes="(min-width: 76rem) 36rem, 45vw" widths={[480, 800]} />
+                        <figcaption>
+                          <span class="sr-mega__cap-name">{s.name}</span>
+                          <span class="sr-mega__cap-line">{s.line}</span>
+                          {s.time && <span class="sr-mega__cap-time"><Icon name="clock" size={14} />{s.time}</span>}
+                        </figcaption>
+                      </figure>
+                    ))
+                  }
+                </div>
+                <div class="sr-mega__talk">
+                  <p class="sr-mega__talk-title">{w.talk}</p>
+                  <p>{w.talkLine}</p>
+                  <button type="button" class="st-btn st-btn--ghost" data-contact-modal><Icon name="whatsapp" />{w.whatsapp}</button>
+                </div>
+              </div>
+            </div>
+          </li>
+          {
+            nav.pages.map((p) => (
+              <li>
+                <a class="sr-nav__link" href={p.href}>{p.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <a class="st-btn st-btn--gold sr-cta" href={quoteHref}>{w.quote}</a>
+      <button class="sr-menu" type="button" commandfor="sr-sheet" command="show-modal" aria-controls="sr-sheet" data-sr-open>
+        <Icon name="menu" size={24} />
+        <span class="visually-hidden">{w.menu}</span>
+      </button>
+    </div>
+  </header>
+</div>
+
+<dialog class="sr-sheet" id="sr-sheet" dir={nav.dir} lang={nav.locale} aria-label={w.menu}>
+  <div class="sr-sheet__top">
+    <WrpLogo class="sr-logo__mark" label="WRP by YACO Automotive" />
+    <button class="sr-sheet__close" type="button" commandfor="sr-sheet" command="close" data-sr-close>
+      <Icon name="close" size={24} />
+      <span class="visually-hidden">{w.close}</span>
+    </button>
+  </div>
+  <nav aria-label="Main (mobile)">
+    <p class="sr-sheet__label">{nav.servicesLabel}</p>
+    <ul role="list" class="sr-sheet__cards">
+      {
+        nav.services.map((s) => (
+          <li>
+            <a class="sr-card" href={s.href}>
+              <Picture base={s.image} alt="" sizes="16rem" widths={[480]} class="sr-card__img" />
+              <span class="sr-card__name">{s.name}</span>
+              <span class="sr-card__price">{s.price}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <ul role="list" class="sr-sheet__links">
+      {
+        nav.pages.map((p) => (
+          <li>
+            <a href={p.href}>
+              {p.label}
+              <Icon name="arrow-right" size={20} class="sr-arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="sr-sheet__actions">
+    <a class="st-btn st-btn--gold" href={quoteHref}>{w.quote}</a>
+    <button type="button" class="st-btn st-btn--light" data-contact-modal data-sr-close-first><Icon name="whatsapp" />{w.whatsapp}</button>
+    <p class="sr-sheet__meta">
+      <a href={nav.phone.href}><Icon name="phone" size={16} /><bdo dir="ltr">{nav.phone.display}</bdo></a>
+      <a href={altHref} hreflang={nav.locale === 'ar' ? 'en' : 'ar'}>{nav.langLabel}</a>
+    </p>
+    <p class="sr-sheet__hours">{nav.hours} · {w.closed}</p>
+  </div>
+</dialog>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-sr-bar]');
+  const svc = document.querySelector<HTMLElement>('[data-sr-svc]');
+  const toggle = svc?.querySelector<HTMLButtonElement>('[data-sr-toggle]');
+
+  // Clear over the hero at the top of the page, solid once it scrolls.
+  const onScroll = () => bar?.toggleAttribute('data-solid', window.scrollY > 24);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  if (bar && svc && toggle) {
+    let timer: number | undefined;
+    let hoverOpenedAt = 0;
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+    const set = (open: boolean) => {
+      window.clearTimeout(timer);
+      toggle.setAttribute('aria-expanded', String(open));
+      bar.toggleAttribute('data-open', open);
+    };
+    // A click right after hover opened the panel keeps it open rather than closing it.
+    toggle.addEventListener('click', () => set(!isOpen() || Date.now() - hoverOpenedAt < 600));
+    // Hover intent on mouse and trackpad only; touch uses the button.
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    svc.addEventListener('pointerenter', () => {
+      if (!fine.matches) return;
+      if (!isOpen()) hoverOpenedAt = Date.now();
+      set(true);
+    });
+    svc.addEventListener('pointerleave', () => {
+      if (fine.matches) timer = window.setTimeout(() => set(false), 180);
+    });
+    svc.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen()) {
+        set(false);
+        toggle.focus();
+      }
+    });
+    svc.addEventListener('focusout', (event) => {
+      if (!svc.contains(event.relatedTarget as Node | null)) set(false);
+    });
+    document.addEventListener('click', (event) => {
+      if (!svc.contains(event.target as Node)) set(false);
+    });
+
+    // The photo follows the service under the pointer or keyboard focus.
+    const items = svc.querySelectorAll<HTMLAnchorElement>('[data-sr-item]');
+    const shots = svc.querySelectorAll<HTMLElement>('[data-sr-shot]');
+    const show = (slug: string) => {
+      shots.forEach((s) => s.toggleAttribute('data-on', s.dataset.srShot === slug));
+      items.forEach((i) => (i.dataset.srItem === slug ? i.setAttribute('aria-current', 'true') : i.removeAttribute('aria-current')));
+    };
+    items.forEach((item) => {
+      item.addEventListener('pointerenter', () => show(item.dataset.srItem ?? ''));
+      item.addEventListener('focus', () => show(item.dataset.srItem ?? ''));
+    });
+  }
+
+  // Phone menu: a modal <dialog> with Invoker Commands and a manual fallback.
+  const sheet = document.getElementById('sr-sheet') as HTMLDialogElement | null;
+  const opener = document.querySelector<HTMLButtonElement>('[data-sr-open]');
+  if (sheet && opener) {
+    if (!('commandForElement' in HTMLButtonElement.prototype)) {
+      opener.addEventListener('click', () => sheet.showModal());
+      sheet.querySelector('[data-sr-close]')?.addEventListener('click', () => sheet.close());
+    }
+    const sync = () => opener.setAttribute('aria-expanded', String(sheet.open));
+    sync();
+    sheet.addEventListener('close', sync);
+    new MutationObserver(sync).observe(sheet, { attributes: true, attributeFilter: ['open'] });
+    // The contact modal must not open underneath the sheet.
+    sheet.querySelector('[data-sr-close-first]')?.addEventListener('click', () => sheet.close());
+  }
+</script>
+
+<style>
+  .skip {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--st-gold);
+    color: var(--st-black);
+    font-weight: 600;
+  }
+  .skip:focus {
+    inset-block-start: 0.5rem;
+  }
+
+  /* No box of its own: the bar must stick against the page, not this wrapper. */
+  .sr {
+    display: contents;
+  }
+  .sr,
+  .sr-sheet {
+    --sr-font: var(--st-head-font);
+    --sr-track: 0.05em;
+    --sr-case: uppercase;
+  }
+  .sr:lang(ar),
+  .sr-sheet:lang(ar) {
+    /* No Oswald glyphs for Arabic, and letter-spacing breaks the joined script. */
+    --sr-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --sr-track: 0;
+    --sr-case: none;
+    font-family: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+  }
+  :global([dir='rtl'] .sr-arrow) {
+    transform: scaleX(-1);
+  }
+
+  /* Contact strip: scrolls away with the page. */
+  .sr-strip {
+    background: var(--st-black);
+    color: var(--st-mute);
+    font-size: 0.8125rem;
+  }
+  .sr-strip__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-block-size: 2.5rem;
+  }
+  .sr-strip a,
+  .sr-strip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .sr-strip a:hover {
+    color: var(--st-white);
+  }
+  .sr-strip__rating strong {
+    color: var(--st-white);
+  }
+  .sr-strip__stars {
+    gap: 1px !important;
+    color: var(--st-gold);
+  }
+  .sr-strip__stars :global(svg) {
+    fill: currentColor;
+  }
+  .sr-strip__list {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sr-strip__list :global(svg) {
+    color: var(--st-gold);
+  }
+  .sr-strip__lang {
+    min-block-size: 2.5rem;
+    color: var(--st-white) !important;
+    font-weight: 600;
+  }
+  .sr-strip__wide {
+    display: none;
+  }
+  @media (min-width: 64rem) {
+    .sr-strip__wide {
+      display: list-item;
+    }
+  }
+
+  /* The bar: clear over the hero, solid after scrolling or with the panel open. */
+  .sr-bar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    margin-block-end: calc(-1 * var(--st-head));
+    color: var(--st-white);
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent);
+    border-block-end: 1px solid transparent;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .sr-bar[data-solid],
+  .sr-bar[data-open] {
+    background: color-mix(in srgb, var(--st-coal) 96%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end-color: var(--st-line-dark);
+  }
+  .sr-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-block-size: var(--st-head);
+  }
+  .sr-logo {
+    display: grid;
+    align-content: center;
+    min-block-size: 2.75rem;
+    margin-inline-end: auto;
+    color: var(--st-white);
+  }
+  .sr-logo__mark {
+    display: block;
+    block-size: 2.75rem;
+    inline-size: auto;
+  }
+  @media (min-width: 64rem) {
+    .sr-logo__mark {
+      block-size: 3rem;
+    }
+  }
+
+  .sr-nav {
+    display: none;
+  }
+  .sr-nav__list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sr-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-block-size: var(--st-head);
+    padding-inline: 0.75rem;
+    border: 0;
+    background: none;
+    color: var(--st-white);
+    font-family: var(--sr-font);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .sr-nav__link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.75rem;
+    inset-block-end: 1.4rem;
+    block-size: 2px;
+    background: var(--st-gold);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+  .sr-nav__link:hover::after,
+  .sr-nav__link[aria-expanded='true']::after {
+    transform: scaleX(1);
+  }
+  .sr-nav__link :global(.sr-nav__chev) {
+    transition: rotate 0.2s ease;
+  }
+  .sr-nav__link[aria-expanded='true'] :global(.sr-nav__chev) {
+    rotate: 180deg;
+  }
+
+  /* Showroom panel: full width under the bar (the bar is its containing block). */
+  .sr-mega {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
+    display: none;
+    background: var(--st-coal);
+    border-block: 1px solid var(--st-line-dark);
+    box-shadow: 0 30px 60px rgb(0 0 0 / 0.5);
+  }
+  .sr-bar[data-open] .sr-mega {
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sr-mega {
+      transition:
+        opacity 0.25s ease,
+        translate 0.25s ease,
+        display 0.25s allow-discrete;
+    }
+    @starting-style {
+      .sr-bar[data-open] .sr-mega {
+        opacity: 0;
+        translate: 0 -0.5rem;
+      }
+    }
+  }
+  .sr-mega__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) 15rem;
+    gap: 2.5rem;
+    padding-block: 2rem 2.25rem;
+  }
+  .sr-mega__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--st-line-dark);
+  }
+  .sr-mega__item {
+    display: grid;
+    grid-template-columns: 2rem 1fr auto;
+    grid-template-areas: 'num name arrow' 'num price arrow';
+    align-items: center;
+    column-gap: 0.75rem;
+    padding-block: 0.8rem;
+    border-block-end: 1px solid var(--st-line-dark);
+    color: var(--st-on-dark);
+    text-decoration: none;
+  }
+  .sr-mega__num {
+    grid-area: num;
+    color: var(--st-mute);
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+  }
+  .sr-mega__name {
+    grid-area: name;
+    font-family: var(--sr-font);
+    font-size: 1.1875rem;
+    font-weight: 500;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+    color: var(--st-white);
+  }
+  .sr-mega__price {
+    grid-area: price;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  .sr-mega__item :global(.sr-arrow) {
+    grid-area: arrow;
+    color: var(--st-gold);
+    opacity: 0;
+    translate: -0.4rem 0;
+    transition:
+      opacity 0.2s ease,
+      translate 0.2s ease;
+  }
+  .sr-mega__item[aria-current] .sr-mega__name {
+    color: var(--st-gold);
+  }
+  .sr-mega__item[aria-current] :global(.sr-arrow) {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .sr-mega__stage {
+    position: relative;
+    min-block-size: 20rem;
+    overflow: hidden;
+    background: var(--st-black);
+  }
+  .sr-mega__shot {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .sr-mega__shot[data-on] {
+    opacity: 1;
+  }
+  .sr-mega__shot :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: grayscale(0.15) contrast(1.05);
+    transform: scale(1.04);
+    transition: transform 1.2s ease;
+  }
+  .sr-mega__shot[data-on] :global(img) {
+    transform: scale(1);
+  }
+  .sr-mega__shot figcaption {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.35rem;
+    padding: 3rem 1.5rem 1.25rem;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.85), transparent);
+  }
+  .sr-mega__cap-name {
+    font-family: var(--sr-font);
+    font-size: 1.5rem;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+  }
+  .sr-mega__cap-line {
+    max-inline-size: 30rem;
+    color: var(--st-on-dark);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .sr-mega__cap-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--st-gold);
+    font-size: 0.8125rem;
+  }
+  .sr-mega__talk {
+    display: grid;
+    align-content: end;
+    gap: 0.75rem;
+    padding-inline-start: 1.5rem;
+    border-inline-start: 1px solid var(--st-line-dark);
+    color: var(--st-on-dark);
+    font-size: 0.9375rem;
+  }
+  .sr-mega__talk-title {
+    font-family: var(--sr-font);
+    font-size: 1.25rem;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+    color: var(--st-white);
+  }
+  .sr-mega__talk .st-btn {
+    margin-block-start: 0.5rem;
+  }
+
+  .sr-cta {
+    display: none;
+  }
+  .sr-menu {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    background: rgb(0 0 0 / 0.2);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  @media (min-width: 26rem) {
+    .sr-cta {
+      display: inline-flex;
+      min-block-size: 2.75rem;
+      padding-inline: 1rem;
+      font-family: var(--sr-font);
+      letter-spacing: var(--sr-track);
+      text-transform: var(--sr-case);
+    }
+  }
+  @media (min-width: 72rem) {
+    .sr-nav {
+      display: block;
+    }
+    .sr-menu {
+      display: none;
+    }
+  }
+
+  /* Phone sheet */
+  .sr-sheet {
+    inset: 0;
+    margin: 0;
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    padding: 0.75rem 0 6rem;
+    border: 0;
+    background: var(--st-black);
+    color: var(--st-white);
+    overflow-y: auto;
+  }
+  .sr-sheet::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sr-sheet[open] {
+      animation: sr-in 0.3s ease-out;
+    }
+    @keyframes sr-in {
+      from {
+        opacity: 0;
+        translate: 0 1rem;
+      }
+    }
+  }
+  .sr-sheet__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: var(--st-pad);
+    min-block-size: 3.5rem;
+  }
+  .sr-sheet__close {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--st-line-dark);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .sr-sheet__label {
+    margin: 1.5rem var(--st-pad) 0.75rem;
+    color: var(--st-gold);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .sr-sheet__cards {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 13.5rem;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0 var(--st-pad) 0.5rem;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--st-pad);
+    scrollbar-width: none;
+  }
+  .sr-sheet__cards > li {
+    scroll-snap-align: start;
+  }
+  .sr-card {
+    position: relative;
+    display: grid;
+    align-content: end;
+    gap: 0.2rem;
+    block-size: 16rem;
+    padding: 1rem;
+    overflow: hidden;
+    color: var(--st-white);
+    text-decoration: none;
+    isolation: isolate;
+  }
+  .sr-card :global(.sr-card__img) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .sr-card :global(.sr-card__img img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .sr-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.85) 15%, transparent 65%);
+  }
+  .sr-card__name {
+    font-family: var(--sr-font);
+    font-size: 1.25rem;
+    line-height: 1.15;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+  }
+  .sr-card__price {
+    color: var(--st-gold);
+    font-size: 0.8125rem;
+  }
+  .sr-sheet__links {
+    margin: 1.75rem var(--st-pad) 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--st-line-dark);
+  }
+  .sr-sheet__links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-block-size: 3.5rem;
+    border-block-end: 1px solid var(--st-line-dark);
+    color: inherit;
+    font-family: var(--sr-font);
+    font-size: 1.5rem;
+    letter-spacing: var(--sr-track);
+    text-transform: var(--sr-case);
+    text-decoration: none;
+  }
+  .sr-sheet__links :global(.sr-arrow) {
+    color: var(--st-gold);
+  }
+  .sr-sheet__actions {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.75rem var(--st-pad) 0;
+  }
+  .sr-sheet__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block-start: 0.5rem;
+  }
+  .sr-sheet__meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    color: var(--st-white);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .sr-sheet__meta :global(svg) {
+    color: var(--st-gold);
+  }
+  .sr-sheet__hours {
+    color: var(--st-mute);
+    font-size: 0.875rem;
+  }
+</style>
