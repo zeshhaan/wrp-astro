@@ -63,7 +63,7 @@ export interface OgCardOptions {
   imageUrl?: string;
   /** Right-hand detail in the footer, e.g. "From AED 399". */
   badge?: string;
-  /** The real WRP lockup as a data URI, rasterised from public/wrp-logo.svg. */
+  /** The real WRP lockup as a data URI, rasterised from public/wrp-logo-white.svg. */
   logoUri?: string;
 }
 
@@ -87,7 +87,7 @@ function titleSize(title: string): number {
 }
 
 /**
- * The real lockup, rasterised from public/wrp-logo.svg.
+ * The real lockup, rasterised from public/wrp-logo-white.svg.
  *
  * An earlier version set "WRP." and the tagline as live text side by side. That
  * was wrong twice over: the actual mark stacks the tagline underneath, and the
@@ -98,9 +98,9 @@ function wordmark(logoUri: string | undefined): ReactElement | null {
   if (!logoUri) return null;
   return el('img', {
     src: logoUri,
-    width: 169,
-    height: 62,
-    style: { width: 169, height: 62, objectFit: 'contain' },
+    width: 190,
+    height: 69,
+    style: { width: 190, height: 69, objectFit: 'contain' },
   });
 }
 
