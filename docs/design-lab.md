@@ -77,9 +77,9 @@ H runs F's photo frames as an endless carousel (`parts/FilmCarousel.astro`,
 whose looping copies are spans, not links). All of them
 render the live navigation's link set from `headers/nav.ts` (six service
 pages, Portfolio, Reviews, About, Blog, Contact) as plain `<a href>` links in
-the HTML, in English or Arabic (RTL). `Home.astro` takes a `header` prop to swap
-one in; the homepage itself still uses `Header.astro`. Once one is picked it
-replaces `Header.astro` and the others are deleted.
+the HTML, in English or Arabic (RTL). Shereef picked G, so it is the Studio homepage's
+header (`Home.astro` defaults its `header` prop to `g`); the other candidates
+stay in the lab for now. The quote pages still use the older `Header.astro`.
 
 ## Next: going live
 

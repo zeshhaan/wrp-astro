@@ -1,7 +1,7 @@
 /**
  * The Studio header candidates, for review side by side at
- * /design-lab/studio/headers/. Once one is picked it replaces
- * src/designs/studio/Header.astro and the others are deleted.
+ * /design-lab/studio/headers/. Shereef picked G on 25 Oct 2026, and it is now
+ * the Studio homepage's header; the others stay here for now.
  *
  * Round 1 (25 Oct 2026) had A, B and C; Shereef kept A and dropped B (too
  * rounded) and C. Round 2 (D, E, F) follows his notes: the logo centred, square

@@ -7,7 +7,6 @@
  * white and brass, with WRP's real photos, prices and Google reviews.
  */
 import DesignShell from '../shared/DesignShell.astro';
-import Header from './Header.astro';
 import Hero from './Hero.astro';
 import About from './About.astro';
 import Services from './Services.astro';
@@ -32,7 +31,7 @@ import type { HeaderVariantId } from './headers/variants';
 import type { Locale } from '@/i18n/translations';
 
 interface Props {
-  /** One of the header candidates (/design-lab/studio/headers/) instead of the current header. */
+  /** One of the header candidates (/design-lab/studio/headers/) instead of the chosen one (G). */
   header?: HeaderVariantId;
   /** Language of the header candidate. The rest of the page is English either way. */
   locale?: Locale;
@@ -40,8 +39,10 @@ interface Props {
   altHref?: string;
 }
 
-const { header, locale = 'en', altHref = '/' } = Astro.props;
-const nav = header ? await getHeaderNav(locale) : undefined;
+// The Studio homepage has no Arabic body yet, so its language switch goes to
+// the Arabic header on the same page.
+const { header = 'g', locale = 'en', altHref = '/design-lab/studio/headers/g/ar/' } = Astro.props;
+const nav = await getHeaderNav(locale);
 const candidates = {
   a: { Candidate: HeaderShowroom, props: {} },
   d: { Candidate: HeaderArrivals, props: {} },
@@ -50,7 +51,7 @@ const candidates = {
   g: { Candidate: HeaderStorefront, props: { phone: 'showroom' } },
   h: { Candidate: HeaderStorefront, props: { phone: 'filmstrip' } },
 } as const;
-const { Candidate, props: candidateProps } = header ? candidates[header] : { Candidate: undefined, props: {} };
+const { Candidate, props: candidateProps } = candidates[header];
 const quoteHref = '/design-lab/studio/quote/';
 ---
 
@@ -66,7 +67,7 @@ const quoteHref = '/design-lab/studio/quote/';
     { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
   ]}
 >
-  {Candidate && nav ? <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} /> : <Header />}
+  <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} />
   <main id="main">
     <Hero />
     <About />
