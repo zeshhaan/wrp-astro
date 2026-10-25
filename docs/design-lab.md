@@ -21,7 +21,7 @@ Every build has a review hub at `/design-lab/` linking to each Studio page:
 | Quote, step by step | `/design-lab/studio/quote/` |
 | Quote, one page (beside a 3D car) | `/design-lab/studio/quote/one-page/` |
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
-| Three header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `b/`, `c/`, Arabic at `…/ar/`) |
+| Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/`, `e/`, `f/`, Arabic at `…/ar/`) |
 
 A floating bar links between them. These pages are `noindex`, excluded from the
 sitemap, and their forms never send leads.
@@ -67,14 +67,15 @@ Delete a Preview with `npx wrangler preview delete --name design-<id>`.
 
 ## Header candidates
 
-`src/designs/studio/headers/` holds three headers to choose from: A Showroom
-(clear over the hero, photo mega menu), B Pit Lane (floating capsule with a live
-open-now light, phone dock at the bottom) and C Pillars (paper masthead, full-screen
-W·R·P index). All three render the live navigation's link set from
-`headers/nav.ts` (six service pages, Portfolio, Reviews, About, Blog, Contact),
-as plain `<a href>` links in the HTML, in English or Arabic (RTL). `Home.astro`
-takes a `header` prop to swap one in; the homepage itself still uses `Header.astro`.
-Once one is picked it replaces `Header.astro` and the other two are deleted.
+`src/designs/studio/headers/` holds the headers to choose from, listed in
+`headers/variants.ts`: A Showroom (kept from round 1), D Arrivals board,
+E Storefront and F Filmstrip (round 2: logo centred, square corners, a
+secondary bar on top, every service visible without a hover). All of them
+render the live navigation's link set from `headers/nav.ts` (six service
+pages, Portfolio, Reviews, About, Blog, Contact) as plain `<a href>` links in
+the HTML, in English or Arabic (RTL). `Home.astro` takes a `header` prop to swap
+one in; the homepage itself still uses `Header.astro`. Once one is picked it
+replaces `Header.astro` and the others are deleted.
 
 ## Next: going live
 

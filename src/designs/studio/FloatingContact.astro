@@ -7,15 +7,9 @@
  */
 import Icon from './Icon.astro';
 import { contact, proof, whatsappQuote } from './content';
-
-interface Props {
-  /** 'wide' hides the floating button on phones, for a header that has its own WhatsApp button there. */
-  fab?: 'always' | 'wide';
-}
-const { fab = 'always' } = Astro.props;
 ---
 
-<button type="button" class="fab" data-fab={fab} data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
+<button type="button" class="fab" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
   <Icon name="whatsapp" size={28} />
   <span class="fab__tip" aria-hidden="true">Chat with us</span>
   <span class="visually-hidden">Chat with us on WhatsApp or by phone</span>
@@ -93,11 +87,6 @@ const { fab = 'always' } = Astro.props;
     box-shadow: 0 8px 22px rgb(0 0 0 / 0.4);
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease;
-  }
-  @media (max-width: 63.99rem) {
-    .fab[data-fab='wide'] {
-      display: none;
-    }
   }
   @media (min-width: 48rem) {
     .fab {

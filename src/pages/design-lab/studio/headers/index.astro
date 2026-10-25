@@ -8,8 +8,8 @@ import { headerVariants } from '@/designs/studio/headers/variants';
 
 <DesignShell
   concept="lab"
-  title="WRP Design Lab: three headers"
-  description="Three candidate headers for the Studio redesign, each on the full homepage, in English and Arabic."
+  title="WRP Design Lab: headers"
+  description="Candidate headers for the Studio redesign, each on the full homepage, in English and Arabic."
   fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
   themeColor="#0c0d0f"
   colorScheme="dark"
@@ -20,8 +20,10 @@ import { headerVariants } from '@/designs/studio/headers/variants';
       <p class="lab__eyebrow">Design Lab · Studio</p>
       <h1>Pick a header</h1>
       <p class="lab__lede">
-        Three headers for the new site, each on the full Studio homepage. Try them on a phone and a laptop: open the
-        Services menu, scroll down and back up, and switch to Arabic. The bar at the bottom switches between them.
+        Round 2. A stays from the first round; D, E and F are new, built on your notes: the logo centred, square
+        corners, a secondary bar on top, and every service visible without a hover or a click. Each one is on the full
+        Studio homepage. Try them on a phone and a laptop, scroll down and back up, and switch to Arabic. The bar at
+        the bottom switches between them.
       </p>
       <p class="lab__lede">
         All three carry the same links as the live site’s navigation today (the six service pages, Portfolio,
@@ -108,7 +110,7 @@ import { headerVariants } from '@/designs/studio/headers/variants';
   }
   @media (min-width: 56rem) {
     .lab__list {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
   }
   .card {

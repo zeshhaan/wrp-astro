@@ -5,16 +5,18 @@
  * variant can replace the header without changing a single internal link:
  * the six service pages (car wash last), Blog, Portfolio, Reviews, About and
  * Contact, the home logo, the language switch and the tracked phone/maps links.
- * Labels come from the live translations and the service .mdx titles.
+ * Labels come from the live translations and the service .mdx titles; `short`
+ * is the live desktop bar's short name for each service (PPF, CERAMIC COATING…).
  */
 import { getCollection } from 'astro:content';
 import { localizeUrl, toLocalNum } from '@/i18n/utils';
-import { t, type Locale } from '@/i18n/translations';
+import { t, type Locale, type TranslationKey } from '@/i18n/translations';
 import { contact, proof, services as serviceData, type Service } from '../../data';
 
 export type NavService = {
   slug: string;
   name: string;
+  short: string;
   href: string;
   /** "From AED 999", or the "priced after inspection" line. */
   price: string;
@@ -22,23 +24,16 @@ export type NavService = {
   line: string;
   image: string;
   imageAlt: string;
-  pillar: Pillar;
 };
 
-export type Pillar = 'wrap' | 'reinforce' | 'protect';
-
-/**
- * Services under the W·R·P pillars as the live homepage's "WRP Philosophy"
- * describes them: PPF and ceramic reinforce, polish and washing protect,
- * film on the glass and the cabin wrap.
- */
-const pillarOf: Record<string, Pillar> = {
-  'paint-protection-film': 'reinforce',
-  'ceramic-coating': 'reinforce',
-  polish: 'protect',
-  'premium-car-wash': 'protect',
-  'window-film': 'wrap',
-  'leather-upholstery': 'wrap',
+/** The live navigation's short service names (translations `nav.service.*`). */
+const shortKey: Record<string, TranslationKey> = {
+  'paint-protection-film': 'nav.service.ppf',
+  'ceramic-coating': 'nav.service.ceramicCoating',
+  'window-film': 'nav.service.windowFilm',
+  polish: 'nav.service.polish',
+  'premium-car-wash': 'nav.service.carWash',
+  'leather-upholstery': 'nav.service.upholstery',
 };
 
 const words = {
@@ -57,8 +52,6 @@ const words = {
     opensAt: 'opens 9 AM',
     opensSat: 'opens Saturday 9 AM',
     reviews: 'Google reviews',
-    allServices: 'All services',
-    index: 'The WRP index',
     talk: 'Not sure which one?',
     talkLine: 'Send us a photo of your car and we will tell you what it needs.',
     skip: 'Skip to content',
@@ -79,8 +72,6 @@ const words = {
     opensAt: 'نفتح ٩ ص',
     opensSat: 'نفتح السبت ٩ ص',
     reviews: 'تقييمات Google',
-    allServices: 'كل الخدمات',
-    index: 'فهرس WRP',
     talk: 'لست متأكدًا؟',
     talkLine: 'أرسل لنا صورة سيارتك وسنخبرك بما تحتاجه.',
     skip: 'تخطَّ إلى المحتوى',
@@ -104,13 +95,13 @@ export async function getHeaderNav(locale: Locale) {
       return {
         slug,
         name: entry.data.title,
+        short: t(locale, shortKey[slug]),
         href: localizeUrl(`/services/${slug}/`, locale),
         price: data.from ? `${w.from} ${aed(data.from)}` : w.inspection,
         time: isArabic ? '' : data.time,
         line: isArabic ? entry.data.description : data.line,
         image: data.image,
         imageAlt: data.imageAlt,
-        pillar: pillarOf[slug],
       };
     })
     // Car wash last, as in the live navigation.
@@ -124,24 +115,14 @@ export async function getHeaderNav(locale: Locale) {
     { key: 'contact', label: t(locale, 'nav.contact'), href: localizeUrl('/contact-us/', locale) },
   ];
 
-  const pillars: { key: Pillar; letter: string; name: string; href: string; services: NavService[] }[] = (
-    ['wrap', 'reinforce', 'protect'] as const
-  ).map((key) => ({
-    key,
-    letter: key[0].toUpperCase(),
-    name: t(locale, `home.pillars.${key}.title`),
-    href: localizeUrl(`/${key}/`, locale),
-    services: services.filter((s) => s.pillar === key),
-  }));
-
   return {
     locale,
     dir: isArabic ? ('rtl' as const) : ('ltr' as const),
+    altLang: isArabic ? ('en' as const) : ('ar' as const),
     words: w,
     servicesLabel: t(locale, 'nav.services'),
     services,
     pages,
-    pillars,
     home: localizeUrl('/', locale),
     langLabel: isArabic ? t(locale, 'lang.switchToEnglish') : t(locale, 'lang.switchToArabic'),
     // Same tracked short links as the live trust bar.

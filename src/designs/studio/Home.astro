@@ -24,8 +24,9 @@ import Footer from './Footer.astro';
 import FloatingContact from './FloatingContact.astro';
 import { heroVideo } from './heroVideo';
 import HeaderShowroom from './headers/HeaderShowroom.astro';
-import HeaderPitLane from './headers/HeaderPitLane.astro';
-import HeaderPillars from './headers/HeaderPillars.astro';
+import HeaderArrivals from './headers/HeaderArrivals.astro';
+import HeaderStorefront from './headers/HeaderStorefront.astro';
+import HeaderFilmstrip from './headers/HeaderFilmstrip.astro';
 import { getHeaderNav } from './headers/nav';
 import type { HeaderVariantId } from './headers/variants';
 import type { Locale } from '@/i18n/translations';
@@ -41,7 +42,7 @@ interface Props {
 
 const { header, locale = 'en', altHref = '/' } = Astro.props;
 const nav = header ? await getHeaderNav(locale) : undefined;
-const Candidate = header ? { a: HeaderShowroom, b: HeaderPitLane, c: HeaderPillars }[header] : undefined;
+const Candidate = header ? { a: HeaderShowroom, d: HeaderArrivals, e: HeaderStorefront, f: HeaderFilmstrip }[header] : undefined;
 const quoteHref = '/design-lab/studio/quote/';
 ---
 
@@ -50,7 +51,7 @@ const quoteHref = '/design-lab/studio/quote/';
   title="WRP Detailing Dubai: PPF, ceramic coating, detailing and window tint"
   description="Paint protection film (Avery Dennison and STEK), ceramic coating, detailing, polish, window tint and upholstery in Al Qusais, Dubai. 5.0 on Google. Get a quick quote."
   fonts={['--font-oswald', '--font-inter', '--font-montserrat', ...(locale === 'ar' ? (['--font-ibm-plex-arabic'] as const) : [])]}
-  themeColor={header === 'c' ? '#f4f4f2' : '#0c0d0f'}
+  themeColor="#0c0d0f"
   colorScheme="dark"
   preloads={[
     { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
@@ -73,7 +74,7 @@ const quoteHref = '/design-lab/studio/quote/';
     <Contact />
   </main>
   <Footer />
-  <FloatingContact fab={header === 'b' ? 'wide' : 'always'} />
+  <FloatingContact />
 </DesignShell>
 
 <style is:global>

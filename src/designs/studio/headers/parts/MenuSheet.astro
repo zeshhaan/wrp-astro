@@ -1,0 +1,232 @@
+---
+/**
+ * Full-screen phone menu for the round-2 header candidates: square, logo
+ * centred, the pages as large rows and the contact actions underneath.
+ * Opened by any button with `commandfor` set to its id (Invoker Commands,
+ * with a manual fallback). The services stay out unless `services` is set,
+ * because D and E already show them on the page; that keeps the link set to
+ * at most two copies.
+ */
+import Icon from '../../Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import type { HeaderNav } from '../nav';
+
+interface Props {
+  id: string;
+  nav: HeaderNav;
+  altHref: string;
+  quoteHref: string;
+  services?: boolean;
+}
+
+const { id, nav, altHref, quoteHref, services = false } = Astro.props;
+const w = nav.words;
+---
+
+<dialog class="ms" id={id} dir={nav.dir} lang={nav.locale} aria-label={w.menu} data-menu-sheet>
+  <div class="ms__top">
+    <button class="ms__close" type="button" commandfor={id} command="close" data-ms-close>
+      <Icon name="close" size={22} />
+      <span class="visually-hidden">{w.close}</span>
+    </button>
+    <WrpLogo class="ms__logo" label="WRP by YACO Automotive" />
+    <span aria-hidden="true"></span>
+  </div>
+  <nav aria-label="Main (mobile)">
+    {
+      services && (
+        <ul role="list" class="ms__services">
+          {nav.services.map((s) => (
+            <li>
+              <a href={s.href}>
+                <span>{s.short}</span>
+                <small>{s.price}</small>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <ul role="list" class="ms__pages">
+      {
+        nav.pages.map((p, i) => (
+          <li>
+            <a href={p.href}>
+              <span class="ms__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              {p.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+  <div class="ms__actions">
+    <a class="st-btn st-btn--gold" href={quoteHref}>{w.quote}</a>
+    <button type="button" class="st-btn st-btn--ghost" data-contact-modal data-ms-close-first><Icon name="whatsapp" />{w.whatsapp}</button>
+    <p class="ms__meta">
+      <a href={nav.phone.href}><Icon name="phone" size={16} /><bdo dir="ltr">{nav.phone.display}</bdo></a>
+      <a href={altHref} hreflang={nav.altLang}>{nav.langLabel}</a>
+    </p>
+    <p class="ms__hours">{nav.hours} · {w.closed}</p>
+  </div>
+</dialog>
+
+<script>
+  // One handler for every sheet on the page (scripts run once per page).
+  const hasCommands = 'commandForElement' in HTMLButtonElement.prototype;
+  document.querySelectorAll<HTMLDialogElement>('[data-menu-sheet]').forEach((sheet) => {
+    const openers = document.querySelectorAll<HTMLButtonElement>(`[commandfor="${sheet.id}"][command="show-modal"]`);
+    if (!hasCommands) {
+      openers.forEach((b) => b.addEventListener('click', () => sheet.showModal()));
+      sheet.querySelector('[data-ms-close]')?.addEventListener('click', () => sheet.close());
+    }
+    const sync = () => openers.forEach((b) => b.setAttribute('aria-expanded', String(sheet.open)));
+    sync();
+    sheet.addEventListener('close', sync);
+    new MutationObserver(sync).observe(sheet, { attributes: true, attributeFilter: ['open'] });
+    // The contact modal must not open underneath the sheet.
+    sheet.querySelector('[data-ms-close-first]')?.addEventListener('click', () => sheet.close());
+  });
+</script>
+
+<style>
+  .ms {
+    inset: 0;
+    margin: 0;
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    padding: 0 var(--st-pad) 6rem;
+    border: 0;
+    background: var(--st-black);
+    color: var(--st-white);
+    overflow-y: auto;
+    --ms-font: var(--st-head-font);
+    --ms-track: 0.05em;
+    --ms-case: uppercase;
+  }
+  .ms:lang(ar) {
+    --ms-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --ms-track: 0;
+    --ms-case: none;
+    font-family: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+  }
+  .ms::backdrop {
+    background: var(--st-black);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ms[open] {
+      animation: ms-in 0.35s cubic-bezier(0.7, 0, 0.2, 1);
+    }
+    @keyframes ms-in {
+      from {
+        clip-path: inset(0 0 100% 0);
+      }
+    }
+  }
+  .ms__top {
+    display: grid;
+    grid-template-columns: 2.75rem 1fr 2.75rem;
+    align-items: center;
+    justify-items: center;
+    min-block-size: 4.5rem;
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .ms__logo {
+    block-size: 2.5rem;
+    inline-size: auto;
+  }
+  .ms__close {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--st-line-dark);
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .ms__services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--st-line-dark);
+    border-inline-start: 1px solid var(--st-line-dark);
+  }
+  .ms__services a {
+    display: grid;
+    gap: 0.15rem;
+    min-block-size: 4rem;
+    padding: 0.75rem;
+    border-block-end: 1px solid var(--st-line-dark);
+    border-inline-end: 1px solid var(--st-line-dark);
+    color: inherit;
+    font-family: var(--ms-font);
+    letter-spacing: var(--ms-track);
+    text-transform: var(--ms-case);
+    text-decoration: none;
+  }
+  .ms__services small {
+    color: var(--st-gold);
+    font-family: var(--st-body-font);
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .ms__pages {
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ms__pages a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-block-end: 1px solid var(--st-line-dark);
+    color: inherit;
+    font-family: var(--ms-font);
+    font-size: 1.75rem;
+    line-height: 1.1;
+    letter-spacing: var(--ms-track);
+    text-transform: var(--ms-case);
+    text-decoration: none;
+  }
+  .ms__pages a:hover {
+    color: var(--st-gold);
+  }
+  .ms__num {
+    color: var(--st-gold);
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+  }
+  .ms__actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-start: 1.75rem;
+  }
+  .ms__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .ms__meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    color: var(--st-white);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .ms__meta :global(svg) {
+    color: var(--st-gold);
+  }
+  .ms__hours {
+    color: var(--st-mute);
+    font-size: 0.875rem;
+  }
+</style>

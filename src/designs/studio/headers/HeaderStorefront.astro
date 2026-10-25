@@ -1,0 +1,370 @@
+---
+/**
+ * Header variant E, "Storefront": the bar reads like the sign over a studio
+ * door. The logo sits in the middle with the six services on either side of
+ * it, three and three, each with its starting price underneath, so every
+ * offering is visible without opening anything. Point at a service and a
+ * photo card of it drops down. The pages (Portfolio, Reviews, About, Blog,
+ * Contact) move up into the thin bar above, and the quote button hangs below
+ * the bar's corner like a tag. On phones the services become a 3×2 grid of
+ * buttons under the logo.
+ *
+ * Every destination is a plain <a href> in the server HTML. The services
+ * appear twice (the bar on wide screens, the grid on phones); only one of the
+ * two is shown at a time.
+ */
+import Icon from '../Icon.astro';
+import Picture from '../../shared/Picture.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import Strip from './parts/Strip.astro';
+import MenuSheet from './parts/MenuSheet.astro';
+import type { HeaderNav } from './nav';
+
+interface Props {
+  nav: HeaderNav;
+  altHref: string;
+  quoteHref: string;
+}
+
+const { nav, altHref, quoteHref } = Astro.props;
+const w = nav.words;
+const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
+---
+
+<a class="skip" href="#main">{w.skip}</a>
+
+<div class="sf" dir={nav.dir} lang={nav.locale}>
+  <Strip nav={nav} altHref={altHref} end="pages" />
+
+  <header class="sf-bar">
+    <div class="st-wrap sf-bar__inner">
+      <button class="sf-sq sf-narrow" type="button" commandfor="sf-menu" command="show-modal" aria-controls="sf-menu">
+        <Icon name="menu" size={22} />
+        <span class="visually-hidden">{w.menu}</span>
+      </button>
+
+      {
+        sides.map((side, i) => (
+          <nav class:list={['sf-side', i === 0 ? 'sf-side--start' : 'sf-side--end']} aria-label={nav.servicesLabel}>
+            <ul role="list">
+              {side.map((s) => (
+                <li class="sf-item">
+                  <a href={s.href}>
+                    <span class="sf-item__name">{s.short}</span>
+                    <span class="sf-item__price">{s.price}</span>
+                  </a>
+                  <div class="sf-card" aria-hidden="true">
+                    <Picture base={s.image} alt="" sizes="18rem" widths={[480]} class="sf-card__img" />
+                    <p class="sf-card__name">{s.name}</p>
+                    <p class="sf-card__line">{s.line}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+
+      <a class="sf-logo" href={nav.home} aria-label={w.home}>
+        <WrpLogo class="sf-logo__mark" />
+      </a>
+
+      <button class="sf-sq sf-narrow" type="button" data-contact-modal>
+        <Icon name="whatsapp" size={22} />
+        <span class="visually-hidden">{w.whatsapp}</span>
+      </button>
+    </div>
+    <a class="sf-tag" href={quoteHref}>
+      {w.quote}
+      <Icon name="arrow-right" size={16} class="sf-arrow" />
+    </a>
+  </header>
+
+  <nav class="sf-grid" aria-label={`${nav.servicesLabel} (mobile)`}>
+    <ul role="list">
+      {
+        nav.services.map((s) => (
+          <li>
+            <a href={s.href}>{s.short}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</div>
+
+<MenuSheet id="sf-menu" nav={nav} altHref={altHref} quoteHref={quoteHref} />
+
+<style>
+  .skip {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--st-gold);
+    color: var(--st-black);
+    font-weight: 600;
+  }
+  .skip:focus {
+    inset-block-start: 0.5rem;
+  }
+
+  /* No box of its own, so the bar sticks against the page, not this wrapper. */
+  .sf {
+    display: contents;
+    --sf-font: var(--st-head-font);
+    --sf-track: 0.07em;
+    --sf-case: uppercase;
+  }
+  .sf:lang(ar) {
+    --sf-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --sf-track: 0;
+    --sf-case: none;
+  }
+  :global([dir='rtl'] .sf-arrow) {
+    transform: scaleX(-1);
+  }
+
+  .sf-bar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--st-coal) 96%, transparent);
+    backdrop-filter: blur(10px);
+    border-block-end: 1px solid var(--st-line-dark);
+    color: var(--st-white);
+  }
+  .sf-bar__inner {
+    display: grid;
+    grid-template-columns: 2.75rem 1fr 2.75rem;
+    align-items: center;
+    justify-items: center;
+    min-block-size: 4.5rem;
+  }
+  .sf-logo {
+    display: grid;
+    align-content: center;
+    min-block-size: 2.75rem;
+    color: var(--st-white);
+  }
+  .sf-logo__mark {
+    display: block;
+    block-size: 2.6rem;
+    inline-size: auto;
+  }
+  .sf-sq {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--st-line-dark);
+    background: none;
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .sf-side,
+  .sf-tag {
+    display: none;
+  }
+
+  /* Phones: the services as a 3×2 grid of buttons under the bar. */
+  .sf-grid {
+    background: var(--st-black);
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .sf-grid ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sf-grid li {
+    border-inline-end: 1px solid var(--st-line-dark);
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .sf-grid li:nth-child(3n) {
+    border-inline-end: 0;
+  }
+  .sf-grid li:nth-last-child(-n + 3) {
+    border-block-end: 0;
+  }
+  .sf-grid a {
+    display: grid;
+    place-items: center;
+    min-block-size: 2.75rem;
+    padding: 0.25rem;
+    color: var(--st-on-dark);
+    font-family: var(--sf-font);
+    font-size: 0.75rem;
+    letter-spacing: var(--sf-track);
+    line-height: 1.15;
+    text-align: center;
+    text-transform: var(--sf-case);
+    text-decoration: none;
+  }
+  .sf-grid a:active {
+    background: var(--st-card-dark);
+  }
+
+  @media (min-width: 72rem) {
+    .sf-narrow,
+    .sf-grid {
+      display: none;
+    }
+    .sf-bar__inner {
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-areas: 'start logo end';
+      column-gap: 2rem;
+      min-block-size: 5.5rem;
+    }
+    .sf-side {
+      display: block;
+      justify-self: stretch;
+    }
+    .sf-side--start {
+      grid-area: start;
+    }
+    .sf-side--end {
+      grid-area: end;
+    }
+    .sf-logo {
+      grid-area: logo;
+    }
+    .sf-logo__mark {
+      block-size: 3.4rem;
+    }
+    .sf-side ul {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .sf-item {
+      position: relative;
+      border-inline-start: 1px solid var(--st-line-dark);
+    }
+    .sf-side--end .sf-item:last-child {
+      border-inline-end: 1px solid var(--st-line-dark);
+    }
+    .sf-item > a {
+      display: grid;
+      justify-items: center;
+      gap: 0.15rem;
+      padding: 0.5rem 0.5rem;
+      color: var(--st-white);
+      text-align: center;
+      text-decoration: none;
+    }
+    .sf-item__name {
+      position: relative;
+      font-family: var(--sf-font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: var(--sf-track);
+      text-transform: var(--sf-case);
+      white-space: nowrap;
+    }
+    .sf-item__name::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: -0.25rem;
+      block-size: 1px;
+      background: var(--st-gold);
+      transform: scaleX(0);
+      transition: transform 0.25s ease;
+    }
+    .sf-item__price {
+      color: var(--st-mute);
+      font-size: 0.6875rem;
+      white-space: nowrap;
+    }
+    .sf-item:hover .sf-item__name,
+    .sf-item:focus-within .sf-item__name {
+      color: var(--st-gold);
+    }
+    .sf-item:hover .sf-item__name::after,
+    .sf-item:focus-within .sf-item__name::after {
+      transform: scaleX(1);
+    }
+
+    /* Photo card: hidden (and its image unloaded) until the pointer arrives. */
+    .sf-card {
+      position: absolute;
+      inset-block-start: calc(100% + 1.6rem);
+      inset-inline-start: 50%;
+      z-index: 2;
+      display: none;
+      inline-size: 18rem;
+      padding: 0 0 1rem;
+      background: var(--st-coal);
+      border: 1px solid var(--st-line-dark);
+      box-shadow: 0 24px 48px rgb(0 0 0 / 0.5);
+      translate: -50% 0;
+      pointer-events: none;
+    }
+    .sf-item:hover .sf-card {
+      display: block;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .sf-card {
+        transition:
+          opacity 0.2s ease,
+          translate 0.2s ease,
+          display 0.2s allow-discrete;
+      }
+      @starting-style {
+        .sf-item:hover .sf-card {
+          opacity: 0;
+          translate: -50% -0.4rem;
+        }
+      }
+    }
+    .sf-card :global(.sf-card__img img) {
+      inline-size: 100%;
+      block-size: 10rem;
+      object-fit: cover;
+    }
+    .sf-card__name {
+      margin: 0.85rem 1rem 0.25rem;
+      font-family: var(--sf-font);
+      font-size: 1.125rem;
+      letter-spacing: var(--sf-track);
+      text-transform: var(--sf-case);
+    }
+    .sf-card__line {
+      margin-inline: 1rem;
+      color: var(--st-on-dark);
+      font-size: 0.8125rem;
+      line-height: 1.5;
+    }
+
+    /* The quote button hangs from the bar's corner like a tag. */
+    .sf-tag {
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-end: var(--st-gutter-x);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-block-size: 2.75rem;
+      padding-inline: 1.25rem 1rem;
+      background: var(--st-gold);
+      color: var(--st-black);
+      font-family: var(--sf-font);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      letter-spacing: var(--sf-track);
+      text-transform: var(--sf-case);
+      text-decoration: none;
+      box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
+    }
+    .sf-tag:hover {
+      background: #dcbb78;
+    }
+  }
+</style>
