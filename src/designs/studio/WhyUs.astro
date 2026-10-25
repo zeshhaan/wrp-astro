@@ -1,88 +1,368 @@
 ---
+import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
-import { whyPoints } from './content';
+import { proof, whyPhotos, whyPoints } from './content';
 ---
 
 <section class="why st-section st-light" id="why" aria-labelledby="why-title">
-  <div class="st-wrap">
-    <header class="st-head st-head--center">
-      <p class="st-eyebrow st-eyebrow--dark">In our customers’ words</p>
-      <h2 id="why-title" class="st-h2">Why choose WRP</h2>
-      <p class="st-intro">The four things our customers mention most in their Google reviews.</p>
-    </header>
-    <ul class="points" role="list">
+  <div class="st-wrap why__grid">
+    <div class="why__aside">
+      <header class="st-head why__head">
+        <p class="st-eyebrow st-eyebrow--dark">In our customers’ words</p>
+        <h2 id="why-title" class="st-h2">Why choose WRP</h2>
+        <p class="st-intro">The four things our customers mention most.</p>
+      </header>
+      <a class="rating" href={proof.reviewsUrl}>
+        <span class="rating__score">{proof.rating}</span>
+        <span class="rating__meta">
+          <span class="rating__stars" role="img" aria-label="5 out of 5 stars">
+            {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+          </span>
+          <span class="rating__count">{proof.reviewCountDisplay} Google reviews</span>
+        </span>
+        <Icon name="arrow-right" size={20} class="rating__arrow" />
+      </a>
+      <div class="why__photos" data-fader>
+        <ul class="why__slides" role="list">
+          {
+            whyPhotos.map((ph, i) => (
+              <li class="why__slide" data-slide aria-hidden={i === 0 ? undefined : 'true'}>
+                <figure>
+                  <Picture
+                    base={ph.base}
+                    widths={[480, 800]}
+                    alt={ph.alt}
+                    sizes="(min-width: 60rem) 34vw, 100vw"
+                  />
+                  <figcaption>{ph.caption} Photo from the customer’s Google review.</figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+        <button class="why__toggle" type="button" data-toggle hidden>
+          <span data-pause-icon><Icon name="pause" size={16} /></span>
+          <span data-play-icon hidden><Icon name="play" size={16} /></span>
+          <span class="visually-hidden" data-toggle-label>Pause photos</span>
+        </button>
+      </div>
+    </div>
+
+    <ol class="points" role="list">
       {
-        whyPoints.map((p) => (
+        whyPoints.map((p, i) => (
           <li class="point">
-            <span class="point__icon">
-              <Icon name={p.icon} size={28} />
-            </span>
-            <h3 class="point__title">{p.title}</h3>
+            <div class="point__label">
+              <span class="point__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="point__title">{p.title}</h3>
+            </div>
+            <figure class="point__quote">
+              <blockquote>
+                <p>{p.quote}</p>
+              </blockquote>
+              <figcaption>
+                <span class="point__author">{p.author}</span>, Google review
+              </figcaption>
+            </figure>
             <p class="point__body">{p.body}</p>
-            <blockquote class="point__quote">
-              <p>“{p.quote}”</p>
-              <footer>{p.author}, Google review</footer>
-            </blockquote>
           </li>
         ))
       }
-    </ul>
+    </ol>
   </div>
 </section>
 
+<script>
+  // Crossfade the customer photos every few seconds. Off for reduced motion;
+  // pauses off-screen, on hover/focus, and with the pause button.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fader]')) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
+    if (slides.length < 2 || !toggle || matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    const label = toggle.querySelector('[data-toggle-label]')!;
+    const pauseIcon = toggle.querySelector<HTMLElement>('[data-pause-icon]')!;
+    const playIcon = toggle.querySelector<HTMLElement>('[data-play-icon]')!;
+    let current = 0;
+    let timer = 0;
+    let paused = false;
+    let visible = false;
+    let hovered = false;
+    root.classList.add('is-fading');
+    slides[0].classList.add('is-active');
+    const show = (n: number) => {
+      slides[current].classList.remove('is-active');
+      slides[current].setAttribute('aria-hidden', 'true');
+      current = n % slides.length;
+      slides[current].classList.add('is-active');
+      slides[current].removeAttribute('aria-hidden');
+    };
+    const sync = () => {
+      clearInterval(timer);
+      if (!paused && visible && !hovered) timer = window.setInterval(() => show(current + 1), 4500);
+    };
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      label.textContent = paused ? 'Play photos' : 'Pause photos';
+      pauseIcon.hidden = paused;
+      playIcon.hidden = !paused;
+      sync();
+    });
+    root.addEventListener('pointerenter', () => { hovered = true; sync(); });
+    root.addEventListener('pointerleave', () => { hovered = false; sync(); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }).observe(root);
+  }
+</script>
+
 <style>
-  .points {
+  .why__grid {
     display: grid;
-    gap: 1.25rem;
+    gap: 2.5rem 5rem;
+  }
+  .why__aside {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .why__head {
+    margin-block-end: 0;
+  }
+
+  /* Google rating badge */
+  .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    justify-self: start;
+    padding: 0.7rem 1rem 0.7rem 0.9rem;
+    background: var(--st-black);
+    color: var(--st-white);
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .rating__score {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+  .rating__meta {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .rating__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-gold);
+  }
+  .rating__stars :global(svg) {
+    fill: currentColor;
+  }
+  .rating__count {
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--st-on-dark);
+  }
+  .rating :global(.rating__arrow) {
+    margin-inline-start: 0.25rem;
+    color: var(--st-gold);
+  }
+  .rating:hover {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .rating:hover :is(.rating__stars, .rating__count, :global(.rating__arrow)) {
+    color: var(--st-black);
+  }
+
+  .why__photos {
+    display: none;
+    position: relative;
+  }
+  .why__slides {
+    display: grid;
     margin: 0;
     padding: 0;
     list-style: none;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  }
+  .why__slide {
+    grid-area: 1 / 1;
+  }
+  /* Before the script runs (or without it), only the first photo shows. */
+  .why__slide:not(:first-child) {
+    visibility: hidden;
+  }
+  .is-fading .why__slide {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity 1.2s ease, visibility 0s 1.2s;
+  }
+  .is-fading .why__slide.is-active {
+    opacity: 1;
+    transition: opacity 1.2s ease, visibility 0s;
+  }
+  .why__slide figure {
+    margin: 0;
+  }
+  .why__slide :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .why__slide figcaption {
+    margin-block-start: 0.6rem;
+    padding-inline-end: 3rem;
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .why__toggle {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    background: rgb(12 13 15 / 0.75);
+    color: var(--st-white);
+    border: 0;
+    cursor: pointer;
+  }
+  .why__toggle:hover {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .why__toggle[hidden], .why__toggle [hidden] {
+    display: none;
+  }
+
+  /* The four points: label row, the customer's words large, then our promise */
+  .points {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 3px solid var(--st-ink);
   }
   .point {
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    justify-items: center;
-    gap: 0.75rem;
-    padding: 2rem 1.5rem 1.5rem;
-    text-align: center;
-    background: var(--st-white);
-    border: 1px solid var(--st-line-light);
+    gap: 1rem;
+    padding-block: 1.75rem 2rem;
+    border-block-end: 1px solid var(--st-line-light);
   }
-  .point__icon {
-    display: inline-grid;
-    place-items: center;
-    inline-size: 3.75rem;
-    block-size: 3.75rem;
-    border: 1.5px solid var(--st-gold);
-    color: var(--st-ink);
+  .point__label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+  .point__num {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: 0.08em;
+    color: var(--st-gold-deep);
   }
   .point__title {
+    flex: 1;
     font-family: var(--st-head-font);
     font-weight: 600;
-    font-size: 1.35rem;
+    font-size: 1.05rem;
     text-transform: uppercase;
-    line-height: 1.15;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+  }
+  .point__quote {
+    margin: 0;
+  }
+  .point__quote blockquote {
+    position: relative;
+    margin: 0;
+    padding-inline-start: 1.6rem;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--st-ink);
+    text-wrap: balance;
+  }
+  .point__quote blockquote::before {
+    content: '“';
+    position: absolute;
+    inset-inline-start: -0.1rem;
+    inset-block-start: -0.35rem;
+    font-size: 3rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--st-gold);
+  }
+  .point__quote blockquote p::after {
+    content: '”';
+  }
+  .point__quote figcaption {
+    margin-block-start: 0.6rem;
+    padding-inline-start: 1.6rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+  }
+  .point__author {
+    font-weight: 700;
+    color: var(--st-ink);
   }
   .point__body {
+    padding-inline-start: 1.6rem;
+    max-inline-size: 36rem;
     color: var(--st-ink-2);
     font-size: 0.9375rem;
   }
-  .point__quote {
-    margin: 0.25rem 0 0;
-    padding-block-start: 0.9rem;
-    border-block-start: 1px solid var(--st-line-light);
-    font-size: 0.875rem;
-    color: var(--st-ink);
-    inline-size: 100%;
+
+  @media (min-width: 40rem) {
+    .why__photos {
+      display: block;
+    }
   }
-  .point__quote p {
-    font-style: italic;
+  @media (min-width: 60rem) {
+    .why__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .why__aside {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 2rem);
+    }
+    .point {
+      grid-template-columns: 13rem 1fr;
+      column-gap: 2rem;
+      padding-block: 2.25rem 2.5rem;
+    }
+    .point__label {
+      grid-row: span 2;
+      flex-direction: column;
+      align-items: start;
+      gap: 0.6rem;
+    }
+    .point__title {
+      flex: none;
+    }
+    .point__num {
+      font-size: 2.75rem;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .point__quote blockquote,
+    .point__quote figcaption,
+    .point__body {
+      padding-inline-start: 0;
+    }
+    .point__quote blockquote::before {
+      inset-inline-start: -1.75rem;
+    }
   }
-  .point__quote footer {
-    margin-block-start: 0.35rem;
-    color: var(--st-gold-deep);
-    font-weight: 600;
-    font-size: 0.8125rem;
+  @media (prefers-reduced-motion: reduce) {
+    .rating {
+      transition: none;
+    }
   }
 </style>

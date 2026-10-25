@@ -150,34 +150,54 @@ export const reviews: Review[] = [
 /** Why choose WRP: each point is backed by what customers wrote. */
 export const whyPoints = [
   {
-    icon: 'camera',
     title: 'Photo & video updates',
     body: 'We send pictures and videos while we work, so you can see the progress without driving over.',
     quote: 'Kept me updated throughout the process with pictures and videos.',
     author: 'Leno Thomas',
   },
   {
-    icon: 'clock',
     title: 'Ready when we say',
     body: 'We give you a handover time before we start, and we keep to it.',
     quote: 'Car was delivered exactly on the promised time.',
     author: 'Leno Thomas',
   },
   {
-    icon: 'shield',
     title: 'Proper films, real warranties',
     body: 'Avery Dennison and STEK paint protection film with up to 10 years of warranty. Ceramic coatings carry 2 to 7 years.',
     quote: 'I choose avery dennison ppf for my car.',
     author: 'Salim Sali',
   },
   {
-    icon: 'tag',
     title: 'Fair prices, no pressure',
     body: 'Starting prices are on this page. We explain the options and you choose; we don’t push extras.',
     quote: 'Didn’t try to push any unnecessary extras.',
     author: 'Ameena Shajahan',
   },
 ] as const;
+
+/** Customer photos for the why-us crossfade, each from the customer's own Google review. */
+export const whyPhotos = [
+  {
+    base: '/review-images/leno_thomas_2',
+    alt: 'Grey Toyota FJ Cruiser with a fresh ceramic coating, front view in the WRP studio',
+    caption: 'Leno Thomas’s FJ Cruiser after its ceramic coating.',
+  },
+  {
+    base: '/review-images/nasar_ck_1',
+    alt: 'Black Cadillac Escalade under the studio lights at WRP',
+    caption: 'Nasar CK’s Cadillac Escalade.',
+  },
+  {
+    base: '/review-images/sujith_prasad_1',
+    alt: 'Blue Subaru WRX STI in front of the WRP logo wall',
+    caption: 'Sujith Prasad’s Subaru WRX STI.',
+  },
+  {
+    base: '/review-images/ritha_farzana_1',
+    alt: 'Red Nissan SUV in the WRP studio',
+    caption: 'Ritha Farzana’s Nissan.',
+  },
+];
 
 /** Only figures we can stand behind. */
 export const stats = [
