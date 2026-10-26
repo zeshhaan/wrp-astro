@@ -3,22 +3,19 @@
  * Studio version of the contact page (/contact-us/), English or Arabic: the
  * live page's two halves (how to reach us, and the estimate form) with its
  * copy and ContactPage JSON-LD from content/contact.ts. The form is the live
- * one, field for field, and posts to the same /api/contact endpoint.
- *
- * In the Design Lab it checks the fields and stops: nothing reaches the lead
- * inbox from a preview.
+ * one, field for field, and posts to the same /api/contact endpoint
+ * (sections/ContactForm.astro).
  */
 import StudioPage from './StudioPage.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
 import Picture from '../../shared/Picture.astro';
 import Icon from '../Icon.astro';
-import ServiceOptions from '@/components/ServiceOptions.astro';
+import ContactForm, { type Field } from './sections/ContactForm.astro';
 import { localizeUrl } from '@/i18n/utils';
 import type { Locale } from '@/i18n/translations';
 import { labPrefix, toLab } from './routes';
 import { say, trail } from './say';
 
-type Field = 'name' | 'email' | 'phone' | 'vehicle' | 'service' | 'message';
 export type ContactCopy = {
   title: string;
   description: string;
@@ -54,8 +51,11 @@ const { copy, locale = 'en' } = Astro.props;
 const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
 const link = (href: string) => (isLab ? toLab(href) : href);
 const s = (text: string) => say(locale, text);
-const label = (field: Field) => `${s(copy.labels[field])}${copy.required.includes(field) ? ' *' : ''}`;
-const placeholder = (field: Exclude<Field, 'service'>) => (copy.placeholders[field] ? s(copy.placeholders[field]!) : undefined);
+const fields = Object.keys(copy.labels) as Field[];
+const labels = Object.fromEntries(fields.map((f) => [f, s(copy.labels[f])])) as Record<Field, string>;
+const placeholders = Object.fromEntries(
+  Object.entries(copy.placeholders).map(([f, text]) => [f, text ? s(text) : undefined]),
+) as Partial<Record<Field, string>>;
 const Heading = copy.headingTag;
 ---
 
@@ -88,100 +88,24 @@ const Heading = copy.headingTag;
         </dl>
       </div>
 
-      <form
-        class="cf"
-        data-contact-form
-        data-lab={isLab ? '' : undefined}
-        data-default-error={s(copy.defaultError)}
-        data-fallback-error={copy.fallbackError}
-        data-network-error={s('@t:home.contact.networkError')}
-        data-fallback-network-error={copy.fallbackNetworkError}
-        action="/api/contact"
-        method="post"
-      >
-        <input type="hidden" name="locale" value={locale} />
-        <div class="cf__field">
-          <label for="name">{label('name')}</label>
-          <input id="name" type="text" name="name" autocomplete="name" required placeholder={placeholder('name')} />
-        </div>
-        <div class="cf__field">
-          <label for="email">{label('email')}</label>
-          <input id="email" type="email" name="email" autocomplete="email" required placeholder={placeholder('email')} />
-        </div>
-        <div class="cf__field">
-          <label for="phone">{label('phone')}</label>
-          <input id="phone" type="tel" name="phone" autocomplete="tel" placeholder={placeholder('phone')} />
-        </div>
-        <div class="cf__field">
-          <label for="vehicle">{label('vehicle')}</label>
-          <input id="vehicle" type="text" name="vehicle" placeholder={placeholder('vehicle')} />
-        </div>
-        <div class="cf__field">
-          <label for="service">{label('service')}</label>
-          <select id="service" name="service">
-            <ServiceOptions locale={locale} />
-          </select>
-        </div>
-        <div class="cf__field">
-          <label for="message">{label('message')}</label>
-          <textarea id="message" name="message" rows="4" required placeholder={placeholder('message')}></textarea>
-        </div>
-        <button type="submit" class="st-btn st-btn--gold cf__send">
-          <span class="cf__idle">{copy.submit} <Icon name="arrow-right" size={18} class="flip" /></span>
-          <span class="cf__busy">{s(copy.sending)}</span>
-        </button>
-        <div class="cf__done" data-contact-done hidden>
-          <p class="cf__done-title">{copy.thanks}</p>
-          <p>{copy.thanksText}</p>
-        </div>
-        <p class="cf__error" data-contact-error role="alert" hidden></p>
-      </form>
+      <ContactForm
+        locale={locale}
+        labels={labels}
+        placeholders={placeholders}
+        required={copy.required}
+        submit={copy.submit}
+        sending={s(copy.sending)}
+        thanks={copy.thanks}
+        thanksText={copy.thanksText}
+        defaultError={s(copy.defaultError)}
+        fallbackError={copy.fallbackError}
+        networkError={s('@t:home.contact.networkError')}
+        fallbackNetworkError={copy.fallbackNetworkError}
+        marks
+      />
     </div>
   </section>
 </StudioPage>
-
-<script>
-  // The live form's behaviour without Alpine: send to /api/contact, then show
-  // thanks or the error. In the Design Lab it stops after the browser's own
-  // field checks, so a preview never reaches the lead inbox.
-  for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
-    const done = form.querySelector<HTMLElement>('[data-contact-done]')!;
-    const error = form.querySelector<HTMLElement>('[data-contact-error]')!;
-    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      error.hidden = true;
-      if (form.hasAttribute('data-lab')) {
-        done.hidden = false;
-        return;
-      }
-      button.disabled = true;
-      form.toggleAttribute('data-sending', true);
-      const defaultError = form.dataset.defaultError || form.dataset.fallbackError || '';
-      try {
-        const data = new FormData(form);
-        const attribution = (window as unknown as { WRPAttribution?: { serialize?: () => string } }).WRPAttribution?.serialize?.();
-        if (attribution) data.set('attribution', attribution);
-        const response = await fetch('/api/contact', { method: 'POST', body: data });
-        const result = (await response.json()) as { success?: boolean; error?: string };
-        if (response.ok && result.success) {
-          done.hidden = false;
-          form.reset();
-          document.dispatchEvent(new Event('wrp:lead'));
-        } else {
-          error.textContent = result.error || defaultError;
-          error.hidden = false;
-        }
-      } catch {
-        error.textContent = form.dataset.networkError || form.dataset.fallbackNetworkError || '';
-        error.hidden = false;
-      } finally {
-        button.disabled = false;
-        form.toggleAttribute('data-sending', false);
-      }
-    });
-  }
-</script>
 
 <style>
   .ct {
@@ -282,81 +206,4 @@ const Heading = copy.headingTag;
     white-space: nowrap;
   }
 
-  /* The form: a white card, like the hero lead form. */
-  .cf {
-    display: grid;
-    gap: 1.1rem;
-    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
-    background: var(--st-white);
-    color: var(--st-ink);
-    color-scheme: light;
-    border-block-start: 4px solid var(--st-gold);
-  }
-  .cf__field {
-    display: grid;
-    gap: 0.35rem;
-  }
-  .cf__field label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-  }
-  .cf__field :is(input, select, textarea) {
-    inline-size: 100%;
-    min-block-size: 3rem;
-    padding: 0.65rem 0.85rem;
-    border: 1.5px solid var(--st-line-light);
-    border-radius: 0;
-    background: var(--st-paper);
-    color: var(--st-ink);
-    font: inherit;
-    font-size: 1rem;
-  }
-  .cf__field textarea {
-    resize: vertical;
-  }
-  .cf__field :is(input, select, textarea):focus-visible {
-    outline: 3px solid var(--st-gold);
-    outline-offset: 0;
-    border-color: var(--st-ink);
-  }
-  .cf__field :is(input, textarea):user-invalid {
-    border-color: #b42318;
-  }
-  .cf__send {
-    justify-self: stretch;
-    margin-block-start: 0.5rem;
-  }
-  .cf__send:disabled {
-    opacity: 0.6;
-    cursor: progress;
-  }
-  .cf__idle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-  }
-  .cf__busy,
-  .cf[data-sending] .cf__idle {
-    display: none;
-  }
-  .cf[data-sending] .cf__busy {
-    display: inline;
-  }
-  .cf__done {
-    padding: 1rem;
-    background: #e8f5ec;
-    color: #14532d;
-  }
-  .cf__done-title {
-    font-weight: 700;
-  }
-  .cf__done p + p {
-    margin-block-start: 0.25rem;
-    font-size: 0.875rem;
-  }
-  .cf__error {
-    padding: 1rem;
-    background: #fdecea;
-    color: #8a1c13;
-  }
 </style>

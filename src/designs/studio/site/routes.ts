@@ -16,7 +16,7 @@ export const studioQuoteHref = `${labPrefix}/quote/`;
 /** Live paths that have a Studio version under labPrefix (the Arabic /ar/ twin included unless noted). */
 const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/, /^\/(wrap|reinforce|protect)\/$/, /^\/more-about-wrp\/$/, /^\/contact-us\/$/, /^\/reviews\/$/, /^\/portfolio\/$/, /^\/blog\/([a-z0-9-]+\/)?$/, /^\/(privacy|terms|credits)\/$/];
 /** Arabic pages whose Studio version is not built yet. */
-const englishOnly: RegExp[] = [/^\/ar\/$/, /^\/ar\/credits\/$/];
+const englishOnly: RegExp[] = [/^\/ar\/credits\/$/];
 
 /** The Studio preview of a live path, or the path itself if it has none yet. */
 export function toLab(href: string): string {

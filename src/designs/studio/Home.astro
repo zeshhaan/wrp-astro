@@ -41,9 +41,8 @@ interface Props {
   altHref?: string;
 }
 
-// The Studio homepage has no Arabic body yet, so its language switch goes to
-// the Arabic header on the same page.
-const { header = 'g', locale = 'en', altHref = '/design-lab/studio/headers/g/ar/' } = Astro.props;
+// The language switch goes to the Arabic Studio homepage (site/ArHomePage.astro).
+const { header = 'g', locale = 'en', altHref = '/design-lab/studio/ar/' } = Astro.props;
 // Service links stay inside the Design Lab, on the Studio service pages.
 const liveNav = await getHeaderNav(locale);
 const nav = { ...liveNav, services: liveNav.services.map((s) => ({ ...s, href: toLab(s.href) })) };

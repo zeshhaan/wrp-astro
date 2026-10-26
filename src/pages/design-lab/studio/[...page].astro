@@ -16,6 +16,7 @@ import ReviewsPage from '@/designs/studio/site/ReviewsPage.astro';
 import PortfolioPage from '@/designs/studio/site/PortfolioPage.astro';
 import BlogIndexPage from '@/designs/studio/site/BlogIndexPage.astro';
 import BlogPostPage from '@/designs/studio/site/BlogPostPage.astro';
+import ArHomePage from '@/designs/studio/site/ArHomePage.astro';
 import LegalPage, { type LegalSlug } from '@/designs/studio/site/LegalPage.astro';
 import { pillars } from '@/designs/studio/site/content/pillars';
 import { about } from '@/designs/studio/site/content/about';
@@ -59,7 +60,9 @@ export const getStaticPaths = (async () => {
       props: { kind: 'legal' as const, locale, slug: slug as string },
     })),
   ]);
-  return [...pages, ...blogPaths];
+  // The Arabic homepage. The English Studio homepage is the concept page at /design-lab/studio/.
+  const home = { params: { page: 'ar' }, props: { kind: 'home' as const, locale: 'ar' as const, slug: '' } };
+  return [home, ...pages, ...blogPaths];
 }) satisfies GetStaticPaths;
 
 const { kind, locale, slug } = Astro.props;
@@ -86,6 +89,7 @@ async function relatedServicesOf(entry: CollectionEntry<'blog'>, arabic: boolean
 const related = post ? await relatedServicesOf(post, locale === 'ar') : [];
 ---
 
+{kind === 'home' && <ArHomePage />}
 {kind === 'pillar' && <PillarPage slug={slug as 'wrap'} copy={pillars[`${locale}/${slug}`]} locale={locale} />}
 {kind === 'about' && <AboutPage copy={about[locale]} locale={locale} />}
 {kind === 'contact' && <ContactPage copy={contact[locale]} locale={locale} />}

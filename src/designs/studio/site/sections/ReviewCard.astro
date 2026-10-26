@@ -56,21 +56,21 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     <span class="rv__stars" role="img" aria-label={`${r.stars} out of 5 stars`}>
       {Array.from({ length: r.stars }, () => <Icon name="star" size={15} />)}
     </span>
-    <span class="rv__date">{r.date}</span>
+    <span class="rv__date" dir="auto">{r.date}</span>
   </div>
   {
     r.text &&
       (long ? (
         <div class="rv__text" data-rv-more>
-          <p data-short set:html={`"${mark(short)}"`} />
-          <p data-full hidden set:html={`"${mark(r.text)}"`} />
+          <p dir="auto" data-short set:html={`"${mark(short)}"`} />
+          <p dir="auto" data-full hidden set:html={`"${mark(r.text)}"`} />
           <button type="button" class="rv__more" aria-expanded="false" data-less={t(locale, 'reviews.showLess')}>
             {t(locale, 'reviews.readMore')}
           </button>
         </div>
       ) : (
         <div class="rv__text">
-          <p set:html={`"${mark(r.text)}"`} />
+          <p dir="auto" set:html={`"${mark(r.text)}"`} />
         </div>
       ))
   }
@@ -81,7 +81,7 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     </span>
     <span>
       <span class="rv__name">{r.reviewerName}</span>
-      {r.reviewerInfo && <span class="rv__info">{r.reviewerInfo}</span>}
+      {r.reviewerInfo && <span class="rv__info" dir="auto">{r.reviewerInfo}</span>}
     </span>
   </p>
 </article>
