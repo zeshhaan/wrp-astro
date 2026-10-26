@@ -15,6 +15,7 @@ import ReviewQuote from './sections/ReviewQuote.astro';
 import ReviewCards from './sections/ReviewCards.astro';
 import PostCards from './sections/PostCards.astro';
 import ServiceCards from './sections/ServiceCards.astro';
+import LeadForm, { type LeadVariant } from './sections/LeadForm.astro';
 import Picture from '../../shared/Picture.astro';
 import Icon from '../Icon.astro';
 import LucideIcon from '@/components/Icon.astro';
@@ -27,9 +28,11 @@ import { fillSpans } from './fill';
 interface Props {
   service: CollectionEntry<'services'>;
   locale?: Locale;
+  /** Put a lead form on the right of the hero, in this layout (Design Lab candidates a–d). */
+  heroForm?: LeadVariant;
 }
 
-const { service, locale = 'en' } = Astro.props;
+const { service, locale = 'en', heroForm } = Astro.props;
 const slug = service.id.replace(/^ar\//, '');
 const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
 const link = (href: string) => (isLab ? toLab(href) : href);
@@ -121,6 +124,10 @@ const breadcrumbs = [
   { name: title, url: `${siteUrl}${localizeUrl(`/services/${slug}/`, locale)}` },
 ];
 const heroBase = imgBase(heroImage);
+// With a form in the hero, every quote button on the page leads to it instead
+// of the separate quote page (and the hero drops its own button).
+const quoteHref = heroForm ? '#quote' : studioQuoteHref;
+const levels = (packages ?? []).map((p) => p.name);
 ---
 
 <StudioPage
@@ -128,6 +135,8 @@ const heroBase = imgBase(heroImage);
   description={description}
   ogImage={ogImage}
   locale={locale}
+  heroForm={Boolean(heroForm)}
+  livePath={`${localizeUrl(`/services/${slug}/`, locale)}`}
   preloads={[
     {
       href: `${heroBase}-1200w.avif`,
@@ -148,10 +157,16 @@ const heroBase = imgBase(heroImage);
 
   <PageHero image={heroBase} imageAlt={w.heroAlt(title, subtitle)} eyebrow={subtitle} title={heroTitle || title} lede={heroDescription || description} long={Boolean(heroTitle)}>
     <Breadcrumbs slot="crumbs" crumbs={breadcrumbs} link={link} />
-    <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
-      {w.getQuote}
-      <Icon name="arrow-right" size={18} class="flip" />
-    </a>
+    {
+      heroForm ? (
+        <LeadForm slot="aside" variant={heroForm} service={title} levels={levels} demo={isLab} />
+      ) : (
+        <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
+          {w.getQuote}
+          <Icon name="arrow-right" size={18} class="flip" />
+        </a>
+      )
+    }
   </PageHero>
 
   <section class="qa st-light" aria-label={w.quickAnswer}>
@@ -313,7 +328,7 @@ const heroBase = imgBase(heroImage);
                     </li>
                   ))}
                 </ul>
-                <a class:list={['st-btn', pkg.badge ? 'st-btn--gold' : 'st-btn--dark']} href={studioQuoteHref} data-quote>
+                <a class:list={['st-btn', pkg.badge ? 'st-btn--gold' : 'st-btn--dark']} href={quoteHref} data-quote>
                   {w.getStarted}
                 </a>
               </li>
@@ -388,7 +403,7 @@ const heroBase = imgBase(heroImage);
           </p>
           <p class="price__note">{w.pricingNote}</p>
           <div class="price__actions">
-            <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+            <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
               {w.getYourQuote}
               <Icon name="arrow-right" size={18} class="flip" />
             </a>
@@ -470,7 +485,7 @@ const heroBase = imgBase(heroImage);
     <div class="st-wrap end__inner">
       <h2 id="end-title" class="st-h2">{ctaHeading || w.experience(title)}</h2>
       <p class="end__text">{ctaDescription || w.ctaDescription}</p>
-      <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+      <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
         {w.getQuote}
         <Icon name="arrow-right" size={18} class="flip" />
       </a>

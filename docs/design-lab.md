@@ -105,6 +105,14 @@ as the live page, so the copy cannot drift.
 - `src/designs/studio/theme.css`: Studio's tokens, layout helpers, headings and
   buttons, shared by the homepage and the inner pages.
 
+- `src/designs/studio/site/sections/LeadForm.astro`: the hero lead form, in
+  four candidate layouts compared at `/design-lab/studio/services/<slug>/form-a/`
+  … `form-d/` (the Lab bar switches between them). With a form in the hero, the
+  hero drops its quote button, every quote button on the page leads to the
+  form, and the header's quote buttons hide while the form is on screen. In the
+  lab the form is a mock-up and sends nothing; at go-live it posts to the lead
+  handler.
+
 Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
 Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.
 Each group gets its Arabic RTL version once the English look is approved.

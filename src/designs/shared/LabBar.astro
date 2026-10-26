@@ -17,6 +17,17 @@ const path = Astro.url.pathname.replace(/\/?$/, '/');
 // English and Arabic instead.
 const header = path.match(/^\/design-lab\/studio\/headers\/([adefgh])\/(ar\/)?$/);
 const lang = header?.[2] ? 'ar/' : '';
+// On a Studio service page, it switches between the hero lead form candidates.
+const service = path.match(/^\/design-lab\/studio\/services\/([a-z-]+)\/(?:form-([a-d])\/)?$/);
+const formLinks = service
+  ? [
+      { href: `/design-lab/studio/services/${service[1]}/`, label: 'Quote button' },
+      ...['a', 'b', 'c', 'd'].map((id) => ({
+        href: `/design-lab/studio/services/${service[1]}/form-${id}/`,
+        label: `Form ${id.toUpperCase()}`,
+      })),
+    ]
+  : undefined;
 const headerLinks = header
   ? [
       ...['a', 'd', 'e', 'f', 'g', 'h'].map((id) => ({ href: `/design-lab/studio/headers/${id}/${lang}`, label: `Header ${id.toUpperCase()}` })),
@@ -27,7 +38,8 @@ const headerLinks = header
 
 <nav class="wrp-lab" aria-label="Design Lab pages" data-lab-bar>
   <a class="wrp-lab__home" href={header ? '/design-lab/studio/headers/' : '/design-lab/'}>{header ? 'Headers' : 'Design Lab'}</a>
-  {(headerLinks ?? links).map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
+  {service && <a href="/design-lab/studio/">Home</a>}
+  {(headerLinks ?? formLinks ?? links).map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
   <button type="button" class="wrp-lab__hide" aria-label="Hide the Design Lab bar" data-lab-hide>×</button>
 </nav>
 

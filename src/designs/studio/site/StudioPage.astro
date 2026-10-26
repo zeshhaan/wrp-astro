@@ -31,6 +31,7 @@ import type { Locale } from '@/i18n/translations';
 import { labPrefix, toLab, studioQuoteHref } from './routes';
 import '../../shared/reset.css';
 import '../theme.css';
+import './hero-form.css';
 
 interface Props {
   title: string;
@@ -45,6 +46,14 @@ interface Props {
   tags?: string[];
   articleSection?: string;
   publisher?: string;
+  /**
+   * The hero has the lead form (#quote). Quote buttons in the header then lead
+   * to it, and hide while it is on screen so the page never shows a button
+   * for the form the visitor is already looking at.
+   */
+  heroForm?: boolean;
+  /** The live URL this page stands for, when its lab path is not simply the live path under the prefix. */
+  livePath?: string;
   /** LCP images to preload (the page hero). */
   preloads?: { href: string; type: string; media?: string; imagesrcset?: string; imagesizes?: string }[];
 }
@@ -63,11 +72,13 @@ const {
   articleSection,
   publisher = 'WRP Detailing Solutions',
   preloads = [],
+  heroForm = false,
+  livePath: livePathProp,
 } = Astro.props;
 
 // The live URL this page stands for. In the lab it is the path without the prefix.
 const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
-const livePath = isLab ? Astro.url.pathname.slice(labPrefix.length) : Astro.url.pathname;
+const livePath = livePathProp ?? (isLab ? Astro.url.pathname.slice(labPrefix.length) : Astro.url.pathname);
 const lab = (href: string) => (isLab ? toLab(href) : href);
 
 const dir = getDir(locale);
@@ -144,7 +155,7 @@ const altHref = lab(alternatePath);
 ---
 
 <!doctype html>
-<html lang={locale} dir={dir} data-concept="studio">
+<html lang={locale} dir={dir} data-concept="studio" data-hero-form={heroForm ? 'in-view' : undefined}>
   <head>
     <meta charset="utf-8" />
     <SEO
@@ -206,12 +217,34 @@ const altHref = lab(alternatePath);
     }
   </head>
   <body>
-    <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={studioQuoteHref} phone="showroom" />
+    <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={heroForm ? '#quote' : studioQuoteHref} phone="showroom" />
     <main id="main">
       <slot />
     </main>
     <Footer home={lab('/')} serviceHref={lab} />
     <FloatingContact />
     {isLab && <LabBar />}
+    {
+      heroForm && (
+        <script>
+          // Header quote buttons hide while the hero form is on screen and come
+          // back once it scrolls away; following one moves focus into the form.
+          const form = document.querySelector<HTMLFormElement>('#quote');
+          const root = document.documentElement;
+          if (form) {
+            new IntersectionObserver(([entry]) => root.setAttribute('data-hero-form', entry.isIntersecting ? 'in-view' : 'away'), {
+              rootMargin: '-80px 0px 0px 0px',
+            }).observe(form);
+            document.addEventListener('click', (e) => {
+              const link = (e.target as Element).closest?.('a[href="#quote"]');
+              if (!link) return;
+              e.preventDefault();
+              form.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+              form.querySelector<HTMLInputElement>('input:not([type=hidden]):not([type=radio])')?.focus({ preventScroll: true });
+            });
+          }
+        </script>
+      )
+    }
   </body>
 </html>

@@ -19,9 +19,11 @@ interface Props {
 }
 
 const { image, imageAlt, eyebrow, title, lede, long = false } = Astro.props;
+// A hero with something on its other side (the lead form) splits into two columns.
+const split = Astro.slots.has('aside');
 ---
 
-<section class="ph" aria-labelledby="ph-title">
+<section class:list={['ph', split && 'ph--split']} aria-labelledby="ph-title">
   <Picture
     base={image}
     alt={imageAlt}
@@ -33,12 +35,15 @@ const { image, imageAlt, eyebrow, title, lede, long = false } = Astro.props;
     fetchpriority="high"
     class="ph__bg"
   />
-  <div class="st-wrap ph__inner">
-    <slot name="crumbs" />
-    {eyebrow && <p class="st-eyebrow ph__eyebrow">{eyebrow}</p>}
-    <h1 id="ph-title" class:list={['ph__title', long && 'ph__title--long']}>{title}</h1>
-    {lede && <p class="ph__lede">{lede}</p>}
-    {Astro.slots.has('default') && <div class="ph__actions"><slot /></div>}
+  <div class="st-wrap ph__grid">
+    <div class="ph__inner">
+      <slot name="crumbs" />
+      {eyebrow && <p class="st-eyebrow ph__eyebrow">{eyebrow}</p>}
+      <h1 id="ph-title" class:list={['ph__title', long && 'ph__title--long']}>{title}</h1>
+      {lede && <p class="ph__lede">{lede}</p>}
+      {Astro.slots.has('default') && <div class="ph__actions"><slot /></div>}
+    </div>
+    {split && <div class="ph__aside"><slot name="aside" /></div>}
   </div>
 </section>
 
@@ -79,6 +84,27 @@ const { image, imageAlt, eyebrow, title, lede, long = false } = Astro.props;
     background:
       linear-gradient(to top, rgb(12 13 15 / 0.92), rgb(12 13 15 / 0.35) 70%, rgb(12 13 15 / 0.55)),
       linear-gradient(to left, rgb(12 13 15 / 0.7), transparent 75%);
+  }
+  .ph__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: end;
+  }
+  @media (min-width: 62rem) {
+    .ph--split .ph__grid {
+      grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 1fr);
+      gap: 3.5rem;
+      align-items: center;
+    }
+    .ph--split {
+      padding-block: 9rem 5rem;
+    }
+  }
+  .ph--split .ph__title {
+    font-size: clamp(2.4rem, 1.4rem + 3.6vw, 4.25rem);
+  }
+  .ph--split .ph__title--long {
+    font-size: clamp(2rem, 1.3rem + 2.6vw, 3.4rem);
   }
   .ph__inner {
     display: grid;
