@@ -1,0 +1,83 @@
+---
+/**
+ * Studio breadcrumbs. Emits the same BreadcrumbList JSON-LD as the live
+ * src/components/Breadcrumbs.astro; only the visible trail is restyled.
+ * Crumb URLs are absolute live URLs (they are what the schema publishes);
+ * `link` may point the visible ones at Studio previews instead.
+ */
+interface Crumb {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  crumbs: Crumb[];
+  link?: (href: string) => string;
+  class?: string;
+}
+
+const { crumbs, link = (href: string) => href, class: className } = Astro.props;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.name,
+    item: crumb.url,
+  })),
+};
+const visible = (url: string) => link(new URL(url).pathname + new URL(url).hash);
+---
+
+<nav aria-label="Breadcrumb" class:list={['crumbs', className]}>
+  <ol role="list">
+    {
+      crumbs.map((crumb, index) => (
+        <li>
+          {index === crumbs.length - 1 ? (
+            <span aria-current="page">{crumb.name}</span>
+          ) : (
+            <a href={visible(crumb.url)}>{crumb.name}</a>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--st-mute);
+  }
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .crumbs li + li::before {
+    content: '/';
+    color: rgb(255 255 255 / 0.35);
+  }
+  .crumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    color: var(--st-gold);
+  }
+  .crumbs [aria-current] {
+    color: var(--st-white);
+  }
+</style>

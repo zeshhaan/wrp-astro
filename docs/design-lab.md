@@ -81,6 +81,50 @@ the HTML, in English or Arabic (RTL). Shereef picked G, so it is the Studio home
 header (`Home.astro` defaults its `header` prop to `g`); the other candidates
 stay in the lab for now. The quote pages still use the older `Header.astro`.
 
+## Studio inner pages
+
+The rest of the site is being rebuilt in Studio one group at a time, each page
+keeping its live copy word for word. A Studio page renders at its live path
+under `/design-lab/studio/` (for example `/design-lab/studio/services/polish/`
+for `/services/polish/`) and reads the same content entries and translations
+as the live page, so the copy cannot drift.
+
+- `src/designs/studio/site/StudioPage.astro`: the document shell. Its `<head>`
+  is the live BaseLayout's (title, description, canonical, OG/Twitter,
+  hreflang, LocalBusiness and SiteNavigationElement JSON-LD, RSS, analytics),
+  around Studio's header G, footer and floating contact. Under the lab prefix it
+  is `noindex, nofollow` without analytics, and its canonical and hreflang
+  already point at the live URL, so the head can be diffed against the live
+  page. At go-live the live route renders the Studio page instead of
+  BaseLayout and nothing in the shell changes.
+- `src/designs/studio/site/routes.ts`: the lab prefix, the temporary quote URL,
+  and which live paths have a Studio version (links to those stay inside the
+  preview).
+- `src/designs/studio/site/ServicePage.astro` + `sections/`: the service page
+  template and the sections it shares with later pages.
+- `src/designs/studio/theme.css`: Studio's tokens, layout helpers, headings and
+  buttons, shared by the homepage and the inner pages.
+
+- `src/designs/studio/site/sections/LeadForm.astro`: the hero quote form
+  (layout A, "Card", picked from four candidates). With a form in the hero, the
+  hero drops its quote button, every quote button on the page leads to the
+  form, and the header's quote buttons hide while the form is on screen. It
+  sends to the `quote` Astro Action (`src/actions/index.ts`), which checks
+  Turnstile and saves to the `quote_form_leads` D1 table and emails the team.
+  Worker previews and Design Lab pages only run the checks: nothing is saved or
+  sent (`quoteLeadMode` in `src/lib/quote-form-lead.ts`).
+
+  Go-live needs: migration `0006_add_quote_form_leads.sql` applied to
+  production D1, a Turnstile widget for wrpdetailing.ae and
+  www.wrpdetailing.ae, its site key as the Workers Builds build variable
+  `PUBLIC_TURNSTILE_SITEKEY` and its secret as the Worker secret
+  `TURNSTILE_SECRET`. Set both keys or neither: a secret without the site key
+  rejects every lead. Without either, leads are taken with no bot check.
+
+Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
+Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.
+Each group gets its Arabic RTL version once the English look is approved.
+
 ## Next: going live
 
 Roll Studio out to every page (services, blog, portfolio, reviews, contact, and

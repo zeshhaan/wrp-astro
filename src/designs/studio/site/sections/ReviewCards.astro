@@ -1,0 +1,248 @@
+---
+/**
+ * Google reviews for one service, as Studio review cards in a masonry of
+ * columns. Studio version of src/components/reviews/ServiceReviews.astro: the
+ * same reviews (getReviewsForService, first 6), heading, rating line and
+ * "see all" link. Long reviews show the first 300 characters with Read more.
+ */
+import type { Review } from '@/lib/reviews';
+import { getReviewsForService, getBusiness, getDisplayCount, getReviewImageAlt } from '@/lib/reviews';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import Icon from '../../Icon.astro';
+
+interface Props {
+  serviceSlug: string;
+  heading?: string;
+  limit?: number;
+  locale?: Locale;
+  link?: (href: string) => string;
+}
+
+const { serviceSlug, heading, limit = 6, locale = 'en', link = (href: string) => href } = Astro.props;
+const reviews = getReviewsForService(serviceSlug).slice(0, limit);
+const business = getBusiness();
+const num = (n: string | number) => toLocalNum(n, locale);
+const MAX = 300;
+const short = (r: Review) => r.text.substring(0, MAX).replace(/\s+\S*$/, '') + '…';
+const initials = (r: Review) => r.reviewerName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+---
+
+{
+  reviews.length > 0 && (
+    <section class="rc st-section st-white" aria-labelledby="rc-title">
+      <div class="st-wrap">
+        <header class="st-head st-head--center">
+          <p class="rc__rating">
+            <svg class="rc__g" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            <strong>{num(business.rating.toFixed(1))}</strong>
+            <span class="rc__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={14} />)}</span>
+            <span>
+              {num(getDisplayCount())} {t(locale, 'reviews.reviews')}
+            </span>
+          </p>
+          <h2 id="rc-title" class="st-h2">{heading || t(locale, 'reviews.whatClientsSay')}</h2>
+          <p class="st-intro">{t(locale, 'reviews.realGoogle')}</p>
+        </header>
+
+        <ul class="rc__list" role="list">
+          {reviews.map((r) => {
+            const long = r.text.length > MAX;
+            return (
+              <li class="rc__card">
+                {r.localImages.length > 0 && (
+                  <img
+                    class="rc__photo"
+                    src={`/${r.localImages[0]}`}
+                    alt={getReviewImageAlt(r, 0)}
+                    width="600"
+                    height="450"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
+                <div class="rc__top">
+                  <span class="rc__stars" role="img" aria-label={`${r.stars} out of 5 stars`}>
+                    {Array.from({ length: r.stars }, () => <Icon name="star" size={15} />)}
+                  </span>
+                  <span class="rc__date">{r.date}</span>
+                </div>
+                {r.text &&
+                  (long ? (
+                    <div class="rc__text" data-rc-more>
+                      <p data-short>"{short(r)}"</p>
+                      <p data-full hidden>"{r.text}"</p>
+                      <button type="button" class="rc__more" aria-expanded="false" data-less={t(locale, 'reviews.showLess')}>
+                        {t(locale, 'reviews.readMore')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div class="rc__text">
+                      <p>"{r.text}"</p>
+                    </div>
+                  ))}
+                <p class="rc__who">
+                  <span class="rc__avatar" aria-hidden="true">
+                    <img src={r.localAvatar ? `/${r.localAvatar}` : r.profilePhoto} alt="" width="36" height="36" loading="lazy" onerror="this.remove()" />
+                    {initials(r)}
+                  </span>
+                  <span>
+                    <span class="rc__name">{r.reviewerName}</span>
+                    {r.reviewerInfo && <span class="rc__info">{r.reviewerInfo}</span>}
+                  </span>
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+
+        <p class="rc__all">
+          <a class="st-btn st-btn--dark" href={link(localizeUrl('/reviews/', locale))}>
+            {t(locale, 'reviews.seeAllReviews')} <Icon name="arrow-right" size={16} />
+          </a>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('[data-rc-more]')) {
+    const btn = box.querySelector<HTMLButtonElement>('button')!;
+    const shortP = box.querySelector<HTMLElement>('[data-short]')!;
+    const fullP = box.querySelector<HTMLElement>('[data-full]')!;
+    const more = btn.textContent!.trim();
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      shortP.hidden = open;
+      fullP.hidden = !open;
+      btn.textContent = open ? btn.dataset.less! : more;
+    });
+  }
+</script>
+
+<style>
+  .rc__rating {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--st-ink-2);
+  }
+  .rc__rating strong {
+    font-size: 1.125rem;
+    color: var(--st-ink);
+  }
+  .rc__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-gold-deep);
+  }
+  .rc__list {
+    columns: 1;
+    column-gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40rem) {
+    .rc__list {
+      columns: 2;
+    }
+  }
+  @media (min-width: 64rem) {
+    .rc__list {
+      columns: 3;
+    }
+  }
+  .rc__card {
+    display: grid;
+    gap: 0.9rem;
+    break-inside: avoid;
+    margin-block-end: 1rem;
+    padding: 1.5rem;
+    background: var(--st-paper);
+    border-block-end: 3px solid var(--st-gold);
+  }
+  .rc__photo {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .rc__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .rc__date {
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .rc__text {
+    color: var(--st-ink);
+    font-size: 0.975rem;
+    line-height: 1.6;
+  }
+  .rc__more {
+    margin-block-start: 0.35rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--st-gold-deep);
+    cursor: pointer;
+  }
+  .rc__who {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .rc__avatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--st-black);
+    color: var(--st-white);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .rc__avatar img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .rc__name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+  .rc__info {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .rc__all {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 1.5rem;
+  }
+</style>

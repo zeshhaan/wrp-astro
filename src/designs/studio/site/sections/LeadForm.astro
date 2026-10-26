@@ -1,0 +1,414 @@
+---
+/**
+ * The quote form in the hero of Studio's inner pages (layout "A, Card", picked
+ * in the Design Lab): a white card asking for name, mobile and car, with one
+ * button and WhatsApp as the alternative.
+ *
+ * It sends to the `quote` Astro Action (src/actions/index.ts) from the browser,
+ * so it works on prerendered pages: the action checks the fields and the
+ * Turnstile token, then saves the lead to D1 and emails the team. On Worker
+ * previews and Design Lab pages the action does the checks and stops, and the
+ * thank-you panel says nothing was sent.
+ *
+ * Turnstile loads on the visitor's first touch of the form, not with the page,
+ * and stays invisible unless Cloudflare wants an interaction. On the live
+ * hostnames it uses the site key from PUBLIC_TURNSTILE_SITEKEY; elsewhere
+ * Cloudflare's always-pass test key, which only the test secret accepts.
+ *
+ * Plain HTML first: native validation (styled only after the visitor has
+ * touched a field, via :user-invalid), the right mobile keyboards and autofill
+ * (inputmode/autocomplete). Without the script the button opens the contact
+ * page instead.
+ */
+import Icon from '../../Icon.astro';
+import { proof, whatsappLink } from '../../../data';
+
+interface Props {
+  /** The service this page is about, sent with the lead. */
+  service: string;
+  id?: string;
+}
+
+const { service, id = 'quote' } = Astro.props;
+const wa = whatsappLink(`Hi WRP, I would like a quote for ${service}.`);
+const f = (name: string) => `${id}-${name}`;
+const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '';
+// Browsers compile `pattern` with the `v` flag, where ( ) and - need escaping in a class.
+const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
+
+const words = {
+  title: 'Get a quick quote',
+  lede: 'Tell us the car and what you want done. We’ll reply with a price and a time.',
+  name: 'Your name',
+  phone: 'Mobile or WhatsApp',
+  phoneHint: '05X XXX XXXX',
+  car: 'Car (make, model, year)',
+  carHint: 'e.g. Land Cruiser 2024',
+  send: 'Get my quote',
+  sending: 'Sending…',
+  or: 'or',
+  waUs: 'WhatsApp us',
+  rating: `${proof.rating} on Google · ${proof.reviewCountDisplay} reviews`,
+  thanks: 'Thank you. We’ve got it.',
+  thanksLine: 'We’ll reply with a price and a time.',
+  previewNote: 'Preview: the form checked out, but nothing was saved or sent.',
+  error: 'Something went wrong. Please WhatsApp or call us.',
+  required: 'Please fill this in.',
+  phoneInvalid: 'Please enter a mobile number.',
+};
+---
+
+<form
+  id={id}
+  class="lf"
+  action="/contact-us/"
+  aria-labelledby={f('title')}
+  data-lead
+  data-sitekey={sitekey}
+  data-msg-required={words.required}
+  data-msg-phone={words.phoneInvalid}
+  data-msg-error={words.error}
+  data-msg-sending={words.sending}
+>
+  <input type="hidden" name="service" value={service} />
+  <input type="hidden" name="locale" value="en" />
+
+  <div class="lf__body" data-lead-body>
+    <header class="lf__head">
+      <h2 id={f('title')} class="lf__title">{words.title}</h2>
+      <p class="lf__lede">{words.lede}</p>
+    </header>
+    <div class="lf__field">
+      <label for={f('name')}>{words.name}</label>
+      <input id={f('name')} name="name" type="text" autocomplete="name" maxlength="100" required enterkeyhint="next" />
+    </div>
+    <div class="lf__field">
+      <label for={f('phone')}>{words.phone}</label>
+      <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern={phonePattern} required enterkeyhint="next" />
+    </div>
+    <div class="lf__field">
+      <label for={f('car')}>{words.car}</label>
+      <input id={f('car')} name="vehicle" type="text" autocomplete="off" maxlength="120" placeholder={words.carHint} enterkeyhint="send" />
+    </div>
+    <div class="lf__bot" data-lead-bot></div>
+    <button class="st-btn st-btn--gold lf__send" type="submit">
+      <span data-lead-label>{words.send}</span> <Icon name="arrow-right" size={18} class="flip" />
+    </button>
+    <p class="lf__error" role="alert" data-lead-error hidden></p>
+    <p class="lf__alt">
+      {words.or} <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />{words.waUs}</a>
+      <span class="lf__dot" aria-hidden="true">·</span>
+      <span class="lf__stars" aria-hidden="true"><Icon name="star" size={13} /></span>{words.rating}
+    </p>
+  </div>
+
+  <div class="lf__done" data-lead-done hidden tabindex="-1">
+    <span class="lf__tick" aria-hidden="true"><Icon name="check" size={26} /></span>
+    <p class="lf__title">{words.thanks}</p>
+    <p class="lf__lede">{words.thanksLine}</p>
+    <p class="lf__demo" data-lead-preview hidden>{words.previewNote}</p>
+    <a class="st-btn st-btn--ghost lf__wa" href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" />{words.waUs}</a>
+  </div>
+</form>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { LIVE_HOSTS, QUOTE_TURNSTILE_ACTION } from '@/lib/quote-form-lead';
+  import { TURNSTILE_TEST_SITEKEY } from '@/lib/turnstile';
+
+  type Turnstile = {
+    render: (el: HTMLElement, options: Record<string, unknown>) => string;
+    reset: (widgetId: string) => void;
+    getResponse: (widgetId: string) => string | undefined;
+  };
+  const w = window as Window & { turnstile?: Turnstile };
+
+  // One copy of the Turnstile script for the page, fetched on first need.
+  let turnstileReady: Promise<Turnstile> | undefined;
+  const loadTurnstile = () =>
+    (turnstileReady ??= new Promise<Turnstile>((resolve, reject) => {
+      if (w.turnstile) return resolve(w.turnstile);
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.onload = () => (w.turnstile ? resolve(w.turnstile) : reject(new Error('Turnstile missing')));
+      script.onerror = () => reject(new Error('Turnstile did not load'));
+      document.head.appendChild(script);
+    }));
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-lead]')) {
+    const body = form.querySelector<HTMLElement>('[data-lead-body]')!;
+    const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
+    const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
+    const bot = form.querySelector<HTMLElement>('[data-lead-bot]')!;
+    const label = form.querySelector<HTMLElement>('[data-lead-label]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const msg = form.dataset;
+    const sitekey = LIVE_HOSTS.includes(location.hostname) && msg.sitekey ? msg.sitekey : TURNSTILE_TEST_SITEKEY;
+    // The script shows its own messages; without it the browser validates.
+    form.noValidate = true;
+    let requestId = crypto.randomUUID();
+
+    // Turnstile: rendered on first touch. `token` settles with the next token.
+    let widgetId: string | undefined;
+    let token: Promise<string>;
+    let settle: { resolve: (t: string) => void; reject: (e: Error) => void };
+    const nextToken = () => {
+      token = new Promise((resolve, reject) => (settle = { resolve, reject }));
+      token.catch(() => {});
+    };
+    nextToken();
+    const startBotCheck = () => {
+      if (widgetId !== undefined) return;
+      widgetId = '';
+      loadTurnstile()
+        .then((turnstile) => {
+          widgetId = turnstile.render(bot, {
+            sitekey,
+            action: QUOTE_TURNSTILE_ACTION,
+            appearance: 'interaction-only',
+            size: 'flexible',
+            theme: 'light',
+            'refresh-expired': 'auto',
+            callback: (t: string) => settle.resolve(t),
+            'error-callback': () => settle.reject(new Error('Turnstile error')),
+          });
+        })
+        .catch((e) => settle.reject(e));
+    };
+    form.addEventListener('focusin', startBotCheck, { once: true });
+    form.addEventListener('pointerdown', startBotCheck, { once: true });
+
+    // Inline message under a field that fails native validation.
+    const check = (input: HTMLInputElement) => {
+      const field = input.closest('.lf__field');
+      let note = field?.querySelector<HTMLElement>('.lf__note');
+      const bad = !input.checkValidity();
+      if (field && bad && !note) {
+        note = document.createElement('p');
+        note.className = 'lf__note';
+        note.id = `${input.id}-note`;
+        field.appendChild(note);
+        input.setAttribute('aria-describedby', note.id);
+      }
+      if (note) {
+        note.textContent = bad ? (input.validity.valueMissing ? msg.msgRequired! : msg.msgPhone!) : '';
+        note.hidden = !bad;
+      }
+      input.setAttribute('aria-invalid', String(bad));
+      return !bad;
+    };
+    const valid = () => {
+      const inputs = [...form.querySelectorAll<HTMLInputElement>('.lf__field input[required], .lf__field input[pattern]')];
+      const results = inputs.map(check);
+      const first = inputs[results.indexOf(false)];
+      first?.focus();
+      return !first;
+    };
+    // A message clears as soon as the field is fixed (while typing, so nothing
+    // shifts under the pointer on the way to the button) and appears when the
+    // visitor leaves a field they've filled in wrongly.
+    form.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.getAttribute('aria-invalid') === 'true') check(input);
+    });
+    form.addEventListener('focusout', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.matches?.('.lf__field input') && input.value && !input.checkValidity()) check(input);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      error.hidden = true;
+      if (!valid()) return;
+      startBotCheck();
+      button.disabled = true;
+      const idle = label.textContent;
+      label.textContent = msg.msgSending!;
+      try {
+        const data = new FormData(form);
+        // Normally ready long before the click; a visible challenge can take a while.
+        const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Turnstile timeout')), 60_000));
+        data.set('cf-turnstile-response', await Promise.race([token, timeout]));
+        data.set('requestId', requestId);
+        data.set('page', location.pathname);
+        const attribution = w.WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const { data: result, error: failed } = await actions.quote(data);
+        if (failed) throw failed;
+        if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'hero' } }));
+        form.querySelector<HTMLElement>('[data-lead-preview]')!.hidden = result.saved;
+        requestId = crypto.randomUUID();
+        body.hidden = true;
+        done.hidden = false;
+        done.focus();
+      } catch {
+        error.textContent = msg.msgError!;
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        label.textContent = idle;
+        // Tokens are single-use: get a fresh one for a retry.
+        if (widgetId) {
+          nextToken();
+          w.turnstile?.reset(widgetId);
+        }
+      }
+    });
+  }
+</script>
+
+<style>
+  /* The thank-you panel and messages use the hidden attribute. */
+  .lf [hidden] {
+    display: none !important;
+  }
+  .lf {
+    --lf-bg: var(--st-white);
+    --lf-ink: var(--st-ink);
+    --lf-mute: var(--st-ink-2);
+    --lf-line: #c9cbc6;
+    --lf-field: var(--st-white);
+    --lf-accent: var(--st-gold-deep);
+    container-type: inline-size;
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 30rem;
+    margin-inline-start: auto;
+    color: var(--lf-ink);
+    color-scheme: light;
+  }
+  .lf__body,
+  .lf__done {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
+    background: var(--lf-bg);
+  }
+  .lf__head {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .lf__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.9rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .lf__lede {
+    font-size: 0.9375rem;
+    color: var(--lf-mute);
+  }
+  .lf__field {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .lf__field label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .lf__field input {
+    inline-size: 100%;
+    min-block-size: 3rem;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--lf-line);
+    border-radius: 0;
+    background: var(--lf-field);
+    color: var(--lf-ink);
+    font-size: 1rem; /* 16px: no zoom-on-focus on iOS */
+    transition: border-color 0.15s;
+  }
+  .lf__field input::placeholder {
+    color: color-mix(in srgb, var(--lf-mute) 70%, transparent);
+  }
+  .lf__field input:focus-visible {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 0;
+    border-color: var(--lf-ink);
+  }
+  /* Only after the visitor has interacted, never on first paint. */
+  .lf__field input:user-invalid,
+  .lf__field input[aria-invalid='true'] {
+    border-color: #b42318;
+  }
+  /* Made by the script, so outside Astro's scoping. */
+  .lf :global(.lf__note) {
+    font-size: 0.8125rem;
+    color: #b42318;
+  }
+  .lf__send {
+    inline-size: 100%;
+  }
+  .lf__send:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .lf__alt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    color: var(--lf-mute);
+  }
+  .lf__alt a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+    color: var(--lf-ink);
+    text-underline-offset: 3px;
+  }
+  .lf__stars {
+    color: var(--lf-accent);
+  }
+  .lf__error {
+    padding: 0.6rem 0.8rem;
+    background: #fdecea;
+    color: #8a1c13;
+    font-size: 0.875rem;
+  }
+  .lf__done {
+    justify-items: center;
+    text-align: center;
+    gap: 0.6rem;
+    padding-block: 2.5rem;
+  }
+  .lf__done:focus {
+    outline: none;
+  }
+  .lf__tick {
+    display: grid;
+    place-items: center;
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+    border-radius: 50%;
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .lf__demo {
+    font-size: 0.75rem;
+    color: var(--lf-mute);
+  }
+  .lf__wa {
+    margin-block-start: 0.75rem;
+  }
+  .lf .lf__wa {
+    border-color: var(--lf-ink);
+    color: var(--lf-ink);
+  }
+
+  /* White card, gold rule on top, a soft shadow off the photo. */
+  .lf__body {
+    border-block-start: 4px solid var(--st-gold);
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+
+  /* Turnstile only shows itself when it needs the visitor (interaction-only). */
+  .lf__bot:empty {
+    display: none;
+  }
+</style>

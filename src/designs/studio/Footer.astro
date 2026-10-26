@@ -4,13 +4,21 @@ import WrpLogo from '@/components/WrpLogo.astro';
 import { pages } from '../data';
 import { contact, serviceCards, whatsappQuote } from './content';
 
+interface Props {
+  /** The Studio homepage, for links to its sections from inner pages. Empty on the homepage itself. */
+  home?: string;
+  /** Overrides for the service page links, e.g. the Studio previews of them. */
+  serviceHref?: (href: string) => string;
+}
+const { home = '', serviceHref = (href: string) => href } = Astro.props;
+
 const siteLinks = [
   { label: 'Portfolio', href: pages.portfolio },
   { label: 'Reviews', href: pages.reviews },
   { label: 'Blog', href: pages.blog },
   { label: 'About WRP', href: pages.about },
   { label: 'Contact us', href: pages.contact },
-  { label: 'The WRP Lounge', href: '#lounge' },
+  { label: 'The WRP Lounge', href: `${home}#lounge` },
 ];
 const year = new Date().getFullYear();
 ---
@@ -31,7 +39,7 @@ const year = new Date().getFullYear();
     <nav class="foot__col" aria-labelledby="foot-services">
       <h2 id="foot-services" class="foot__h">Services</h2>
       <ul role="list">
-        {serviceCards.map((c) => <li><a href={c.href}>{c.name}</a></li>)}
+        {serviceCards.map((c) => <li><a href={serviceHref(c.href)}>{c.name}</a></li>)}
       </ul>
     </nav>
     <nav class="foot__col" aria-labelledby="foot-links">
