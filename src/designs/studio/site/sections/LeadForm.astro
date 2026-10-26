@@ -1,47 +1,40 @@
 ---
 /**
- * The hero lead form, in four candidate layouts (picked in the Design Lab):
+ * The quote form in the hero of Studio's inner pages (layout "A, Card", picked
+ * in the Design Lab): a white card asking for name, mobile and car, with one
+ * button and WhatsApp as the alternative.
  *
- *  a "Card"      A white card: name, mobile, car, one button. The plain default.
- *  b "Two-step"  Dark glass panel. Step 1 asks only about the car (and the
- *                level, when the service has levels); step 2 asks who to reply
- *                to. A small first ask that people finish more often.
- *  c "Callback"  The least typing: a mobile number and "Call me back", with a
- *                "WhatsApp me instead" switch. For people who'd rather talk.
- *  d "Choices"   Taps before typing: car size and how to reply are chips, then
- *                name, mobile and car.
+ * It sends to the `quote` Astro Action (src/actions/index.ts) from the browser,
+ * so it works on prerendered pages: the action checks the fields and the
+ * Turnstile token, then saves the lead to D1 and emails the team. On Worker
+ * previews and Design Lab pages the action does the checks and stops, and the
+ * thank-you panel says nothing was sent.
  *
- * All four post the same fields (name, phone, vehicle, service, plus
- * level/size/reply where asked) with the visitor's attribution, and fire the
- * `wrp:lead` event the live forms fire. On a Design Lab page the form is a
- * mock-up (`data-demo-form`): it validates and shows the thank-you state but
- * sends nothing. When the redesign goes live it posts to the lead handler.
+ * Turnstile loads on the visitor's first touch of the form, not with the page,
+ * and stays invisible unless Cloudflare wants an interaction. On the live
+ * hostnames it uses the site key from PUBLIC_TURNSTILE_SITEKEY; elsewhere
+ * Cloudflare's always-pass test key, which only the test secret accepts.
  *
  * Plain HTML first: native validation (styled only after the visitor has
- * touched a field, via :user-invalid), the right mobile keyboards and
- * autofill (inputmode/autocomplete), and a real <form> that works without
- * the script. The script adds the steps, the inline errors and the
- * no-reload submit.
+ * touched a field, via :user-invalid), the right mobile keyboards and autofill
+ * (inputmode/autocomplete). Without the script the button opens the contact
+ * page instead.
  */
 import Icon from '../../Icon.astro';
-import { contact, proof, whatsappLink } from '../../../data';
-
-export type LeadVariant = 'a' | 'b' | 'c' | 'd';
+import { proof, whatsappLink } from '../../../data';
 
 interface Props {
-  variant: LeadVariant;
   /** The service this page is about, sent with the lead. */
   service: string;
-  /** Levels the visitor can pick from in the two-step form (package names). */
-  levels?: string[];
-  /** Mock-up only: never sends. True on Design Lab pages. */
-  demo?: boolean;
   id?: string;
 }
 
-const { variant, service, levels = [], demo = true, id = 'quote' } = Astro.props;
+const { service, id = 'quote' } = Astro.props;
 const wa = whatsappLink(`Hi WRP, I would like a quote for ${service}.`);
 const f = (name: string) => `${id}-${name}`;
+const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '';
+// Browsers compile `pattern` with the `v` flag, where ( ) and - need escaping in a class.
+const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 
 const words = {
   title: 'Get a quick quote',
@@ -52,27 +45,13 @@ const words = {
   car: 'Car (make, model, year)',
   carHint: 'e.g. Land Cruiser 2024',
   send: 'Get my quote',
-  next: 'Next',
-  back: 'Back',
-  step: (n: number) => `Step ${n} of 2`,
-  stepCar: 'What car is it?',
-  stepYou: 'Where should we send the price?',
-  level: 'Which level?',
-  levelUnsure: 'Not sure',
-  callTitle: 'Want a price? We’ll call you.',
-  callLede: 'Leave your number and we’ll call you back with a price.',
-  callMe: 'Call me back',
-  waInstead: 'WhatsApp me instead',
-  size: 'Car size',
-  sizes: ['Sedan', 'SUV', 'Other'],
-  reply: 'Reply by',
-  replies: ['WhatsApp', 'Phone call'],
+  sending: 'Sending…',
   or: 'or',
   waUs: 'WhatsApp us',
   rating: `${proof.rating} on Google · ${proof.reviewCountDisplay} reviews`,
   thanks: 'Thank you. We’ve got it.',
   thanksLine: 'We’ll reply with a price and a time.',
-  demoNote: 'Design preview: nothing was sent.',
+  previewNote: 'Preview: the form checked out, but nothing was saved or sent.',
   error: 'Something went wrong. Please WhatsApp or call us.',
   required: 'Please fill this in.',
   phoneInvalid: 'Please enter a mobile number.',
@@ -81,207 +60,124 @@ const words = {
 
 <form
   id={id}
-  class:list={['lf', `lf--${variant}`]}
-  method="post"
-  action="/api/contact"
+  class="lf"
+  action="/contact-us/"
   aria-labelledby={f('title')}
   data-lead
-  data-lead-variant={variant}
-  data-demo-form={demo ? '' : undefined}
+  data-sitekey={sitekey}
   data-msg-required={words.required}
   data-msg-phone={words.phoneInvalid}
   data-msg-error={words.error}
+  data-msg-sending={words.sending}
 >
   <input type="hidden" name="service" value={service} />
   <input type="hidden" name="locale" value="en" />
 
   <div class="lf__body" data-lead-body>
-    {
-      variant === 'a' && (
-        <>
-          <header class="lf__head">
-            <h2 id={f('title')} class="lf__title">{words.title}</h2>
-            <p class="lf__lede">{words.lede}</p>
-          </header>
-          <div class="lf__field">
-            <label for={f('name')}>{words.name}</label>
-            <input id={f('name')} name="name" type="text" autocomplete="name" required enterkeyhint="next" />
-          </div>
-          <div class="lf__field">
-            <label for={f('phone')}>{words.phone}</label>
-            <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern="[+0-9 ()\-]{7,}" required enterkeyhint="next" />
-          </div>
-          <div class="lf__field">
-            <label for={f('car')}>{words.car}</label>
-            <input id={f('car')} name="vehicle" type="text" autocomplete="off" placeholder={words.carHint} enterkeyhint="send" />
-          </div>
-          <button class="st-btn st-btn--gold lf__send" type="submit">
-            {words.send} <Icon name="arrow-right" size={18} class="flip" />
-          </button>
-          <p class="lf__alt">
-            {words.or} <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />{words.waUs}</a>
-            <span class="lf__dot" aria-hidden="true">·</span>
-            <span class="lf__stars" aria-hidden="true"><Icon name="star" size={13} /></span>{words.rating}
-          </p>
-        </>
-      )
-    }
-
-    {
-      variant === 'b' && (
-        <>
-          <header class="lf__head">
-            <p class="lf__step" data-lead-steplabel>{words.step(1)}</p>
-            <h2 id={f('title')} class="lf__title">{words.title}</h2>
-            <span class="lf__bar" aria-hidden="true"><span data-lead-progress /></span>
-          </header>
-          <fieldset class="lf__pane" data-lead-step="1">
-            <legend class="lf__q">{words.stepCar}</legend>
-            <div class="lf__field">
-              <label for={f('car')}>{words.car}</label>
-              <input id={f('car')} name="vehicle" type="text" autocomplete="off" placeholder={words.carHint} required enterkeyhint="next" />
-            </div>
-            {levels.length > 0 && (
-              <fieldset class="lf__chips">
-                <legend>{words.level}</legend>
-                {[...levels, words.levelUnsure].map((level, i) => (
-                  <label class="lf__chip">
-                    <input type="radio" name="level" value={level} checked={i === levels.length} />
-                    <span>{level}</span>
-                  </label>
-                ))}
-              </fieldset>
-            )}
-            <button class="st-btn st-btn--gold lf__send" type="button" data-lead-next>
-              {words.next} <Icon name="arrow-right" size={18} class="flip" />
-            </button>
-          </fieldset>
-          <fieldset class="lf__pane" data-lead-step="2" hidden>
-            <legend class="lf__q">{words.stepYou}</legend>
-            <div class="lf__field">
-              <label for={f('name')}>{words.name}</label>
-              <input id={f('name')} name="name" type="text" autocomplete="name" required enterkeyhint="next" />
-            </div>
-            <div class="lf__field">
-              <label for={f('phone')}>{words.phone}</label>
-              <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern="[+0-9 ()\-]{7,}" required enterkeyhint="send" />
-            </div>
-            <div class="lf__row">
-              <button class="lf__back" type="button" data-lead-back>
-                <Icon name="arrow-left" size={16} class="flip" /> {words.back}
-              </button>
-              <button class="st-btn st-btn--gold lf__send" type="submit">
-                {words.send} <Icon name="arrow-right" size={18} class="flip" />
-              </button>
-            </div>
-          </fieldset>
-        </>
-      )
-    }
-
-    {
-      variant === 'c' && (
-        <>
-          <header class="lf__head">
-            <h2 id={f('title')} class="lf__title">{words.callTitle}</h2>
-            <p class="lf__lede">{words.callLede}</p>
-          </header>
-          <div class="lf__inline">
-            <div class="lf__field">
-              <label for={f('phone')} class="visually-hidden">{words.phone}</label>
-              <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern="[+0-9 ()\-]{7,}" required enterkeyhint="send" />
-            </div>
-            <button class="st-btn st-btn--gold lf__send" type="submit">
-              <Icon name="phone" size={18} />
-              <span data-lead-cta data-call={words.callMe} data-wa={words.send}>{words.callMe}</span>
-            </button>
-          </div>
-          <label class="lf__switch">
-            <input type="checkbox" name="reply" value="WhatsApp" role="switch" data-lead-wa />
-            <span class="lf__track" aria-hidden="true" />
-            {words.waInstead}
-          </label>
-          <p class="lf__alt">
-            {words.or} <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />{words.waUs}</a>
-            <span class="lf__dot" aria-hidden="true">·</span>
-            <a href={contact.phoneHref}>{contact.phoneDisplay}</a>
-          </p>
-        </>
-      )
-    }
-
-    {
-      variant === 'd' && (
-        <>
-          <header class="lf__head">
-            <h2 id={f('title')} class="lf__title">{words.title}</h2>
-          </header>
-          <fieldset class="lf__chips lf__chips--seg">
-            <legend>{words.size}</legend>
-            {words.sizes.map((size, i) => (
-              <label class="lf__chip">
-                <input type="radio" name="size" value={size} checked={i === 0} />
-                <span>{size}</span>
-              </label>
-            ))}
-          </fieldset>
-          <div class="lf__two">
-            <div class="lf__field">
-              <label for={f('name')}>{words.name}</label>
-              <input id={f('name')} name="name" type="text" autocomplete="name" required enterkeyhint="next" />
-            </div>
-            <div class="lf__field">
-              <label for={f('phone')}>{words.phone}</label>
-              <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern="[+0-9 ()\-]{7,}" required enterkeyhint="next" />
-            </div>
-          </div>
-          <div class="lf__field">
-            <label for={f('car')}>{words.car}</label>
-            <input id={f('car')} name="vehicle" type="text" autocomplete="off" placeholder={words.carHint} enterkeyhint="send" />
-          </div>
-          <fieldset class="lf__chips lf__chips--seg">
-            <legend>{words.reply}</legend>
-            {words.replies.map((reply, i) => (
-              <label class="lf__chip">
-                <input type="radio" name="reply" value={reply} checked={i === 0} />
-                <span>
-                  <Icon name={i === 0 ? 'whatsapp' : 'phone'} size={16} />
-                  {reply}
-                </span>
-              </label>
-            ))}
-          </fieldset>
-          <button class="st-btn st-btn--gold lf__send" type="submit">
-            {words.send} <Icon name="arrow-right" size={18} class="flip" />
-          </button>
-        </>
-      )
-    }
+    <header class="lf__head">
+      <h2 id={f('title')} class="lf__title">{words.title}</h2>
+      <p class="lf__lede">{words.lede}</p>
+    </header>
+    <div class="lf__field">
+      <label for={f('name')}>{words.name}</label>
+      <input id={f('name')} name="name" type="text" autocomplete="name" maxlength="100" required enterkeyhint="next" />
+    </div>
+    <div class="lf__field">
+      <label for={f('phone')}>{words.phone}</label>
+      <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern={phonePattern} required enterkeyhint="next" />
+    </div>
+    <div class="lf__field">
+      <label for={f('car')}>{words.car}</label>
+      <input id={f('car')} name="vehicle" type="text" autocomplete="off" maxlength="120" placeholder={words.carHint} enterkeyhint="send" />
+    </div>
+    <div class="lf__bot" data-lead-bot></div>
+    <button class="st-btn st-btn--gold lf__send" type="submit">
+      <span data-lead-label>{words.send}</span> <Icon name="arrow-right" size={18} class="flip" />
+    </button>
     <p class="lf__error" role="alert" data-lead-error hidden></p>
+    <p class="lf__alt">
+      {words.or} <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />{words.waUs}</a>
+      <span class="lf__dot" aria-hidden="true">·</span>
+      <span class="lf__stars" aria-hidden="true"><Icon name="star" size={13} /></span>{words.rating}
+    </p>
   </div>
 
   <div class="lf__done" data-lead-done hidden tabindex="-1">
     <span class="lf__tick" aria-hidden="true"><Icon name="check" size={26} /></span>
     <p class="lf__title">{words.thanks}</p>
     <p class="lf__lede">{words.thanksLine}</p>
-    {demo && <p class="lf__demo">{words.demoNote}</p>}
+    <p class="lf__demo" data-lead-preview hidden>{words.previewNote}</p>
     <a class="st-btn st-btn--ghost lf__wa" href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" />{words.waUs}</a>
   </div>
 </form>
 
 <script>
-  type Attribution = { serialize?: () => string | null };
+  import { actions } from 'astro:actions';
+  import { LIVE_HOSTS, QUOTE_TURNSTILE_ACTION } from '@/lib/quote-form-lead';
+  import { TURNSTILE_TEST_SITEKEY } from '@/lib/turnstile';
+
+  type Turnstile = {
+    render: (el: HTMLElement, options: Record<string, unknown>) => string;
+    reset: (widgetId: string) => void;
+    getResponse: (widgetId: string) => string | undefined;
+  };
+  const w = window as Window & { turnstile?: Turnstile };
+
+  // One copy of the Turnstile script for the page, fetched on first need.
+  let turnstileReady: Promise<Turnstile> | undefined;
+  const loadTurnstile = () =>
+    (turnstileReady ??= new Promise<Turnstile>((resolve, reject) => {
+      if (w.turnstile) return resolve(w.turnstile);
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.onload = () => (w.turnstile ? resolve(w.turnstile) : reject(new Error('Turnstile missing')));
+      script.onerror = () => reject(new Error('Turnstile did not load'));
+      document.head.appendChild(script);
+    }));
 
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-lead]')) {
     const body = form.querySelector<HTMLElement>('[data-lead-body]')!;
     const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
     const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
-    const steps = [...form.querySelectorAll<HTMLElement>('[data-lead-step]')];
-    const stepLabel = form.querySelector<HTMLElement>('[data-lead-steplabel]');
-    const progress = form.querySelector<HTMLElement>('[data-lead-progress]');
+    const bot = form.querySelector<HTMLElement>('[data-lead-bot]')!;
+    const label = form.querySelector<HTMLElement>('[data-lead-label]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const msg = form.dataset;
+    const sitekey = LIVE_HOSTS.includes(location.hostname) && msg.sitekey ? msg.sitekey : TURNSTILE_TEST_SITEKEY;
     // The script shows its own messages; without it the browser validates.
     form.noValidate = true;
+    let requestId = crypto.randomUUID();
+
+    // Turnstile: rendered on first touch. `token` settles with the next token.
+    let widgetId: string | undefined;
+    let token: Promise<string>;
+    let settle: { resolve: (t: string) => void; reject: (e: Error) => void };
+    const nextToken = () => {
+      token = new Promise((resolve, reject) => (settle = { resolve, reject }));
+      token.catch(() => {});
+    };
+    nextToken();
+    const startBotCheck = () => {
+      if (widgetId !== undefined) return;
+      widgetId = '';
+      loadTurnstile()
+        .then((turnstile) => {
+          widgetId = turnstile.render(bot, {
+            sitekey,
+            action: QUOTE_TURNSTILE_ACTION,
+            appearance: 'interaction-only',
+            size: 'flexible',
+            theme: 'light',
+            'refresh-expired': 'auto',
+            callback: (t: string) => settle.resolve(t),
+            'error-callback': () => settle.reject(new Error('Turnstile error')),
+          });
+        })
+        .catch((e) => settle.reject(e));
+    };
+    form.addEventListener('focusin', startBotCheck, { once: true });
+    form.addEventListener('pointerdown', startBotCheck, { once: true });
 
     // Inline message under a field that fails native validation.
     const check = (input: HTMLInputElement) => {
@@ -292,7 +188,7 @@ const words = {
         note = document.createElement('p');
         note.className = 'lf__note';
         note.id = `${input.id}-note`;
-        field.append(note);
+        field.appendChild(note);
         input.setAttribute('aria-describedby', note.id);
       }
       if (note) {
@@ -302,8 +198,8 @@ const words = {
       input.setAttribute('aria-invalid', String(bad));
       return !bad;
     };
-    const valid = (scope: ParentNode) => {
-      const inputs = [...scope.querySelectorAll<HTMLInputElement>('input[required], input[pattern]')];
+    const valid = () => {
+      const inputs = [...form.querySelectorAll<HTMLInputElement>('.lf__field input[required], .lf__field input[pattern]')];
       const results = inputs.map(check);
       const first = inputs[results.indexOf(false)];
       first?.focus();
@@ -318,51 +214,31 @@ const words = {
     });
     form.addEventListener('focusout', (e) => {
       const input = e.target as HTMLInputElement;
-      if (input.matches?.('input[required], input[pattern]') && input.value && !input.checkValidity()) check(input);
-    });
-
-    // Two-step layout.
-    const show = (n: number) => {
-      steps.forEach((s) => (s.hidden = s.dataset.leadStep !== String(n)));
-      if (stepLabel) stepLabel.textContent = stepLabel.textContent!.replace(/\d(?= of)/, String(n));
-      progress?.style.setProperty('--p', n === 1 ? '50%' : '100%');
-      steps[n - 1]?.querySelector<HTMLInputElement>('input:not([type=radio])')?.focus();
-    };
-    form.querySelector('[data-lead-next]')?.addEventListener('click', () => {
-      if (valid(steps[0])) show(2);
-    });
-    form.querySelector('[data-lead-back]')?.addEventListener('click', () => show(1));
-    // Enter in step 1 goes to step 2 rather than submitting.
-    steps[0]?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.target as HTMLElement).matches('input:not([type=radio])')) {
-        e.preventDefault();
-        if (valid(steps[0])) show(2);
-      }
-    });
-
-    // Callback: the button says what will happen.
-    const wa = form.querySelector<HTMLInputElement>('[data-lead-wa]');
-    const cta = form.querySelector<HTMLElement>('[data-lead-cta]');
-    wa?.addEventListener('change', () => {
-      if (cta) cta.textContent = wa.checked ? cta.dataset.wa! : cta.dataset.call!;
+      if (input.matches?.('.lf__field input') && input.value && !input.checkValidity()) check(input);
     });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       error.hidden = true;
-      if (!valid(form)) return;
-      const button = form.querySelector<HTMLButtonElement>('button[type=submit]:not([hidden])');
+      if (!valid()) return;
+      startBotCheck();
+      button.disabled = true;
+      const idle = label.textContent;
+      label.textContent = msg.msgSending!;
       try {
-        if (!form.hasAttribute('data-demo-form')) {
-          button?.setAttribute('disabled', '');
-          const data = new FormData(form);
-          const attribution = (window as Window & { WRPAttribution?: Attribution }).WRPAttribution?.serialize?.();
-          if (attribution) data.set('attribution', attribution);
-          const res = await fetch(form.action, { method: 'POST', body: data });
-          const json = await res.json().catch(() => ({}));
-          if (!res.ok || !json.success) throw new Error(json.error);
-          document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: `hero-${form.dataset.leadVariant}` } }));
-        }
+        const data = new FormData(form);
+        // Normally ready long before the click; a visible challenge can take a while.
+        const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Turnstile timeout')), 60_000));
+        data.set('cf-turnstile-response', await Promise.race([token, timeout]));
+        data.set('requestId', requestId);
+        data.set('page', location.pathname);
+        const attribution = w.WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const { data: result, error: failed } = await actions.quote(data);
+        if (failed) throw failed;
+        if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'hero' } }));
+        form.querySelector<HTMLElement>('[data-lead-preview]')!.hidden = result.saved;
+        requestId = crypto.randomUUID();
         body.hidden = true;
         done.hidden = false;
         done.focus();
@@ -370,14 +246,20 @@ const words = {
         error.textContent = msg.msgError!;
         error.hidden = false;
       } finally {
-        button?.removeAttribute('disabled');
+        button.disabled = false;
+        label.textContent = idle;
+        // Tokens are single-use: get a fresh one for a retry.
+        if (widgetId) {
+          nextToken();
+          w.turnstile?.reset(widgetId);
+        }
       }
     });
   }
 </script>
 
 <style>
-  /* The steps, thank-you panel and messages use the hidden attribute. */
+  /* The thank-you panel and messages use the hidden attribute. */
   .lf [hidden] {
     display: none !important;
   }
@@ -418,28 +300,11 @@ const words = {
     font-size: 0.9375rem;
     color: var(--lf-mute);
   }
-  fieldset {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    min-inline-size: 0;
-  }
-  .lf__pane {
-    display: grid;
-    gap: 1rem;
-  }
-  .lf__q {
-    padding: 0;
-    margin-block-end: 0.25rem;
-    font-weight: 600;
-    font-size: 1rem;
-  }
   .lf__field {
     display: grid;
     gap: 0.35rem;
   }
-  .lf__field label,
-  .lf__chips legend {
+  .lf__field label {
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -468,7 +333,8 @@ const words = {
   .lf__field input[aria-invalid='true'] {
     border-color: #b42318;
   }
-  .lf__note {
+  /* Made by the script, so outside Astro's scoping. */
+  .lf :global(.lf__note) {
     font-size: 0.8125rem;
     color: #b42318;
   }
@@ -530,229 +396,19 @@ const words = {
   .lf__wa {
     margin-block-start: 0.75rem;
   }
-  .lf--a .lf__wa,
-  .lf--d .lf__wa {
+  .lf .lf__wa {
     border-color: var(--lf-ink);
     color: var(--lf-ink);
   }
 
-  /* Chips: radio inputs styled as buttons. */
-  .lf__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .lf__chips legend {
-    inline-size: 100%;
-    margin-block-end: 0.45rem;
-    float: inline-start;
-  }
-  .lf__chip {
-    position: relative;
-    flex: 1 1 auto;
-  }
-  .lf__chip input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    margin: 0;
-    cursor: pointer;
-  }
-  .lf__chip span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    min-block-size: 2.75rem;
-    padding: 0.4rem 0.9rem;
-    border: 1.5px solid var(--lf-line);
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .lf__chip input:checked + span {
-    border-color: var(--lf-ink);
-    background: var(--lf-ink);
-    color: var(--lf-bg);
-  }
-  .lf__chip input:focus-visible + span {
-    outline: 3px solid var(--st-gold);
-    outline-offset: 2px;
-  }
-  .lf__chips--seg {
-    gap: 0;
-  }
-  .lf__chips--seg .lf__chip + .lf__chip span {
-    border-inline-start-width: 0;
-  }
-  .lf__chips--seg .lf__chip input:checked + span {
-    position: relative;
-  }
-
-  /* a: Card. White, gold rule on top, a soft shadow off the photo. */
-  .lf--a .lf__body {
+  /* White card, gold rule on top, a soft shadow off the photo. */
+  .lf__body {
     border-block-start: 4px solid var(--st-gold);
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
   }
 
-  /* b: Two-step, dark glass over the photo. */
-  .lf--b {
-    --lf-bg: rgb(12 13 15 / 0.62);
-    --lf-ink: var(--st-white);
-    --lf-mute: var(--st-on-dark);
-    --lf-line: rgb(255 255 255 / 0.28);
-    --lf-field: rgb(255 255 255 / 0.06);
-    --lf-accent: var(--st-gold);
-    color-scheme: dark;
-  }
-  .lf--b .lf__body,
-  .lf--b .lf__done {
-    border: 1px solid rgb(255 255 255 / 0.14);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
-    backdrop-filter: blur(14px) saturate(1.2);
-  }
-  .lf--b .lf__step {
-    font-family: var(--st-head-font);
-    font-size: 0.8125rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--st-gold);
-  }
-  .lf__bar {
-    display: block;
-    block-size: 3px;
-    margin-block-start: 0.6rem;
-    background: rgb(255 255 255 / 0.15);
-  }
-  .lf__bar span {
-    display: block;
-    block-size: 100%;
-    inline-size: var(--p, 50%);
-    background: var(--st-gold);
-    transition: inline-size 0.3s;
-  }
-  .lf--b .lf__chip input:checked + span {
-    background: var(--st-gold);
-    border-color: var(--st-gold);
-    color: var(--st-black);
-  }
-  .lf__row {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-  }
-  .lf__row .lf__send {
-    flex: 1;
-  }
-  .lf__back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-block-size: 3rem;
-    padding: 0 0.5rem;
-    border: 0;
-    background: none;
-    color: var(--lf-mute);
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-  .lf__back:hover {
-    color: var(--lf-ink);
-  }
-
-  /* c: Callback. One field and a button on a slim panel. */
-  .lf--c {
-    --lf-bg: var(--st-white);
-  }
-  .lf--c .lf__body {
-    border-inline-start: 4px solid var(--st-gold);
-  }
-  .lf__inline {
-    display: grid;
-    gap: 0.6rem;
-  }
-  @container (min-width: 24rem) {
-    .lf__inline {
-      grid-template-columns: 1fr auto;
-      gap: 0;
-    }
-    .lf__inline input {
-      border-inline-end-width: 0;
-    }
-    .lf__inline .lf__send {
-      inline-size: auto;
-    }
-  }
-  .lf__switch {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 0.875rem;
-    cursor: pointer;
-    position: relative;
-  }
-  .lf__switch input {
-    position: absolute;
-    opacity: 0;
-    inline-size: 2.5rem;
-    block-size: 1.4rem;
-    margin: 0;
-    cursor: pointer;
-  }
-  .lf__track {
-    position: relative;
-    flex: none;
-    inline-size: 2.5rem;
-    block-size: 1.4rem;
-    border-radius: 1rem;
-    background: var(--lf-line);
-    transition: background-color 0.2s;
-  }
-  .lf__track::after {
-    content: '';
-    position: absolute;
-    inset-block-start: 0.2rem;
-    inset-inline-start: 0.2rem;
-    inline-size: 1rem;
-    block-size: 1rem;
-    border-radius: 50%;
-    background: var(--st-white);
-    transition: translate 0.2s;
-  }
-  .lf__switch input:checked + .lf__track {
-    background: #1f8f4e;
-  }
-  .lf__switch input:checked + .lf__track::after {
-    translate: 1.1rem 0;
-  }
-  :global([dir='rtl']) .lf__switch input:checked + .lf__track::after {
-    translate: -1.1rem 0;
-  }
-  .lf__switch input:focus-visible + .lf__track {
-    outline: 3px solid var(--st-gold);
-    outline-offset: 2px;
-  }
-
-  /* d: Choices. Chips first, fields after. */
-  .lf--d .lf__body {
-    border-block-start: 4px solid var(--st-ink);
-  }
-  .lf__two {
-    display: grid;
-    gap: 1rem;
-  }
-  @container (min-width: 26rem) {
-    .lf__two {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .lf__bar span,
-    .lf__track,
-    .lf__track::after {
-      transition: none;
-    }
+  /* Turnstile only shows itself when it needs the visitor (interaction-only). */
+  .lf__bot:empty {
+    display: none;
   }
 </style>

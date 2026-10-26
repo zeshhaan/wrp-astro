@@ -15,7 +15,7 @@ import ReviewQuote from './sections/ReviewQuote.astro';
 import ReviewCards from './sections/ReviewCards.astro';
 import PostCards from './sections/PostCards.astro';
 import ServiceCards from './sections/ServiceCards.astro';
-import LeadForm, { type LeadVariant } from './sections/LeadForm.astro';
+import LeadForm from './sections/LeadForm.astro';
 import Picture from '../../shared/Picture.astro';
 import Icon from '../Icon.astro';
 import LucideIcon from '@/components/Icon.astro';
@@ -28,11 +28,11 @@ import { fillSpans } from './fill';
 interface Props {
   service: CollectionEntry<'services'>;
   locale?: Locale;
-  /** Put a lead form on the right of the hero, in this layout (Design Lab candidates a–d). */
-  heroForm?: LeadVariant;
+  /** The quote form on the right of the hero (default). False puts a quote button there instead. */
+  heroForm?: boolean;
 }
 
-const { service, locale = 'en', heroForm } = Astro.props;
+const { service, locale = 'en', heroForm = true } = Astro.props;
 const slug = service.id.replace(/^ar\//, '');
 const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
 const link = (href: string) => (isLab ? toLab(href) : href);
@@ -127,7 +127,6 @@ const heroBase = imgBase(heroImage);
 // With a form in the hero, every quote button on the page leads to it instead
 // of the separate quote page (and the hero drops its own button).
 const quoteHref = heroForm ? '#quote' : studioQuoteHref;
-const levels = (packages ?? []).map((p) => p.name);
 ---
 
 <StudioPage
@@ -135,7 +134,7 @@ const levels = (packages ?? []).map((p) => p.name);
   description={description}
   ogImage={ogImage}
   locale={locale}
-  heroForm={Boolean(heroForm)}
+  heroForm={heroForm}
   livePath={`${localizeUrl(`/services/${slug}/`, locale)}`}
   preloads={[
     {
@@ -159,7 +158,7 @@ const levels = (packages ?? []).map((p) => p.name);
     <Breadcrumbs slot="crumbs" crumbs={breadcrumbs} link={link} />
     {
       heroForm ? (
-        <LeadForm slot="aside" variant={heroForm} service={title} levels={levels} demo={isLab} />
+        <LeadForm slot="aside" service={title} />
       ) : (
         <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
           {w.getQuote}

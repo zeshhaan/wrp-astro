@@ -105,13 +105,21 @@ as the live page, so the copy cannot drift.
 - `src/designs/studio/theme.css`: Studio's tokens, layout helpers, headings and
   buttons, shared by the homepage and the inner pages.
 
-- `src/designs/studio/site/sections/LeadForm.astro`: the hero lead form, in
-  four candidate layouts compared at `/design-lab/studio/services/<slug>/form-a/`
-  … `form-d/` (the Lab bar switches between them). With a form in the hero, the
+- `src/designs/studio/site/sections/LeadForm.astro`: the hero quote form
+  (layout A, "Card", picked from four candidates). With a form in the hero, the
   hero drops its quote button, every quote button on the page leads to the
-  form, and the header's quote buttons hide while the form is on screen. In the
-  lab the form is a mock-up and sends nothing; at go-live it posts to the lead
-  handler.
+  form, and the header's quote buttons hide while the form is on screen. It
+  sends to the `quote` Astro Action (`src/actions/index.ts`), which checks
+  Turnstile and saves to the `quote_form_leads` D1 table and emails the team.
+  Worker previews and Design Lab pages only run the checks: nothing is saved or
+  sent (`quoteLeadMode` in `src/lib/quote-form-lead.ts`).
+
+  Go-live needs: migration `0006_add_quote_form_leads.sql` applied to
+  production D1, a Turnstile widget for wrpdetailing.ae and
+  www.wrpdetailing.ae, its site key as the Workers Builds build variable
+  `PUBLIC_TURNSTILE_SITEKEY` and its secret as the Worker secret
+  `TURNSTILE_SECRET`. Set both keys or neither: a secret without the site key
+  rejects every lead. Without either, leads are taken with no bot check.
 
 Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
 Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.
