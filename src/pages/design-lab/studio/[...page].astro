@@ -17,6 +17,7 @@ import PortfolioPage from '@/designs/studio/site/PortfolioPage.astro';
 import BlogIndexPage from '@/designs/studio/site/BlogIndexPage.astro';
 import BlogPostPage from '@/designs/studio/site/BlogPostPage.astro';
 import ArHomePage from '@/designs/studio/site/ArHomePage.astro';
+import Home from '@/designs/studio/Home.astro';
 import LegalPage, { type LegalSlug } from '@/designs/studio/site/LegalPage.astro';
 import { pillars } from '@/designs/studio/site/content/pillars';
 import { about } from '@/designs/studio/site/content/about';
@@ -60,9 +61,14 @@ export const getStaticPaths = (async () => {
       props: { kind: 'legal' as const, locale, slug: slug as string },
     })),
   ]);
-  // The Arabic homepage. The English Studio homepage is the concept page at /design-lab/studio/.
-  const home = { params: { page: 'ar' }, props: { kind: 'home' as const, locale: 'ar' as const, slug: '' } };
-  return [home, ...pages, ...blogPaths];
+  // The homepages. This rest route also matches /design-lab/studio/ itself, so
+  // it owns the English homepage too: without it, the `/` rewrite on the
+  // design-studio Preview finds no static path and renders an empty page.
+  const homes = [
+    { params: { page: undefined }, props: { kind: 'home' as const, locale: 'en' as const, slug: '' } },
+    { params: { page: 'ar' }, props: { kind: 'home' as const, locale: 'ar' as const, slug: '' } },
+  ];
+  return [...homes, ...pages, ...blogPaths];
 }) satisfies GetStaticPaths;
 
 const { kind, locale, slug } = Astro.props;
@@ -89,7 +95,7 @@ async function relatedServicesOf(entry: CollectionEntry<'blog'>, arabic: boolean
 const related = post ? await relatedServicesOf(post, locale === 'ar') : [];
 ---
 
-{kind === 'home' && <ArHomePage />}
+{kind === 'home' && (locale === 'ar' ? <ArHomePage /> : <Home />)}
 {kind === 'pillar' && <PillarPage slug={slug as 'wrap'} copy={pillars[`${locale}/${slug}`]} locale={locale} />}
 {kind === 'about' && <AboutPage copy={about[locale]} locale={locale} />}
 {kind === 'contact' && <ContactPage copy={contact[locale]} locale={locale} />}
