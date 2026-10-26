@@ -1,0 +1,168 @@
+---
+/**
+ * "Other services": three service cards. Studio version of
+ * src/components/OtherServices.astro, with the same three services (the first
+ * three that are not this one), heading, subtitle, card text and link label.
+ * Cards answer to their own width (container queries), so the same card works
+ * in this three-up row and anywhere narrower.
+ */
+import Picture from '../../../shared/Picture.astro';
+import Icon from '../../Icon.astro';
+import { localizeUrl } from '@/i18n/utils';
+import { getBaseSlug, getLocalizedServices } from '@/i18n/content';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  currentService: string;
+  locale?: Locale;
+  link?: (href: string) => string;
+}
+
+const { currentService, locale = 'en', link = (href: string) => href } = Astro.props;
+const others = (await getLocalizedServices(locale))
+  .filter((s) => getBaseSlug(s.id) !== currentService)
+  .slice(0, 3)
+  .map((s) => ({
+    name: s.data.title,
+    slug: getBaseSlug(s.id),
+    description: s.data.description,
+    image: s.data.heroImage.replace(/\.(jpe?g|png|webp)$/i, ''),
+  }));
+---
+
+<section class="sc st-section st-dark" aria-labelledby="sc-title">
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <h2 id="sc-title" class="st-h2">{t(locale, 'services.otherServices')}</h2>
+      <p class="st-intro">{t(locale, 'services.otherSubtitle')}</p>
+    </header>
+    <ul class="sc__list" role="list">
+      {
+        others.map((s) => (
+          <li class="sc__item">
+            <article class="sc__card">
+              <div class="sc__media">
+                <Picture base={s.image} alt={s.name} sizes="(min-width: 60rem) 30vw, (min-width: 40rem) 50vw, 100vw" widths={[480, 800]} width={800} height={600} />
+                <h3 class="sc__name">{s.name}</h3>
+              </div>
+              <div class="sc__body">
+                <p class="sc__desc">{s.description}</p>
+                <a class="sc__link" href={link(localizeUrl(`/services/${s.slug}/`, locale))}>
+                  {t(locale, 'common.learnMore').toUpperCase()} <Icon name="arrow-right" size={16} class="sc__arrow" />
+                </a>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sc__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sc__item {
+    container-type: inline-size;
+    display: flex;
+  }
+  .sc__card {
+    display: flex;
+    flex-direction: column;
+    inline-size: 100%;
+    background: var(--st-card-dark);
+    border-block-end: 3px solid var(--st-gold);
+  }
+  .sc__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .sc__media :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.6s;
+  }
+  .sc__card:hover .sc__media :global(img) {
+    transform: scale(1.05);
+  }
+  .sc__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(12 13 15 / 0.85), transparent 60%);
+  }
+  .sc__name {
+    position: absolute;
+    inset-inline: 1.25rem;
+    inset-block-end: 1rem;
+    z-index: 1;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .sc__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    flex: 1;
+    padding: 1.25rem;
+  }
+  .sc__desc {
+    flex: 1;
+    color: var(--st-on-dark);
+    font-size: 0.9375rem;
+  }
+  .sc__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--st-white);
+    text-decoration: none;
+  }
+  .sc__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .sc__card {
+    position: relative;
+  }
+  .sc__link:hover {
+    color: var(--st-gold);
+  }
+  :global([dir='rtl']) .sc__link :global(.sc__arrow) {
+    transform: scaleX(-1);
+  }
+  /* A wide card (a row of one or two) puts the photo beside the text. */
+  @container (min-width: 34rem) {
+    .sc__card {
+      flex-direction: row;
+    }
+    .sc__media {
+      flex: 0 0 48%;
+      aspect-ratio: auto;
+      min-block-size: 16rem;
+    }
+    .sc__body {
+      padding: 1.75rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sc__media :global(img) {
+      transition: none;
+    }
+  }
+</style>
