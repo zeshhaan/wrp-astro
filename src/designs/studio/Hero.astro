@@ -45,9 +45,12 @@ import { heroVideo as hv } from './heroVideo';
     </div>
     <div class="hero__side">
       <p class="hero__lede">
-        Paint protection film from Avery Dennison and STEK, ceramic coating, polish and paint correction,
-        window tint, upholstery and hand washes, done properly and on time at our studio in Al Qusais Industrial
-        Area 1.
+        <span class="hero__lede-long">
+          Paint protection film from Avery Dennison and STEK, ceramic coating, polish and paint correction,
+          window tint, upholstery and hand washes, done properly and on time at our studio in Al Qusais
+          Industrial Area 1.
+        </span>
+        <span class="hero__lede-short">Premium Protection. Expert Installation. Lasting Results.</span>
       </p>
       <div class="hero__actions">
         <a class="st-btn st-btn--gold" href="/design-lab/studio/quote/">Get a quick quote <Icon name="arrow-right" size={18} /></a>
@@ -201,13 +204,24 @@ import { heroVideo as hv } from './heroVideo';
     gap: 2px;
     color: var(--st-gold);
   }
-  /* Phones: the H1 says enough, so the buttons sit straight under it. The lede stays in the HTML. */
+  /*
+    Phones: the hero fills the screen below the rating strip (2.5rem, plus 1px each for its rule
+    and the header's, which sits over the hero), content at the bottom and clear of the floating
+    WhatsApp button. The lede swaps to its short line; the long one stays in the HTML.
+  */
+  .hero__lede-short {
+    display: none;
+  }
   @media (max-width: 40rem) {
-    .hero__lede {
+    .hero {
+      min-block-size: calc(100svh - 2.5rem - 2px);
+      padding-block: 5.5rem 4.75rem;
+    }
+    .hero__lede-long {
       display: none;
     }
-    .hero__actions {
-      margin-block-start: 0;
+    .hero__lede-short {
+      display: inline;
     }
   }
   @media (max-width: 29.99rem) {
