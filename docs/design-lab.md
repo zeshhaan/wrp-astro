@@ -23,7 +23,7 @@ Every build has a review hub at `/design-lab/` linking to each Studio page:
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
 | Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
 
-A floating bar links between them. These pages are `noindex`, excluded from the
+These pages are `noindex`, excluded from the
 sitemap, and their forms never send leads.
 
 Studio also has its own Cloudflare **Worker Preview** where it is served at `/`,

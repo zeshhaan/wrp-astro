@@ -21,7 +21,6 @@ import { Font } from 'astro:assets';
 import Schema from '@/components/Schema.astro';
 import Analytics from '@/components/Analytics.astro';
 import Attribution from '@/components/Attribution.astro';
-import LabBar from '../../shared/LabBar.astro';
 import HeaderStorefront from '../headers/HeaderStorefront.astro';
 import { getHeaderNav } from '../headers/nav';
 import Footer from '../Footer.astro';
@@ -223,7 +222,6 @@ const altHref = lab(alternatePath);
     </main>
     <Footer home={lab('/')} serviceHref={lab} />
     <FloatingContact />
-    {isLab && <LabBar />}
     {
       heroForm && (
         <script>

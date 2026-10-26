@@ -105,11 +105,6 @@
 
 /* ---------- Page chrome on this page ---------- */
 
-/* The Design Lab switcher would sit on top of the action bar: hidden on this page only
-   (the Studio header, footer and "Back to the homepage" still link out). */
-[data-lab-bar] {
-  display: none !important;
-}
 /* The site header scrolls away here; the compact progress bar takes the sticky slot. */
 body:has(main.q) .head {
   position: relative;

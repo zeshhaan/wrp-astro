@@ -73,8 +73,7 @@ import { contact, proof, whatsappQuote } from './content';
   .fab {
     position: fixed;
     inset-inline-end: max(1rem, env(safe-area-inset-right));
-    /* Clear of the Design Lab bar at bottom-centre on phones. */
-    inset-block-end: calc(max(12px, env(safe-area-inset-bottom)) + 4.25rem);
+    inset-block-end: max(1rem, env(safe-area-inset-bottom));
     z-index: 40;
     display: grid;
     place-items: center;

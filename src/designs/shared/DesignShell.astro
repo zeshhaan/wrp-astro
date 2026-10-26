@@ -7,8 +7,6 @@
  * only those are loaded.
  */
 import { Font } from 'astro:assets';
-import LabBar from './LabBar.astro';
-import { getConcept } from '../registry';
 import './reset.css';
 
 type FontVar =
@@ -32,7 +30,6 @@ interface Props {
 }
 
 const { concept, title, description, fonts, themeColor, preloadImage, preloads = [], colorScheme = 'light' } = Astro.props;
-const meta = getConcept(concept);
 const widths = preloadImage?.widths ?? [480, 800, 1200];
 ---
 
@@ -67,7 +64,6 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
   </head>
   <body>
     <slot />
-    {meta && <LabBar />}
     <script>
       // Concept forms are mock-ups: never send real leads from a design preview.
       document.addEventListener('submit', (event) => {
