@@ -1,0 +1,471 @@
+---
+/**
+ * Studio version of the blog index (/blog/), English or Arabic. Same posts,
+ * order, featured post, category filter, empty states, CollectionPage JSON-LD
+ * and closing call to action as the live src/pages/blog/index.astro, with the
+ * page's own words from content/blog.ts.
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import EndCta from './sections/EndCta.astro';
+import Picture from '../../shared/Picture.astro';
+import { scrimStops } from '../../shared/easedGradient';
+import Icon from '../Icon.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import { getLocalizedBlogPosts } from '@/i18n/content';
+import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { say, trail } from './say';
+
+type Category = 'guide' | 'news' | 'update' | 'event' | 'listicle';
+export type BlogIndexCopy = {
+  title: string;
+  description: string;
+  crumbs: string[];
+  h1: string;
+  lede: string;
+  featured: string;
+  minRead: string;
+  min: string;
+  categoryLabels: Record<Category, string>;
+  filterLabels: Record<'all' | 'guide' | 'listicle' | 'news', string>;
+  empty: { h3: string; text: string; button: string; none: string };
+  cta: { h2: string; text: string; button: string };
+  schema: { name: string; description: string; inLanguage: string; siteName: string };
+};
+
+interface Props {
+  copy: BlogIndexCopy;
+  locale?: Locale;
+}
+
+const { copy, locale = 'en' } = Astro.props;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const s = (text: string) => say(locale, text);
+const num = (n: string | number) => toLocalNum(n, locale);
+const site = 'https://wrpdetailing.ae';
+const postPath = (id: string) => localizeUrl(`/blog/${id.replace(/^ar\//, '')}/`, locale);
+const coverBase = (src: string) => src.replace(/\.(jpe?g|png|webp)$/i, '');
+
+const posts = (await getLocalizedBlogPosts(locale)).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const featured = posts.find((post) => post.data.featured);
+const categories = ['all', 'guide', 'listicle', 'news'] as const;
+const withPosts = new Set(posts.map((p) => p.data.category));
+const hasPosts = Object.fromEntries(categories.map((c) => [c, c === 'all' ? posts.length > 0 : withPosts.has(c)]));
+const label = (c: string) => copy.categoryLabels[c as Category] || c;
+
+// The live page's CollectionPage + ItemList JSON-LD.
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: copy.schema.name,
+  description: copy.schema.description,
+  url: `${site}${localizeUrl('/blog/', locale)}`,
+  inLanguage: copy.schema.inLanguage,
+  isPartOf: { '@type': 'WebSite', name: copy.schema.siteName, url: `${site}/` },
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: posts.length,
+    itemListElement: posts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `${site}${postPath(post.id)}`,
+      name: post.data.title,
+    })),
+  },
+};
+const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 18, to: 78, max: 0.94 })}, rgb(12 13 15 / 0.94) 100%)`;
+---
+
+<StudioPage title={copy.title} description={copy.description} locale={locale} livePath={localizeUrl('/blog/', locale)}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <section class="bh">
+    <div class="st-wrap bh__inner">
+      <Breadcrumbs crumbs={trail(locale, copy.crumbs, ['/', '/blog/'])} link={link} />
+      <h1 class="bh__title">{copy.h1}</h1>
+      <p class="bh__lede">{copy.lede}</p>
+    </div>
+  </section>
+
+  {
+    featured && (
+      <section class="ft st-section st-light">
+        <div class="st-wrap">
+          <p class="ft__label"><span>{s(copy.featured)}</span></p>
+          <a class="ft__card" href={link(postPath(featured.id))}>
+            {featured.data.heroImage && (
+              <Picture
+                base={coverBase(featured.data.heroImage)}
+                alt={featured.data.title}
+                sizes="(min-width: 56rem) 50vw, 100vw"
+                widths={[480, 800]}
+                width={800}
+                height={450}
+                loading="eager"
+                class="ft__photo"
+              />
+            )}
+            <div class="ft__body">
+              <p class="ft__meta">
+                <span class="ft__cat">{label(featured.data.category)}</span>
+                <FormattedDate date={featured.data.pubDate} locale={locale} />
+                {featured.data.readingTime && (
+                  <span>
+                    {num(featured.data.readingTime)} {s(copy.minRead)}
+                  </span>
+                )}
+              </p>
+              <h2 class="ft__title">{featured.data.title}</h2>
+              <p class="ft__desc">{featured.data.description}</p>
+              <span class="ft__more">
+                {t(locale, 'blog.readMore')} <Icon name="arrow-right" size={16} class="flip" />
+              </span>
+            </div>
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="bl st-section st-black" data-blog data-has={JSON.stringify(hasPosts)}>
+    <div class="st-wrap">
+      <div class="bl__filters" role="group">
+        {
+          categories.map((cat) => (
+            <button type="button" class="bl__filter" data-cat={cat} aria-pressed={cat === 'all' ? 'true' : 'false'}>
+              {copy.filterLabels[cat]}
+            </button>
+          ))
+        }
+      </div>
+
+      <ul class="bl__grid" role="list">
+        {
+          posts.map((post) => (
+            <li class="bl__card" data-post-cat={post.data.category} style={`--scrim:${scrim}`}>
+              {post.data.heroImage && (
+                <Picture
+                  base={coverBase(post.data.heroImage)}
+                  alt={post.data.title}
+                  sizes="(min-width: 64rem) 30vw, (min-width: 40rem) 50vw, 100vw"
+                  widths={[480, 800]}
+                  width={800}
+                  height={450}
+                  class="bl__cover"
+                />
+              )}
+              <p class="bl__meta">
+                {post.data.category && <span class="bl__cat">{label(post.data.category)}</span>}
+                <FormattedDate date={post.data.pubDate} locale={locale} />
+                {post.data.readingTime && (
+                  <span>
+                    {num(post.data.readingTime)} {copy.min}
+                  </span>
+                )}
+              </p>
+              <h3 class="bl__title">
+                <a href={link(postPath(post.id))}>{post.data.title}</a>
+              </h3>
+              <p class="bl__desc">{post.data.description}</p>
+              <span class="bl__more" aria-hidden="true">
+                {t(locale, 'blog.readMore')} <Icon name="arrow-right" size={16} class="flip" />
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="bl__empty" data-blog-empty hidden>
+        <h3 class="bl__empty-title">{copy.empty.h3}</h3>
+        <p>{copy.empty.text}</p>
+        <button type="button" class="st-btn st-btn--light" data-cat="all">{copy.empty.button}</button>
+      </div>
+      {posts.length === 0 && <p class="bl__none">{copy.empty.none}</p>}
+    </div>
+  </section>
+
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={copy.cta.button} href={studioQuoteHref} />
+</StudioPage>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-blog]')) {
+    const has = JSON.parse(root.dataset.has || '{}') as Record<string, boolean>;
+    const filters = [...root.querySelectorAll<HTMLButtonElement>('.bl__filter')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-post-cat]')];
+    const empty = root.querySelector<HTMLElement>('[data-blog-empty]')!;
+    const pick = (cat: string) => {
+      for (const f of filters) f.setAttribute('aria-pressed', String(f.dataset.cat === cat));
+      for (const c of cards) c.hidden = cat !== 'all' && c.dataset.postCat !== cat;
+      empty.hidden = Boolean(has[cat]);
+    };
+    root.addEventListener('click', (e) => {
+      const btn = (e.target as Element).closest?.<HTMLButtonElement>('button[data-cat]');
+      if (btn) pick(btn.dataset.cat!);
+    });
+  }
+</script>
+
+<style>
+  .bh {
+    padding-block: 8.5rem 3rem;
+    background: var(--st-black);
+  }
+  .bh__inner {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .bh__inner > :global(.crumbs) {
+    margin-block-end: 0.75rem;
+  }
+  .bh__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .bh__lede {
+    max-inline-size: 40rem;
+    color: var(--st-on-dark);
+    font-size: 1.125rem;
+  }
+
+  .ft__label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-block-end: 2rem;
+    font-family: var(--st-head-font);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--st-gold-deep);
+  }
+  .ft__label::before,
+  .ft__label::after {
+    content: '';
+    flex: 1;
+    block-size: 1px;
+    background: var(--st-line-light);
+  }
+  .ft__card {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+  }
+  @media (min-width: 56rem) {
+    .ft__card {
+      grid-template-columns: 1.1fr 1fr;
+      gap: 3.5rem;
+    }
+  }
+  .ft__card :global(.ft__photo) {
+    display: block;
+    overflow: hidden;
+  }
+  .ft__card :global(.ft__photo img) {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .ft__card:hover :global(.ft__photo img) {
+    transform: scale(1.04);
+  }
+  .ft__body {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .ft__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.9rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+  }
+  .ft__cat {
+    padding: 0.2rem 0.55rem;
+    background: var(--st-black);
+    color: var(--st-gold);
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.8125rem;
+  }
+  .ft__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.8rem, 1.3rem + 2vw, 2.8rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .ft__desc {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+  }
+  .ft__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--st-gold-deep);
+  }
+
+  .bl__filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-block-end: 2.5rem;
+  }
+  .bl__filter {
+    min-block-size: 2.75rem;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--st-line-dark);
+    background: transparent;
+    color: var(--st-white);
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .bl__filter:hover {
+    border-color: var(--st-gold);
+  }
+  .bl__filter[aria-pressed='true'] {
+    background: var(--st-gold);
+    border-color: var(--st-gold);
+    color: var(--st-black);
+  }
+  .bl__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .bl__card {
+    position: relative;
+    display: grid;
+    align-content: end;
+    gap: 0.6rem;
+    min-block-size: 25rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--st-coal);
+  }
+  .bl__card[hidden] {
+    display: none;
+  }
+  .bl__card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--scrim);
+  }
+  .bl__card :global(.bl__cover) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .bl__card :global(.bl__cover img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .bl__card:hover :global(.bl__cover img) {
+    transform: scale(1.04);
+  }
+  .bl__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--st-on-dark);
+  }
+  .bl__cat {
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--st-gold);
+  }
+  .bl__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.45rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .bl__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .bl__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .bl__desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    color: var(--st-on-dark);
+  }
+  .bl__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.9375rem;
+    color: var(--st-gold);
+  }
+  .bl__card:focus-within {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 3px;
+  }
+  .bl__empty {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    padding-block: 4rem;
+    text-align: center;
+  }
+  .bl__empty[hidden] {
+    display: none;
+  }
+  .bl__empty-title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.75rem;
+    text-transform: uppercase;
+  }
+  .bl__empty p,
+  .bl__none {
+    max-inline-size: 28rem;
+    color: var(--st-on-dark);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bl__card :global(.bl__cover img),
+    .ft__card :global(.ft__photo img) {
+      transition: none;
+    }
+  }
+</style>

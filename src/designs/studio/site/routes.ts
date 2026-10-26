@@ -14,7 +14,7 @@ export const labPrefix = '/design-lab/studio';
 export const studioQuoteHref = `${labPrefix}/quote/`;
 
 /** Live paths that have a Studio version under labPrefix (the Arabic /ar/ twin included unless noted). */
-const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/, /^\/(wrap|reinforce|protect)\/$/, /^\/more-about-wrp\/$/, /^\/contact-us\/$/, /^\/reviews\/$/];
+const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/, /^\/(wrap|reinforce|protect)\/$/, /^\/more-about-wrp\/$/, /^\/contact-us\/$/, /^\/reviews\/$/, /^\/portfolio\/$/, /^\/blog\/([a-z0-9-]+\/)?$/];
 /** Arabic pages whose Studio version is not built yet. */
 const englishOnly: RegExp[] = [/^\/ar\/$/, /^\/ar\/services\//];
 

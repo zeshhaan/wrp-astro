@@ -1,0 +1,346 @@
+---
+/**
+ * Studio version of the portfolio (/portfolio/), English or Arabic. Same
+ * projects in the same order as the live src/pages/portfolio/index.astro
+ * (featured first, then newest), the same titles, subtitles and image alts,
+ * and the same lightbox: every project's gallery in one sequence, opening at
+ * the project you chose, with its title and subtitle as the caption.
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import EndCta from './sections/EndCta.astro';
+import Picture from '../../shared/Picture.astro';
+import Icon from '../Icon.astro';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { getLocalizedPortfolio } from '@/i18n/content';
+import { getImageDimensions } from '@/utils/image-dimensions';
+import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { say, trail } from './say';
+
+export type PortfolioCopy = {
+  title: string;
+  description: string;
+  crumbs: string[];
+  h1: string;
+  lede: string;
+  cta: { h2: string; text: string; button: string };
+};
+
+interface Props {
+  copy: PortfolioCopy;
+  locale?: Locale;
+}
+
+const { copy, locale = 'en' } = Astro.props;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const base = (src: string) => src.replace(/\.(webp|jpe?g|png|avif)$/i, '');
+
+const items = (await getLocalizedPortfolio(locale)).sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return b.data.completionDate.getTime() - a.data.completionDate.getTime();
+});
+// Where each project's photos start in the one lightbox sequence.
+const starts = items.map((_, i) => items.slice(0, i).reduce((n, it) => n + it.data.gallery.length, 0));
+const slides = items.flatMap((item) =>
+  item.data.gallery.map((src) => ({ src: `${base(src)}-1200w.webp`, title: item.data.title, subtitle: item.data.subtitle })),
+);
+---
+
+<StudioPage title={copy.title} description={copy.description} locale={locale} livePath={localizeUrl('/portfolio/', locale)}>
+  <section class="pf-hero">
+    <div class="st-wrap pf-hero__inner">
+      <Breadcrumbs crumbs={trail(locale, copy.crumbs, ['/', '/portfolio/'])} link={link} />
+      <h1 class="pf-hero__title">{copy.h1}</h1>
+      <p class="pf-hero__lede">{copy.lede}</p>
+    </div>
+  </section>
+
+  <section class="pf st-section st-black" data-pf>
+    <div class="st-wrap">
+      <ul class="pf__grid" role="list">
+        {
+          items.map((item, i) => {
+            const size = getImageDimensions(item.data.heroImage.replace(/^\//, ''));
+            return (
+              <li class="pf__item">
+                <div class="pf__card">
+                  <Picture
+                    base={base(item.data.heroImage)}
+                    alt={`${item.data.title} ${item.data.subtitle} - Professional car detailing work completed at WRP Detailing Studio luxury automotive studio`}
+                    sizes="(min-width: 64rem) 33vw, (min-width: 40rem) 50vw, 100vw"
+                    width={size.width}
+                    height={size.height}
+                    loading={i < 3 ? 'eager' : 'lazy'}
+                    class="pf__photo"
+                  />
+                  <div class="pf__caption">
+                    <h3 class="pf__title">{item.data.title}</h3>
+                    <p class="pf__sub">{item.data.subtitle}</p>
+                  </div>
+                  {item.data.gallery.length > 1 && (
+                    <span class="pf__count" aria-hidden="true">
+                      <Icon name="camera" size={14} /> {item.data.gallery.length}
+                    </span>
+                  )}
+                  <button type="button" class="pf__open" data-pf-open={starts[i]} aria-label={`${item.data.title} ${item.data.subtitle}`} />
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+
+    <dialog class="pf__box" aria-label={copy.h1} data-pf-dialog>
+      <figure class="pf__fig">
+        <img class="pf__full" alt="" data-pf-img />
+        <figcaption class="pf__cap"><strong data-pf-title></strong> <span data-pf-sub></span></figcaption>
+      </figure>
+      <p class="pf__n" data-pf-n></p>
+      <form method="dialog">
+        <button class="pf__btn pf__close" aria-label="Close"><Icon name="close" size={22} /></button>
+      </form>
+      <button type="button" class="pf__btn pf__prev" aria-label="Previous photo" data-pf-prev><Icon name="arrow-left" size={22} /></button>
+      <button type="button" class="pf__btn pf__next" aria-label="Next photo" data-pf-next><Icon name="arrow-right" size={22} /></button>
+      <script type="application/json" data-pf-slides set:html={JSON.stringify(slides)} />
+    </dialog>
+  </section>
+
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(locale, copy.cta.button)} href={studioQuoteHref} />
+</StudioPage>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-pf]')) {
+    const slides = JSON.parse(root.querySelector('[data-pf-slides]')!.textContent!) as { src: string; title: string; subtitle: string }[];
+    const dialog = root.querySelector<HTMLDialogElement>('[data-pf-dialog]')!;
+    const img = root.querySelector<HTMLImageElement>('[data-pf-img]')!;
+    const title = root.querySelector<HTMLElement>('[data-pf-title]')!;
+    const sub = root.querySelector<HTMLElement>('[data-pf-sub]')!;
+    const n = root.querySelector<HTMLElement>('[data-pf-n]')!;
+    let index = 0;
+    const show = (i: number) => {
+      index = (i + slides.length) % slides.length;
+      const slide = slides[index];
+      img.src = slide.src;
+      img.alt = `${slide.title} ${slide.subtitle}`;
+      title.textContent = slide.title;
+      sub.textContent = slide.subtitle;
+      n.textContent = `${index + 1} / ${slides.length}`;
+    };
+    for (const card of root.querySelectorAll<HTMLButtonElement>('[data-pf-open]')) {
+      card.addEventListener('click', () => {
+        show(Number(card.dataset.pfOpen));
+        dialog.showModal();
+      });
+    }
+    root.querySelector('[data-pf-prev]')!.addEventListener('click', () => show(index - 1));
+    root.querySelector('[data-pf-next]')!.addEventListener('click', () => show(index + 1));
+    dialog.addEventListener('keydown', (e) => {
+      const rtl = document.documentElement.dir === 'rtl';
+      if (e.key === 'ArrowLeft') show(index + (rtl ? 1 : -1));
+      if (e.key === 'ArrowRight') show(index + (rtl ? -1 : 1));
+    });
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+</script>
+
+<style>
+  .pf-hero {
+    padding-block: 8.5rem 1rem;
+    background: var(--st-black);
+  }
+  .pf-hero__inner {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .pf-hero__inner > :global(.crumbs) {
+    margin-block-end: 0.75rem;
+  }
+  .pf-hero__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.8rem, 1.6rem + 5vw, 5.5rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .pf-hero__lede {
+    max-inline-size: 40rem;
+    color: var(--st-on-dark);
+    font-size: 1.125rem;
+  }
+
+  .pf {
+    padding-block-start: 2.5rem;
+  }
+  .pf__grid {
+    columns: 1;
+    column-gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40rem) {
+    .pf__grid {
+      columns: 2;
+    }
+  }
+  @media (min-width: 64rem) {
+    .pf__grid {
+      columns: 3;
+    }
+  }
+  .pf__item {
+    break-inside: avoid;
+    margin-block-end: 1rem;
+  }
+  .pf__card {
+    position: relative;
+    overflow: hidden;
+    background: var(--st-coal);
+    color: var(--st-white);
+  }
+  /* The whole card opens the lightbox. */
+  .pf__open {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+  .pf__open:focus-visible {
+    outline-offset: -3px;
+  }
+  .pf__card :global(.pf__photo img) {
+    inline-size: 100%;
+    block-size: auto;
+    transition: transform 0.6s;
+  }
+  .pf__card:hover :global(.pf__photo img) {
+    transform: scale(1.04);
+  }
+  .pf__caption {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: grid;
+    gap: 0.2rem;
+    padding: 3.5rem 1.25rem 1.1rem;
+    background: linear-gradient(to top, rgb(12 13 15 / 0.92), rgb(12 13 15 / 0.55) 60%, transparent);
+  }
+  .pf__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .pf__sub {
+    font-size: 0.875rem;
+    color: var(--st-gold);
+  }
+  .pf__count {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    background: rgb(12 13 15 / 0.75);
+    font-size: 0.8125rem;
+  }
+
+  .pf__box {
+    inline-size: 100vw;
+    block-size: 100dvh;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    padding: 4rem 1rem;
+    border: 0;
+    background: rgb(12 13 15 / 0.96);
+    color: var(--st-white);
+  }
+  .pf__box[open] {
+    display: grid;
+    place-items: center;
+  }
+  .pf__box::backdrop {
+    background: transparent;
+  }
+  .pf__fig {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+    margin: 0;
+  }
+  .pf__full {
+    max-inline-size: min(100%, 75rem);
+    max-block-size: calc(100dvh - 10rem);
+    object-fit: contain;
+  }
+  .pf__cap {
+    font-size: 0.9375rem;
+    color: var(--st-on-dark);
+  }
+  .pf__cap strong {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--st-white);
+  }
+  .pf__n {
+    position: absolute;
+    inset-block-start: 1.25rem;
+    inset-inline-start: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--st-mute);
+  }
+  .pf__btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    border: 0;
+    background: rgb(255 255 255 / 0.08);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .pf__btn:hover {
+    background: var(--st-gold);
+    color: var(--st-black);
+  }
+  .pf__close {
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+  }
+  .pf__prev,
+  .pf__next {
+    inset-block-start: 50%;
+    translate: 0 -50%;
+  }
+  .pf__prev {
+    inset-inline-start: 0.75rem;
+  }
+  .pf__next {
+    inset-inline-end: 0.75rem;
+  }
+  :global([dir='rtl']) .pf__prev :global(svg),
+  :global([dir='rtl']) .pf__next :global(svg) {
+    transform: scaleX(-1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pf__card :global(.pf__photo img) {
+      transition: none;
+    }
+  }
+</style>
