@@ -1,8 +1,12 @@
 ---
 /**
- * Blog posts related to a service, as Studio photo cards. Studio version of
- * src/components/RelatedPosts.astro: same selection (posts tagged with the
- * service, newest first, up to 3), heading, subtitle and card text.
+ * Blog posts as Studio photo cards, in two modes:
+ *  - with `serviceId`: the Studio version of src/components/RelatedPosts.astro
+ *    (posts tagged with the service, newest first, up to 3);
+ *  - without: the Studio version of src/components/LatestPosts.astro (the
+ *    newest `count` posts, the page's heading and subheading, and a link to
+ *    the blog).
+ * Same selection, headings and card text as the live components.
  */
 import Picture from '../../../shared/Picture.astro';
 import { scrimStops } from '../../../shared/easedGradient';
@@ -13,17 +17,24 @@ import { t, type Locale } from '@/i18n/translations';
 import { getLocalizedBlogPosts } from '@/i18n/content';
 
 interface Props {
-  serviceId: string;
+  serviceId?: string;
   locale?: Locale;
   link?: (href: string) => string;
+  heading?: string;
+  subheading?: string;
+  count?: number;
+  class?: string;
 }
 
-const { serviceId, locale = 'en', link = (href: string) => href } = Astro.props;
+const { serviceId, locale = 'en', link = (href: string) => href, count = 3, class: className = 'st-light' } = Astro.props;
+const latest = !serviceId;
+const heading = Astro.props.heading ?? t(locale, latest ? 'blog.latestPosts' : 'blog.relatedPosts');
+const subheading = Astro.props.subheading ?? t(locale, 'blog.latestSubtitle');
 const all = await getLocalizedBlogPosts(locale);
 const related = all
-  .filter((post) => post.data.relatedServices.includes(serviceId as never))
+  .filter((post) => latest || post.data.relatedServices.includes(serviceId as never))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, latest ? count : 3);
 
 const categoryLabels: Record<string, string> = {
   guide: 'Guide',
@@ -38,11 +49,11 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
 
 {
   related.length > 0 && (
-    <section class="pc st-section st-light" aria-labelledby="pc-title">
+    <section class:list={['pc st-section', className]} aria-labelledby="pc-title">
       <div class="st-wrap">
         <header class="st-head st-head--center">
-          <h2 id="pc-title" class="st-h2">{t(locale, 'blog.relatedPosts')}</h2>
-          <p class="st-intro">{t(locale, 'blog.latestSubtitle')}</p>
+          <h2 id="pc-title" class="st-h2">{heading}</h2>
+          <p class="st-intro">{subheading}</p>
         </header>
         <ul class="pc__list" role="list" data-count={related.length}>
           {related.map((post) => (
@@ -73,12 +84,24 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
             </li>
           ))}
         </ul>
+        {latest && (
+          <p class="pc__all">
+            <a class="st-btn st-btn--dark" href={link(localizeUrl('/blog/', locale))}>
+              {t(locale, 'blog.viewAll').toUpperCase()}
+              <Icon name="arrow-right" size={18} class="flip" />
+            </a>
+          </p>
+        )}
       </div>
     </section>
   )
 }
 
 <style>
+  .pc__all {
+    margin-block-start: 2.5rem;
+    text-align: center;
+  }
   .pc__list {
     container-type: inline-size;
     display: grid;

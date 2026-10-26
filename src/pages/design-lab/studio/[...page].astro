@@ -1,0 +1,41 @@
+---
+/**
+ * Studio previews of the site's pages, English and Arabic, each at its live
+ * path under /design-lab/studio (/design-lab/studio/wrap/,
+ * /design-lab/studio/ar/more-about-wrp/, …). Every page renders its Studio
+ * template with the live page's own copy (site/content/*.ts). Service pages
+ * have their own route (services/[slug].astro).
+ */
+import type { GetStaticPaths } from 'astro';
+import type { Locale } from '@/i18n/translations';
+import PillarPage from '@/designs/studio/site/PillarPage.astro';
+import AboutPage from '@/designs/studio/site/AboutPage.astro';
+import ContactPage from '@/designs/studio/site/ContactPage.astro';
+import ReviewsPage from '@/designs/studio/site/ReviewsPage.astro';
+import { pillars } from '@/designs/studio/site/content/pillars';
+import { about } from '@/designs/studio/site/content/about';
+import { contact } from '@/designs/studio/site/content/contact';
+
+export const prerender = true;
+
+export const getStaticPaths = (() => {
+  // getStaticPaths runs on its own: everything it uses is defined inside it.
+  const at = (locale: Locale, path: string) => (locale === 'en' ? path : `ar/${path}`);
+  return (['en', 'ar'] as const).flatMap((locale) => [
+    ...(['wrap', 'reinforce', 'protect'] as const).map((slug) => ({
+      params: { page: at(locale, slug) },
+      props: { kind: 'pillar' as const, locale, slug },
+    })),
+    { params: { page: at(locale, 'more-about-wrp') }, props: { kind: 'about' as const, locale, slug: '' } },
+    { params: { page: at(locale, 'contact-us') }, props: { kind: 'contact' as const, locale, slug: '' } },
+    { params: { page: at(locale, 'reviews') }, props: { kind: 'reviews' as const, locale, slug: '' } },
+  ]);
+}) satisfies GetStaticPaths;
+
+const { kind, locale, slug } = Astro.props;
+---
+
+{kind === 'pillar' && <PillarPage slug={slug as 'wrap'} copy={pillars[`${locale}/${slug}`]} locale={locale} />}
+{kind === 'about' && <AboutPage copy={about[locale]} locale={locale} />}
+{kind === 'contact' && <ContactPage copy={contact[locale]} locale={locale} />}
+{kind === 'reviews' && <ReviewsPage locale={locale} />}

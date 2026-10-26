@@ -1,0 +1,329 @@
+---
+/**
+ * Studio version of the About page (/more-about-wrp/), English or Arabic.
+ * Same sections in the same order as the live src/pages/more-about-wrp.astro,
+ * with its copy, image alts and AboutPage JSON-LD from content/about.ts:
+ * hero, story, core values, the process, why WRP, latest posts and the
+ * closing call to action.
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import PageHero from './sections/PageHero.astro';
+import PostCards from './sections/PostCards.astro';
+import EndCta from './sections/EndCta.astro';
+import Picture from '../../shared/Picture.astro';
+import Icon from '../Icon.astro';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { fillSpans } from './fill';
+import { say, trail } from './say';
+
+type Img = { src: string; alt: string };
+export type AboutCopy = {
+  title: string;
+  description: string;
+  crumbs: string[];
+  hero: { h1: string; lede: string; image: Img };
+  story: { h2: string[]; paras: string[]; image: Img };
+  values: { h2: string; sub: string; cards: (Img & { title: string; desc: string })[] };
+  process: { h2: string; sub: string; steps: (Img & { n: string; h3: string; p: string })[] };
+  why: { h2: string; sub: string; stats: { value: string; label: string; desc: string }[]; box: { h3: string; p: string } };
+  posts: { heading: string; subheading: string };
+  cta: { h2: string; text: string; quote: string; services: string };
+  schema: object;
+};
+
+interface Props {
+  copy: AboutCopy;
+  locale?: Locale;
+}
+
+const { copy, locale = 'en' } = Astro.props;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const s = (text: string) => say(locale, text);
+const spans = fillSpans(copy.values.cards.length, 3);
+const hero = copy.hero.image.src;
+---
+
+<StudioPage
+  title={copy.title}
+  description={copy.description}
+  locale={locale}
+  livePath={localizeUrl('/more-about-wrp/', locale)}
+  preloads={[{ href: `${hero}-1200w.avif`, type: 'image/avif', imagesrcset: `${hero}-800w.avif 800w, ${hero}-1200w.avif 1200w`, imagesizes: '100vw' }]}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(copy.schema)} />
+  <PageHero image={hero} imageAlt={copy.hero.image.alt} title={copy.hero.h1} lede={copy.hero.lede}>
+    <Breadcrumbs slot="crumbs" crumbs={trail(locale, copy.crumbs, ['/', '/more-about-wrp/'])} link={link} />
+  </PageHero>
+
+  <section class="story st-section st-light">
+    <div class="st-wrap story__grid">
+      <div class="story__text">
+        <h2 class="st-h2">{copy.story.h2.map((line, i) => (i ? <><br />{line}</> : line))}</h2>
+        {copy.story.paras.map((p) => <p>{p}</p>)}
+      </div>
+      <Picture base={copy.story.image.src} alt={copy.story.image.alt} sizes="(min-width: 56rem) 45vw, 100vw" width={1200} height={1500} class="story__photo" />
+    </div>
+  </section>
+
+  <section class="values st-section st-dark">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{copy.values.h2}</h2>
+        <p class="st-intro">{copy.values.sub}</p>
+      </header>
+      <div class="fill">
+        <ul class="fill__grid" role="list">
+          {
+            copy.values.cards.map((card, i) => (
+              <li class="value" style={spans[i].style}>
+                <Picture base={card.src} alt={card.alt} sizes="(min-width: 60rem) 50vw, 100vw" width={1200} height={800} class="value__photo" />
+                <div class="value__body">
+                  <p class="value__title">{card.title}</p>
+                  <p class="value__desc">{card.desc}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="process st-section st-white">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{copy.process.h2}</h2>
+        <p class="st-intro">{copy.process.sub}</p>
+      </header>
+      <ol class="process__list" role="list">
+        {
+          copy.process.steps.map((step) => (
+            <li class="step">
+              <Picture base={step.src} alt={step.alt} sizes="(min-width: 56rem) 45vw, 100vw" width={1200} height={750} class="step__photo" />
+              <div class="step__text">
+                <span class="step__n">{s(step.n)}</span>
+                <h3 class="step__title">{step.h3}</h3>
+                <p class="step__p">{step.p}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="why st-section st-black">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{copy.why.h2}</h2>
+        <p class="st-intro">{copy.why.sub}</p>
+      </header>
+      <ul class="why__stats" role="list">
+        {
+          copy.why.stats.map((stat) => (
+            <li class="stat">
+              <div class="stat__value">{s(stat.value)}</div>
+              <div class="stat__label">{stat.label}</div>
+              <p class="stat__desc">{stat.desc}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="why__box">
+        <h3 class="why__box-title">{copy.why.box.h3}</h3>
+        <p>{copy.why.box.p}</p>
+      </div>
+    </div>
+  </section>
+
+  <PostCards locale={locale} link={link} heading={copy.posts.heading} subheading={copy.posts.subheading} />
+
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} href={studioQuoteHref}>
+    <div class="end-actions">
+      <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+        {copy.cta.quote}
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+      <a class="st-btn st-btn--ghost" href={link(`${localizeUrl('/', locale)}#services`)}>{copy.cta.services}</a>
+    </div>
+  </EndCta>
+</StudioPage>
+
+<style>
+  /* Story: text beside a tall photo. */
+  .story__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .story__grid {
+      grid-template-columns: 1.1fr 1fr;
+      gap: 4.5rem;
+    }
+  }
+  .story__text {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .story__text p {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+  }
+  .story :global(.story__photo img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  /* Core values: a bento of photo cards that always fills its rows. */
+  .value {
+    display: flex;
+    flex-direction: column;
+    background: var(--st-card-dark);
+    border-block-end: 3px solid var(--st-gold);
+  }
+  .value :global(.value__photo img) {
+    inline-size: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .value__body {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.5rem 1.75rem 1.85rem;
+  }
+  .value__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .value__desc {
+    color: var(--st-on-dark);
+    font-size: 0.9625rem;
+  }
+
+  /* Process: numbered steps, photo and text alternating sides. */
+  .process__list {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step {
+    display: grid;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .step {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+    .step:nth-child(odd) :global(.step__photo) {
+      order: 2;
+    }
+  }
+  .step :global(.step__photo img) {
+    inline-size: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+  .step__text {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .step__n {
+    display: grid;
+    place-items: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    background: var(--st-black);
+    color: var(--st-gold);
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.35rem;
+  }
+  .step__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .step__p {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+    max-inline-size: 34rem;
+  }
+
+  /* Why WRP: three figures, then the materials note. */
+  .why__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1px;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    list-style: none;
+    background: var(--st-line-dark);
+    border: 1px solid var(--st-line-dark);
+  }
+  .stat {
+    display: grid;
+    gap: 0.4rem;
+    align-content: start;
+    padding: 2rem 1.75rem;
+    background: var(--st-black);
+    text-align: center;
+  }
+  .stat__value {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(3rem, 2.4rem + 2.4vw, 4.5rem);
+    line-height: 1;
+    color: var(--st-gold);
+  }
+  .stat__label {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .stat__desc {
+    color: var(--st-on-dark);
+    font-size: 0.9375rem;
+  }
+  .why__box {
+    display: grid;
+    gap: 0.75rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--st-card-dark);
+    border-inline-start: 4px solid var(--st-gold);
+  }
+  .why__box-title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+  }
+  .why__box p {
+    color: var(--st-on-dark);
+    max-inline-size: 52rem;
+  }
+
+  .end-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+</style>

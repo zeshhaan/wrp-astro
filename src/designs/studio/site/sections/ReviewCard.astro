@@ -1,0 +1,210 @@
+---
+/**
+ * One Google review as a Studio card. Same text as the live
+ * src/components/reviews/ReviewCard.astro: reviews over `max` characters show
+ * the shortened text with Read more (the full text is in the page, hidden),
+ * and `highlight` wraps the review's highlight quote in <mark>.
+ * `photos` shows the customer's photos: 'first', or 'all' (the first, then a
+ * strip of the rest).
+ * The script that runs Read more is in ReviewScript.astro, once per page.
+ */
+import type { Review } from '@/lib/reviews';
+import { getReviewImageAlt } from '@/lib/reviews';
+import { t, type Locale } from '@/i18n/translations';
+import Icon from '../../Icon.astro';
+
+interface Props {
+  review: Review;
+  locale?: Locale;
+  max?: number;
+  highlight?: boolean;
+  photos?: false | 'first' | 'all';
+  tone?: 'paper' | 'white' | 'dark';
+}
+
+const { review: r, locale = 'en', max = 0, highlight = false, photos = false, tone = 'paper' } = Astro.props;
+const words = highlight && r.highlightQuote ? [r.highlightQuote] : [];
+const escape = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const mark = (text: string) => {
+  const safe = escape(text);
+  if (!words.length) return safe;
+  const re = new RegExp(`(${words.map((w) => escape(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
+  return safe.replace(re, '<mark>$1</mark>');
+};
+const long = max > 0 && r.text.length > max;
+const short = long ? r.text.substring(0, max).replace(/\s+\S*$/, '') + '…' : r.text;
+const initials = r.reviewerName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localImages.slice(0, 1) : [];
+---
+
+<article class:list={['rv', `rv--${tone}`]}>
+  {
+    images.length > 0 && (
+      <div class="rv__photos">
+        <img class="rv__photo" src={`/${images[0]}`} alt={getReviewImageAlt(r, 0)} width="600" height="450" loading="lazy" decoding="async" />
+        {images.length > 1 && (
+          <div class="rv__strip">
+            {images.slice(1).map((img, i) => (
+              <img src={`/${img}`} alt={getReviewImageAlt(r, i + 1)} width="150" height="112" loading="lazy" decoding="async" />
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+  <div class="rv__top">
+    <span class="rv__stars" role="img" aria-label={`${r.stars} out of 5 stars`}>
+      {Array.from({ length: r.stars }, () => <Icon name="star" size={15} />)}
+    </span>
+    <span class="rv__date">{r.date}</span>
+  </div>
+  {
+    r.text &&
+      (long ? (
+        <div class="rv__text" data-rv-more>
+          <p data-short set:html={`"${mark(short)}"`} />
+          <p data-full hidden set:html={`"${mark(r.text)}"`} />
+          <button type="button" class="rv__more" aria-expanded="false" data-less={t(locale, 'reviews.showLess')}>
+            {t(locale, 'reviews.readMore')}
+          </button>
+        </div>
+      ) : (
+        <div class="rv__text">
+          <p set:html={`"${mark(r.text)}"`} />
+        </div>
+      ))
+  }
+  <p class="rv__who">
+    <span class="rv__avatar" aria-hidden="true">
+      <img src={r.localAvatar ? `/${r.localAvatar}` : r.profilePhoto} alt="" width="36" height="36" loading="lazy" onerror="this.remove()" />
+      {initials}
+    </span>
+    <span>
+      <span class="rv__name">{r.reviewerName}</span>
+      {r.reviewerInfo && <span class="rv__info">{r.reviewerInfo}</span>}
+    </span>
+  </p>
+</article>
+
+<style>
+  .rv {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+    block-size: 100%;
+    padding: 1.5rem;
+    background: var(--st-paper);
+    color: var(--st-ink);
+    border-block-end: 3px solid var(--st-gold);
+  }
+  .rv--white {
+    background: var(--st-white);
+  }
+  .rv--dark {
+    background: var(--st-card-dark);
+    color: var(--st-white);
+  }
+  .rv__photos {
+    display: grid;
+    gap: 4px;
+    margin: -1.5rem -1.5rem 0.25rem;
+  }
+  .rv__photo {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .rv__strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .rv__strip img {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .rv__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .rv__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-gold-deep);
+  }
+  .rv--dark .rv__stars {
+    color: var(--st-gold);
+  }
+  .rv__date {
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .rv--dark .rv__date,
+  .rv--dark .rv__info {
+    color: var(--st-mute);
+  }
+  .rv__text {
+    font-size: 0.975rem;
+    line-height: 1.6;
+  }
+  .rv__text :global(mark) {
+    background: color-mix(in srgb, var(--st-gold) 35%, transparent);
+    color: inherit;
+    padding-inline: 0.1em;
+  }
+  .rv__more {
+    margin-block-start: 0.35rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--st-gold-deep);
+    cursor: pointer;
+  }
+  .rv--dark .rv__more {
+    color: var(--st-gold);
+  }
+  .rv__who {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-block-start: auto;
+  }
+  .rv__avatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--st-black);
+    color: var(--st-white);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .rv__avatar img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .rv__name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+  .rv__info {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+</style>

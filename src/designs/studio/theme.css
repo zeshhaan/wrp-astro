@@ -218,3 +218,8 @@
     grid-column: var(--fill-wide, span 2);
   }
 }
+
+/* Arrows that point "forward" turn round on right-to-left pages. */
+:root[data-concept='studio'][dir='rtl'] .flip {
+  transform: scaleX(-1);
+}
