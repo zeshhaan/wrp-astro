@@ -1,8 +1,14 @@
 ---
 /**
- * The quote form in the hero of Studio's inner pages (layout "A, Card", picked
- * in the Design Lab): a white card asking for name, mobile and car, with one
- * button and WhatsApp as the alternative.
+ * The quote form in the hero of Studio's inner pages: a white card picked from
+ * the Design Lab candidates, in two shapes from one set of fields.
+ *
+ *  - Tablets and up, layout A "Card": name, mobile and car, one button, and
+ *    WhatsApp as the alternative.
+ *  - Phones, layout C "Callback": only the mobile number and "Call me back",
+ *    with a "WhatsApp me instead" switch, so the form doesn't fill the screen.
+ *    The fields it doesn't show are left out of the lead, and the lead says
+ *    whether to call or WhatsApp.
  *
  * It sends to the `quote` Astro Action (src/actions/index.ts) from the browser,
  * so it works on prerendered pages: the action checks the fields and the
@@ -39,6 +45,10 @@ const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 const words = {
   title: 'Get a quick quote',
   lede: 'Tell us the car and what you want done. We’ll reply with a price and a time.',
+  callTitle: 'Want a price? We’ll call you.',
+  callLede: 'Leave your number and we’ll call you back with a price.',
+  callMe: 'Call me back',
+  waInstead: 'WhatsApp me instead',
   name: 'Your name',
   phone: 'Mobile or WhatsApp',
   phoneHint: '05X XXX XXXX',
@@ -68,17 +78,16 @@ const words = {
   data-msg-required={words.required}
   data-msg-phone={words.phoneInvalid}
   data-msg-error={words.error}
-  data-msg-sending={words.sending}
 >
   <input type="hidden" name="service" value={service} />
   <input type="hidden" name="locale" value="en" />
 
   <div class="lf__body" data-lead-body>
     <header class="lf__head">
-      <h2 id={f('title')} class="lf__title">{words.title}</h2>
-      <p class="lf__lede">{words.lede}</p>
+      <h2 id={f('title')} class="lf__title"><span class="lf__wide">{words.title}</span><span class="lf__narrow">{words.callTitle}</span></h2>
+      <p class="lf__lede"><span class="lf__wide">{words.lede}</span><span class="lf__narrow">{words.callLede}</span></p>
     </header>
-    <div class="lf__field">
+    <div class="lf__field lf__wide">
       <label for={f('name')}>{words.name}</label>
       <input id={f('name')} name="name" type="text" autocomplete="name" maxlength="100" required enterkeyhint="next" />
     </div>
@@ -86,13 +95,20 @@ const words = {
       <label for={f('phone')}>{words.phone}</label>
       <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern={phonePattern} required enterkeyhint="next" />
     </div>
-    <div class="lf__field">
+    <div class="lf__field lf__wide">
       <label for={f('car')}>{words.car}</label>
       <input id={f('car')} name="vehicle" type="text" autocomplete="off" maxlength="120" placeholder={words.carHint} enterkeyhint="send" />
     </div>
+    <label class="lf__switch lf__narrow">
+      <input type="checkbox" role="switch" data-lead-wa />
+      <span class="lf__track" aria-hidden="true"></span>
+      {words.waInstead}
+    </label>
     <div class="lf__bot" data-lead-bot></div>
     <button class="st-btn st-btn--gold lf__send" type="submit">
-      <span data-lead-label>{words.send}</span> <Icon name="arrow-right" size={18} class="flip" />
+      <span class="lf__cta lf__cta--quote">{words.send} <Icon name="arrow-right" size={18} class="flip" /></span>
+      <span class="lf__cta lf__cta--call"><Icon name="phone" size={18} /> {words.callMe}</span>
+      <span class="lf__cta lf__cta--busy">{words.sending}</span>
     </button>
     <p class="lf__error" role="alert" data-lead-error hidden></p>
     <p class="lf__alt">
@@ -141,7 +157,7 @@ const words = {
     const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
     const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
     const bot = form.querySelector<HTMLElement>('[data-lead-bot]')!;
-    const label = form.querySelector<HTMLElement>('[data-lead-label]')!;
+    const waSwitch = form.querySelector<HTMLInputElement>('[data-lead-wa]')!;
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const msg = form.dataset;
     const sitekey = LIVE_HOSTS.includes(location.hostname) && msg.sitekey ? msg.sitekey : TURNSTILE_TEST_SITEKEY;
@@ -199,7 +215,10 @@ const words = {
       return !bad;
     };
     const valid = () => {
-      const inputs = [...form.querySelectorAll<HTMLInputElement>('.lf__field input[required], .lf__field input[pattern]')];
+      // Only the fields this layout shows (phones show just the mobile number).
+      const inputs = [...form.querySelectorAll<HTMLInputElement>('.lf__field input[required], .lf__field input[pattern]')].filter(
+        (input) => input.offsetParent !== null,
+      );
       const results = inputs.map(check);
       const first = inputs[results.indexOf(false)];
       first?.focus();
@@ -223,10 +242,16 @@ const words = {
       if (!valid()) return;
       startBotCheck();
       button.disabled = true;
-      const idle = label.textContent;
-      label.textContent = msg.msgSending!;
+      form.toggleAttribute('data-sending', true);
       try {
         const data = new FormData(form);
+        // The phone layout asks only for the number, and how to reply.
+        const callback = waSwitch.offsetParent !== null;
+        if (callback) {
+          data.delete('name');
+          data.delete('vehicle');
+          data.set('reply', waSwitch.checked ? 'whatsapp' : 'call');
+        }
         // Normally ready long before the click; a visible challenge can take a while.
         const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Turnstile timeout')), 60_000));
         data.set('cf-turnstile-response', await Promise.race([token, timeout]));
@@ -247,7 +272,7 @@ const words = {
         error.hidden = false;
       } finally {
         button.disabled = false;
-        label.textContent = idle;
+        form.toggleAttribute('data-sending', false);
         // Tokens are single-use: get a fresh one for a retry.
         if (widgetId) {
           nextToken();
@@ -405,6 +430,108 @@ const words = {
   .lf__body {
     border-block-start: 4px solid var(--st-gold);
     box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+
+  /* Two shapes from one form: the card from tablet width up, the callback on
+     phones. Hidden fields stay out of validation and out of the lead. */
+  @media (max-width: 47.99rem) {
+    .lf__wide {
+      display: none !important;
+    }
+  }
+  @media (min-width: 48rem) {
+    .lf__narrow {
+      display: none !important;
+    }
+  }
+
+  /* The button says what will happen: a quote, a call back, or (with the
+     WhatsApp switch on) a quote by WhatsApp. */
+  .lf__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lf__cta--call,
+  .lf__cta--busy {
+    display: none;
+  }
+  @media (max-width: 47.99rem) {
+    .lf__cta--quote {
+      display: none;
+    }
+    .lf__cta--call {
+      display: inline-flex;
+    }
+    .lf:has([data-lead-wa]:checked) .lf__cta--call {
+      display: none;
+    }
+    .lf:has([data-lead-wa]:checked) .lf__cta--quote {
+      display: inline-flex;
+    }
+  }
+  .lf[data-sending] .lf__cta:not(.lf__cta--busy) {
+    display: none !important;
+  }
+  .lf[data-sending] .lf__cta--busy {
+    display: inline-flex;
+  }
+
+  /* "WhatsApp me instead" switch (phones). */
+  .lf__switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .lf__switch input {
+    position: absolute;
+    opacity: 0;
+    inline-size: 2.5rem;
+    block-size: 1.4rem;
+    margin: 0;
+    cursor: pointer;
+  }
+  .lf__track {
+    position: relative;
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 1.4rem;
+    border-radius: 1rem;
+    background: var(--lf-line);
+    transition: background-color 0.2s;
+  }
+  .lf__track::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.2rem;
+    inset-inline-start: 0.2rem;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 50%;
+    background: var(--st-white);
+    transition: translate 0.2s;
+  }
+  .lf__switch input:checked + .lf__track {
+    background: #1f8f4e;
+  }
+  .lf__switch input:checked + .lf__track::after {
+    translate: 1.1rem 0;
+  }
+  :global([dir='rtl']) .lf__switch input:checked + .lf__track::after {
+    translate: -1.1rem 0;
+  }
+  .lf__switch input:focus-visible + .lf__track {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lf__track,
+    .lf__track::after {
+      transition: none;
+    }
   }
 
   /* Turnstile only shows itself when it needs the visitor (interaction-only). */

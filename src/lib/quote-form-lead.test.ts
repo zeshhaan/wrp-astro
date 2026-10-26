@@ -36,6 +36,7 @@ describe('notification', () => {
   const lead: QuoteLead = {
     name: 'Sam <b>',
     phone: '050 123 4567',
+    reply: null,
     vehicle: 'Land Cruiser 2024',
     service: 'Paint Protection Film',
     page: '/services/ppf-dubai/',
@@ -46,6 +47,9 @@ describe('notification', () => {
   test('subject names the service, car and person', () => {
     expect(quoteLeadSubject(lead)).toBe('Website quote: Paint Protection Film for Land Cruiser 2024 from Sam <b>');
     expect(quoteLeadSubject({ ...lead, vehicle: null, service: null })).toBe('Website quote: quote from Sam <b>');
+    expect(quoteLeadSubject({ ...lead, name: null, vehicle: null, reply: 'call' })).toBe(
+      'Call back: Paint Protection Film from 050 123 4567',
+    );
   });
 
   test('escapes what the visitor typed and links a WhatsApp reply', () => {
@@ -53,6 +57,9 @@ describe('notification', () => {
     expect(html).toContain('Sam &lt;b&gt;');
     expect(html).not.toContain('Sam <b>');
     expect(html).toContain('https://wa.me/971501234567');
+    const phoneOnly = quoteLeadEmailHtml({ ...lead, name: null, reply: 'whatsapp' }, '', new Date());
+    expect(phoneOnly).toContain('Not given');
+    expect(phoneOnly).toContain('<strong>WhatsApp</strong>');
   });
 
   test('WhatsApp link handles local, 00 and + prefixes', () => {

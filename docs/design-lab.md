@@ -105,8 +105,9 @@ as the live page, so the copy cannot drift.
 - `src/designs/studio/theme.css`: Studio's tokens, layout helpers, headings and
   buttons, shared by the homepage and the inner pages.
 
-- `src/designs/studio/site/sections/LeadForm.astro`: the hero quote form
-  (layout A, "Card", picked from four candidates). With a form in the hero, the
+- `src/designs/studio/site/sections/LeadForm.astro`: the hero quote form,
+  layout A "Card" from tablet width up and layout C "Callback" (mobile number
+  only, call or WhatsApp) on phones, from one set of fields. With a form in the hero, the
   hero drops its quote button, every quote button on the page leads to the
   form, and the header's quote buttons hide while the form is on screen. It
   sends to the `quote` Astro Action (`src/actions/index.ts`), which checks

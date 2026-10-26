@@ -32,8 +32,9 @@ const optionalText = (max: number) =>
 export const server = {
   /**
    * The quote form in the hero of the Studio pages (LeadForm.astro). Public, at
-   * /_actions/quote/. A lead is a name and a mobile number, with the car and
-   * the page's service when given.
+   * /_actions/quote/. A lead is a mobile number, with the name, car, the
+   * page's service and call-or-WhatsApp when given (phones ask only for the
+   * number and how to reply).
    *
    * Order of work: validate, check Turnstile, then, only for a live lead, save
    * to D1 and email the team. The insert is idempotent on the form's request
@@ -45,10 +46,11 @@ export const server = {
   quote: defineAction({
     accept: 'form',
     input: z.object({
-      name: z.string().trim().min(1).max(100),
+      name: optionalText(100),
       phone: z.string().trim().refine(isPhone, 'Please enter a mobile number.'),
       vehicle: optionalText(120),
       service: optionalText(120),
+      reply: z.enum(['call', 'whatsapp']).nullish().catch(null).transform((value) => value ?? null),
       locale: z.enum(['en', 'ar']).catch('en'),
       page: optionalText(300),
       requestId: z.uuid(),
@@ -90,6 +92,7 @@ export const server = {
       const lead: QuoteLead = {
         name: input.name,
         phone: input.phone,
+        reply: input.reply,
         vehicle: input.vehicle,
         service: input.service,
         page: input.page,
@@ -101,14 +104,15 @@ export const server = {
       try {
         const inserted = await env.DB.prepare(
           `INSERT INTO quote_form_leads
-             (request_id, name, phone, vehicle, service_interest, source_url, locale, attribution_json)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             (request_id, name, phone, reply_by, vehicle, service_interest, source_url, locale, attribution_json)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT (request_id) DO NOTHING`,
         )
           .bind(
             input.requestId,
             lead.name,
             lead.phone,
+            lead.reply,
             lead.vehicle,
             lead.service,
             lead.page,
