@@ -184,3 +184,37 @@
     transition: none;
   }
 }
+
+/*
+ * Fill grid: card rows that are always full (spans from site/fill.ts, set on
+ * each item as --fill-wide / --fill-mid). Sized by the container, not the
+ * screen, so the same grid works full width or inside a narrower column.
+ *   <div class="fill"><ul class="fill__grid"><li style={span.style}>…
+ */
+:where(:root[data-concept='studio']) .fill {
+  container-type: inline-size;
+}
+:where(:root[data-concept='studio']) .fill__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container (min-width: 36rem) {
+  :where(:root[data-concept='studio']) .fill__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :where(:root[data-concept='studio']) .fill__grid > * {
+    grid-column: var(--fill-mid, auto);
+  }
+}
+@container (min-width: 60rem) {
+  :where(:root[data-concept='studio']) .fill__grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  :where(:root[data-concept='studio']) .fill__grid > * {
+    grid-column: var(--fill-wide, span 2);
+  }
+}

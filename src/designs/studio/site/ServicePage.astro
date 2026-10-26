@@ -22,6 +22,7 @@ import ServiceSchema from '@/components/ServiceSchema.astro';
 import { localizeUrl } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
 import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { fillSpans } from './fill';
 
 interface Props {
   service: CollectionEntry<'services'>;
@@ -207,9 +208,11 @@ const heroBase = imgBase(heroImage);
             <h2 class="st-h2">{additionalSection.heading || w.whyChoose}</h2>
             {additionalSection.subheading && <p class="st-intro">{additionalSection.subheading}</p>}
           </header>
-          <ul class="cards__grid cards__grid--2" role="list">
-            {additionalSection.cards.map((card) => (
-              <li class="card">
+          <div class="fill">
+          <ul class="fill__grid" role="list">
+            {additionalSection.cards.map((card, i, all) => (
+              <li class="cell" style={fillSpans(all.length, 2)[i].style}>
+                <article class:list={['card', card.image && 'card--photo']}>
                 {card.image && (
                   <Picture
                     base={imgBase(card.image)}
@@ -230,9 +233,11 @@ const heroBase = imgBase(heroImage);
                     </p>
                   )}
                 </div>
+                </article>
               </li>
             ))}
           </ul>
+          </div>
         </div>
       </section>
     )
@@ -246,17 +251,21 @@ const heroBase = imgBase(heroImage);
             <h2 class="st-h2">{benefitsHeading || w.whyService}</h2>
             <p class="st-intro">{w.benefitsSub}</p>
           </header>
-          <ol class="cards__grid cards__grid--3" role="list">
-            {benefits.map((benefit, i) => (
-              <li class="card card--num">
+          <div class="fill">
+          <ol class="fill__grid" role="list">
+            {benefits.map((benefit, i, all) => (
+              <li class="cell" style={fillSpans(all.length, 3)[i].style}>
+                <article class="card card--num">
                 <div class="card__body">
                   <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
                   <h3 class="card__title">{benefit.title}</h3>
                   <p class="card__desc">{benefit.description}</p>
                 </div>
+                </article>
               </li>
             ))}
           </ol>
+          </div>
         </div>
       </section>
     )
@@ -401,7 +410,8 @@ const heroBase = imgBase(heroImage);
             <h2 class="st-h2">{processHeading || w.process}</h2>
             <p class="st-intro">{processSubheading || w.processSub}</p>
           </header>
-          <ol class="steps__list" role="list">
+          <div class="steps__box">
+          <ol class="steps__list" role="list" style={`--n:${process.length}`}>
             {process.map((step) => (
               <li class="step">
                 <span class="step__num">{String(step.step).padStart(2, '0')}</span>
@@ -410,6 +420,7 @@ const heroBase = imgBase(heroImage);
               </li>
             ))}
           </ol>
+          </div>
         </div>
       </section>
     )
@@ -560,23 +571,12 @@ const heroBase = imgBase(heroImage);
   }
 
   /* Why-us / benefit cards on dark. Each card responds to its own width. */
-  .cards__grid {
-    display: grid;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  @media (min-width: 48rem) {
-    .cards__grid--2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  .cards__grid--3 {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  .cell {
+    container-type: inline-size;
+    display: flex;
   }
   .card {
-    container-type: inline-size;
+    flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--st-card-dark);
@@ -622,6 +622,24 @@ const heroBase = imgBase(heroImage);
     }
     .card__title {
       font-size: 1.55rem;
+    }
+  }
+  /* A card given a whole row turns sideways: photo beside the text. */
+  @container (min-width: 44rem) {
+    .card--photo {
+      flex-direction: row;
+    }
+    .card--photo :global(.card__img) {
+      flex: 0 0 50%;
+    }
+    .card--photo :global(.card__img img) {
+      block-size: 100%;
+      aspect-ratio: auto;
+      min-block-size: 18rem;
+    }
+    .card__body {
+      align-content: center;
+      padding: 2.5rem;
     }
   }
 
@@ -833,14 +851,34 @@ const heroBase = imgBase(heroImage);
   }
 
   /* Process: numbered steps along a rule. */
+  /* Steps sit in one row when there is room, else two columns, else one. */
+  .steps__box {
+    container-type: inline-size;
+  }
   .steps__list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem 1.5rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    counter-reset: none;
+  }
+  @container (min-width: 34rem) {
+    .steps__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    /* An odd last step takes the whole row rather than leaving a hole. */
+    .step:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+  }
+  @container (min-width: 56rem) {
+    .steps__list {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    }
+    .step:last-child:nth-child(odd) {
+      grid-column: auto;
+    }
   }
   .step {
     display: grid;
