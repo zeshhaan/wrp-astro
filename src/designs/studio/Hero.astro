@@ -201,6 +201,15 @@ import { heroVideo as hv } from './heroVideo';
     gap: 2px;
     color: var(--st-gold);
   }
+  /* Phones: the H1 says enough, so the buttons sit straight under it. The lede stays in the HTML. */
+  @media (max-width: 40rem) {
+    .hero__lede {
+      display: none;
+    }
+    .hero__actions {
+      margin-block-start: 0;
+    }
+  }
   @media (max-width: 29.99rem) {
     .hero__actions .st-btn {
       flex: 1 1 100%;
