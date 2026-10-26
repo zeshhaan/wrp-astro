@@ -16,6 +16,8 @@ import ReviewCards from './sections/ReviewCards.astro';
 import PostCards from './sections/PostCards.astro';
 import ServiceCards from './sections/ServiceCards.astro';
 import LeadForm from './sections/LeadForm.astro';
+import Faq from './sections/Faq.astro';
+import EndCta from './sections/EndCta.astro';
 import Picture from '../../shared/Picture.astro';
 import Icon from '../Icon.astro';
 import LucideIcon from '@/components/Icon.astro';
@@ -440,56 +442,29 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     )
   }
 
-  <section class="faq st-section st-light" aria-labelledby="faq-title">
-    <div class="st-wrap faq__grid">
-      <header class="st-head faq__head">
-        <h2 id="faq-title" class="st-h2">{t(locale, 'services.faqs')}</h2>
-        <p class="st-intro">
-          {t(locale, 'services.faqMore')}{' '}
-          <a href={link(localizeUrl('/contact-us/', locale))}>{t(locale, 'services.faqContact')}</a>
-        </p>
-      </header>
-      <dl class="faq__list">
-        {
-          faqs.map((faq) => (
-            <div class="faq__item">
-              <dt>{faq.question}</dt>
-              <dd>{faq.answer}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: faqs.map((faq) => ({
-          '@type': 'Question',
-          name: faq.question,
-          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-        })),
-      })}
-    />
-  </section>
+  <Faq
+    heading={t(locale, 'services.faqs')}
+    items={faqs.map((faq) => ({ q: faq.question, a: faq.answer }))}
+    schema={{
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+      })),
+    }}
+  >
+    {t(locale, 'services.faqMore')}{' '}
+    <a href={link(localizeUrl('/contact-us/', locale))}>{t(locale, 'services.faqContact')}</a>
+  </Faq>
 
   <ReviewQuote serviceSlug={slug} locale={locale} />
   <ReviewCards serviceSlug={slug} heading={w.reviewsHeading(title)} locale={locale} link={link} />
   <PostCards serviceId={slug} locale={locale} link={link} />
   <ServiceCards currentService={slug} locale={locale} link={link} />
 
-  <section class="end" aria-labelledby="end-title">
-    <Picture base="/review-images/mark_ban_1" alt="" sizes="100vw" class="end__bg" />
-    <div class="st-wrap end__inner">
-      <h2 id="end-title" class="st-h2">{ctaHeading || w.experience(title)}</h2>
-      <p class="end__text">{ctaDescription || w.ctaDescription}</p>
-      <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
-        {w.getQuote}
-        <Icon name="arrow-right" size={18} class="flip" />
-      </a>
-    </div>
-  </section>
+  <EndCta heading={ctaHeading || w.experience(title)} text={ctaDescription || w.ctaDescription} button={w.getQuote} href={quoteHref} />
 </StudioPage>
 
 <style>
@@ -920,87 +895,4 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     color: var(--st-ink-2);
   }
 
-  /* FAQs: every answer visible (as on the live page), heading beside them on wide screens. */
-  .faq__grid {
-    display: grid;
-    gap: 2rem;
-  }
-  @media (min-width: 60rem) {
-    .faq__grid {
-      grid-template-columns: 1fr 2fr;
-      gap: 4rem;
-      align-items: start;
-    }
-    .faq__head {
-      position: sticky;
-      inset-block-start: calc(var(--st-head) + 2rem);
-    }
-  }
-  .faq__head a {
-    color: var(--st-gold-deep);
-    font-weight: 600;
-    text-underline-offset: 3px;
-  }
-  .faq__list {
-    display: grid;
-    margin: 0;
-  }
-  .faq__item {
-    display: grid;
-    gap: 0.5rem;
-    padding-block: 1.4rem;
-    border-block-start: 1px solid var(--st-line-light);
-  }
-  .faq__item:last-child {
-    border-block-end: 1px solid var(--st-line-light);
-  }
-  .faq__item dt {
-    font-weight: 700;
-    font-size: 1.0625rem;
-    color: var(--st-ink);
-  }
-  .faq__item dd {
-    color: var(--st-ink-2);
-    line-height: 1.65;
-  }
-
-  /* Final call to action over a studio photo. */
-  .end {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    padding-block: clamp(4rem, 3rem + 5vw, 7rem);
-    background: var(--st-black);
-    color: var(--st-white);
-    text-align: center;
-  }
-  .end :global(.end__bg) {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-  }
-  .end :global(.end__bg img) {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    object-position: 50% 35%;
-  }
-  .end::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: rgb(12 13 15 / 0.75);
-  }
-  .end__inner {
-    display: grid;
-    justify-items: center;
-    gap: 1rem;
-  }
-  .end__text {
-    max-inline-size: 38rem;
-    color: var(--st-on-dark);
-    font-size: 1.0625rem;
-    margin-block-end: 0.5rem;
-  }
 </style>

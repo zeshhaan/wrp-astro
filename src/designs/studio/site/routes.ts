@@ -14,7 +14,7 @@ export const labPrefix = '/design-lab/studio';
 export const studioQuoteHref = `${labPrefix}/quote/`;
 
 /** Live paths (English) that have a Studio version under labPrefix. */
-const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/];
+const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/, /^\/(wrap|reinforce|protect)\/$/];
 
 /** The Studio preview of a live path, or the path itself if it has none yet. */
 export function toLab(href: string): string {
