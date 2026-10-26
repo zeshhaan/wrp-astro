@@ -16,6 +16,7 @@ import ReviewsPage from '@/designs/studio/site/ReviewsPage.astro';
 import PortfolioPage from '@/designs/studio/site/PortfolioPage.astro';
 import BlogIndexPage from '@/designs/studio/site/BlogIndexPage.astro';
 import BlogPostPage from '@/designs/studio/site/BlogPostPage.astro';
+import LegalPage, { type LegalSlug } from '@/designs/studio/site/LegalPage.astro';
 import { pillars } from '@/designs/studio/site/content/pillars';
 import { about } from '@/designs/studio/site/content/about';
 import { contact } from '@/designs/studio/site/content/contact';
@@ -52,6 +53,11 @@ export const getStaticPaths = (async () => {
     { params: { page: at(locale, 'reviews') }, props: { kind: 'reviews' as const, locale, slug: '' } },
     { params: { page: at(locale, 'portfolio') }, props: { kind: 'portfolio' as const, locale, slug: '' } },
     { params: { page: at(locale, 'blog') }, props: { kind: 'blog' as const, locale, slug: '' } },
+    // Credits is English only, as live.
+    ...(locale === 'en' ? (['privacy', 'terms', 'credits'] as const) : (['privacy', 'terms'] as const)).map((slug) => ({
+      params: { page: at(locale, slug) },
+      props: { kind: 'legal' as const, locale, slug: slug as string },
+    })),
   ]);
   return [...pages, ...blogPaths];
 }) satisfies GetStaticPaths;
@@ -86,6 +92,7 @@ const related = post ? await relatedServicesOf(post, locale === 'ar') : [];
 {kind === 'reviews' && <ReviewsPage locale={locale} />}
 {kind === 'portfolio' && <PortfolioPage copy={portfolio[locale]} locale={locale} />}
 {kind === 'blog' && <BlogIndexPage copy={blog[locale]} locale={locale} />}
+{kind === 'legal' && <LegalPage slug={slug as LegalSlug} locale={locale} />}
 {
   kind === 'post' && post && Content && (
     <BlogPostPage {...post.data} relatedServices={related} locale={locale} slug={slug}>

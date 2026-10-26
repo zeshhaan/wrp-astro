@@ -1,0 +1,183 @@
+---
+/**
+ * Body of the live terms.astro (everything after its <h1>), word for word,
+ * for the Studio legal page. Copied 2026-10-26; only the Tailwind classes are
+ * gone and site links go through link() so previews stay in the Design Lab.
+ */
+interface Props {
+  link?: (href: string) => string;
+}
+const { link = (href: string) => href } = Astro.props;
+---
+
+<p>Last updated: November 4, 2025</p>
+
+<div>
+  <h2>1. Agreement to Terms</h2>
+  <p>
+    By accessing and using the WRP Detailing Solutions website (wrpdetailing.ae), you agree to be bound by these Terms of
+    Service and all applicable laws and regulations of the United Arab Emirates. If you do not agree with
+    any of these terms, you are prohibited from using this site.
+  </p>
+
+  <h2>2. Service Information Disclaimer</h2>
+  <p>
+    <strong>Important:</strong> All information displayed on this website, including but not limited to
+    service descriptions, pricing, packages, timelines, and specifications, is provided for{' '}
+    <strong>informational and marketing purposes only</strong>.
+  </p>
+
+  <div>
+    <p>Key Disclaimers:</p>
+    <ul>
+      <li><strong>Pricing:</strong> All prices shown are indicative estimates and subject to change without notice. Final pricing will be confirmed during in-person consultation based on your specific vehicle and requirements.</li>
+      <li><strong>Services:</strong> Actual services provided may vary based on vehicle condition, paint type, size, and specific requirements. Service descriptions are general guidelines.</li>
+      <li><strong>Timelines:</strong> Service completion times are estimates and may vary depending on workload, vehicle condition, and complexity.</li>
+      <li><strong>Availability:</strong> Service availability, packages, and offerings may change. Current availability must be confirmed by contacting us directly.</li>
+    </ul>
+  </div>
+
+  <p>
+    <strong>You must contact WRP Detailing Solutions directly</strong> to verify current pricing, service availability, and
+    specific details before making any decisions. Do not rely solely on website information for final
+    purchasing decisions.
+  </p>
+
+  <h2>3. No Online Transactions</h2>
+  <p>
+    This website does not process payments or bookings online. All service appointments require:
+  </p>
+  <ul>
+    <li>Personal consultation (in-person, phone, or email)</li>
+    <li>Vehicle inspection and assessment</li>
+    <li>Written quotation and approval</li>
+    <li>Confirmation of appointment and deposit (if required)</li>
+  </ul>
+
+  <h2>4. Content Accuracy</h2>
+  <p>
+    While we make reasonable efforts to ensure information on this website is accurate and up-to-date:
+  </p>
+  <ul>
+    <li>We do not guarantee the accuracy, completeness, or currentness of any information</li>
+    <li>Content may be updated, modified, or removed without prior notice</li>
+    <li>Product specifications, service details, and pricing may change over time</li>
+    <li>Images and descriptions are for illustrative purposes and may not reflect exact results</li>
+  </ul>
+
+  <h2>5. Service Results Disclaimer</h2>
+  <p>
+    <strong>Results May Vary:</strong> The results of our services depend on many factors including original
+    paint condition, vehicle age, previous damage, maintenance history, and environmental factors. Images
+    and descriptions shown on this website are examples and do not guarantee identical results for your
+    vehicle.
+  </p>
+
+  <h2>6. Intellectual Property</h2>
+
+  <h3>Our Content</h3>
+  <p>
+    All original content on this website, including text, photographs, graphics, and design elements, is the
+    property of WRP Detailing Solutions and protected by applicable copyright and trademark laws.
+    Unauthorized use is prohibited.
+  </p>
+
+  <h3>Third-Party Trademarks</h3>
+  <p>
+    <strong>Automotive Brand Logos:</strong> The vehicle manufacturer logos and trademarks displayed on this
+    website (including but not limited to Ferrari, Lamborghini, Porsche, Rolls-Royce, Mercedes-Benz, BMW,
+    McLaren, Aston Martin, and others) are used for <strong>illustrative purposes only</strong> to indicate
+    the types of vehicles we service.
+  </p>
+  <div>
+    <p>
+      <strong>Important:</strong> These logos are the property of their respective owners and manufacturers.
+      WRP Detailing Solutions is an independent automotive care studio and is not affiliated with, endorsed by,
+      or sponsored by any vehicle manufacturers. The use of these logos does not imply any official
+      relationship, partnership, or endorsement by these brands. All trademarks and logos belong to their
+      respective owners.
+    </p>
+  </div>
+
+  <h2>7. Limitation of Liability</h2>
+  <p>
+    WRP Detailing Solutions shall not be liable for any damages arising from:
+  </p>
+  <ul>
+    <li>Use or inability to use this website</li>
+    <li>Reliance on information provided on the website</li>
+    <li>Errors, inaccuracies, or omissions in website content</li>
+    <li>Interruptions or delays in website access</li>
+  </ul>
+
+  <h2>8. External Links</h2>
+  <p>
+    This website may contain links to external websites (such as social media profiles). We are not
+    responsible for the content, privacy practices, or terms of third-party websites.
+  </p>
+
+  <h2>9. Governing Law & Jurisdiction</h2>
+  <p>
+    These Terms of Service are governed by and construed in accordance with the laws of the United Arab
+    Emirates and the Emirate of Dubai. Any disputes arising from these terms shall be subject to the
+    exclusive jurisdiction of the courts of Dubai, UAE.
+  </p>
+
+  <p>
+    This website complies with:
+  </p>
+  <ul>
+    <li>Federal Law No. 15 of 2020 on Consumer Protection</li>
+    <li>Federal Law No. 1 of 2006 on Electronic Commerce and Transactions</li>
+    <li>Dubai Law No. 2 of 2002 on Electronic Transactions and Commerce</li>
+  </ul>
+
+  <h2>10. Contact for Service Confirmation</h2>
+  <p>
+    <strong>Before proceeding with any service</strong>, please contact us to:
+  </p>
+  <ul>
+    <li>Verify current pricing and package details</li>
+    <li>Confirm service availability for your vehicle</li>
+    <li>Schedule an inspection and consultation</li>
+    <li>Receive a written quotation</li>
+  </ul>
+
+  <div>
+    <h3>Contact Information:</h3>
+    <ul>
+      <li><strong>Phone:</strong> <a href="https://dub.sh/wrp-phone">+971 54 717 3000</a></li>
+      <li><strong>Email:</strong> <a href="https://dub.sh/wrp-email">info@wrpdetailing.ae</a></li>
+      <li><strong>Address:</strong> Al Qusais Industrial Area 1, Dubai, UAE · <a href="https://dub.sh/wrp-map" target="_blank" rel="noopener">View on Maps</a></li>
+      <li><strong>Hours:</strong> Sat – Thu: 9:00 AM – 9:30 PM | Friday: Closed</li>
+    </ul>
+  </div>
+
+  <h2>11. Changes to Terms</h2>
+  <p>
+    We reserve the right to modify these Terms of Service at any time. Changes will be effective
+    immediately upon posting to this website. Your continued use of the website after changes constitutes
+    acceptance of the modified terms.
+  </p>
+
+  <h2>12. Acknowledgment</h2>
+  <p>
+    By using this website and our services, you acknowledge that:
+  </p>
+  <ul>
+    <li>You have read and understood these Terms of Service</li>
+    <li>You will verify all information before making decisions</li>
+    <li>You will contact us directly for accurate, current information</li>
+    <li>Website content is for marketing and informational purposes</li>
+    <li>Final service details must be confirmed in writing</li>
+  </ul>
+
+  <div>
+    <p>
+      <strong>Important Notice:</strong> This website is designed primarily for search engine visibility
+      and general information. All service details, pricing, and availability must be confirmed through
+      direct contact with WRP Detailing Solutions. We cannot be held liable for decisions made based solely on website
+      content without personal verification.
+    </p>
+  </div>
+</div>
