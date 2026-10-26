@@ -24,7 +24,9 @@ const num = (n: string | number) => toLocalNum(n, locale);
 // Arabic labels are the live site's translations wherever it has them.
 const w = ar
   ? {
-      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التفصيل، تظليل النوافذ والتنجيد من الاستوديو الخاص بنا في القصيص، دبي. غلّف، عزّز، احمِ.',
+      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التفصيل، تظليل النوافذ والتنجيد من الاستوديو الخاص بنا في القصيص، دبي.',
+      pillars: ['غلّف', 'عزّز', 'احمِ'],
+      comma: '، ',
       services: t(locale, 'nav.services'),
       siteLinks: 'روابط الموقع',
       visit: 'زورونا',
@@ -35,7 +37,9 @@ const w = ar
       other: { label: 'English', lang: 'en' },
     }
   : {
-      blurb: 'Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais, Dubai. Wrap, Reinforce, Protect.',
+      blurb: 'Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais, Dubai.',
+      pillars: ['Wrap', 'Reinforce', 'Protect'],
+      comma: ', ',
       services: 'Services',
       siteLinks: 'Site links',
       visit: 'Visit us',
@@ -76,6 +80,9 @@ const legal = ar
       { label: 'Terms', href: pages.terms },
       { label: 'Credits', href: pages.credits },
     ];
+// The blurb's closing "Wrap, Reinforce, Protect." links each pillar page, so
+// they stay linked from every page (the live homepage links them; Studio's does not).
+const pillarHrefs = ['/wrap/', '/reinforce/', '/protect/'].map((href) => serviceHref(ar ? localizeUrl(href, locale) : href));
 const otherHref = altHref ?? (ar ? '/' : pages.arabic);
 ---
 
@@ -83,7 +90,15 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
   <div class="st-wrap foot__grid">
     <div class="foot__brand">
       <WrpLogo class="foot__mark" label="WRP by YACO Automotive" />
-      <p>{w.blurb}</p>
+      <p>
+        {w.blurb}{' '}
+        {w.pillars.map((name, i) => (
+          <>
+            <a href={pillarHrefs[i]}>{name}</a>
+            {i < 2 ? w.comma : '.'}
+          </>
+        ))}
+      </p>
       <ul class="foot__social" role="list">
         <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{contact.instagramHandle}</a></li>
         <li><a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a></li>
@@ -167,6 +182,14 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
   }
   .foot__brand p {
     max-inline-size: 22rem;
+  }
+  .foot__brand p a {
+    color: inherit;
+    text-decoration-color: var(--st-gold);
+    text-underline-offset: 3px;
+  }
+  .foot__brand p a:hover {
+    color: var(--st-white);
   }
   .foot ul {
     margin: 0;

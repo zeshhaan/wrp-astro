@@ -1,0 +1,29 @@
+---
+/** The Studio homepage's sections, in order, shared by the homepage and its header candidates. */
+import Hero from './Hero.astro';
+import About from './About.astro';
+import Services from './Services.astro';
+import CtaBanner from './CtaBanner.astro';
+import WhyUs from './WhyUs.astro';
+import Proof from './Proof.astro';
+import Testimonials from './Testimonials.astro';
+import Projects from './Projects.astro';
+import Lounge from './Lounge.astro';
+import Social from './Social.astro';
+import Blog from './Blog.astro';
+import Contact from './Contact.astro';
+import { toLab } from './site/routes';
+---
+
+<Hero />
+<About />
+<Services link={toLab} />
+<CtaBanner />
+<WhyUs />
+<Proof />
+<Testimonials />
+<Projects />
+<Lounge />
+<Social />
+<Blog />
+<Contact />

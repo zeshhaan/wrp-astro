@@ -7,18 +7,9 @@
  * white and brass, with WRP's real photos, prices and Google reviews.
  */
 import DesignShell from '../shared/DesignShell.astro';
-import Hero from './Hero.astro';
-import About from './About.astro';
-import Services from './Services.astro';
-import CtaBanner from './CtaBanner.astro';
-import WhyUs from './WhyUs.astro';
-import Proof from './Proof.astro';
-import Testimonials from './Testimonials.astro';
-import Projects from './Projects.astro';
-import Lounge from './Lounge.astro';
-import Social from './Social.astro';
-import Blog from './Blog.astro';
-import Contact from './Contact.astro';
+import HomeMain from './HomeMain.astro';
+import StudioPage from './site/StudioPage.astro';
+import Schema from '@/components/Schema.astro';
 import Footer from './Footer.astro';
 import FloatingContact from './FloatingContact.astro';
 import { heroVideo } from './heroVideo';
@@ -33,7 +24,11 @@ import type { Locale } from '@/i18n/translations';
 import { toLab } from './site/routes';
 
 interface Props {
-  /** One of the header candidates (/design-lab/studio/headers/) instead of the chosen one (G). */
+  /**
+   * One of the header candidates (/design-lab/studio/headers/). Without it the
+   * page is the Studio homepage proper: StudioPage's head (canonical, hreflang,
+   * Open Graph, JSON-LD), with header G, footer and floating contact.
+   */
   header?: HeaderVariantId;
   /** Language of the header candidate. The rest of the page is English either way. */
   locale?: Locale;
@@ -43,6 +38,7 @@ interface Props {
 
 // The language switch goes to the Arabic Studio homepage (site/ArHomePage.astro).
 const { header = 'g', locale = 'en', altHref = '/design-lab/studio/ar/' } = Astro.props;
+const candidate = Astro.props.header !== undefined;
 // Service links stay inside the Design Lab, on the Studio service pages.
 const liveNav = await getHeaderNav(locale);
 const nav = { ...liveNav, services: liveNav.services.map((s) => ({ ...s, href: toLab(s.href) })) };
@@ -56,35 +52,44 @@ const candidates = {
 } as const;
 const { Candidate, props: candidateProps } = candidates[header];
 const quoteHref = '/design-lab/studio/quote/';
+const title = 'WRP Detailing Dubai: PPF, ceramic coating, detailing and window tint';
+const description =
+  'Paint protection film (Avery Dennison and STEK), ceramic coating, detailing, polish, window tint and upholstery in Al Qusais, Dubai. 5.0 on Google. Get a quick quote.';
+const posters = [
+  { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
+  { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
+];
+// The homepage is always a lab preview for now, also at `/` on the Studio
+// Worker Preview. At go-live it drops `lab` and its head is the live homepage's.
 ---
 
-<DesignShell
-  concept="studio"
-  title="WRP Detailing Dubai: PPF, ceramic coating, detailing and window tint"
-  description="Paint protection film (Avery Dennison and STEK), ceramic coating, detailing, polish, window tint and upholstery in Al Qusais, Dubai. 5.0 on Google. Get a quick quote."
-  fonts={['--font-oswald', '--font-inter', '--font-montserrat', ...(locale === 'ar' ? (['--font-ibm-plex-arabic'] as const) : [])]}
-  themeColor="#0c0d0f"
-  colorScheme="dark"
-  preloads={[
-    { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
-    { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
-  ]}
->
-  <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} />
-  <main id="main">
-    <Hero />
-    <About />
-    <Services link={toLab} />
-    <CtaBanner />
-    <WhyUs />
-    <Proof />
-    <Testimonials />
-    <Projects />
-    <Lounge />
-    <Social />
-    <Blog />
-    <Contact />
-  </main>
-  <Footer serviceHref={toLab} />
-  <FloatingContact />
-</DesignShell>
+{
+  !candidate && (
+    <StudioPage lab title={title} description={description} livePath="/" preloads={posters}>
+      <Schema type="WebSite" />
+      <Schema type="ServiceCatalog" />
+      <HomeMain />
+    </StudioPage>
+  )
+}
+
+{
+  candidate && (
+    <DesignShell
+      concept="studio"
+      title={title}
+      description={description}
+      fonts={['--font-oswald', '--font-inter', '--font-montserrat', ...(locale === 'ar' ? (['--font-ibm-plex-arabic'] as const) : [])]}
+      themeColor="#0c0d0f"
+      colorScheme="dark"
+      preloads={posters}
+    >
+      <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} />
+      <main id="main">
+        <HomeMain />
+      </main>
+      <Footer serviceHref={toLab} />
+      <FloatingContact />
+    </DesignShell>
+  )
+}

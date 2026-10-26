@@ -1,0 +1,22 @@
+---
+/**
+ * Stops Design Lab mock-up forms (`data-demo-form`) from sending anything and
+ * says so in their `data-demo-status` line. Include it with any such form; the
+ * script runs once per page however many times it is included.
+ */
+---
+
+<script>
+  // Concept forms are mock-ups: never send real leads from a design preview.
+  document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-demo-form')) return;
+    event.preventDefault();
+    const status = form.querySelector<HTMLElement>('[data-demo-status]');
+    if (status) {
+      status.hidden = false;
+      status.textContent =
+        'Design preview: this form is not connected yet. It will post to the live enquiry API when the redesign goes live.';
+    }
+  });
+</script>
