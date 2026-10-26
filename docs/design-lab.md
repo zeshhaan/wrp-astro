@@ -21,6 +21,7 @@ Every build has a review hub at `/design-lab/` linking to each Studio page:
 | Quote, step by step | `/design-lab/studio/quote/` |
 | Quote, one page (beside a 3D car) | `/design-lab/studio/quote/one-page/` |
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
+| Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
 
 A floating bar links between them. These pages are `noindex`, excluded from the
 sitemap, and their forms never send leads.
@@ -63,6 +64,22 @@ bun run preview:designs -- --dry-run    # print the commands
 ```
 
 Delete a Preview with `npx wrangler preview delete --name design-<id>`.
+
+## Header candidates
+
+`src/designs/studio/headers/` holds the headers to choose from, listed in
+`headers/variants.ts`: A Showroom (kept from round 1), D Arrivals board,
+E Storefront and F Filmstrip (round 2: logo centred, square corners, a
+secondary bar on top, every service visible without a hover). G and H are E
+on wide screens with a different phone layout (`HeaderStorefront`'s `phone`
+prop): G uses A's phone bar and photo-card menu (`parts/ShowroomSheet.astro`),
+H runs F's photo frames as an endless carousel (`parts/FilmCarousel.astro`,
+whose looping copies are spans, not links). All of them
+render the live navigation's link set from `headers/nav.ts` (six service
+pages, Portfolio, Reviews, About, Blog, Contact) as plain `<a href>` links in
+the HTML, in English or Arabic (RTL). Shereef picked G, so it is the Studio homepage's
+header (`Home.astro` defaults its `header` prop to `g`); the other candidates
+stay in the lab for now. The quote pages still use the older `Header.astro`.
 
 ## Next: going live
 

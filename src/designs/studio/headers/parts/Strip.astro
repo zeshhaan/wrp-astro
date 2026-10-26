@@ -1,0 +1,176 @@
+---
+/**
+ * The thin secondary bar above the round-2 header candidates (D, E, F): a live
+ * open/closed light in Dubai time, the Google rating, then either the contact
+ * details or the page links, and the language switch. It scrolls away with
+ * the page; only the header under it sticks.
+ */
+import Icon from '../../Icon.astro';
+import type { HeaderNav } from '../nav';
+
+interface Props {
+  nav: HeaderNav;
+  altHref: string;
+  /** 'contact': phone, address and hours on the right. 'pages': the page links there instead. */
+  end?: 'contact' | 'pages';
+}
+
+const { nav, altHref, end = 'contact' } = Astro.props;
+const w = nav.words;
+const statusWords = JSON.stringify({
+  open: `${w.openNow} · ${w.until}`,
+  closed: `${w.closedNow} · ${w.opensAt}`,
+  closedSat: `${w.closedNow} · ${w.opensSat}`,
+});
+---
+
+<div class="ss" dir={nav.dir} lang={nav.locale}>
+  <div class="st-wrap ss__inner">
+    <div class="ss__start">
+      <p class="ss__status" data-ss-status data-schedule={JSON.stringify(nav.schedule)} data-words={statusWords}>
+        <span class="ss__dot" aria-hidden="true"></span>
+        <span data-ss-text>{nav.hours}</span>
+      </p>
+      <a class="ss__rating" href={nav.rating.href}>
+        <span class="ss__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={11} />)}</span>
+        <strong>{nav.rating.value}</strong>
+        <span class="ss__count">{nav.rating.count} {w.reviews}</span>
+      </a>
+    </div>
+    <ul class="ss__end" role="list">
+      {
+        end === 'pages'
+          ? nav.pages.map((p) => (
+              <li class="ss__wide">
+                <a href={p.href}>{p.label}</a>
+              </li>
+            ))
+          : [
+              <li class="ss__wide">
+                <a href={nav.maps.href} target="_blank" rel="noopener">
+                  <Icon name="pin" size={14} />
+                  {nav.maps.label}
+                </a>
+              </li>,
+            ]
+      }
+      <li class="ss__phone">
+        <a href={nav.phone.href}><Icon name="phone" size={14} /><bdo dir="ltr">{nav.phone.display}</bdo></a>
+      </li>
+      <li><a class="ss__lang" href={altHref} hreflang={nav.altLang}>{nav.langLabel}</a></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  import { dubaiOpenState, type Schedule } from '../openStatus';
+
+  const status = document.querySelector<HTMLElement>('[data-ss-status]');
+  const paint = () => {
+    if (!status) return;
+    const words = JSON.parse(status.dataset.words ?? '{}') as Record<string, string>;
+    const { open, opensSaturday } = dubaiOpenState(JSON.parse(status.dataset.schedule ?? '{}') as Schedule);
+    status.dataset.open = String(open);
+    status.querySelector('[data-ss-text]')!.textContent = open ? words.open : opensSaturday ? words.closedSat : words.closed;
+  };
+  paint();
+  window.setInterval(paint, 60_000);
+</script>
+
+<style>
+  .ss {
+    background: var(--st-black);
+    color: var(--st-mute);
+    font-size: 0.8125rem;
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .ss:lang(ar) {
+    font-family: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+  }
+  .ss__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-block-size: 2.5rem;
+  }
+  .ss__start,
+  .ss__end {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ss a,
+  .ss__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-block-size: 2.5rem;
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .ss a:hover {
+    color: var(--st-white);
+  }
+  .ss__end :global(svg) {
+    color: var(--st-gold);
+  }
+  .ss__dot {
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    background: var(--st-mute);
+  }
+  .ss__status[data-open='true'] .ss__dot {
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgb(74 222 128 / 0.18);
+  }
+  .ss__status[data-open='false'] .ss__dot {
+    background: #f87171;
+  }
+  .ss__status[data-open='true'] {
+    color: var(--st-on-dark);
+  }
+  .ss__stars {
+    display: inline-flex;
+    gap: 1px;
+    color: var(--st-gold);
+  }
+  .ss__stars :global(svg) {
+    fill: currentColor;
+  }
+  .ss__rating strong {
+    color: var(--st-white);
+  }
+  .ss__lang {
+    color: var(--st-white) !important;
+    font-weight: 600;
+  }
+  .ss__wide,
+  .ss__count,
+  .ss__phone {
+    display: none;
+  }
+  .ss__status {
+    display: none;
+  }
+  @media (min-width: 30rem) {
+    .ss__status {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 48rem) {
+    .ss__count,
+    .ss__phone {
+      display: inline-flex;
+    }
+  }
+  @media (min-width: 64rem) {
+    .ss__wide {
+      display: list-item;
+    }
+  }
+</style>

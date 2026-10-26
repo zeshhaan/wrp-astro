@@ -1,0 +1,206 @@
+---
+/**
+ * The six services as photo frames (from header F, "Filmstrip") that drift
+ * past on their own in an endless loop, for phones. A touch stops the drift
+ * and the strip swipes like any other; it picks up again a few seconds after
+ * the finger lifts. With reduced motion it stays a plain swipeable strip.
+ *
+ * The six links are in the server HTML once. The script copies the frames to
+ * close the loop, and the copies are spans hidden from assistive tech (a tap
+ * on one goes to its service), so the page gains no extra links.
+ */
+import Picture from '../../../shared/Picture.astro';
+import type { HeaderNav } from '../nav';
+
+interface Props {
+  nav: HeaderNav;
+  class?: string;
+}
+
+const { nav, class: className } = Astro.props;
+---
+
+<nav class:list={['fc', className]} aria-label={`${nav.servicesLabel} (mobile)`} dir={nav.dir} lang={nav.locale}>
+  <ul role="list" class="fc__track" data-fc-track>
+    {
+      nav.services.map((s) => (
+        <li>
+          <a class="fc__frame" href={s.href}>
+            <Picture base={s.image} alt="" sizes="10rem" widths={[480]} class="fc__img" />
+            <span class="fc__name">{s.short}</span>
+            <span class="fc__price">{s.price}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<script>
+  const SPEED = 28; // px per second
+  const REST = 3000; // ms to wait after a touch before drifting again
+
+  document.querySelectorAll<HTMLUListElement>('[data-fc-track]').forEach((track) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Close the loop with a copy of the frames: spans, not links.
+    const originals = [...track.children] as HTMLLIElement[];
+    originals.forEach((li) => {
+      const copy = li.cloneNode(true) as HTMLLIElement;
+      const link = copy.querySelector('a')!;
+      const span = document.createElement('span');
+      // Every attribute but href, so the scoped styles still match.
+      for (const { name, value } of link.attributes) if (name !== 'href') span.setAttribute(name, value);
+      span.dataset.href = link.getAttribute('href') ?? '';
+      span.append(...link.childNodes);
+      link.replaceWith(span);
+      copy.setAttribute('aria-hidden', 'true');
+      track.append(copy);
+    });
+    track.addEventListener('click', (event) => {
+      const copy = (event.target as Element).closest<HTMLElement>('[data-href]');
+      if (copy) window.location.href = copy.dataset.href!;
+    });
+
+    // RTL tracks scroll towards negative scrollLeft.
+    const sign = getComputedStyle(track).direction === 'rtl' ? -1 : 1;
+    let loop = 0;
+    const measure = () => {
+      loop = Math.abs(track.children[originals.length].getBoundingClientRect().left - originals[0].getBoundingClientRect().left);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+
+    let pos = 0;
+    let restUntil = 0;
+    let touching = false;
+    let visible = true;
+    let last = performance.now();
+    const rest = () => (restUntil = performance.now() + REST);
+    track.addEventListener('pointerdown', () => (touching = true));
+    track.addEventListener('touchstart', () => (touching = true), { passive: true });
+    for (const type of ['pointerup', 'pointercancel', 'touchend', 'touchcancel']) {
+      track.addEventListener(type, () => {
+        touching = false;
+        rest();
+      });
+    }
+    track.addEventListener('pointerenter', (event) => event.pointerType === 'mouse' && (touching = true));
+    track.addEventListener('pointerleave', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      touching = false;
+      rest();
+    });
+    track.addEventListener('wheel', rest, { passive: true });
+    track.addEventListener('focusin', () => (touching = true));
+    track.addEventListener('focusout', () => {
+      touching = false;
+      rest();
+    });
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(track);
+
+    const frame = (now: number) => {
+      const dt = Math.min(now - last, 100);
+      last = now;
+      if (loop > 0 && visible) {
+        if (touching || now < restUntil) {
+          // The person is in charge: follow their scroll, only keep it inside the loop.
+          pos = Math.abs(track.scrollLeft);
+          if (!touching && (pos >= loop || pos <= 0)) {
+            pos = ((pos % loop) + loop) % loop || loop;
+            track.scrollLeft = sign * pos;
+          }
+        } else {
+          pos += (SPEED * dt) / 1000;
+          if (pos >= loop) pos -= loop;
+          track.scrollLeft = sign * pos;
+        }
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  });
+</script>
+
+<style>
+  .fc {
+    --fc-font: var(--st-head-font);
+    --fc-track: 0.06em;
+    --fc-case: uppercase;
+    background: var(--st-black);
+    border-block-end: 1px solid var(--st-line-dark);
+  }
+  .fc:lang(ar) {
+    --fc-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --fc-track: 0;
+    --fc-case: none;
+  }
+  .fc__track {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .fc__track::-webkit-scrollbar {
+    display: none;
+  }
+  .fc__track > li {
+    flex: 0 0 10rem;
+  }
+  .fc__frame {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-content: end;
+    gap: 0.1rem;
+    block-size: 6.25rem;
+    padding: 0.6rem 0.75rem;
+    overflow: hidden;
+    border-inline-end: 2px solid var(--st-black);
+    color: var(--st-white);
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .fc__frame :global(.fc__img) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .fc__frame :global(.fc__img img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: grayscale(0.35);
+    -webkit-user-drag: none;
+  }
+  .fc__frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.1) 75%);
+  }
+  .fc__name {
+    overflow: hidden;
+    font-family: var(--fc-font);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: var(--fc-track);
+    text-transform: var(--fc-case);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fc__price {
+    overflow: hidden;
+    color: var(--st-gold);
+    font-size: 0.6875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>

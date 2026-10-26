@@ -8,13 +8,25 @@ const links = [
   { href: '/design-lab/studio/', label: 'Home' },
   { href: '/design-lab/studio/quote/', label: 'Quote' },
   { href: '/design-lab/studio/quote/one-page/', label: 'One-page quote' },
+  { href: '/design-lab/studio/headers/', label: 'Headers' },
 ];
 const path = Astro.url.pathname.replace(/\/?$/, '/');
+
+// On the header candidates, the bar switches between the candidates and between
+// English and Arabic instead.
+const header = path.match(/^\/design-lab\/studio\/headers\/([adefgh])\/(ar\/)?$/);
+const lang = header?.[2] ? 'ar/' : '';
+const headerLinks = header
+  ? [
+      ...['a', 'd', 'e', 'f', 'g', 'h'].map((id) => ({ href: `/design-lab/studio/headers/${id}/${lang}`, label: `Header ${id.toUpperCase()}` })),
+      { href: `/design-lab/studio/headers/${header[1]}/${lang ? '' : 'ar/'}`, label: lang ? 'English' : 'العربية' },
+    ]
+  : undefined;
 ---
 
 <nav class="wrp-lab" aria-label="Design Lab pages" data-lab-bar>
-  <a class="wrp-lab__home" href="/design-lab/">Design Lab</a>
-  {links.map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
+  <a class="wrp-lab__home" href={header ? '/design-lab/studio/headers/' : '/design-lab/'}>{header ? 'Headers' : 'Design Lab'}</a>
+  {(headerLinks ?? links).map((l) => <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>{l.label}</a>)}
   <button type="button" class="wrp-lab__hide" aria-label="Hide the Design Lab bar" data-lab-hide>×</button>
 </nav>
 

@@ -1,0 +1,18 @@
+---
+export const prerender = true;
+
+import Home from '@/designs/studio/Home.astro';
+import { headerVariants, type HeaderVariantId } from '@/designs/studio/headers/variants';
+
+export function getStaticPaths() {
+  return headerVariants.flatMap((v) => [
+    { params: { slug: v.id }, props: { id: v.id, locale: 'en' as const } },
+    { params: { slug: `${v.id}/ar` }, props: { id: v.id, locale: 'ar' as const } },
+  ]);
+}
+
+const { id, locale } = Astro.props as { id: HeaderVariantId; locale: 'en' | 'ar' };
+const altHref = `/design-lab/studio/headers/${id}/${locale === 'ar' ? '' : 'ar/'}`;
+---
+
+<Home header={id} locale={locale} altHref={altHref} />
