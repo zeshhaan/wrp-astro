@@ -28,21 +28,25 @@
  */
 import Icon from '../../Icon.astro';
 import { proof, whatsappLink } from '../../../data';
+import { toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
 
 interface Props {
   /** The service this page is about, sent with the lead. */
   service: string;
   id?: string;
+  locale?: Locale;
 }
 
-const { service, id = 'quote' } = Astro.props;
-const wa = whatsappLink(`Hi WRP, I would like a quote for ${service}.`);
+const { service, id = 'quote', locale = 'en' } = Astro.props;
+const num = (n: string | number) => toLocalNum(n, locale);
+const wa = whatsappLink(locale === 'ar' ? `مرحباً WRP، أود الحصول على عرض سعر لخدمة ${service}.` : `Hi WRP, I would like a quote for ${service}.`);
 const f = (name: string) => `${id}-${name}`;
 const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '';
 // Browsers compile `pattern` with the `v` flag, where ( ) and - need escaping in a class.
 const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 
-const words = {
+const en = {
   title: 'Get a quick quote',
   lede: 'Tell us the car and what you want done. We’ll reply with a price and a time.',
   callTitle: 'Want a price? We’ll call you.',
@@ -66,6 +70,33 @@ const words = {
   required: 'Please fill this in.',
   phoneInvalid: 'Please enter a mobile number.',
 };
+// Arabic: the live site's form wording (translations form.*, home.contact.*)
+// where it has the same field, and the Studio header's Arabic quote wording.
+const ar: typeof en = {
+  title: 'احصل على عرض سعر سريع',
+  lede: 'أخبرنا بسيارتك والخدمة التي تريدها، وسنرد عليك بالسعر والموعد.',
+  callTitle: 'تريد السعر؟ سنتصل بك.',
+  callLede: 'اترك رقمك وسنعاود الاتصال بك بالسعر.',
+  callMe: 'اتصلوا بي',
+  waInstead: 'راسلوني على واتساب بدلاً من ذلك',
+  name: t('ar', 'form.name'),
+  phone: 'رقم الجوال أو واتساب',
+  phoneHint: '05X XXX XXXX',
+  car: t('ar', 'form.vehicle'),
+  carHint: t('ar', 'home.contact.vehiclePlaceholder'),
+  send: t('ar', 'services.getQuote'),
+  sending: t('ar', 'form.sending'),
+  or: 'أو',
+  waUs: 'راسلنا على واتساب',
+  rating: `${num(proof.rating)} على Google · ${num(proof.reviewCountDisplay)} ${t('ar', 'reviews.reviews')}`,
+  thanks: 'شكراً لك. وصلنا طلبك.',
+  thanksLine: 'سنرد عليك بالسعر والموعد.',
+  previewNote: 'معاينة: النموذج سليم، لكن لم يُحفظ أو يُرسل شيء.',
+  error: 'حدث خطأ. يرجى مراسلتنا على واتساب أو الاتصال بنا.',
+  required: t('ar', 'form.required'),
+  phoneInvalid: 'يرجى إدخال رقم جوال.',
+};
+const words = locale === 'ar' ? ar : en;
 ---
 
 <form
@@ -80,7 +111,7 @@ const words = {
   data-msg-error={words.error}
 >
   <input type="hidden" name="service" value={service} />
-  <input type="hidden" name="locale" value="en" />
+  <input type="hidden" name="locale" value={locale} />
 
   <div class="lf__body" data-lead-body>
     <header class="lf__head">

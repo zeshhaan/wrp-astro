@@ -5,6 +5,10 @@
  * src/pages/services/[slug].astro (same sections, same order, same headings,
  * same fallbacks, Service + BreadcrumbList + FAQPage JSON-LD), in Studio's
  * design. Only the look changes: nothing here is new copy.
+ *
+ * Arabic follows the live src/pages/ar/services/[slug].astro, which differs
+ * from the English page in places (no work gallery, its own quick answer,
+ * headings from translations, prices in د.إ): `ar` marks each difference.
  */
 import type { CollectionEntry } from 'astro:content';
 import StudioPage from './StudioPage.astro';
@@ -22,10 +26,11 @@ import Picture from '../../shared/Picture.astro';
 import Icon from '../Icon.astro';
 import LucideIcon from '@/components/Icon.astro';
 import ServiceSchema from '@/components/ServiceSchema.astro';
-import { localizeUrl } from '@/i18n/utils';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
 import { labPrefix, toLab, studioQuoteHref } from './routes';
 import { fillSpans } from './fill';
+import Swap from './sections/Swap.astro';
 
 interface Props {
   service: CollectionEntry<'services'>;
@@ -101,10 +106,13 @@ const words = {
       `${name} service - Professional automotive ${sub.toLowerCase()} at WRP Detailing Studio luxury car detailing studio`,
   },
 } as const;
-const w = words[locale === 'ar' ? 'en' : locale];
+const w = words.en;
+const ar = locale === 'ar';
+const num = (n: string | number) => toLocalNum(n, locale);
+/** A price as each live page writes it: "AED 1,500" or "١٬٥٠٠ د.إ". */
+const money = (n: number) => (ar ? `${num(n.toLocaleString())} د.إ` : `AED ${n.toLocaleString()}`);
 
 const imgBase = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
-const aed = (n: number) => n.toLocaleString();
 
 // Same values as the live page (OG card, schema price range, quick answer, crumbs).
 const ogImage = `/og/service/${slug}.jpg`;
@@ -116,9 +124,13 @@ const highPrice = hasRealPricing
     : lowPrice! * 4
   : undefined;
 const quickAnswerDescription = description ? `${description.charAt(0).toLowerCase()}${description.slice(1).replace(/\.$/, '')}` : title;
-const quickAnswer = service.data.quickAnswer
-  ? service.data.quickAnswer
-  : `${title} at WRP Detailing Studio in Dubai is for owners who want ${quickAnswerDescription}.${startingPrice ? ` Pricing starts from AED ${startingPrice.toLocaleString()}.` : ''}`;
+const quickAnswer = ar
+  ? `إجابة سريعة: خدمة ${title} في WRP Detailing Studio بدبي مناسبة لمن يريد ${description ? description.replace(/\.$/, '') : title}.${startingPrice ? ` الأسعار تبدأ من ${num(startingPrice.toLocaleString())} د.إ.` : ''}`
+  : service.data.quickAnswer
+    ? service.data.quickAnswer
+    : `${title} at WRP Detailing Studio in Dubai is for owners who want ${quickAnswerDescription}.${startingPrice ? ` Pricing starts from AED ${startingPrice.toLocaleString()}.` : ''}`;
+const quickLabel = ar ? 'إجابة سريعة' : w.quickAnswer;
+const getQuote = ar ? t(locale, 'services.getQuote') : w.getQuote;
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://wrpdetailing.ae';
 const breadcrumbs = [
   { name: t(locale, 'common.home'), url: `${siteUrl}${localizeUrl('/', locale)}` },
@@ -132,7 +144,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
 ---
 
 <StudioPage
-  title={metaTitle || `${title} | WRP Detailing Studio`}
+  title={ar ? `${title} | WRP Detailing Studio` : metaTitle || `${title} | WRP Detailing Studio`}
   description={description}
   ogImage={ogImage}
   locale={locale}
@@ -153,27 +165,34 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     description={description}
     lowPrice={lowPrice}
     highPrice={highPrice}
-    serviceUrl={`https://wrpdetailing.ae/services/${slug}/`}
+    serviceUrl={`https://wrpdetailing.ae${localizeUrl(`/services/${slug}/`, locale)}`}
   />
 
-  <PageHero image={heroBase} imageAlt={w.heroAlt(title, subtitle)} eyebrow={subtitle} title={heroTitle || title} lede={heroDescription || description} long={Boolean(heroTitle)}>
+  <PageHero
+    image={heroBase}
+    imageAlt={ar ? title : w.heroAlt(title, subtitle)}
+    eyebrow={subtitle}
+    title={(!ar && heroTitle) || title}
+    lede={(!ar && heroDescription) || description}
+    long={!ar && Boolean(heroTitle)}
+  >
     <Breadcrumbs slot="crumbs" crumbs={breadcrumbs} link={link} />
     {
       heroForm ? (
-        <LeadForm slot="aside" service={title} />
+        <LeadForm slot="aside" service={title} locale={locale} />
       ) : (
         <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
-          {w.getQuote}
+          {getQuote}
           <Icon name="arrow-right" size={18} class="flip" />
         </a>
       )
     }
   </PageHero>
 
-  <section class="qa st-light" aria-label={w.quickAnswer}>
+  <section class="qa st-light" aria-label={quickLabel}>
     <div class="st-wrap">
       <div class="qa__card">
-        <p class="st-eyebrow st-eyebrow--dark">{w.quickAnswer}</p>
+        <p class="st-eyebrow st-eyebrow--dark">{quickLabel}</p>
         <p class="qa__text">{quickAnswer}</p>
       </div>
     </div>
@@ -205,7 +224,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
           </div>
           <Picture
             base={imgBase(mainImage || heroImage)}
-            alt={mainImageAlt || `${title} Detail`}
+            alt={mainImageAlt || (ar ? title : `${title} Detail`)}
             sizes="(min-width: 56rem) 45vw, 100vw"
             width={1200}
             height={1500}
@@ -216,221 +235,227 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     )
   }
 
-  {
-    additionalSection && (
-      <section class="cards st-section st-dark">
-        <div class="st-wrap">
-          <header class="st-head st-head--center">
-            <h2 class="st-h2">{additionalSection.heading || w.whyChoose}</h2>
-            {additionalSection.subheading && <p class="st-intro">{additionalSection.subheading}</p>}
-          </header>
-          <div class="fill">
-          <ul class="fill__grid" role="list">
-            {additionalSection.cards.map((card, i, all) => (
-              <li class="cell" style={fillSpans(all.length, 2)[i].style}>
-                <article class:list={['card', card.image && 'card--photo']}>
-                {card.image && (
-                  <Picture
-                    base={imgBase(card.image)}
-                    alt={card.imageAlt || card.title}
-                    sizes="(min-width: 56rem) 40vw, 100vw"
-                    widths={[480, 800]}
-                    width={800}
-                    height={500}
-                    class="card__img"
-                  />
-                )}
-                <div class="card__body">
-                  <h3 class="card__title">{card.title}</h3>
-                  <p class="card__desc">{card.description}</p>
-                  {card.solution && (
-                    <p class="card__solution">
-                      {w.solution} {card.solution}
-                    </p>
-                  )}
-                </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    benefits && benefits.length > 0 && !additionalSection && (
-      <section class="cards st-section st-dark">
-        <div class="st-wrap">
-          <header class="st-head st-head--center">
-            <h2 class="st-h2">{benefitsHeading || w.whyService}</h2>
-            <p class="st-intro">{w.benefitsSub}</p>
-          </header>
-          <div class="fill">
-          <ol class="fill__grid" role="list">
-            {benefits.map((benefit, i, all) => (
-              <li class="cell" style={fillSpans(all.length, 3)[i].style}>
-                <article class="card card--num">
-                <div class="card__body">
-                  <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                  <h3 class="card__title">{benefit.title}</h3>
-                  <p class="card__desc">{benefit.description}</p>
-                </div>
-                </article>
-              </li>
-            ))}
-          </ol>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    realTimeWork && realTimeWork.items.length > 0 && (
-      <WorkGallery heading={realTimeWork.heading} subheading={realTimeWork.subheading} items={realTimeWork.items} name={title} class="st-white" />
-    )
-  }
-
-  {
-    showPackages && packages && packages.length > 0 && (
-      <section class="pk st-section st-light">
-        <div class="st-wrap">
-          <header class="st-head st-head--center">
-            <h2 class="st-h2">{packagesHeading || w.packages}</h2>
-            <p class="st-intro">{packagesSubheading || w.packagesSub}</p>
-          </header>
-          <ul class="pk__grid" role="list">
-            {packages.map((pkg) => (
-              <li class:list={['pk__card', pkg.badge && 'pk__card--pick']}>
-                {pkg.badge && <p class="pk__badge">{pkg.badge}</p>}
-                <h3 class="pk__name">{pkg.name}</h3>
-                {pkg.tagline && <p class="pk__tag">{pkg.tagline}</p>}
-                {pkg.priceSuv ? (
-                  <div class="pk__prices">
-                    <p>
-                      <span class="pk__body">{w.sedan}</span>
-                      <span class="pk__price">AED {aed(pkg.price)}</span>
-                    </p>
-                    <p>
-                      <span class="pk__body">{w.suv}</span>
-                      <span class="pk__price">AED {aed(pkg.priceSuv)}</span>
-                    </p>
-                  </div>
-                ) : (
-                  <p class="pk__price pk__price--one">AED {aed(pkg.price)}</p>
-                )}
-                <ul class="pk__feats" role="list">
-                  {pkg.features.map((feature) => (
-                    <li>
-                      <Icon name="check" size={18} />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a class:list={['st-btn', pkg.badge ? 'st-btn--gold' : 'st-btn--dark']} href={quoteHref} data-quote>
-                  {w.getStarted}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    )
-  }
-
-  {
-    comparison && comparison.rows.length > 0 && (
-      <section class="cmp st-section st-white">
-        <div class="st-wrap">
-          <header class="st-head st-head--center">
-            <h2 class="st-h2">{comparison.heading || w.compare}</h2>
-            {comparison.subheading && <p class="st-intro">{comparison.subheading}</p>}
-          </header>
-          <div class="cmp__scroll" tabindex="0" role="region" aria-label={comparison.heading || w.compare}>
-            <table class="cmp__table">
-              <thead>
-                <tr>
-                  <th scope="col">{w.included}</th>
-                  {comparison.columns.map((col) => (
-                    <th scope="col">{col}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.rows.map((row) => (
-                  <tr>
-                    <th scope="row">
-                      <span>{row.label}</span>
-                      {row.note && <span class="cmp__note">{row.note}</span>}
-                    </th>
-                    {row.values.map((value) => (
-                      <td>
-                        {value === 'yes' ? (
-                          <>
-                            <Icon name="check" size={18} class="cmp__yes" />
-                            <span class="visually-hidden">{w.included}</span>
-                          </>
-                        ) : value === 'no' ? (
-                          <>
-                            <span aria-hidden="true" class="cmp__no">
-                              &mdash;
-                            </span>
-                            <span class="visually-hidden">{w.notIncluded}</span>
-                          </>
-                        ) : (
-                          <span class="cmp__val">{value}</span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
+  {/* Arabic puts the packages, comparison and price before these, as live does. */}
+  <Swap swap={ar}>
+    <Fragment slot="a">
+      {
+        additionalSection && (
+          <section class="cards st-section st-dark">
+            <div class="st-wrap">
+              <header class="st-head st-head--center">
+                <h2 class="st-h2">{additionalSection.heading || (ar ? '' : w.whyChoose)}</h2>
+                {additionalSection.subheading && <p class="st-intro">{additionalSection.subheading}</p>}
+              </header>
+              <div class="fill">
+              <ul class="fill__grid" role="list">
+                {additionalSection.cards.map((card, i, all) => (
+                  <li class="cell" style={fillSpans(all.length, 2)[i].style}>
+                    <article class:list={['card', card.image && 'card--photo']}>
+                    {card.image && (
+                      <Picture
+                        base={imgBase(card.image)}
+                        alt={card.imageAlt || card.title}
+                        sizes="(min-width: 56rem) 40vw, 100vw"
+                        widths={[480, 800]}
+                        width={800}
+                        height={500}
+                        class="card__img"
+                      />
+                    )}
+                    <div class="card__body">
+                      <h3 class="card__title">{card.title}</h3>
+                      <p class="card__desc">{card.description}</p>
+                      {!ar && card.solution && (
+                        <p class="card__solution">
+                          {w.solution} {card.solution}
+                        </p>
+                      )}
+                    </div>
+                    </article>
+                  </li>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    )
-  }
+              </ul>
+              </div>
+            </div>
+          </section>
+        )
+      }
 
-  {
-    !showPackages && startingPrice && (
-      <section class="price st-section st-black">
-        <div class="st-wrap price__inner">
-          <p class="st-eyebrow">{w.pricing}</p>
-          <p class="price__amount">
-            {w.startingFrom} {startingPrice.toLocaleString()}
-          </p>
-          <p class="price__note">{w.pricingNote}</p>
-          <div class="price__actions">
-            <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
-              {w.getYourQuote}
-              <Icon name="arrow-right" size={18} class="flip" />
-            </a>
-            <a class="st-btn st-btn--ghost" href="https://dub.sh/wrp-phone" target="_blank" rel="noopener noreferrer">
-              <Icon name="phone" size={18} />
-              {w.callUs}
-            </a>
-          </div>
-        </div>
-      </section>
-    )
-  }
+      {
+        benefits && benefits.length > 0 && !additionalSection && (
+          <section class="cards st-section st-dark">
+            <div class="st-wrap">
+              <header class="st-head st-head--center">
+                <h2 class="st-h2">{benefitsHeading || (ar ? t(locale, 'services.benefits') : w.whyService)}</h2>
+                {!ar && <p class="st-intro">{w.benefitsSub}</p>}
+              </header>
+              <div class="fill">
+              <ol class="fill__grid" role="list">
+                {benefits.map((benefit, i, all) => (
+                  <li class="cell" style={fillSpans(all.length, 3)[i].style}>
+                    <article class="card card--num">
+                    <div class="card__body">
+                      <span class="card__num" aria-hidden="true">{num(String(i + 1).padStart(2, '0'))}</span>
+                      <h3 class="card__title">{benefit.title}</h3>
+                      <p class="card__desc">{benefit.description}</p>
+                    </div>
+                    </article>
+                  </li>
+                ))}
+              </ol>
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        !ar && realTimeWork && realTimeWork.items.length > 0 && (
+          <WorkGallery heading={realTimeWork.heading} subheading={realTimeWork.subheading} items={realTimeWork.items} name={title} class="st-white" />
+        )
+      }
+    </Fragment>
+    <Fragment slot="b">
+      {
+        showPackages && packages && packages.length > 0 && (
+          <section class="pk st-section st-light">
+            <div class="st-wrap">
+              <header class="st-head st-head--center">
+                <h2 class="st-h2">{packagesHeading || (ar ? t(locale, 'services.process') : w.packages)}</h2>
+                {(packagesSubheading || !ar) && <p class="st-intro">{packagesSubheading || w.packagesSub}</p>}
+              </header>
+              <ul class="pk__grid" role="list">
+                {packages.map((pkg) => (
+                  <li class:list={['pk__card', pkg.badge && 'pk__card--pick']}>
+                    {pkg.badge && <p class="pk__badge">{pkg.badge}</p>}
+                    <h3 class="pk__name">{pkg.name}</h3>
+                    {pkg.tagline && <p class="pk__tag">{pkg.tagline}</p>}
+                    {pkg.priceSuv ? (
+                      <div class="pk__prices">
+                        <p>
+                          <span class="pk__body">{ar ? t(locale, 'services.sedan') : w.sedan}</span>
+                          <span class="pk__price">{money(pkg.price)}</span>
+                        </p>
+                        <p>
+                          <span class="pk__body">{ar ? t(locale, 'services.suv') : w.suv}</span>
+                          <span class="pk__price">{money(pkg.priceSuv)}</span>
+                        </p>
+                      </div>
+                    ) : (
+                      <p class="pk__price pk__price--one">{money(pkg.price)}</p>
+                    )}
+                    <ul class="pk__feats" role="list">
+                      {pkg.features.map((feature) => (
+                        <li>
+                          <Icon name="check" size={18} />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <a class:list={['st-btn', pkg.badge ? 'st-btn--gold' : 'st-btn--dark']} href={quoteHref} data-quote>
+                      {ar ? t(locale, 'services.bookNow') : w.getStarted}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        comparison && comparison.rows.length > 0 && (
+          <section class="cmp st-section st-white">
+            <div class="st-wrap">
+              <header class="st-head st-head--center">
+                <h2 class="st-h2">{comparison.heading || (ar ? '' : w.compare)}</h2>
+                {comparison.subheading && <p class="st-intro">{comparison.subheading}</p>}
+              </header>
+              <div class="cmp__scroll" tabindex="0" role="region" aria-label={comparison.heading || w.compare}>
+                <table class="cmp__table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{ar ? t(locale, 'services.included') : w.included}</th>
+                      {comparison.columns.map((col) => (
+                        <th scope="col">{col}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {comparison.rows.map((row) => (
+                      <tr>
+                        <th scope="row">
+                          <span>{row.label}</span>
+                          {row.note && <span class="cmp__note">{row.note}</span>}
+                        </th>
+                        {row.values.map((value) => (
+                          <td>
+                            {value === 'yes' ? (
+                              <>
+                                <Icon name="check" size={18} class="cmp__yes" />
+                                <span class="visually-hidden">{ar ? t(locale, 'services.included') : w.included}</span>
+                              </>
+                            ) : value === 'no' ? (
+                              <>
+                                <span aria-hidden="true" class="cmp__no">
+                                  &mdash;
+                                </span>
+                                <span class="visually-hidden">{ar ? t(locale, 'services.notIncluded') : w.notIncluded}</span>
+                              </>
+                            ) : (
+                              <span class="cmp__val">{value}</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        !showPackages && startingPrice && (
+          <section class="price st-section st-black">
+            <div class="st-wrap price__inner">
+              <p class="st-eyebrow">{ar ? t(locale, 'services.startingFrom').toUpperCase() : w.pricing}</p>
+              <p class="price__amount">{ar ? money(startingPrice) : `${w.startingFrom} ${startingPrice.toLocaleString()}`}</p>
+              {!ar && <p class="price__note">{w.pricingNote}</p>}
+              <div class="price__actions">
+                <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
+                  {ar ? getQuote : w.getYourQuote}
+                  <Icon name="arrow-right" size={18} class="flip" />
+                </a>
+                {!ar && (
+                  <a class="st-btn st-btn--ghost" href="https://dub.sh/wrp-phone" target="_blank" rel="noopener noreferrer">
+                    <Icon name="phone" size={18} />
+                    {w.callUs}
+                  </a>
+                )}
+              </div>
+            </div>
+          </section>
+        )
+      }
+    </Fragment>
+  </Swap>
 
   {
     process && process.length > 0 && (
       <section class="steps st-section st-white">
         <div class="st-wrap">
           <header class="st-head st-head--center">
-            <h2 class="st-h2">{processHeading || w.process}</h2>
-            <p class="st-intro">{processSubheading || w.processSub}</p>
+            <h2 class="st-h2">{processHeading || (ar ? t(locale, 'services.process') : w.process)}</h2>
+            {(processSubheading || !ar) && <p class="st-intro">{processSubheading || w.processSub}</p>}
           </header>
           <div class="steps__box">
           <ol class="steps__list" role="list" style={`--n:${process.length}`}>
             {process.map((step) => (
               <li class="step">
-                <span class="step__num">{String(step.step).padStart(2, '0')}</span>
+                <span class="step__num">{num(String(step.step).padStart(2, '0'))}</span>
                 <h3 class="step__title">{step.title}</h3>
                 <p class="step__desc">{step.description}</p>
               </li>
@@ -455,16 +480,26 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
       })),
     }}
   >
-    {t(locale, 'services.faqMore')}{' '}
-    <a href={link(localizeUrl('/contact-us/', locale))}>{t(locale, 'services.faqContact')}</a>
+    {
+      !ar && (
+        <>
+          {t(locale, 'services.faqMore')} <a href={link(localizeUrl('/contact-us/', locale))}>{t(locale, 'services.faqContact')}</a>
+        </>
+      )
+    }
   </Faq>
 
   <ReviewQuote serviceSlug={slug} locale={locale} />
-  <ReviewCards serviceSlug={slug} heading={w.reviewsHeading(title)} locale={locale} link={link} />
+  <ReviewCards serviceSlug={slug} heading={ar ? title : w.reviewsHeading(title)} locale={locale} link={link} />
   <PostCards serviceId={slug} locale={locale} link={link} />
   <ServiceCards currentService={slug} locale={locale} link={link} />
 
-  <EndCta heading={ctaHeading || w.experience(title)} text={ctaDescription || w.ctaDescription} button={w.getQuote} href={quoteHref} />
+  <EndCta
+    heading={ctaHeading || (ar ? title : w.experience(title))}
+    text={ctaDescription || (ar ? t(locale, 'contact.teamReady') : w.ctaDescription)}
+    button={getQuote}
+    href={quoteHref}
+  />
 </StudioPage>
 
 <style>

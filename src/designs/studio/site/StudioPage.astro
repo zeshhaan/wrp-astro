@@ -220,8 +220,8 @@ const altHref = lab(alternatePath);
     <main id="main">
       <slot />
     </main>
-    <Footer home={lab('/')} serviceHref={lab} />
-    <FloatingContact />
+    <Footer home={lab('/')} serviceHref={lab} locale={locale} altHref={altHref} />
+    <FloatingContact locale={locale} />
     {
       heroForm && (
         <script>
