@@ -1,0 +1,486 @@
+---
+/**
+ * Studio version of a blog post (/blog/<slug>/), English or Arabic. Same head
+ * (article Open Graph tags, BlogPosting and BreadcrumbList JSON-LD), the same
+ * header, trust box, article body, tags, related services and review as the
+ * live src/layouts/BlogPost.astro. The post text is the content collection's,
+ * rendered unchanged; only its typography is Studio's.
+ */
+import type { CollectionEntry } from 'astro:content';
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import ServiceCards from './sections/ServiceCards.astro';
+import ReviewQuote from './sections/ReviewQuote.astro';
+import Picture from '../../shared/Picture.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import { labPrefix, toLab } from './routes';
+
+type Props = CollectionEntry<'blog'>['data'] & {
+  locale: Locale;
+  /** The post's slug, without the ar/ prefix. */
+  slug: string;
+};
+
+const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags, relatedServices, locale, slug } = Astro.props;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const num = (n: string | number) => toLocalNum(n, locale);
+const site = 'https://wrpdetailing.ae';
+const livePath = localizeUrl(`/blog/${slug}/`, locale);
+
+// The live layout's words, as it has them.
+const ar = locale === 'ar';
+const authorNote = ar
+  ? 'أُعد هذا الدليل بواسطة فريق WRP Detailing Studio استناداً إلى أعمال التركيب اليومية، وأسئلة العملاء المتكرّرة، وظروف القيادة الفعلية في دبي.'
+  : 'This guide was prepared by the WRP Detailing Studio team using day-to-day installation work, recurring client questions, and real Dubai driving conditions.';
+const freshnessNote = ar
+  ? 'نراجع أدلتنا عند تغيّر الممارسات، أو الباقات، أو تعليمات العناية، أو المعلومات المحلية ذات الصلة.'
+  : 'We review guides when service practices, package details, aftercare advice, or relevant local guidance materially changes.';
+const trustHeading = ar ? 'لماذا يمكن الوثوق بهذا الدليل' : 'Why trust this guide';
+const sourcesHeading = ar ? 'إشارات الموثوقية' : 'Trust signals';
+const coverageHeading = ar ? 'نطاق الخبرة' : 'Coverage';
+const coverage = ar
+  ? 'PPF، طلاء السيراميك، التظليل، التلميع، والعناية الداخلية للسيارات في دبي.'
+  : 'PPF, ceramic coating, window tinting, paint correction, and interior care for vehicles in Dubai.';
+const categoryLabels: Record<string, Record<string, string>> = {
+  en: { guide: 'Guide', news: 'News', update: 'Update', event: 'Event', listicle: 'Listicle' },
+  ar: { guide: 'دليل', news: 'أخبار', update: 'تحديث', event: 'فعالية', listicle: 'قائمة' },
+};
+const categoryLabel = (cat: string) => categoryLabels[locale]?.[cat] || cat;
+
+// The live BlogPosting JSON-LD, with the live URL.
+const canonicalURL = `${site}${livePath}`;
+const ogImageURL = new URL(heroImage ?? '/og/site.jpg', site).toString();
+const toIsoDate = (d: Date | string) => new Date(d).toISOString().slice(0, 10);
+const topics = (tags || []).map((tag) => ({ '@type': 'Thing', name: tag }));
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  url: canonicalURL,
+  image: ogImageURL,
+  inLanguage: ar ? 'ar' : 'en',
+  isAccessibleForFree: true,
+  datePublished: toIsoDate(pubDate),
+  ...(updatedDate ? { dateModified: toIsoDate(updatedDate) } : {}),
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+  author: { '@type': 'Organization', name: author || 'WRP Detailing Solutions', url: `${site}/` },
+  publisher: {
+    '@type': 'Organization',
+    name: 'WRP Detailing Solutions',
+    url: `${site}/`,
+    logo: { '@type': 'ImageObject', url: `${site}/wrp-logo.svg` },
+  },
+  ...(readingTime ? { timeRequired: `PT${readingTime}M` } : {}),
+  ...(category ? { articleSection: categoryLabel(category) } : {}),
+  ...(tags && tags.length ? { keywords: tags.join(', ') } : {}),
+  ...(topics.length ? { about: topics } : {}),
+};
+const crumbs = [
+  { name: t(locale, 'common.home'), url: ar ? `${site}/ar/` : `${site}/` },
+  { name: t(locale, 'blog.title'), url: ar ? `${site}/ar/blog/` : `${site}/blog/` },
+  { name: title, url: canonicalURL },
+];
+const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') : '';
+---
+
+<StudioPage
+  title={`${title} | WRP Blog`}
+  description={description}
+  locale={locale}
+  livePath={livePath}
+  ogType="article"
+  ogImage={heroImage}
+  publishedTime={pubDate}
+  modifiedTime={updatedDate}
+  author={author}
+  tags={tags}
+  articleSection={category ? categoryLabel(category) : undefined}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article class="bp">
+    <header class:list={['bp__head', heroImage && 'bp__head--photo']}>
+      {
+        heroImage && (
+          <Picture
+            base={heroBase}
+            alt=""
+            sizes="100vw"
+            widths={[800, 1200, 1920]}
+            width={1920}
+            height={1080}
+            loading="eager"
+            fetchpriority="high"
+            class="bp__bg"
+          />
+        )
+      }
+      <div class="st-wrap bp__head-inner">
+        <Breadcrumbs crumbs={crumbs} link={link} />
+        <p class="bp__meta">
+          {category && <span class="bp__cat">{categoryLabel(category)}</span>}
+          <span>
+            {t(locale, 'blog.published')} <FormattedDate date={pubDate} locale={locale} showHijri={ar} />
+          </span>
+          {
+            readingTime && (
+              <span>
+                {num(readingTime)} {t(locale, 'blog.minRead')}
+              </span>
+            )
+          }
+        </p>
+        <h1 class="bp__title">{title}</h1>
+        <p class="bp__desc">{description}</p>
+        {
+          author && (
+            <p class="bp__by">
+              {t(locale, 'blog.by')} <span>{author}</span>
+            </p>
+          )
+        }
+        {
+          updatedDate && (
+            <p class="bp__by">
+              {t(locale, 'blog.updated')} <FormattedDate date={updatedDate} locale={locale} showHijri={ar} />
+            </p>
+          )
+        }
+      </div>
+    </header>
+
+    <div class="bp__body st-white">
+      <div class="bp__col">
+        <aside class="bp__trust">
+          <p class="bp__trust-title">{trustHeading}</p>
+          <p class="bp__trust-note">{authorNote}</p>
+          <div class="bp__trust-grid">
+            <div>
+              <p class="bp__trust-h">{sourcesHeading}</p>
+              <p>{freshnessNote}</p>
+            </div>
+            <div>
+              <p class="bp__trust-h">{coverageHeading}</p>
+              <p>{coverage}</p>
+            </div>
+          </div>
+        </aside>
+        <div class="bp__content">
+          <slot />
+        </div>
+        {
+          tags && tags.length > 0 && (
+            <ul class="bp__tags" role="list">
+              {tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
+  </article>
+
+  <ServiceCards serviceIds={relatedServices} locale={locale} link={link} />
+  {relatedServices && relatedServices.length > 0 && <ReviewQuote serviceSlug={relatedServices[0]} locale={locale} />}
+</StudioPage>
+
+<style>
+  .bp__head {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: 8.5rem 3.5rem;
+    background: var(--st-black);
+  }
+  .bp__head--photo {
+    padding-block-start: clamp(14rem, 30vw, 22rem);
+  }
+  .bp__head :global(.bp__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .bp__head :global(.bp__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .bp__head--photo::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(12 13 15 / 0.96) 25%, rgb(12 13 15 / 0.55) 65%, rgb(12 13 15 / 0.3));
+  }
+  .bp__head-inner {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    max-inline-size: calc(52rem + 2 * var(--st-gutter-x));
+  }
+  .bp__head-inner > :global(.crumbs) {
+    margin-block-end: 0.5rem;
+  }
+  .bp__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 1rem;
+    font-size: 0.875rem;
+    color: var(--st-on-dark);
+  }
+  .bp__cat {
+    padding: 0.2rem 0.6rem;
+    background: var(--st-gold);
+    color: var(--st-black);
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+  }
+  .bp__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.2rem, 1.4rem + 3.2vw, 3.8rem);
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+  .bp__desc {
+    color: var(--st-on-dark);
+    font-size: 1.1875rem;
+    line-height: 1.5;
+  }
+  .bp__by {
+    font-size: 0.875rem;
+    color: var(--st-mute);
+  }
+  .bp__by span {
+    color: var(--st-white);
+    font-weight: 600;
+  }
+
+  .bp__body {
+    padding-block: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+  .bp__col {
+    max-inline-size: 46rem;
+    margin-inline: auto;
+    padding-inline: var(--st-pad);
+  }
+  .bp__trust {
+    display: grid;
+    gap: 0.75rem;
+    margin-block-end: 2.5rem;
+    padding: 1.5rem;
+    background: var(--st-paper);
+    border-inline-start: 4px solid var(--st-gold);
+    font-size: 0.9375rem;
+    color: var(--st-ink-2);
+  }
+  .bp__trust-title {
+    font-family: var(--st-head-font);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--st-gold-deep);
+  }
+  .bp__trust-note {
+    color: var(--st-ink);
+  }
+  .bp__trust-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .bp__trust-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .bp__trust-h {
+    font-weight: 600;
+    color: var(--st-ink);
+  }
+  .bp__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 3rem 0 0;
+    padding: 2rem 0 0;
+    border-block-start: 1px solid var(--st-line-light);
+    list-style: none;
+  }
+  .bp__tags li {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--st-line-light);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--st-ink-2);
+  }
+
+  /* The post body (Markdown), in Studio type. */
+  .bp__content {
+    color: var(--st-ink-2);
+    font-size: 1.0938rem;
+    line-height: 1.7;
+  }
+  .bp__content :global(> * + *) {
+    margin-block-start: 1.25em;
+  }
+  .bp__content :global(h2) {
+    margin-block: 2.25em 0.75em;
+    padding-block-end: 0.5rem;
+    border-block-end: 2px solid var(--st-line-light);
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 1.3rem + 1vw, 2rem);
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: var(--st-ink);
+  }
+  .bp__content :global(h3) {
+    margin-block: 1.75em 0.5em;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.4rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--st-ink);
+  }
+  .bp__content :global(h4) {
+    margin-block: 1.5em 0.4em;
+    font-weight: 700;
+    color: var(--st-ink);
+  }
+  .bp__content :global(:is(h2, h3, h4) + *) {
+    margin-block-start: 0;
+  }
+  .bp__content :global(a) {
+    color: var(--st-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--st-gold);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .bp__content :global(a:hover) {
+    color: var(--st-gold-deep);
+  }
+  .bp__content :global(strong) {
+    font-weight: 600;
+    color: var(--st-ink);
+  }
+  .bp__content :global(ul),
+  .bp__content :global(ol) {
+    display: grid;
+    gap: 0.6em;
+    padding: 0;
+    list-style: none;
+  }
+  .bp__content :global(ul > li) {
+    position: relative;
+    padding-inline-start: 1.6rem;
+  }
+  .bp__content :global(ul > li)::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.2rem;
+    inset-block-start: 0.7em;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--st-gold);
+  }
+  .bp__content :global(ol) {
+    counter-reset: bp;
+  }
+  .bp__content :global(ol > li) {
+    position: relative;
+    padding-inline-start: 2.4rem;
+    counter-increment: bp;
+  }
+  .bp__content :global(ol > li)::before {
+    content: counter(bp);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.15em;
+    display: grid;
+    place-items: center;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    background: var(--st-black);
+    color: var(--st-gold);
+    font-family: var(--st-head-font);
+    font-size: 0.85rem;
+  }
+  :global([dir='rtl']) .bp__content :global(ol > li)::before {
+    content: counter(bp, arabic-indic);
+  }
+  .bp__content :global(blockquote) {
+    margin-inline: 0;
+    padding: 1.25rem 1.5rem;
+    background: var(--st-paper);
+    border-inline-start: 4px solid var(--st-gold);
+  }
+  .bp__content :global(blockquote p) {
+    color: var(--st-ink);
+    font-weight: 500;
+  }
+  .bp__content :global(img) {
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+  .bp__content :global(figcaption) {
+    margin-block-start: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+    text-align: center;
+  }
+  .bp__content :global(hr) {
+    block-size: 1px;
+    margin-block: 2.5em;
+    border: 0;
+    background: var(--st-line-light);
+  }
+  .bp__content :global(.table-scroll) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .bp__content :global(table) {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+  @media (max-width: 47.99rem) {
+    .bp__content :global(.table-scroll table) {
+      inline-size: max-content;
+      min-inline-size: 100%;
+    }
+  }
+  .bp__content :global(thead) {
+    background: var(--st-black);
+  }
+  .bp__content :global(th) {
+    padding: 0.85rem 1rem;
+    color: var(--st-white);
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: start;
+  }
+  .bp__content :global(td) {
+    padding: 0.75rem 1rem;
+    border-block-end: 1px solid var(--st-line-light);
+    color: var(--st-ink);
+  }
+  .bp__content :global(tbody tr:nth-child(even)) {
+    background: var(--st-paper);
+  }
+</style>

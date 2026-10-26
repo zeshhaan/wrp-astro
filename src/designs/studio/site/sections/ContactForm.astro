@@ -1,0 +1,212 @@
+---
+/**
+ * The live enquiry form (contact page and homepage), field for field, in
+ * Studio's white card. Posts to /api/contact like the live one and shows the
+ * live thanks or error text. In the Design Lab it checks the fields and
+ * stops: nothing reaches the lead inbox from a preview.
+ */
+import Icon from '../../Icon.astro';
+import ServiceOptions from '@/components/ServiceOptions.astro';
+import type { Locale } from '@/i18n/translations';
+import { labPrefix } from '../routes';
+
+export type Field = 'name' | 'email' | 'phone' | 'vehicle' | 'service' | 'message';
+
+interface Props {
+  locale: Locale;
+  labels: Record<Field, string>;
+  placeholders: Partial<Record<Field, string>>;
+  required: Field[];
+  submit: string;
+  sending: string;
+  thanks: string;
+  thanksText: string;
+  defaultError: string;
+  fallbackError: string;
+  networkError: string;
+  fallbackNetworkError: string;
+  /** Add " *" to the labels of required fields, as the contact page does. */
+  marks?: boolean;
+  /** Keeps field ids unique if a page ever holds two forms. */
+  idPrefix?: string;
+}
+
+const p = Astro.props;
+const { locale, required, idPrefix = '' } = p;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const label = (field: Field) => `${p.labels[field]}${p.marks && required.includes(field) ? ' *' : ''}`;
+const id = (field: Field) => `${idPrefix}${field}`;
+const need = (field: Field) => required.includes(field);
+---
+
+<form
+  class="cf"
+  data-contact-form
+  data-lab={isLab ? '' : undefined}
+  data-default-error={p.defaultError}
+  data-fallback-error={p.fallbackError}
+  data-network-error={p.networkError}
+  data-fallback-network-error={p.fallbackNetworkError}
+  action="/api/contact"
+  method="post"
+>
+  <input type="hidden" name="locale" value={locale} />
+  <div class="cf__field">
+    <label for={id('name')}>{label('name')}</label>
+    <input id={id('name')} type="text" name="name" autocomplete="name" required={need('name')} placeholder={p.placeholders.name} />
+  </div>
+  <div class="cf__field">
+    <label for={id('email')}>{label('email')}</label>
+    <input id={id('email')} type="email" name="email" autocomplete="email" required={need('email')} placeholder={p.placeholders.email} />
+  </div>
+  <div class="cf__field">
+    <label for={id('phone')}>{label('phone')}</label>
+    <input id={id('phone')} type="tel" name="phone" autocomplete="tel" required={need('phone')} placeholder={p.placeholders.phone} />
+  </div>
+  <div class="cf__field">
+    <label for={id('vehicle')}>{label('vehicle')}</label>
+    <input id={id('vehicle')} type="text" name="vehicle" required={need('vehicle')} placeholder={p.placeholders.vehicle} />
+  </div>
+  <div class="cf__field">
+    <label for={id('service')}>{label('service')}</label>
+    <select id={id('service')} name="service">
+      <ServiceOptions locale={locale} />
+    </select>
+  </div>
+  <div class="cf__field">
+    <label for={id('message')}>{label('message')}</label>
+    <textarea id={id('message')} name="message" rows="4" required={need('message')} placeholder={p.placeholders.message}></textarea>
+  </div>
+  <button type="submit" class="st-btn st-btn--gold cf__send">
+    <span class="cf__idle">{p.submit} <Icon name="arrow-right" size={18} class="flip" /></span>
+    <span class="cf__busy">{p.sending}</span>
+  </button>
+  <div class="cf__done" data-contact-done hidden>
+    <p class="cf__done-title">{p.thanks}</p>
+    <p>{p.thanksText}</p>
+  </div>
+  <p class="cf__error" data-contact-error role="alert" hidden></p>
+</form>
+
+<script>
+  // The live form's behaviour without Alpine: send to /api/contact, then show
+  // thanks or the error. In the Design Lab it stops after the browser's own
+  // field checks, so a preview never reaches the lead inbox.
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
+    const done = form.querySelector<HTMLElement>('[data-contact-done]')!;
+    const error = form.querySelector<HTMLElement>('[data-contact-error]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      error.hidden = true;
+      if (form.hasAttribute('data-lab')) {
+        done.hidden = false;
+        return;
+      }
+      button.disabled = true;
+      form.toggleAttribute('data-sending', true);
+      const defaultError = form.dataset.defaultError || form.dataset.fallbackError || '';
+      try {
+        const data = new FormData(form);
+        const attribution = (window as unknown as { WRPAttribution?: { serialize?: () => string } }).WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const response = await fetch('/api/contact', { method: 'POST', body: data });
+        const result = (await response.json()) as { success?: boolean; error?: string };
+        if (response.ok && result.success) {
+          done.hidden = false;
+          form.reset();
+          document.dispatchEvent(new Event('wrp:lead'));
+        } else {
+          error.textContent = result.error || defaultError;
+          error.hidden = false;
+        }
+      } catch {
+        error.textContent = form.dataset.networkError || form.dataset.fallbackNetworkError || '';
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        form.toggleAttribute('data-sending', false);
+      }
+    });
+  }
+</script>
+
+<style>
+  /* The form: a white card, like the hero lead form. */
+  .cf {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    background: var(--st-white);
+    color: var(--st-ink);
+    color-scheme: light;
+    border-block-start: 4px solid var(--st-gold);
+  }
+  .cf__field {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .cf__field label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .cf__field :is(input, select, textarea) {
+    inline-size: 100%;
+    min-block-size: 3rem;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--st-line-light);
+    border-radius: 0;
+    background: var(--st-paper);
+    color: var(--st-ink);
+    font: inherit;
+    font-size: 1rem;
+  }
+  .cf__field textarea {
+    resize: vertical;
+  }
+  .cf__field :is(input, select, textarea):focus-visible {
+    outline: 3px solid var(--st-gold);
+    outline-offset: 0;
+    border-color: var(--st-ink);
+  }
+  .cf__field :is(input, textarea):user-invalid {
+    border-color: #b42318;
+  }
+  .cf__send {
+    justify-self: stretch;
+    margin-block-start: 0.5rem;
+  }
+  .cf__send:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .cf__idle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .cf__busy,
+  .cf[data-sending] .cf__idle {
+    display: none;
+  }
+  .cf[data-sending] .cf__busy {
+    display: inline;
+  }
+  .cf__done {
+    padding: 1rem;
+    background: #e8f5ec;
+    color: #14532d;
+  }
+  .cf__done-title {
+    font-weight: 700;
+  }
+  .cf__done p + p {
+    margin-block-start: 0.25rem;
+    font-size: 0.875rem;
+  }
+  .cf__error {
+    padding: 1rem;
+    background: #fdecea;
+    color: #8a1c13;
+  }
+</style>

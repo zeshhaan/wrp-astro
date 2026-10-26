@@ -50,9 +50,13 @@ export function isPhone(value: string): boolean {
   return /^[+0-9 ()\-]{7,40}$/.test(value) && value.replace(/\D/g, '').length >= 7;
 }
 
+export type QuoteReply = 'call' | 'whatsapp';
+
 export type QuoteLead = {
-  name: string;
+  name: string | null;
   phone: string;
+  /** How the visitor wants the answer, when the form asked (the phone layout). */
+  reply: QuoteReply | null;
   vehicle: string | null;
   service: string | null;
   page: string | null;
@@ -60,9 +64,11 @@ export type QuoteLead = {
   attribution: LeadAttribution | null;
 };
 
-export function quoteLeadSubject({ name, vehicle, service }: QuoteLead): string {
+export function quoteLeadSubject({ name, phone, vehicle, service, reply }: QuoteLead): string {
   const what = service ?? 'quote';
-  return vehicle ? `Website quote: ${what} for ${vehicle} from ${name}` : `Website quote: ${what} from ${name}`;
+  const who = name ?? phone;
+  const ask = reply === 'call' ? 'Call back' : reply === 'whatsapp' ? 'WhatsApp' : 'Website quote';
+  return vehicle ? `${ask}: ${what} for ${vehicle} from ${who}` : `${ask}: ${what} from ${who}`;
 }
 
 /** WhatsApp chat link for the number the visitor left, so the team can reply in one tap. */
@@ -93,8 +99,9 @@ export function quoteLeadEmailHtml(lead: QuoteLead, outcomeActions: string, sent
             </div>
             <div style="background: #f9f9f9; padding: 20px; border: 1px solid #ddd;">
               <table style="width: 100%; border-collapse: collapse; background: #fff;">
-                ${row('Name', escapeHtml(lead.name))}
+                ${row('Name', escapeHtml(lead.name ?? 'Not given'))}
                 ${row('Phone', `<a href="tel:${phone}">${phone}</a>${wa ? ` · <a href="${wa}">WhatsApp</a>` : ''}`)}
+                ${lead.reply ? row('Reply by', lead.reply === 'call' ? '<strong>Call back</strong>' : '<strong>WhatsApp</strong>') : ''}
                 ${row('Vehicle', escapeHtml(lead.vehicle ?? 'Not provided'))}
                 ${row('Service', escapeHtml(lead.service ?? 'Not specified'))}
                 ${row('Came from', escapeHtml(lead.page ?? 'Unknown'))}

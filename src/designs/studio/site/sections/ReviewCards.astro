@@ -5,11 +5,12 @@
  * same reviews (getReviewsForService, first 6), heading, rating line and
  * "see all" link. Long reviews show the first 300 characters with Read more.
  */
-import type { Review } from '@/lib/reviews';
-import { getReviewsForService, getBusiness, getDisplayCount, getReviewImageAlt } from '@/lib/reviews';
+import { getReviewsForService, getBusiness, getDisplayCount } from '@/lib/reviews';
 import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
 import Icon from '../../Icon.astro';
+import ReviewCard from './ReviewCard.astro';
+import ReviewScript from './ReviewScript.astro';
 
 interface Props {
   serviceSlug: string;
@@ -24,8 +25,6 @@ const reviews = getReviewsForService(serviceSlug).slice(0, limit);
 const business = getBusiness();
 const num = (n: string | number) => toLocalNum(n, locale);
 const MAX = 300;
-const short = (r: Review) => r.text.substring(0, MAX).replace(/\s+\S*$/, '') + '…';
-const initials = (r: Review) => r.reviewerName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 ---
 
 {
@@ -51,54 +50,11 @@ const initials = (r: Review) => r.reviewerName.split(' ').map((n) => n[0]).join(
         </header>
 
         <ul class="rc__list" role="list">
-          {reviews.map((r) => {
-            const long = r.text.length > MAX;
-            return (
-              <li class="rc__card">
-                {r.localImages.length > 0 && (
-                  <img
-                    class="rc__photo"
-                    src={`/${r.localImages[0]}`}
-                    alt={getReviewImageAlt(r, 0)}
-                    width="600"
-                    height="450"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                )}
-                <div class="rc__top">
-                  <span class="rc__stars" role="img" aria-label={`${r.stars} out of 5 stars`}>
-                    {Array.from({ length: r.stars }, () => <Icon name="star" size={15} />)}
-                  </span>
-                  <span class="rc__date">{r.date}</span>
-                </div>
-                {r.text &&
-                  (long ? (
-                    <div class="rc__text" data-rc-more>
-                      <p data-short>"{short(r)}"</p>
-                      <p data-full hidden>"{r.text}"</p>
-                      <button type="button" class="rc__more" aria-expanded="false" data-less={t(locale, 'reviews.showLess')}>
-                        {t(locale, 'reviews.readMore')}
-                      </button>
-                    </div>
-                  ) : (
-                    <div class="rc__text">
-                      <p>"{r.text}"</p>
-                    </div>
-                  ))}
-                <p class="rc__who">
-                  <span class="rc__avatar" aria-hidden="true">
-                    <img src={r.localAvatar ? `/${r.localAvatar}` : r.profilePhoto} alt="" width="36" height="36" loading="lazy" onerror="this.remove()" />
-                    {initials(r)}
-                  </span>
-                  <span>
-                    <span class="rc__name">{r.reviewerName}</span>
-                    {r.reviewerInfo && <span class="rc__info">{r.reviewerInfo}</span>}
-                  </span>
-                </p>
-              </li>
-            );
-          })}
+          {reviews.map((r) => (
+            <li class="rc__item">
+              <ReviewCard review={r} locale={locale} max={MAX} photos="first" />
+            </li>
+          ))}
         </ul>
 
         <p class="rc__all">
@@ -111,21 +67,7 @@ const initials = (r: Review) => r.reviewerName.split(' ').map((n) => n[0]).join(
   )
 }
 
-<script>
-  for (const box of document.querySelectorAll<HTMLElement>('[data-rc-more]')) {
-    const btn = box.querySelector<HTMLButtonElement>('button')!;
-    const shortP = box.querySelector<HTMLElement>('[data-short]')!;
-    const fullP = box.querySelector<HTMLElement>('[data-full]')!;
-    const more = btn.textContent!.trim();
-    btn.addEventListener('click', () => {
-      const open = btn.getAttribute('aria-expanded') !== 'true';
-      btn.setAttribute('aria-expanded', String(open));
-      shortP.hidden = open;
-      fullP.hidden = !open;
-      btn.textContent = open ? btn.dataset.less! : more;
-    });
-  }
-</script>
+<ReviewScript />
 
 <style>
   .rc__rating {
@@ -163,82 +105,9 @@ const initials = (r: Review) => r.reviewerName.split(' ').map((n) => n[0]).join(
       columns: 3;
     }
   }
-  .rc__card {
-    display: grid;
-    gap: 0.9rem;
+  .rc__item {
     break-inside: avoid;
     margin-block-end: 1rem;
-    padding: 1.5rem;
-    background: var(--st-paper);
-    border-block-end: 3px solid var(--st-gold);
-  }
-  .rc__photo {
-    inline-size: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-  }
-  .rc__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .rc__date {
-    font-size: 0.8125rem;
-    color: var(--st-ink-2);
-  }
-  .rc__text {
-    color: var(--st-ink);
-    font-size: 0.975rem;
-    line-height: 1.6;
-  }
-  .rc__more {
-    margin-block-start: 0.35rem;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    color: var(--st-gold-deep);
-    cursor: pointer;
-  }
-  .rc__who {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-  }
-  .rc__avatar {
-    position: relative;
-    display: grid;
-    place-items: center;
-    flex: none;
-    inline-size: 2.25rem;
-    block-size: 2.25rem;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--st-black);
-    color: var(--st-white);
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
-  .rc__avatar img {
-    position: absolute;
-    inset: 0;
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-  }
-  .rc__name {
-    display: block;
-    font-weight: 700;
-    font-size: 0.9375rem;
-  }
-  .rc__info {
-    display: block;
-    font-size: 0.8125rem;
-    color: var(--st-ink-2);
   }
   .rc__all {
     display: flex;

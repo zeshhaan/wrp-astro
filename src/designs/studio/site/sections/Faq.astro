@@ -1,0 +1,84 @@
+---
+/**
+ * Questions and answers, every answer visible (as on the live pages), with
+ * the heading beside the list on wide screens. Renders the page's FAQPage
+ * JSON-LD when given one: pass the live page's own object, so its wording
+ * stays exactly as it is live.
+ */
+interface Props {
+  heading: string;
+  /** Line under the heading. The default slot replaces it when it needs a link. */
+  intro?: string | null;
+  items: { q: string; a: string }[];
+  schema?: object;
+  class?: string;
+}
+
+const { heading, intro, items, schema, class: className = 'st-light' } = Astro.props;
+const hasSlot = Astro.slots.has('default');
+---
+
+<section class:list={['faq st-section', className]} aria-labelledby="faq-title">
+  <div class="st-wrap faq__grid">
+    <header class="st-head faq__head">
+      <h2 id="faq-title" class="st-h2">{heading}</h2>
+      {hasSlot ? <p class="st-intro"><slot /></p> : intro && <p class="st-intro">{intro}</p>}
+    </header>
+    <dl class="faq__list">
+      {
+        items.map((item) => (
+          <div class="faq__item">
+            <dt>{item.q}</dt>
+            <dd>{item.a}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+  {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+</section>
+
+<style>
+  .faq__grid {
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 60rem) {
+    .faq__grid {
+      grid-template-columns: 1fr 2fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .faq__head {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 2rem);
+    }
+  }
+  .faq__head :global(a) {
+    color: var(--st-gold-deep);
+    font-weight: 600;
+    text-underline-offset: 3px;
+  }
+  .faq__list {
+    display: grid;
+    margin: 0;
+  }
+  .faq__item {
+    display: grid;
+    gap: 0.5rem;
+    padding-block: 1.4rem;
+    border-block-start: 1px solid var(--st-line-light);
+  }
+  .faq__item:last-child {
+    border-block-end: 1px solid var(--st-line-light);
+  }
+  .faq__item dt {
+    font-weight: 700;
+    font-size: 1.0625rem;
+    color: var(--st-ink);
+  }
+  .faq__item dd {
+    color: var(--st-ink-2);
+    line-height: 1.65;
+  }
+</style>

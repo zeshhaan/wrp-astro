@@ -3,24 +3,87 @@ import Icon from './Icon.astro';
 import WrpLogo from '@/components/WrpLogo.astro';
 import { pages } from '../data';
 import { contact, serviceCards, whatsappQuote } from './content';
+import { getHeaderNav } from './headers/nav';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
 
 interface Props {
   /** The Studio homepage, for links to its sections from inner pages. Empty on the homepage itself. */
   home?: string;
   /** Overrides for the service page links, e.g. the Studio previews of them. */
   serviceHref?: (href: string) => string;
+  /** Arabic pages get the Arabic footer, which links to the Arabic pages. */
+  locale?: Locale;
+  /** The same page in the other language (defaults to the other homepage). */
+  altHref?: string;
 }
-const { home = '', serviceHref = (href: string) => href } = Astro.props;
+const { home = '', serviceHref = (href: string) => href, locale = 'en', altHref } = Astro.props;
+const ar = locale === 'ar';
+const num = (n: string | number) => toLocalNum(n, locale);
 
-const siteLinks = [
-  { label: 'Portfolio', href: pages.portfolio },
-  { label: 'Reviews', href: pages.reviews },
-  { label: 'Blog', href: pages.blog },
-  { label: 'About WRP', href: pages.about },
-  { label: 'Contact us', href: pages.contact },
-  { label: 'The WRP Lounge', href: `${home}#lounge` },
-];
-const year = new Date().getFullYear();
+// Arabic labels are the live site's translations wherever it has them.
+const w = ar
+  ? {
+      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التفصيل، تظليل النوافذ والتنجيد من الاستوديو الخاص بنا في القصيص، دبي.',
+      pillars: ['غلّف', 'عزّز', 'احمِ'],
+      comma: '، ',
+      services: t(locale, 'nav.services'),
+      siteLinks: 'روابط الموقع',
+      visit: 'زورونا',
+      hours: t(locale, 'nav.hours'),
+      closed: 'الجمعة مغلق',
+      address: [t(locale, 'home.contact.address1'), t(locale, 'home.contact.address2')],
+      rights: `© ${num(new Date().getFullYear())} WRP Detailing Solutions. ${t(locale, 'footer.rights')}`,
+      other: { label: 'English', lang: 'en' },
+    }
+  : {
+      blurb: 'Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais, Dubai.',
+      pillars: ['Wrap', 'Reinforce', 'Protect'],
+      comma: ', ',
+      services: 'Services',
+      siteLinks: 'Site links',
+      visit: 'Visit us',
+      hours: contact.hours,
+      closed: contact.closed,
+      address: contact.address,
+      rights: `© ${new Date().getFullYear()} WRP Detailing Solutions. All rights reserved.`,
+      other: { label: 'العربية', lang: 'ar' },
+    };
+const services = ar
+  ? (await getHeaderNav(locale)).services.map((s) => ({ name: s.name, href: s.href }))
+  : serviceCards.map((c) => ({ name: c.name, href: c.href }));
+const siteLinks = ar
+  ? [
+      { label: t(locale, 'nav.portfolio'), href: localizeUrl(pages.portfolio, locale) },
+      { label: t(locale, 'nav.reviews'), href: localizeUrl(pages.reviews, locale) },
+      { label: t(locale, 'nav.blog'), href: localizeUrl(pages.blog, locale) },
+      { label: t(locale, 'nav.about'), href: localizeUrl(pages.about, locale) },
+      { label: t(locale, 'nav.contact'), href: localizeUrl(pages.contact, locale) },
+    ]
+  : [
+      { label: 'Portfolio', href: pages.portfolio },
+      { label: 'Reviews', href: pages.reviews },
+      { label: 'Blog', href: pages.blog },
+      { label: 'About WRP', href: pages.about },
+      { label: 'Contact us', href: pages.contact },
+      { label: 'The WRP Lounge', href: `${home}#lounge` },
+    ];
+// Credits has no Arabic page; Arabic visitors get the English one.
+const legal = ar
+  ? [
+      { label: t(locale, 'nav.privacy'), href: localizeUrl(pages.privacy, locale) },
+      { label: t(locale, 'nav.terms'), href: localizeUrl(pages.terms, locale) },
+      { label: t(locale, 'nav.credits'), href: pages.credits },
+    ]
+  : [
+      { label: 'Privacy', href: pages.privacy },
+      { label: 'Terms', href: pages.terms },
+      { label: 'Credits', href: pages.credits },
+    ];
+// The blurb's closing "Wrap, Reinforce, Protect." links each pillar page, so
+// they stay linked from every page (the live homepage links them; Studio's does not).
+const pillarHrefs = ['/wrap/', '/reinforce/', '/protect/'].map((href) => serviceHref(ar ? localizeUrl(href, locale) : href));
+const otherHref = altHref ?? (ar ? '/' : pages.arabic);
 ---
 
 <footer class="foot">
@@ -28,8 +91,13 @@ const year = new Date().getFullYear();
     <div class="foot__brand">
       <WrpLogo class="foot__mark" label="WRP by YACO Automotive" />
       <p>
-        Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais,
-        Dubai. Wrap, Reinforce, Protect.
+        {w.blurb}{' '}
+        {w.pillars.map((name, i) => (
+          <>
+            <a href={pillarHrefs[i]}>{name}</a>
+            {i < 2 ? w.comma : '.'}
+          </>
+        ))}
       </p>
       <ul class="foot__social" role="list">
         <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{contact.instagramHandle}</a></li>
@@ -37,34 +105,32 @@ const year = new Date().getFullYear();
       </ul>
     </div>
     <nav class="foot__col" aria-labelledby="foot-services">
-      <h2 id="foot-services" class="foot__h">Services</h2>
+      <h2 id="foot-services" class="foot__h">{w.services}</h2>
       <ul role="list">
-        {serviceCards.map((c) => <li><a href={serviceHref(c.href)}>{c.name}</a></li>)}
+        {services.map((c) => <li><a href={serviceHref(c.href)}>{c.name}</a></li>)}
       </ul>
     </nav>
     <nav class="foot__col" aria-labelledby="foot-links">
-      <h2 id="foot-links" class="foot__h">Site links</h2>
+      <h2 id="foot-links" class="foot__h">{w.siteLinks}</h2>
       <ul role="list">
-        {siteLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        {siteLinks.map((l) => <li><a href={serviceHref(l.href)}>{l.label}</a></li>)}
       </ul>
     </nav>
     <div class="foot__col">
-      <h2 class="foot__h">Visit us</h2>
+      <h2 class="foot__h">{w.visit}</h2>
       <ul role="list">
-        <li><a href={contact.phoneHref}>{contact.phoneDisplay}</a></li>
+        <li><a href={contact.phoneHref} dir="ltr">{num(contact.phoneDisplay)}</a></li>
         <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
-        <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{contact.address[0]},<br />{contact.address[1]}</a></li>
-        <li class="foot__hours">{contact.hours}<br />{contact.closed}</li>
+        <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{w.address[0]}{ar ? '،' : ','}<br />{w.address[1]}</a></li>
+        <li class="foot__hours">{w.hours}<br />{w.closed}</li>
       </ul>
     </div>
   </div>
   <div class="st-wrap foot__base">
-    <p>© {year} WRP Detailing Solutions. All rights reserved.</p>
+    <p>{w.rights}</p>
     <ul role="list">
-      <li><a href={pages.privacy}>Privacy</a></li>
-      <li><a href={pages.terms}>Terms</a></li>
-      <li><a href={pages.credits}>Credits</a></li>
-      <li><a href={pages.arabic} lang="ar" hreflang="ar">العربية</a></li>
+      {legal.map((l) => <li><a href={serviceHref(l.href)}>{l.label}</a></li>)}
+      <li><a href={otherHref} lang={w.other.lang} hreflang={w.other.lang}>{w.other.label}</a></li>
     </ul>
   </div>
 </footer>
@@ -116,6 +182,14 @@ const year = new Date().getFullYear();
   }
   .foot__brand p {
     max-inline-size: 22rem;
+  }
+  .foot__brand p a {
+    color: inherit;
+    text-decoration-color: var(--st-gold);
+    text-underline-offset: 3px;
+  }
+  .foot__brand p a:hover {
+    color: var(--st-white);
   }
   .foot ul {
     margin: 0;

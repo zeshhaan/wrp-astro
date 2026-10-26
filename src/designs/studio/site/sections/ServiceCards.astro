@@ -1,8 +1,12 @@
 ---
 /**
- * "Other services": three service cards. Studio version of
- * src/components/OtherServices.astro, with the same three services (the first
- * three that are not this one), heading, subtitle, card text and link label.
+ * Three service cards, in two modes:
+ *  - `currentService`: "Other services", the Studio version of
+ *    src/components/OtherServices.astro (the first three that are not this one);
+ *  - `serviceIds`: "Related services", the Studio version of
+ *    src/components/RelatedServices.astro used under blog posts (the listed
+ *    services, in collection order, up to three).
+ * Same headings, subtitles, card text and link label as the live components.
  * Cards answer to their own width (container queries), so the same card works
  * in this three-up row and anywhere narrower.
  */
@@ -13,14 +17,16 @@ import { getBaseSlug, getLocalizedServices } from '@/i18n/content';
 import { t, type Locale } from '@/i18n/translations';
 
 interface Props {
-  currentService: string;
+  currentService?: string;
+  serviceIds?: string[];
   locale?: Locale;
   link?: (href: string) => string;
 }
 
-const { currentService, locale = 'en', link = (href: string) => href } = Astro.props;
+const { currentService, serviceIds, locale = 'en', link = (href: string) => href } = Astro.props;
+const related = Boolean(serviceIds);
 const others = (await getLocalizedServices(locale))
-  .filter((s) => getBaseSlug(s.id) !== currentService)
+  .filter((s) => (serviceIds ? serviceIds.includes(getBaseSlug(s.id)) : getBaseSlug(s.id) !== currentService))
   .slice(0, 3)
   .map((s) => ({
     name: s.data.title,
@@ -30,11 +36,12 @@ const others = (await getLocalizedServices(locale))
   }));
 ---
 
+{others.length > 0 && (
 <section class="sc st-section st-dark" aria-labelledby="sc-title">
   <div class="st-wrap">
     <header class="st-head st-head--center">
-      <h2 id="sc-title" class="st-h2">{t(locale, 'services.otherServices')}</h2>
-      <p class="st-intro">{t(locale, 'services.otherSubtitle')}</p>
+      <h2 id="sc-title" class="st-h2">{t(locale, related ? 'services.relatedTitle' : 'services.otherServices')}</h2>
+      <p class="st-intro">{t(locale, related ? 'services.relatedSubtitle' : 'services.otherSubtitle')}</p>
     </header>
     <ul class="sc__list" role="list">
       {
@@ -58,6 +65,7 @@ const others = (await getLocalizedServices(locale))
     </ul>
   </div>
 </section>
+)}
 
 <style>
   .sc__list {
