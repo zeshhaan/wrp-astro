@@ -46,15 +46,13 @@ async function photoDataUri(publicPath) {
 }
 
 /**
- * The shipped WRP lockup, rasterised white for the dark scrim. The SVG is black
- * artwork on transparency, so negating the colour channels alone flips it to
- * white and leaves the alpha intact.
+ * The shipped WRP lockup, rasterised for the dark scrim. Uses the white variant
+ * rather than negating the colour artwork, which would turn the red "YACO" cyan.
  */
 async function whiteLogo() {
-  const svg = await readFile(join(PUBLIC, 'wrp-logo.svg'));
+  const svg = await readFile(join(PUBLIC, 'wrp-logo-white.svg'));
   const png = await sharp(svg, { density: 600 })
     .resize({ width: 420 })
-    .negate({ alpha: false })
     .png()
     .toBuffer();
   return `data:image/png;base64,${png.toString('base64')}`;

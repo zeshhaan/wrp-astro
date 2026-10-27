@@ -1,0 +1,970 @@
+---
+/**
+ * Studio version of the live Arabic homepage (src/pages/ar/index.astro).
+ *
+ * The English Studio homepage (../Home.astro) carries the content writer's new
+ * copy, which has no Arabic yet. Until it does, the Arabic homepage keeps the
+ * live Arabic page's copy, word for word, in the live page's section order:
+ * hero, philosophy, the three pillars, the six services, portfolio, client
+ * reviews, about, brands, latest posts and the enquiry form. Same title,
+ * description, image alts and WebSite + ServiceCatalog JSON-LD. Only the look
+ * is Studio's.
+ */
+import StudioPage from './StudioPage.astro';
+import Picture from '../../shared/Picture.astro';
+import Icon from '../Icon.astro';
+import LucideIcon from '@/components/Icon.astro';
+import Schema from '@/components/Schema.astro';
+import ReviewCard from './sections/ReviewCard.astro';
+import ReviewScript from './sections/ReviewScript.astro';
+import PostCards from './sections/PostCards.astro';
+import ContactForm from './sections/ContactForm.astro';
+import { getFeaturedReviews, getReviewsForService, getBusiness, getDisplayCount } from '@/lib/reviews';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t } from '@/i18n/translations';
+import { labPrefix, toLab, studioQuoteHref } from './routes';
+
+const locale = 'ar' as const;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const local = (href: string) => link(localizeUrl(href, locale));
+type Key = Parameters<typeof t>[1];
+const tr = (key: string) => t(locale, key as Key);
+const num = (n: string | number) => toLocalNum(n, locale);
+
+// The same review the live page quotes beside paint correction.
+const polishReviews = getReviewsForService('polish');
+const inlineReview = polishReviews.find((r) => r.highlightQuote) || polishReviews[0];
+const displayCount = getDisplayCount();
+const business = getBusiness();
+const featured = getFeaturedReviews();
+
+const title = 'WRP Detailing Studio | فيلم حماية الطلاء (PPF)، طلاء سيراميك وتلميع سيارات';
+const description =
+  'خبراء حماية الطلاء في دبي لفيلم حماية الطلاء (PPF)، طلاء السيراميك، تظليل النوافذ، تلميع السيارات، والعناية بالتنجيد. تركيب دقيق مع ضمان حتى 10 سنوات.';
+
+const heroLines = tr('home.heroTitle').split('\n');
+const philosophyLines = tr('home.philosophy.title').split('\n');
+const aboutLines = tr('home.about.title').split('\n');
+
+const pillars = [
+  { letter: 'W', key: 'wrap', href: '/wrap/' },
+  { letter: 'R', key: 'reinforce', href: '/reinforce/' },
+  { letter: 'P', key: 'protect', href: '/protect/' },
+];
+
+// Photos, alts and icons exactly as on the live page.
+const services = [
+  {
+    key: 'ceramic',
+    icons: ['shield', 'droplets', 'clock'],
+    href: '/services/ceramic-coating/',
+    image: '/portfolio/team-detailing-black-lexus-hood',
+    alt: 'فني من WRP Detailing Studio يطبق طلاء سيراميك احترافياً على غطاء سيارة لكزس فاخرة',
+  },
+  {
+    key: 'ppf',
+    icons: ['shield-check', 'rotate-cw', 'sun'],
+    href: '/services/paint-protection-film/',
+    image: '/portfolio/porsche-boxster-spyder-gray',
+    alt: 'بورشه بوكستر سبايدر بعد تركيب فيلم حماية الطلاء في صالة WRP Detailing Studio',
+  },
+  {
+    key: 'polish',
+    icons: ['sparkles', 'eraser', 'gauge'],
+    href: '/services/polish/',
+    image: '/portfolio/green-porsche-911-showroom-event',
+    alt: 'بورشه 911 خضراء تُظهر نتائج تصحيح الطلاء واللمعان المرآوي في WRP Detailing Studio',
+    review: true,
+  },
+  {
+    key: 'window',
+    icons: ['sun', 'eye-off', 'signal'],
+    href: '/services/window-film/',
+    image: '/portfolio/black-lexus-lx-570-showroom',
+    alt: 'لكزس LX 570 بعد تنفيذ تظليل احترافي وطلاء سيراميك في WRP Detailing Studio',
+  },
+  {
+    key: 'wash',
+    icons: ['hand', 'sparkles', 'droplet'],
+    href: '/services/premium-car-wash/',
+    image: '/portfolio/team-washing-subaru-sti-foam',
+    alt: 'فريق WRP Detailing Studio ينفذ غسيلاً يدوياً فاخرًا بالرغوة على سوبارو WRX STI',
+  },
+  {
+    key: 'upholstery',
+    icons: ['shield-check', 'sparkles', 'sun'],
+    href: '/services/leather-upholstery/',
+    image: '/luxury-suv-black-and-white-premium-detail',
+    alt: 'ترميم الجلود والعناية الداخلية لسيارة فاخرة داخل WRP Detailing Studio',
+  },
+];
+
+const portfolio = [
+  {
+    key: 'lamborghini',
+    image: '/luxury-sports-car-detail-black-and-white-dramatic',
+    alt: 'لامبورغيني أفنتادور بعد فيلم حماية طلاء كامل وطلاء سيراميك في WRP Detailing Studio',
+  },
+  {
+    key: 'rollsRoyce',
+    image: '/luxury-sedan-close-up-black-and-white-elegant',
+    alt: 'رولز رويس فانتوم بعد باقة تلميع فاخر وتصحيح طلاء في دبي',
+  },
+  {
+    key: 'ferrari',
+    image: '/supercar-wheel-detail-black-and-white-luxury',
+    alt: 'فيراري SF90 بعد تغليف مخصص وحماية طلاء في دبي',
+  },
+  {
+    key: 'bentley',
+    image: '/luxury-suv-black-and-white-premium-detail',
+    alt: 'بنتلي بنتايجا بعد ترميم داخلي ومعالجة للجلود في دبي',
+  },
+];
+
+const brands = [
+  ['lamborghini-alt', 'Lamborghini'],
+  ['porsche', 'Porsche'],
+  ['rolls-royce', 'Rolls-Royce'],
+  ['lexus', 'Lexus'],
+  ['ferrari', 'Ferrari'],
+  ['mercedes-benz', 'Mercedes-Benz'],
+  ['land-rover', 'Land Rover'],
+  ['jaguar', 'Jaguar'],
+  ['mclaren-alt', 'McLaren'],
+  ['nissan', 'Nissan'],
+  ['aston-martin', 'Aston Martin'],
+  ['alfa-romeo', 'Alfa Romeo'],
+];
+
+const heroImage = '/luxury-supercar-close-up-detail-black-and-white';
+const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.split('.').slice(0, 2).join('.') + '.' : '';
+---
+
+<StudioPage
+  title={title}
+  description={description}
+  locale={locale}
+  livePath="/ar/"
+  preloads={[
+    {
+      href: `${heroImage}-1200w.avif`,
+      type: 'image/avif',
+      imagesrcset: `${heroImage}-800w.avif 800w, ${heroImage}-1200w.avif 1200w`,
+      imagesizes: '100vw',
+    },
+  ]}
+>
+  <Schema type="WebSite" />
+  <Schema type="ServiceCatalog" />
+
+  <section class="hh" aria-labelledby="hh-title">
+    <Picture
+      base={heroImage}
+      alt="سيارة رياضية فاخرة تتلقى طلاء سيراميك وحماية طلاء في استوديو WRP Detailing Studio"
+      sizes="100vw"
+      widths={[800, 1200]}
+      width={1920}
+      height={1080}
+      loading="eager"
+      fetchpriority="high"
+      class="hh__bg"
+    />
+    <div class="st-wrap hh__inner">
+      <h1 id="hh-title" class="hh__title">{heroLines[0]} <br />{heroLines[1]}</h1>
+      <p class="hh__lede">{tr('home.heroSubtitle')}</p>
+      <div class="hh__actions">
+        <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+          {tr('home.hero.getQuote')}
+          <Icon name="arrow-right" size={18} class="flip" />
+        </a>
+        <a class="st-btn st-btn--ghost" href={local('/portfolio/')}>{tr('home.hero.viewPortfolio')}</a>
+      </div>
+      <a class="hh__rating" href="https://dub.sh/wrp-map" target="_blank" rel="noopener noreferrer">
+        <span class="hh__stars" aria-hidden="true">
+          {[1, 2, 3, 4, 5].map(() => <Icon name="star" size={14} />)}
+        </span>
+        <span>
+          <strong>{num('5.0')}</strong>
+          {tr('home.hero.from')}
+          <strong>{num(displayCount)}</strong>
+          {tr('home.hero.reviews')}
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section class="split st-section st-light">
+    <div class="st-wrap split__grid">
+      <div class="split__text">
+        <h2 class="st-h2">{philosophyLines[0]} <br />{philosophyLines[1]}</h2>
+        <p>{tr('home.philosophy.p1')}</p>
+        <p>
+          {tr('home.philosophy.p2Start')} <a href={local('/more-about-wrp/')}>{tr('home.philosophy.discoverStory')}</a>
+          {tr('home.philosophy.p2End')}
+        </p>
+      </div>
+      <Picture
+        base="/luxury-car-detailing-studio-interior-minimal-black"
+        alt="الجزء الداخلي من استوديو WRP Detailing Studio المجهز للعناية الدقيقة بالسيارات الفاخرة"
+        sizes="(min-width: 56rem) 50vw, 100vw"
+        widths={[800, 1200]}
+        width={1200}
+        height={800}
+        class="split__img"
+      />
+    </div>
+  </section>
+
+  <section id="services" class="pl st-section st-dark">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{tr('home.pillars.title')}</h2>
+        <p class="st-intro">{tr('home.pillars.subtitle')}</p>
+      </header>
+      <ul class="pl__grid" role="list">
+        {
+          pillars.map((p) => (
+            <li class="pl__card">
+              <p class="pl__letter" aria-hidden="true">{p.letter}</p>
+              <h3 class="pl__title">{tr(`home.pillars.${p.key}.title`)}</h3>
+              <p class="pl__desc">{tr(`home.pillars.${p.key}.desc`)}</p>
+              <ul class="pl__list" role="list">
+                {[1, 2, 3].map((n) => (
+                  <li>
+                    <Icon name="check" size={16} />
+                    <span>{tr(`home.pillars.${p.key}.item${n}`)}</span>
+                  </li>
+                ))}
+              </ul>
+              <a class="st-btn st-btn--ghost pl__btn" href={local(p.href)}>
+                {tr('home.pillars.learnMore')}
+                <Icon name="arrow-right" size={18} class="flip" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="sv st-section st-white">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{tr('home.servicesTitle')}</h2>
+        <p class="st-intro">{tr('home.servicesSubtitle')}</p>
+      </header>
+      <div class="sv__list">
+        {
+          services.map((s, i) => (
+            <article class:list={['sv__row', i % 2 === 1 && 'sv__row--flip']}>
+              <div class="sv__text">
+                <p class="sv__num" aria-hidden="true">{num(String(i + 1).padStart(2, '0'))}</p>
+                <h3 class="sv__title">{tr(`home.services.${s.key}.title`)}</h3>
+                <p class="sv__desc">{tr(`home.services.${s.key}.desc`)}</p>
+                <dl class="sv__feats">
+                  {s.icons.map((icon, n) => (
+                    <div>
+                      <dt>
+                        <LucideIcon name={`lucide:${icon}`} width="20" height="20" />
+                        {tr(`home.services.${s.key}.feat${n + 1}`)}
+                      </dt>
+                      <dd>{tr(`home.services.${s.key}.feat${n + 1}Desc`)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <a class="st-btn st-btn--dark sv__btn" href={local(s.href)}>
+                  {tr('home.services.exploreService')}
+                  <Icon name="arrow-right" size={18} class="flip" />
+                </a>
+                {s.review && inlineReview && (
+                  <figure class="sv__quote">
+                    <blockquote>
+                      <p>"{quote}"</p>
+                    </blockquote>
+                    <figcaption>
+                      <strong>{inlineReview.reviewerName}</strong>
+                      <span> – {tr('reviews.verified')}</span>
+                    </figcaption>
+                  </figure>
+                )}
+              </div>
+              <Picture base={s.image} alt={s.alt} sizes="(min-width: 56rem) 50vw, 100vw" widths={[800, 1200]} width={1200} height={800} class="sv__img" />
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section id="portfolio" class="pf st-section st-light">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{tr('home.portfolio.title')}</h2>
+        <p class="st-intro">{tr('home.portfolio.subtitle')}</p>
+      </header>
+      <ul class="pf__grid" role="list">
+        {
+          portfolio.map((p) => (
+            <li class="pf__card">
+              <Picture base={p.image} alt={p.alt} sizes="(min-width: 48rem) 50vw, 100vw" widths={[800, 1200]} width={1200} height={800} class="pf__img" />
+              <div class="pf__cap">
+                <h3 class="pf__title">{tr(`home.portfolio.${p.key}`)}</h3>
+                <p>{tr(`home.portfolio.${p.key}Desc`)}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="pf__more">
+        <a class="st-btn st-btn--dark" href={local('/portfolio/')}>
+          {tr('home.portfolio.viewAll')}
+          <Icon name="arrow-right" size={18} class="flip" />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="tm st-section st-black">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <p class="tm__score">
+          <span class="tm__rating">{num(business.rating.toFixed(1))}</span>
+          <span class="tm__stars" aria-hidden="true">{[1, 2, 3, 4, 5].map(() => <Icon name="star" size={16} />)}</span>
+          <span class="tm__count">{num(displayCount)} {tr('reviews.reviews')}</span>
+        </p>
+        <h2 class="st-h2">{tr('reviews.clientTestimonials')}</h2>
+        <p class="st-intro">{tr('reviews.trustedBy')}</p>
+      </header>
+      <ul class="tm__grid" role="list">
+        {
+          featured.map((review) => (
+            <li>
+              <ReviewCard review={review} locale={locale} max={280} photos="all" tone="dark" />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tm__more">
+        <a href={local('/reviews/')}>
+          {tr('reviews.readAll')} {num(displayCount)}+ {tr('reviews.reviewsLabel')}
+          <Icon name="arrow-right" size={16} class="flip" />
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section id="about" class="split split--rev st-section st-white">
+    <div class="st-wrap split__grid">
+      <Picture
+        base="/luxury-car-detailing-craftsman-working-black-and-w"
+        alt="خبير WRP Detailing Studio ينفذ تصحيح طلاء وتطبيق طلاء سيراميك بدقة على سيارة فاخرة"
+        sizes="(min-width: 56rem) 50vw, 100vw"
+        widths={[800, 1200]}
+        width={1200}
+        height={800}
+        class="split__img"
+      />
+      <div class="split__text">
+        <h2 class="st-h2">{aboutLines[0]} <br />{aboutLines[1]}</h2>
+        <p>{tr('home.about.p1Start')} <a href={local('/more-about-wrp/')}>{tr('home.about.learnMore')}</a>.</p>
+        <p>{tr('home.about.p2Start')} <a href="#contact">{tr('home.about.getInTouch')}</a>.</p>
+        <div class="split__stats">
+          {
+            [1, 2, 3].map((n) => (
+              <div>
+                <p class="split__stat">{tr(`home.about.stat${n}`)}</p>
+                <p>{tr(`home.about.stat${n}Label`)}</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="br st-section st-dark">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{tr('home.brands.title')}</h2>
+      </header>
+      <ul class="br__grid" role="list">
+        {
+          brands.map(([file, name]) => (
+            <li>
+              <img src={`/logos/${file}-svgrepo-com.svg`} alt={name} width="96" height="96" loading="lazy" decoding="async" />
+            </li>
+          ))
+        }
+      </ul>
+      <p class="br__note">{tr('home.brands.disclaimer')}</p>
+    </div>
+  </section>
+
+  <PostCards locale={locale} link={link} class="st-light" />
+
+  <section id="contact" class="hc st-section st-white">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{tr('home.contact.title')}</h2>
+        <p class="st-intro">{tr('home.contact.subtitle')}</p>
+      </header>
+      <div class="hc__grid">
+        <div class="hc__info">
+          <h3 class="hc__title">{tr('home.contact.infoTitle')}</h3>
+          <ul class="hc__list" role="list">
+            <li>
+              <Icon name="pin" size={22} />
+              <div>
+                <p class="hc__label">{tr('home.contact.location')}</p>
+                <p>{tr('home.contact.address1')} <br />{tr('home.contact.address2')}</p>
+              </div>
+            </li>
+            <li>
+              <Icon name="phone" size={22} />
+              <div>
+                <p class="hc__label">{tr('home.contact.phone')}</p>
+                <a href="https://dub.sh/wrp-phone" dir="ltr">{num('+971 54 717 3000')}</a>
+              </div>
+            </li>
+            <li>
+              <Icon name="mail" size={22} />
+              <div>
+                <p class="hc__label">{tr('home.contact.email')}</p>
+                <a href="https://dub.sh/wrp-email">info@wrpdetailing.ae</a>
+              </div>
+            </li>
+            <li>
+              <Icon name="instagram" size={22} />
+              <div>
+                <p class="hc__label">{tr('home.contact.followUs')}</p>
+                <a href="https://dub.sh/wrp_ig" target="_blank" rel="noopener noreferrer">@wrp_ae</a>
+              </div>
+            </li>
+          </ul>
+          <div class="hc__hours">
+            <h4>{tr('home.contact.studioHours')}</h4>
+            <p>{tr('home.contact.hours')}</p>
+            <p>{tr('home.contact.closed')}</p>
+          </div>
+        </div>
+        <ContactForm
+          locale={locale}
+          labels={{
+            name: tr('form.name'),
+            email: tr('home.contact.email'),
+            phone: tr('home.contact.phone'),
+            vehicle: tr('form.vehicle'),
+            service: tr('form.serviceInterest'),
+            message: tr('form.message'),
+          }}
+          placeholders={{
+            name: tr('home.contact.namePlaceholder'),
+            email: tr('home.contact.emailPlaceholder'),
+            phone: tr('home.contact.phonePlaceholder'),
+            vehicle: tr('home.contact.vehiclePlaceholder'),
+            message: tr('home.contact.messagePlaceholder'),
+          }}
+          required={['name', 'email', 'message']}
+          submit={tr('home.contact.submit')}
+          sending={tr('home.contact.sending')}
+          thanks={tr('home.contact.successTitle')}
+          thanksText={tr('home.contact.successDesc')}
+          defaultError={tr('form.error')}
+          fallbackError="حدث خطأ."
+          networkError={tr('home.contact.networkError')}
+          fallbackNetworkError="خطأ في الشبكة. يرجى المحاولة مرة أخرى أو الاتصال بنا مباشرة."
+        />
+      </div>
+    </div>
+  </section>
+  <ReviewScript />
+</StudioPage>
+
+<style>
+  /* Hero: full-height photo, title and actions low on the page. */
+  .hh {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-block-size: min(52rem, 100svh);
+    padding-block: 9rem clamp(3.5rem, 2rem + 5vw, 6rem);
+    background: var(--st-black);
+    color: var(--st-white);
+    overflow: hidden;
+  }
+  .hh :global(.hh__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .hh :global(.hh__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .hh::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(12 13 15 / 0.92), rgb(12 13 15 / 0.45) 60%, rgb(12 13 15 / 0.6));
+  }
+  .hh__inner {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+    max-inline-size: 52rem;
+    margin-inline: 0;
+  }
+  .hh__title {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 1.6rem + 4.5vw, 5.25rem);
+    line-height: 1.1;
+  }
+  .hh__lede {
+    max-inline-size: 38rem;
+    color: var(--st-on-dark);
+    font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+  }
+  .hh__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 0.5rem;
+  }
+  .hh__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-block-start: 0.75rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--st-line-dark);
+    background: rgb(255 255 255 / 0.06);
+    color: var(--st-white);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+  .hh__rating:hover {
+    border-color: var(--st-gold);
+  }
+  .hh__rating strong {
+    font-weight: 700;
+  }
+  .hh__stars,
+  .tm__stars {
+    display: inline-flex;
+    gap: 0.1rem;
+    color: var(--st-gold);
+  }
+  .hh__stars :global(svg),
+  .tm__stars :global(svg) {
+    fill: currentColor;
+  }
+
+  /* Text beside a photo (philosophy, about). */
+  .split__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .split__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4.5rem;
+    }
+  }
+  .split__text {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .split__text > p {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+  }
+  .split__text a {
+    color: var(--st-ink);
+    font-weight: 600;
+    text-decoration-color: var(--st-gold);
+    text-underline-offset: 4px;
+  }
+  .split :global(.split__img img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+  @media (max-width: 55.99rem) {
+    .split--rev :global(.split__img) {
+      order: 2;
+    }
+    .split :global(.split__img img) {
+      aspect-ratio: 3 / 2;
+    }
+  }
+  .split__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 0.75rem 0 0;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--st-line-light);
+  }
+  .split__stats > div {
+    display: grid;
+    gap: 0.35rem;
+    align-content: start;
+  }
+  .split__stat {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.6rem);
+    line-height: 1;
+    color: var(--st-gold-deep);
+  }
+  .split__stat + p {
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+  }
+
+  /* The three pillars. */
+  .pl__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pl__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+    background: var(--st-card-dark);
+    border-block-end: 3px solid var(--st-gold);
+  }
+  .pl__letter {
+    font-family: var(--st-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: 3.5rem;
+    line-height: 0.9;
+    color: var(--st-gold);
+  }
+  .pl__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.6rem;
+  }
+  .pl__desc {
+    color: var(--st-on-dark);
+  }
+  .pl__list {
+    display: grid;
+    gap: 0.6rem;
+    flex: 1;
+    margin: 0.25rem 0 0.75rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+  .pl__list li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: start;
+  }
+  .pl__list :global(svg) {
+    flex: none;
+    margin-block-start: 0.3rem;
+    color: var(--st-gold);
+  }
+  .pl__btn {
+    align-self: start;
+  }
+
+  /* The six services: photo and text, alternating sides. */
+  .sv__list {
+    display: grid;
+    gap: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+  }
+  .sv__row {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .sv__row {
+      grid-template-columns: 1fr 1fr;
+      gap: 4.5rem;
+    }
+    .sv__row--flip :global(.sv__img) {
+      order: -1;
+    }
+  }
+  .sv__text {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .sv__num {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--st-gold-deep);
+  }
+  .sv__title {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.4rem);
+    line-height: 1.15;
+  }
+  .sv__desc {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+  }
+  .sv__feats {
+    display: grid;
+    gap: 1rem;
+    margin: 0.5rem 0;
+  }
+  .sv__feats > div {
+    padding-inline-start: 2rem;
+    position: relative;
+    color: var(--st-ink-2);
+  }
+  .sv__feats dt {
+    display: inline;
+    font-weight: 700;
+    color: var(--st-ink);
+  }
+  .sv__feats dt :global(svg) {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.15rem;
+    color: var(--st-gold-deep);
+  }
+  .sv__feats dd {
+    display: inline;
+    margin: 0;
+  }
+  .sv__feats dd::before {
+    content: ' ';
+  }
+  .sv__btn {
+    margin-block-start: 0.5rem;
+  }
+  .sv__quote {
+    margin: 1.5rem 0 0;
+    padding-inline-start: 1.25rem;
+    border-inline-start: 3px solid var(--st-gold);
+  }
+  .sv__quote blockquote {
+    margin: 0;
+    font-style: italic;
+    color: var(--st-ink-2);
+  }
+  .sv__quote figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.875rem;
+  }
+  .sv__quote figcaption span {
+    color: var(--st-ink-2);
+  }
+  .sv :global(.sv__img img) {
+    inline-size: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+  }
+
+  /* Portfolio: four photos, caption always visible. */
+  .pf__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 42rem) {
+    .pf__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .pf__card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--st-black);
+    color: var(--st-white);
+  }
+  .pf__card :global(.pf__img img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .pf__card:hover :global(.pf__img img) {
+    transform: scale(1.04);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pf__card :global(.pf__img img) {
+      transition: none;
+    }
+  }
+  .pf__cap {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.35rem;
+    padding: 4rem 1.5rem 1.5rem;
+    background: linear-gradient(to top, rgb(12 13 15 / 0.9), transparent);
+    font-size: 0.9375rem;
+  }
+  .pf__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.4rem;
+  }
+  .pf__more,
+  .tm__more {
+    margin-block-start: 2.5rem;
+    text-align: center;
+  }
+
+  /* Client reviews, on black. */
+  .tm__score {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-block-end: 0.5rem;
+  }
+  .tm__rating {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: 1.6rem;
+  }
+  .tm__count {
+    color: var(--st-on-dark);
+    font-size: 0.875rem;
+  }
+  .tm__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: 1.25rem;
+    align-items: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tm__more a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-block-end: 0.25rem;
+    border-block-end: 1px solid var(--st-gold);
+    color: var(--st-white);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  /* Brands we look after. */
+  .br__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+    align-items: center;
+    justify-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .br__grid img {
+    inline-size: clamp(4.5rem, 3.5rem + 3vw, 6rem);
+    block-size: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    /* The logos are black line art; white on the dark band. */
+    filter: invert(1);
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+  .br__grid img:hover {
+    opacity: 1;
+  }
+  .br__note {
+    margin-block-start: 3rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--st-mute);
+  }
+
+  /* Enquiry: how to reach us beside the form. */
+  .hc__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: start;
+  }
+  @media (min-width: 56rem) {
+    .hc__grid {
+      grid-template-columns: 1fr 1.2fr;
+      gap: 4.5rem;
+    }
+  }
+  .hc__info {
+    display: grid;
+    gap: 2rem;
+  }
+  .hc__title {
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: 1.75rem;
+  }
+  .hc__list {
+    display: grid;
+    gap: 1.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hc__list li {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+  }
+  .hc__list :global(svg) {
+    flex: none;
+    margin-block-start: 0.15rem;
+    color: var(--st-gold-deep);
+  }
+  .hc__label {
+    font-weight: 700;
+    margin-block-end: 0.2rem;
+  }
+  .hc__list a,
+  .hc__list p:not(.hc__label) {
+    color: var(--st-ink-2);
+  }
+  .hc__list a:hover {
+    color: var(--st-ink);
+  }
+  .hc__hours {
+    display: grid;
+    gap: 0.4rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--st-line-light);
+    color: var(--st-ink-2);
+  }
+  .hc__hours h4 {
+    font-weight: 700;
+    color: var(--st-ink);
+  }
+  .hc :global(.cf) {
+    border: 1px solid var(--st-line-light);
+    border-block-start: 4px solid var(--st-gold);
+  }
+</style>

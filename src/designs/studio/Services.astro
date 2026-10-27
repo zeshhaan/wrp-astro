@@ -2,6 +2,12 @@
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { serviceCards } from './content';
+
+interface Props {
+  /** Overrides the card links, e.g. to the Studio previews of the service pages. */
+  link?: (href: string) => string;
+}
+const { link = (href: string) => href } = Astro.props;
 ---
 
 <section class="services st-section st-dark" id="services" aria-labelledby="services-title">
@@ -23,7 +29,7 @@ import { serviceCards } from './content';
               <Picture
                 base={c.image}
                 alt={c.alt}
-                sizes="(min-width: 72rem) 300px, (min-width: 40rem) 45vw, 100vw"
+                sizes="(min-width: 76rem) 400px, (min-width: 60rem) 31vw, (min-width: 36rem) 48vw, 100vw"
                 width={c.width}
                 height={c.height}
               />
@@ -32,7 +38,7 @@ import { serviceCards } from './content';
             <div class="card__body">
               <p class="card__line">{c.line}</p>
               <p class="card__price">{c.price}</p>
-              <a class="card__link" href={c.href} aria-label={c.linkLabel}>
+              <a class="card__link" href={link(c.href)} aria-label={c.linkLabel}>
                 Learn more <Icon name="arrow-right" size={16} />
               </a>
             </div>
@@ -56,9 +62,10 @@ import { serviceCards } from './content';
       grid-template-columns: repeat(2, 1fr);
     }
   }
+  /* Nine cards: three rows of three. */
   @media (min-width: 60rem) {
     .grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
   .card {

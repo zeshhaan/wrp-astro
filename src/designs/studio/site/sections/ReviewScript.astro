@@ -1,0 +1,17 @@
+---
+/** Read more / Show less for every ReviewCard on the page. Include once. */
+---
+
+<script>
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as Element).closest?.<HTMLButtonElement>('[data-rv-more] > button');
+    if (!btn) return;
+    const box = btn.parentElement!;
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.dataset.more ??= btn.textContent!.trim();
+    btn.setAttribute('aria-expanded', String(open));
+    box.querySelector<HTMLElement>('[data-short]')!.hidden = open;
+    box.querySelector<HTMLElement>('[data-full]')!.hidden = !open;
+    btn.textContent = open ? btn.dataset.less! : btn.dataset.more;
+  });
+</script>

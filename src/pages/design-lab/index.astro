@@ -2,12 +2,18 @@
 export const prerender = true;
 
 import DesignShell from '@/designs/shared/DesignShell.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
 
 const pages = [
   {
     href: '/design-lab/studio/',
     name: 'Homepage',
     line: 'Video hero, services and prices, why WRP, reviews, work, the lounge, blog and the contact form.',
+  },
+  {
+    href: '/design-lab/studio/headers/',
+    name: 'Headers to choose from',
+    line: 'Showroom, Arrivals board, Storefront and Filmstrip, each on the full homepage in English and Arabic.',
   },
   {
     href: '/design-lab/studio/quote/',
@@ -37,7 +43,7 @@ const pages = [
 >
   <main class="lab">
     <header class="lab__head">
-      <p class="lab__mark">WRP.</p>
+      <WrpLogo class="lab__mark" label="WRP by YACO Automotive" />
       <p class="lab__eyebrow">Design Lab</p>
       <h1>The Studio redesign</h1>
       <p class="lab__lede">
@@ -91,8 +97,9 @@ const pages = [
     padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2.5rem) 6rem;
   }
   .lab__mark {
-    font: 900 italic 1.25rem/1 var(--font-montserrat, system-ui), system-ui;
-    letter-spacing: -0.02em;
+    display: block;
+    block-size: 2.5rem;
+    inline-size: auto;
     color: #fff;
     margin-block-end: 2.5rem;
   }

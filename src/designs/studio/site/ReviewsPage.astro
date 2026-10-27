@@ -1,0 +1,369 @@
+---
+/**
+ * Studio version of the reviews page (/reviews/), English or Arabic. Same
+ * title, description, JSON-LD and sections as the live src/pages/reviews.astro
+ * and its TestimonialWall: the rating hero, two scrolling rows of reviews, the
+ * reviews with customer photos, every review (the first 12, then Show all),
+ * and the closing call to action. All text comes from the same review data
+ * and translation keys as the live page.
+ */
+import StudioPage from './StudioPage.astro';
+import ReviewCard from './sections/ReviewCard.astro';
+import ReviewScript from './sections/ReviewScript.astro';
+import Icon from '../Icon.astro';
+import { getAllReviews, getReviewsWithImages, getBusiness, getMarqueeReviews, getDisplayCount, getSchemaReviews } from '@/lib/reviews';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import { labPrefix, toLab } from './routes';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const num = (n: string | number) => toLocalNum(n, locale);
+
+const business = getBusiness();
+const displayCount = getDisplayCount();
+const title =
+  locale === 'ar'
+    ? `تقييمات العملاء | WRP Detailing Studio - ${toLocalNum(displayCount, 'ar')} تقييمات جوجل`
+    : `Client Reviews | WRP Detailing Studio – ${business.rating.toFixed(1)} Stars, ${displayCount} Google Reviews`;
+const description =
+  locale === 'ar'
+    ? `اقرأ ${toLocalNum(displayCount, 'ar')} من تقييمات جوجل الموثقة لعملاء WRP Detailing Studio. تقييم ${toLocalNum(business.rating.toFixed(1), 'ar')} نجوم لخدمات التلميع وطلاء السيراميك وPPF وتظليل النوافذ في دبي.`
+    : `Read ${displayCount} verified Google reviews from WRP Detailing Studio clients. ${business.rating.toFixed(1)}-star rated car detailing, PPF, ceramic coating, and window tinting in Dubai.`;
+
+// The live page's AggregateRating + Review JSON-LD, built the same way.
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': 'https://wrpdetailing.ae/#localbusiness',
+  name: 'WRP Detailing Studio',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: business.rating.toString(),
+    reviewCount: business.totalReviews.toString(),
+    bestRating: '5',
+    worstRating: '1',
+  },
+  review: getSchemaReviews(10).map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.reviewerName },
+    reviewRating: { '@type': 'Rating', ratingValue: r.stars.toString(), bestRating: '5' },
+    reviewBody: r.text.slice(0, 500),
+    datePublished: new Date().toISOString().split('T')[0],
+  })),
+};
+
+const marquee = getMarqueeReviews();
+const mid = Math.ceil(marquee.length / 2);
+const rows = [marquee.slice(0, mid), marquee.slice(mid)];
+const withImages = getReviewsWithImages();
+const textOnly = getAllReviews().filter((r) => !r.localImages?.length && r.text.length > 30);
+const joinLine =
+  locale === 'ar'
+    ? `انضم إلى ${num(displayCount)} من العملاء الراضين الذين يثقون بـ WRP للعناية بسياراتهم.`
+    : `Join ${displayCount} satisfied customers who trust WRP with their vehicles.`;
+---
+
+<StudioPage title={title} description={description} locale={locale} livePath={localizeUrl('/reviews/', locale)}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <section class="rh">
+    <div class="st-wrap rh__inner">
+      <p class="rh__rating">
+        <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        <span class="rh__score">{num(business.rating.toFixed(1))}</span>
+        <span class="rh__stars" role="img" aria-label="5 out of 5 stars">{Array.from({ length: 5 }, () => <Icon name="star" size={22} />)}</span>
+      </p>
+      <h1 class="rh__title">{t(locale, 'reviews.whatClientsSay')}</h1>
+      <p class="rh__count">{num(displayCount)} {t(locale, 'reviews.verifiedOnGoogle')}</p>
+      <dl class="rh__stats">
+        <div><dd>{num(displayCount)}</dd><dt>{t(locale, 'reviews.reviews')}</dt></div>
+        <div><dd>{num('5.0')}</dd><dt>{t(locale, 'reviews.statsRating')}</dt></div>
+        <div><dd>{num('100%')}</dd><dt>{t(locale, 'reviews.statsFiveStar')}</dt></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="mq st-dark" aria-label={t(locale, 'reviews.scrollingLabel')}>
+    {
+      rows.map((row, i) => (
+        <div class:list={['mq__row', i === 1 && 'mq__row--back']}>
+          <ul class="mq__track" role="list">
+            {row.map((r) => (
+              <li class="mq__item">
+                <ReviewCard review={r} locale={locale} max={150} highlight tone="dark" />
+              </li>
+            ))}
+          </ul>
+          <ul class="mq__track" role="list" aria-hidden="true" inert>
+            {row.map((r) => (
+              <li class="mq__item">
+                <ReviewCard review={r} locale={locale} max={150} highlight tone="dark" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </section>
+
+  {
+    withImages.length > 0 && (
+      <section class="st-section st-white">
+        <div class="st-wrap">
+          <header class="st-head st-head--center">
+            <h2 class="st-h2">{t(locale, 'reviews.seeResults')}</h2>
+            <p class="st-intro">{t(locale, 'reviews.customerPhotos')}</p>
+          </header>
+          <ul class="wall" role="list">
+            {withImages.map((r) => (
+              <li class="wall__item">
+                <ReviewCard review={r} locale={locale} max={400} highlight photos="all" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="st-section st-light">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{t(locale, 'reviews.allReviews')}</h2>
+        <p class="st-intro">{t(locale, 'reviews.everyReview')}</p>
+      </header>
+      <ul class="wall" role="list">
+        {
+          textOnly.map((r, i) => (
+            <li class="wall__item" data-more-review={i >= 12 ? '' : undefined} hidden={i >= 12}>
+              <ReviewCard review={r} locale={locale} max={250} tone="white" />
+            </li>
+          ))
+        }
+      </ul>
+      {
+        textOnly.length > 12 && (
+          <p class="wall__all">
+            <button type="button" class="st-btn st-btn--dark" data-show-all>
+              {t(locale, 'reviews.showAll')} {num(textOnly.length)} {t(locale, 'reviews.reviewsLabel')}
+              <Icon name="chevron-down" size={18} />
+            </button>
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="end st-section st-black">
+    <div class="st-wrap end__inner">
+      <h2 class="st-h2">{t(locale, 'reviews.readyDifference')}</h2>
+      <p class="end__text">{joinLine}</p>
+      <a class="st-btn st-btn--gold" href={link(localizeUrl('/contact-us/', locale))}>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+    </div>
+  </section>
+  <ReviewScript />
+</StudioPage>
+
+<script>
+  document.querySelector('[data-show-all]')?.addEventListener('click', (e) => {
+    const first = document.querySelector<HTMLElement>('[data-more-review]');
+    for (const item of document.querySelectorAll<HTMLElement>('[data-more-review]')) item.hidden = false;
+    (e.currentTarget as HTMLElement).parentElement!.remove();
+    first?.querySelector<HTMLElement>('button, a')?.focus({ preventScroll: true });
+  });
+</script>
+
+<style>
+  .rh {
+    padding-block: 9rem 4.5rem;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgb(201 164 92 / 0.16), transparent 60%),
+      var(--st-black);
+    text-align: center;
+  }
+  .rh__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .rh__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .rh__score {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  .rh__stars {
+    display: inline-flex;
+    gap: 3px;
+    color: var(--st-gold);
+  }
+  .rh__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 1.5rem + 4.6vw, 5rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+  }
+  .rh__count {
+    color: var(--st-on-dark);
+    font-size: 1.125rem;
+  }
+  .rh__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    inline-size: min(100%, 30rem);
+    margin: 1.5rem 0 0;
+    border: 1px solid var(--st-line-dark);
+  }
+  .rh__stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.2rem;
+    padding: 1.1rem 0.5rem;
+  }
+  .rh__stats > div + div {
+    border-inline-start: 1px solid var(--st-line-dark);
+  }
+  .rh__stats dd {
+    margin: 0;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--st-gold);
+  }
+  .rh__stats dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--st-mute);
+  }
+
+  /* Two rows of reviews drifting in opposite directions. */
+  .mq {
+    display: grid;
+    gap: 1rem;
+    padding-block: 3.5rem;
+    overflow: hidden;
+  }
+  .mq__row {
+    display: flex;
+    inline-size: max-content;
+  }
+  .mq__track {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0 1rem 0 0;
+    list-style: none;
+    animation: mq 90s linear infinite;
+  }
+  .mq__row--back .mq__track {
+    animation-direction: reverse;
+  }
+  .mq__row:hover .mq__track {
+    animation-play-state: paused;
+  }
+  .mq__item {
+    inline-size: 21rem;
+    flex: none;
+  }
+  @keyframes mq {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  :global([dir='rtl']) .mq__track {
+    padding: 0 0 0 1rem;
+    animation-name: mq-rtl;
+  }
+  @keyframes mq-rtl {
+    to {
+      transform: translateX(100%);
+    }
+  }
+  /* No motion: the rows scroll sideways by hand instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .mq {
+      overflow: visible;
+    }
+    .mq__row {
+      inline-size: auto;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-inline: var(--st-gutter-x);
+    }
+    .mq__track {
+      animation: none;
+    }
+    .mq__track[aria-hidden] {
+      display: none;
+    }
+    .mq__item {
+      scroll-snap-align: start;
+    }
+  }
+
+  .wall {
+    columns: 1;
+    column-gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40rem) {
+    .wall {
+      columns: 2;
+    }
+  }
+  @media (min-width: 64rem) {
+    .wall {
+      columns: 3;
+    }
+  }
+  .wall__item {
+    break-inside: avoid;
+    margin-block-end: 1rem;
+  }
+  .wall__item[hidden] {
+    display: none;
+  }
+  .wall__all {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 1.5rem;
+  }
+
+  .end {
+    text-align: center;
+  }
+  .end__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .end__text {
+    color: var(--st-on-dark);
+    font-size: 1.0625rem;
+    margin-block-end: 0.5rem;
+  }
+</style>

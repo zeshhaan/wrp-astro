@@ -7,18 +7,61 @@
  */
 import Icon from './Icon.astro';
 import { contact, proof, whatsappQuote } from './content';
+import { toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const num = (n: string | number) => toLocalNum(n, locale);
+// Arabic uses the live site's own contact-modal wording (translations contact.*).
+const w =
+  locale === 'ar'
+    ? {
+        tip: t(locale, 'contact.chatWithUs'),
+        sr: `${t(locale, 'contact.chatWithUs')}: ${t(locale, 'contact.messageWhatsapp')} / ${t(locale, 'contact.callNow')}`,
+        close: 'إغلاق',
+        title: t(locale, 'contact.getInTouch'),
+        lede: t(locale, 'contact.teamReady'),
+        status: `${t(locale, 'nav.hours')} · الجمعة مغلق`,
+        open: t(locale, 'contact.availableNow'),
+        closedNow: 'مغلق الآن: راسلنا وسنرد عليك عند الافتتاح',
+        from: t(locale, 'contact.from'),
+        reviews: t(locale, 'contact.googleReviews'),
+        wa: t(locale, 'contact.messageWhatsapp'),
+        waHint: t(locale, 'contact.chatInstantly'),
+        call: t(locale, 'contact.callNow'),
+        foot: `${t(locale, 'contact.openHours')}. ${t(locale, 'home.contact.address1')}.`,
+      }
+    : {
+        tip: 'Chat with us',
+        sr: 'Chat with us on WhatsApp or by phone',
+        close: 'Close',
+        title: 'Get in touch',
+        lede: 'Our team is ready to help with prices, bookings and questions.',
+        status: `${contact.hoursShort} · ${contact.closed}`,
+        open: 'Open now: quick replies during business hours',
+        closedNow: 'We’re closed right now: message us and we’ll reply when we open',
+        from: 'from',
+        reviews: 'Google reviews',
+        wa: 'Message on WhatsApp',
+        waHint: 'Chat with our team, usually a quick reply',
+        call: 'Call now',
+        foot: `Open ${contact.hoursShort}. ${contact.closed}. Al Qusais Industrial Area 1, Dubai.`,
+      };
 ---
 
 <button type="button" class="fab" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
   <Icon name="whatsapp" size={28} />
-  <span class="fab__tip" aria-hidden="true">Chat with us</span>
-  <span class="visually-hidden">Chat with us on WhatsApp or by phone</span>
+  <span class="fab__tip" aria-hidden="true">{w.tip}</span>
+  <span class="visually-hidden">{w.sr}</span>
 </button>
 
-<dialog id="contact-dialog" class="cd" aria-labelledby="cd-title" data-contact-dialog data-schedule={JSON.stringify(contact.schedule)}>
+<dialog id="contact-dialog" class="cd" aria-labelledby="cd-title" data-contact-dialog data-schedule={JSON.stringify(contact.schedule)} data-open-text={w.open} data-closed-text={w.closedNow}>
   <div class="cd__box">
     <form method="dialog" class="cd__closeform">
-      <button class="cd__close" aria-label="Close">
+      <button class="cd__close" aria-label={w.close}>
         <Icon name="close" size={20} />
       </button>
     </form>
@@ -31,40 +74,40 @@ import { contact, proof, whatsappQuote } from './content';
           <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
         </svg>
       </span>
-      <h2 id="cd-title" class="cd__title">Get in touch</h2>
-      <p class="cd__lede">Our team is ready to help with prices, bookings and questions.</p>
+      <h2 id="cd-title" class="cd__title">{w.title}</h2>
+      <p class="cd__lede">{w.lede}</p>
     </header>
 
     <p class="cd__status" data-contact-status>
       <span class="cd__dot" aria-hidden="true"></span>
-      <span data-contact-status-text>{contact.hoursShort} · {contact.closed}</span>
+      <span data-contact-status-text>{w.status}</span>
     </p>
 
     <a class="cd__rating" href={proof.reviewsUrl} target="_blank" rel="noopener">
       <span class="cd__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={15} />)}</span>
-      <span><strong>{proof.rating}</strong> from <strong>{proof.reviewCountDisplay}</strong> Google reviews</span>
+      <span><strong>{num(proof.rating)}</strong> {w.from} <strong>{num(proof.reviewCountDisplay)}</strong> {w.reviews}</span>
     </a>
 
     <div class="cd__actions">
       <a class="cd__opt cd__opt--wa" href={whatsappQuote} target="_blank" rel="noopener">
         <span class="cd__optico"><Icon name="whatsapp" size={24} /></span>
         <span class="cd__opttext">
-          <span class="cd__optname">Message on WhatsApp</span>
-          <span class="cd__opthint">Chat with our team, usually a quick reply</span>
+          <span class="cd__optname">{w.wa}</span>
+          <span class="cd__opthint">{w.waHint}</span>
         </span>
-        <Icon name="arrow-right" size={18} />
+        <Icon name="arrow-right" size={18} class="flip" />
       </a>
       <a class="cd__opt cd__opt--call" href={contact.phoneHref}>
         <span class="cd__optico"><Icon name="phone" size={22} /></span>
         <span class="cd__opttext">
-          <span class="cd__optname">Call now</span>
-          <span class="cd__opthint">{contact.phoneDisplay}</span>
+          <span class="cd__optname">{w.call}</span>
+          <span class="cd__opthint" dir="ltr">{num(contact.phoneDisplay)}</span>
         </span>
-        <Icon name="arrow-right" size={18} />
+        <Icon name="arrow-right" size={18} class="flip" />
       </a>
     </div>
 
-    <p class="cd__foot">Open {contact.hoursShort}. {contact.closed}. Al Qusais Industrial Area 1, Dubai.</p>
+    <p class="cd__foot">{w.foot}</p>
   </div>
 </dialog>
 
@@ -73,8 +116,7 @@ import { contact, proof, whatsappQuote } from './content';
   .fab {
     position: fixed;
     inset-inline-end: max(1rem, env(safe-area-inset-right));
-    /* Clear of the Design Lab bar at bottom-centre on phones. */
-    inset-block-end: calc(max(12px, env(safe-area-inset-bottom)) + 4.25rem);
+    inset-block-end: max(1rem, env(safe-area-inset-bottom));
     z-index: 40;
     display: grid;
     place-items: center;
@@ -378,9 +420,7 @@ import { contact, proof, whatsappQuote } from './content';
     const mins = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
     const open = !s.closedDays.includes(day) && now >= mins(s.open) && now < mins(s.close);
     statusEl.dataset.open = String(open);
-    statusText.textContent = open
-      ? 'Open now: quick replies during business hours'
-      : 'We’re closed right now: message us and we’ll reply when we open';
+    statusText.textContent = (open ? dialog.dataset.openText : dialog.dataset.closedText) ?? '';
   }
 
   function openDialog() {

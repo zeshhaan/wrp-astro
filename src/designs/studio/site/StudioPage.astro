@@ -1,0 +1,251 @@
+---
+/**
+ * Document shell for Studio's inner pages (service pages first; the rest of the
+ * site follows). It is the live BaseLayout's <head>, unchanged in substance:
+ * title, description, canonical, Open Graph and Twitter cards, hreflang pairs,
+ * LocalBusiness + SiteNavigationElement JSON-LD, RSS link, geo tags and
+ * analytics. Around it sit Studio's header (G), footer and floating contact.
+ *
+ * The same page can render in two places:
+ *  - under /design-lab/studio/… for review. It is then noindex, nofollow, has
+ *    no analytics, and its canonical and hreflang point at the live URL it will
+ *    replace (the path with /design-lab/studio taken off), so the head can be
+ *    diffed against the live page.
+ *  - at the live URL when the redesign goes live. Nothing here changes; the
+ *    route file just renders this instead of BaseLayout.
+ *
+ * Never imports src/styles/global.css: Studio owns its whole visual system.
+ */
+import { SEO } from 'astro-seo';
+import { Font } from 'astro:assets';
+import Schema from '@/components/Schema.astro';
+import Analytics from '@/components/Analytics.astro';
+import Attribution from '@/components/Attribution.astro';
+import HeaderStorefront from '../headers/HeaderStorefront.astro';
+import { getHeaderNav } from '../headers/nav';
+import Footer from '../Footer.astro';
+import FloatingContact from '../FloatingContact.astro';
+import { getDir, getOgLocale, getAlternateUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { labPrefix, toLab, studioQuoteHref } from './routes';
+import '../../shared/reset.css';
+import '../theme.css';
+import './hero-form.css';
+
+interface Props {
+  title: string;
+  description: string;
+  locale?: Locale;
+  ogImage?: string;
+  noindex?: boolean;
+  ogType?: 'website' | 'article';
+  publishedTime?: string | Date;
+  modifiedTime?: string | Date;
+  author?: string;
+  tags?: string[];
+  articleSection?: string;
+  publisher?: string;
+  /**
+   * The hero has the lead form (#quote). Quote buttons in the header then lead
+   * to it, and hide while it is on screen so the page never shows a button
+   * for the form the visitor is already looking at.
+   */
+  heroForm?: boolean;
+  /** The live URL this page stands for, when its lab path is not simply the live path under the prefix. */
+  livePath?: string;
+  /** Render as a Design Lab preview (noindex, no analytics, links kept in the lab) whatever the URL, e.g. the homepage on a Worker Preview. */
+  lab?: boolean;
+  /** LCP images to preload (the page hero). */
+  preloads?: { href: string; type: string; media?: string; imagesrcset?: string; imagesizes?: string }[];
+}
+
+const {
+  title,
+  description,
+  locale = 'en',
+  ogImage,
+  noindex = false,
+  ogType = 'website',
+  publishedTime,
+  modifiedTime,
+  author,
+  tags = [],
+  articleSection,
+  publisher = 'WRP Detailing Solutions',
+  preloads = [],
+  heroForm = false,
+  livePath: livePathProp,
+  lab: labProp = false,
+} = Astro.props;
+
+// The live URL this page stands for. In the lab it is the path without the prefix.
+const isLab = labProp || Astro.url.pathname.startsWith(`${labPrefix}/`);
+const livePath = livePathProp ?? (isLab ? Astro.url.pathname.slice(labPrefix.length) : Astro.url.pathname);
+const lab = (href: string) => (isLab ? toLab(href) : href);
+
+const dir = getDir(locale);
+const isArabic = locale === 'ar';
+const ogLocale = getOgLocale(locale);
+const alternateOgLocale = getOgLocale(isArabic ? 'en' : 'ar');
+const canonicalURL = new URL(livePath, Astro.site).toString();
+const alternatePath = getAlternateUrl(livePath, locale);
+const alternateUrl = new URL(alternatePath, Astro.site).toString();
+const robotsOff = noindex || isLab;
+
+// Same OG image rules as BaseLayout: generated cards are 1200x630, photos say nothing.
+const resolvedOgImage = ogImage ?? '/og/site.jpg';
+const ogImageURL = new URL(resolvedOgImage, Astro.site).toString();
+const isGeneratedCard = resolvedOgImage.startsWith('/og/');
+
+const publishedISO = publishedTime ? new Date(publishedTime).toISOString() : undefined;
+const modifiedISO = modifiedTime ? new Date(modifiedTime).toISOString() : undefined;
+const articleMeta: Array<{ property: string; content: string }> = [];
+if (ogType === 'article') {
+  if (publishedISO) articleMeta.push({ property: 'article:published_time', content: publishedISO });
+  if (modifiedISO) articleMeta.push({ property: 'article:modified_time', content: modifiedISO });
+  if (author) articleMeta.push({ property: 'article:author', content: String(author) });
+  if (articleSection) articleMeta.push({ property: 'article:section', content: String(articleSection) });
+  articleMeta.push(...tags.map((tag) => ({ property: 'article:tag', content: String(tag) })));
+}
+
+const robotsFull = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+const extendLinks = [
+  { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+  { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+  { rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon-96x96.png' },
+  { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+  { rel: 'manifest', href: '/site.webmanifest' },
+];
+const extendMeta = [
+  { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
+  { name: 'theme-color', content: '#0c0d0f' },
+  { name: 'color-scheme', content: 'dark' },
+  { name: 'geo.region', content: 'AE-DU' },
+  { name: 'geo.placename', content: 'Dubai' },
+  { name: 'geo.position', content: '25.2854;55.3781' },
+  { name: 'ICBM', content: '25.2854, 55.3781' },
+  { name: 'googlebot', content: robotsOff ? 'noindex, nofollow' : robotsFull },
+  { name: 'bingbot', content: robotsOff ? 'noindex, nofollow' : robotsFull },
+  { property: 'og:locale:alternate', content: alternateOgLocale },
+  ...articleMeta,
+  ...(ogType === 'article' && articleSection
+    ? [
+        { name: 'twitter:label1', content: 'Section' },
+        { name: 'twitter:data1', content: String(articleSection) },
+      ]
+    : []),
+  ...(ogType === 'article' && publisher
+    ? [
+        { name: 'twitter:label2', content: 'Publisher' },
+        { name: 'twitter:data2', content: String(publisher) },
+      ]
+    : []),
+];
+
+// Header G: E's bar on wide screens, A's menu on phones. In the lab, links to
+// pages that already have a Studio preview stay inside the preview.
+const nav = await getHeaderNav(locale);
+const labNav = isLab
+  ? {
+      ...nav,
+      home: lab(nav.home),
+      services: nav.services.map((s) => ({ ...s, href: lab(s.href) })),
+      pages: nav.pages.map((p) => ({ ...p, href: lab(p.href) })),
+    }
+  : nav;
+const altHref = lab(alternatePath);
+---
+
+<!doctype html>
+<html lang={locale} dir={dir} data-concept="studio" data-hero-form={heroForm ? 'in-view' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonicalURL}
+      noindex={robotsOff}
+      nofollow={isLab}
+      openGraph={{
+        basic: { title, type: ogType, image: ogImageURL, url: canonicalURL },
+        optional: { description, siteName: 'WRP Detailing Studio', locale: ogLocale },
+        image: { alt: title, ...(isGeneratedCard ? { width: 1200, height: 630 } : {}), type: 'image/jpeg' },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        site: '@wrp_ae',
+        creator: '@wrp_ae',
+        title,
+        description,
+        image: ogImageURL,
+        imageAlt: title,
+      }}
+      extend={{ link: extendLinks, meta: extendMeta }}
+    />
+
+    <Schema />
+    <Schema type="SiteNavigationElement" />
+
+    <link rel="alternate" hreflang="en-AE" href={isArabic ? alternateUrl : canonicalURL} />
+    <link rel="alternate" hreflang="ar-AE" href={isArabic ? canonicalURL : alternateUrl} />
+    <link rel="alternate" hreflang="x-default" href={isArabic ? alternateUrl : canonicalURL} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={isArabic ? 'WRP Detailing Studio: خلاصة RSS' : 'WRP Detailing Studio: RSS Feed'}
+      href={new URL(isArabic ? '/ar/rss.xml' : '/rss.xml', Astro.site)}
+    />
+
+    {
+      preloads.map((p) => (
+        <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} imagesrcset={p.imagesrcset} imagesizes={p.imagesizes} fetchpriority="high" />
+      ))
+    }
+    <Font cssVariable="--font-oswald" preload />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-montserrat" />
+    {isArabic && <Font cssVariable="--font-ibm-plex-arabic" preload />}
+
+    {
+      !isLab && (
+        <>
+          <Attribution />
+          <Analytics />
+          <script is:inline>
+            {`(function(){function l(){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","u18n0h2k1x");}if('requestIdleCallback' in window){requestIdleCallback(l,{timeout:3000});}else{setTimeout(l,2000);}})();`}
+          </script>
+        </>
+      )
+    }
+  </head>
+  <body>
+    <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={heroForm ? '#quote' : studioQuoteHref} phone="showroom" />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer home={lab('/')} serviceHref={lab} locale={locale} altHref={altHref} />
+    <FloatingContact locale={locale} />
+    {
+      heroForm && (
+        <script>
+          // Header quote buttons hide while the hero form is on screen and come
+          // back once it scrolls away; following one moves focus into the form.
+          const form = document.querySelector<HTMLFormElement>('#quote');
+          const root = document.documentElement;
+          if (form) {
+            new IntersectionObserver(([entry]) => root.setAttribute('data-hero-form', entry.isIntersecting ? 'in-view' : 'away'), {
+              rootMargin: '-80px 0px 0px 0px',
+            }).observe(form);
+            document.addEventListener('click', (e) => {
+              const link = (e.target as Element).closest?.('a[href="#quote"]');
+              if (!link) return;
+              e.preventDefault();
+              form.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+              form.querySelector<HTMLInputElement>('input:not([type=hidden]):not([type=radio])')?.focus({ preventScroll: true });
+            });
+          }
+        </script>
+      )
+    }
+  </body>
+</html>

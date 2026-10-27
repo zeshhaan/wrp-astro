@@ -7,13 +7,14 @@
  * only those are loaded.
  */
 import { Font } from 'astro:assets';
-import LabBar from './LabBar.astro';
-import { getConcept } from '../registry';
+import DemoForms from './DemoForms.astro';
+import './reset.css';
 
 type FontVar =
   | '--font-inter'
   | '--font-oswald'
-  | '--font-montserrat';
+  | '--font-montserrat'
+  | '--font-ibm-plex-arabic';
 
 interface Props {
   concept: string;
@@ -30,7 +31,6 @@ interface Props {
 }
 
 const { concept, title, description, fonts, themeColor, preloadImage, preloads = [], colorScheme = 'light' } = Astro.props;
-const meta = getConcept(concept);
 const widths = preloadImage?.widths ?? [480, 800, 1200];
 ---
 
@@ -62,46 +62,9 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
     }
     {preloads.map((p) => <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} fetchpriority="high" />)}
     {fonts.map((f, i) => <Font cssVariable={f} preload={i < 2} />)}
-    <style is:global>
-      /* Shared reset only. All look-and-feel lives in each concept. */
-      *, *::before, *::after { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-      body { margin: 0; min-height: 100dvh; -webkit-font-smoothing: antialiased; }
-      img, picture, svg, video { display: block; max-width: 100%; }
-      img { height: auto; }
-      input, button, textarea, select { font: inherit; color: inherit; }
-      h1, h2, h3, h4, p, figure, blockquote, ul, ol, dl, dd { margin: 0; }
-      ul[role='list'], ol[role='list'] { list-style: none; padding: 0; }
-      :where(h1, h2, h3) { text-wrap: balance; }
-      :where(p, li, blockquote) { text-wrap: pretty; }
-      :target { scroll-margin-block-start: 5rem; }
-      .visually-hidden {
-        clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; width: 1px;
-        overflow: hidden; position: absolute; white-space: nowrap;
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        html { scroll-behavior: smooth; }
-      }
-      /* Cross-document view transitions between lab pages (progressive enhancement). */
-      @view-transition { navigation: auto; }
-    </style>
   </head>
   <body>
     <slot />
-    {meta && <LabBar />}
-    <script>
-      // Concept forms are mock-ups: never send real leads from a design preview.
-      document.addEventListener('submit', (event) => {
-        const form = event.target;
-        if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-demo-form')) return;
-        event.preventDefault();
-        const status = form.querySelector<HTMLElement>('[data-demo-status]');
-        if (status) {
-          status.hidden = false;
-          status.textContent =
-            'Design preview: this form is not connected yet. It will post to the live enquiry API when the redesign goes live.';
-        }
-      });
-    </script>
+    <DemoForms />
   </body>
 </html>

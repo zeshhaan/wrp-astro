@@ -29,7 +29,7 @@ for (const body of ['sedan', 'coupe', 'suv', 'pickup']) {
   // Only the canvas, full-bleed, on a transparent page.
   await page.addStyleTag({
     content: `html, body, main, .cv__stage { background: transparent !important; }
-      body > *:not(main), [data-lab-bar], astro-dev-toolbar, .cv__head, .cv__controls, .cv__status, .cv__credit { display: none !important; }
+      body > *:not(main), astro-dev-toolbar, .cv__head, .cv__controls, .cv__status, .cv__credit { display: none !important; }
       main, .cv, .cv__stage { padding: 0 !important; margin: 0 !important; max-width: none !important; border: 0 !important; }
       .cv__viewer { position: fixed !important; inset: 0 !important; width: ${W}px !important; height: ${H}px !important; border-radius: 0 !important; background: transparent !important; }`,
   });
