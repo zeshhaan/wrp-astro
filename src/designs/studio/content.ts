@@ -48,11 +48,14 @@ const fromService = (slug: string, over: Partial<Card> = {}): Card => {
  * levels are listed.
  */
 export const serviceCards: Card[] = [
-  fromService('paint-protection-film'),
+  fromService('paint-protection-film', {
+    name: 'Paint Protection Film (PPF)',
+    line: 'Clear, self-healing film that protects your paint from stone chips, sand and the GCC heat.',
+  }),
   {
     key: 'detailing',
     name: 'Detailing',
-    line: 'Our Level 3 detail, inside and out: tar and iron removal, carpet extraction, engine bay and six months of ceramic.',
+    line: 'Level 3 detailing inside and out: iron decontamination, carpet steam extraction, an engine bay clean and a 6-month ceramic sealant.',
     price: `From ${aed(300)}`,
     href: '/services/premium-car-wash/',
     linkLabel: 'Learn more about detailing levels',
@@ -61,11 +64,29 @@ export const serviceCards: Card[] = [
     width: 1200,
     height: 1269,
   },
-  fromService('polish'),
-  fromService('ceramic-coating', { width: 1179, height: 2091 }),
-  fromService('leather-upholstery', { width: 1199, height: 800 }),
-  fromService('window-film', { width: 1024, height: 1024 }),
+  fromService('polish', {
+    line: 'Multi-stage machine polishing that removes swirl marks, scratches and oxidation, checked with a paint-depth gauge.',
+  }),
+  fromService('ceramic-coating', {
+    line: 'Hydrophobic ceramic glass layer for high gloss, chemical resistance and easier washes.',
+    width: 1179,
+    height: 2091,
+  }),
+  fromService('leather-upholstery', {
+    line: 'Custom seat covers, hand-stitched leather upholstery and fitted floor mats, crafted in our mezzanine design lab.',
+    width: 1199,
+    height: 800,
+  }),
+  // "Window Tinting" on the card for the homepage keyword; the service itself stays "Window Film".
+  fromService('window-film', {
+    name: 'Window Tinting',
+    line: 'Nano-ceramic window tint that blocks up to 99% of UV rays and solar heat, without blocking your phone signal.',
+    linkLabel: 'Learn more about window tinting',
+    width: 1024,
+    height: 1024,
+  }),
   fromService('premium-car-wash', {
+    line: 'Safe hand wash with pH-neutral shampoo, microfiber mitts and a filtered deionized rinse, sealed with ceramic spray.',
     image: '/portfolio/team-washing-subaru-sti-foam',
     alt: 'WRP team hand washing a blue Subaru WRX STI covered in foam',
     height: 1471,
@@ -73,12 +94,25 @@ export const serviceCards: Card[] = [
   {
     key: 'wrap',
     name: 'Wrap & styling',
-    line: 'Partial wraps and details, like a matte-black bonnet and spoiler or a chrome delete.',
+    line: 'Partial vinyl wraps, bonnet accents, satin-black trim and chrome delete, fitted with clean, tucked edges.',
     price: 'Priced after inspection',
     href: '/contact-us/',
     linkLabel: 'Ask about wrap and styling',
     image: '/review-images/sujith_prasad_2',
     alt: 'The WRP logo wall above two cars in the studio',
+    width: 1200,
+    height: 900,
+  },
+  // No service page yet, so the card goes to the contact form. Placeholder studio photo until there is one of tint work.
+  {
+    key: 'architectural-tint',
+    name: 'Home & architectural glass tint',
+    line: 'Heat and UV protection using premium architectural film for cooler interiors and privacy.',
+    price: 'Priced after inspection',
+    href: '/contact-us/',
+    linkLabel: 'Ask about home and architectural glass tint',
+    image: '/review-images/tariq_murad_2',
+    alt: 'Glass-walled mezzanine lounge above the WRP studio bays',
     width: 1200,
     height: 900,
   },
@@ -91,9 +125,10 @@ export const serviceOptions = [
   'Polish & paint correction',
   'Ceramic coating',
   'Leather & upholstery',
-  'Window film',
+  'Window tinting',
   'Premium car wash',
   'Wrap & styling',
+  'Home & architectural glass tint',
   'Not sure yet',
 ];
 
@@ -208,10 +243,10 @@ export const stats = [
 ];
 
 export const aboutChecklist = [
-  'Avery Dennison & STEK paint protection film',
-  'Up to 10-year warranty on PPF',
-  'Ceramic coatings with 2 to 7-year warranties',
-  'Hand wash only, with filtered rinse water',
+  'Official STEK self-healing paint protection film, plus Avery Dennison',
+  'Up to 10-year manufacturer & installation warranty',
+  'Multi-layer 9H ceramic coatings with 2 to 7-year warranties',
+  'Safe-touch hand wash with filtered deionized water',
 ];
 
 /** Blog posts to feature (ids in src/content/blog); only ones that exist are shown. */

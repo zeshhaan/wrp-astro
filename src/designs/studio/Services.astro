@@ -16,8 +16,9 @@ const { link = (href: string) => href } = Astro.props;
       <p class="st-eyebrow">Our services</p>
       <h2 id="services-title" class="st-h2">What we offer</h2>
       <p class="st-intro">
-        Protection, detailing and interior work for daily drivers, family SUVs and weekend cars. Starting prices are
-        shown; we confirm the final price when we see the car.
+        Protection, detailing and interior care for daily drivers, family SUVs and supercars, including window
+        tinting and ceramic coating in Dubai. Starting prices are shown; we confirm the final price when we see the
+        car.
       </p>
     </header>
     <ul class="grid" role="list">
@@ -28,7 +29,7 @@ const { link = (href: string) => href } = Astro.props;
               <Picture
                 base={c.image}
                 alt={c.alt}
-                sizes="(min-width: 72rem) 300px, (min-width: 40rem) 45vw, 100vw"
+                sizes="(min-width: 76rem) 400px, (min-width: 60rem) 31vw, (min-width: 36rem) 48vw, 100vw"
                 width={c.width}
                 height={c.height}
               />
@@ -61,9 +62,10 @@ const { link = (href: string) => href } = Astro.props;
       grid-template-columns: repeat(2, 1fr);
     }
   }
+  /* Nine cards: three rows of three. */
   @media (min-width: 60rem) {
     .grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
   .card {
