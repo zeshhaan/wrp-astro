@@ -160,7 +160,7 @@ const altHref = lab(alternatePath);
 <html lang={locale} dir={dir} data-concept="studio" data-hero-form={heroForm ? 'in-view' : undefined}>
   <head>
     <meta charset="utf-8" />
-    <!-- Palette trial: ?palette=mono turns the brass off for this tab, ?palette=gold turns it back on. -->
+    <!-- Palette trial: ?palette=mono turns the brass off for this tab, ?palette=gold turns it back on; on by default on red-theme-* Previews. -->
     <script is:inline>
       try {
         var q = new URLSearchParams(location.search).get('palette');
@@ -168,6 +168,8 @@ const altHref = lab(alternatePath);
         if (q === 'mono') sessionStorage.setItem('st-palette', 'mono');
         if (q === 'gold') sessionStorage.removeItem('st-palette');
         if (sessionStorage.getItem('st-palette') === 'mono') document.documentElement.dataset.palette = 'mono';
+        // The red-theme-studio branch Preview shows the trial without a query string.
+        if (q !== 'gold' && location.hostname.indexOf('red-theme-') === 0) document.documentElement.dataset.palette = 'mono';
       } catch (e) {}
     </script>
     <SEO
