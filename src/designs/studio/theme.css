@@ -239,3 +239,49 @@
 :root[data-concept='studio']:lang(ar) :is(h1, h2, h3, .st-h2) {
   line-height: 1.3;
 }
+
+/*
+ * Palette trial: black, white and YACO red, no brass. Off unless the page is
+ * opened with ?palette=mono (see the inline script in StudioPage), so the gold
+ * Studio stays the default while the two are compared.
+ */
+:root[data-concept='studio'][data-palette='mono'] {
+  --st-gold: #ffffff;
+  --st-gold-deep: var(--st-ink);
+  --st-paper: #f2f2f2;
+  --st-light: #e8e8e8;
+  --st-line-light: #dadada;
+  --st-red: #d4141c; /* YACO red (#ed1c24), deepened so white button text passes 4.5:1 */
+  --st-red-hover: #b31017;
+}
+/* On light sections the accent is ink, so lines, ticks and stars stay visible. */
+:root[data-concept='studio'][data-palette='mono'] :is(.st-light, .st-white) {
+  --st-gold: var(--st-ink);
+}
+/* Dark panels inside light sections (blog cards, the rating box) go back to white. */
+:root[data-concept='studio'][data-palette='mono'] :is(.st-light, .st-white) :is(.post, .rating) {
+  --st-gold: #ffffff;
+}
+/* The About ticks become black circles, so their check marks turn white. */
+:root[data-concept='studio'][data-palette='mono'] .about__tick {
+  color: var(--st-white);
+}
+/* Dark buttons on light sections would turn ink-on-ink on hover. */
+:root[data-concept='studio'][data-palette='mono'] :is(.navbtn:hover:not(:disabled), .why__toggle:hover) {
+  background: var(--st-ink-2);
+  color: var(--st-white);
+}
+/* Red is kept for the one action that matters: the quote buttons. */
+:root[data-concept='studio'][data-palette='mono'] :is(.st-btn--gold, .sf-tag) {
+  background: var(--st-red);
+  border-color: var(--st-red);
+  color: var(--st-white);
+}
+:root[data-concept='studio'][data-palette='mono'] :is(.st-btn--gold, .sf-tag):hover {
+  background: var(--st-red-hover);
+  border-color: var(--st-red-hover);
+}
+:root[data-concept='studio'][data-palette='mono'] ::selection {
+  background: var(--st-white);
+  color: var(--st-black);
+}
