@@ -207,6 +207,7 @@ const panelGroups = [
                   <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFilm" value={i === 0 ? 'avery' : 'stek'} /><span>{f.name}</span></label>
                 ))}
               </div>
+              <p class="qo-help">{catalog.ppf.films.map((f) => `${f.name}: ${f.lines.join(', ')}.`).join(' ')}</p>
             </fieldset>
             <label class="qo-toggle">
               <input type="checkbox" name="ppfCeramic" />

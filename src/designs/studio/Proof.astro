@@ -17,7 +17,8 @@ const w =
         eyebrow: 'الأفلام والضمانات',
         title: 'حماية تثق بها',
         text: 'نركّب أفلام حماية طلاء ذاتية الإصلاح من علامتين عالميتين، STEK وAvery Dennison، بضمان يصل إلى ١٠ سنوات. زُر استوديونا في القصيص لترى عينات الأفلام وتلمسها بنفسك قبل أن تختار.',
-        films: 'علامات الأفلام',
+        films: 'الأفلام التي نركّبها',
+        finish: (f: string) => (f === 'Gloss or matte' ? 'لامع أو مطفي' : f),
         stats: statsAr,
         quote: 'احصل على عرض سعر سريع',
         whatsapp: 'راسلنا على واتساب',
@@ -29,7 +30,8 @@ const w =
         eyebrow: 'Films and warranties',
         title: 'Protection you can trust',
         text: 'We fit self-healing paint protection film from two global brands, STEK and Avery Dennison, with up to a 10-year warranty. Visit our Al Qusais studio to see and feel the film samples before you choose.',
-        films: 'Film brands',
+        films: 'Films we fit',
+        finish: (f: string) => f,
         stats,
         quote: 'Get a quick quote',
         whatsapp: 'WhatsApp us',
@@ -54,8 +56,12 @@ const w =
       <ul class="films" role="list" aria-label={w.films}>
         {
           proof.films.map((f) => (
-            <li>
-              <img src={f.logo} alt={f.name} width="160" height="48" loading="lazy" decoding="async" />
+            <li class="film">
+              <span class="film__logo">
+                <img src={f.logo} alt={f.name} width="160" height="48" loading="lazy" decoding="async" />
+              </span>
+              <span class="film__lines" dir="ltr">{f.lines.join(' · ')}</span>
+              {f.finishes && <span class="film__finish">{w.finish(f.finishes)}</span>}
             </li>
           ))
         }
@@ -105,17 +111,33 @@ const w =
   .films {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 1rem 1.5rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .films li {
+  .film {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+  }
+  .film__logo {
+    justify-self: start;
     display: grid;
     place-items: center;
     padding: 0.75rem 1.1rem;
     background: var(--st-white);
     min-inline-size: 9rem;
+    margin-block-end: 0.25rem;
+  }
+  .film__lines {
+    color: var(--st-white);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .film__finish {
+    color: var(--st-mute);
+    font-size: 0.8125rem;
   }
   .films img {
     block-size: 2rem;
