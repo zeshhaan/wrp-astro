@@ -78,7 +78,7 @@ import { contact, serviceOptions, whatsappQuote } from './content';
           <textarea name="message" rows="4" placeholder="Coverage, timing, colour, current marks or damage"></textarea>
         </label>
       </div>
-      <button class="st-btn st-btn--gold form__submit" type="submit">Send my quote request</button>
+      <button class="st-btn st-btn--primary form__submit" type="submit">Send my quote request</button>
       <p class="form__note">Prefer to chat? <a href={whatsappQuote} target="_blank" rel="noopener">Message us on WhatsApp</a> instead.</p>
       <p class="form__status" data-demo-status hidden role="status"></p>
     </form>
@@ -114,7 +114,7 @@ import { contact, serviceOptions, whatsappQuote } from './content';
   .details li > :global(svg) {
     flex: none;
     margin-block-start: 0.2rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .details div {
     display: grid;
@@ -129,12 +129,12 @@ import { contact, serviceOptions, whatsappQuote } from './content';
   .details a {
     color: var(--st-white);
     text-decoration: underline;
-    text-decoration-color: var(--st-gold);
+    text-decoration-color: var(--st-accent);
     text-underline-offset: 3px;
     padding-block: 0.55rem;
   }
   .details a:hover {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .mapcard {
     position: relative;
@@ -174,12 +174,14 @@ import { contact, serviceOptions, whatsappQuote } from './content';
 
   /* Form */
   .form {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     gap: 1.25rem;
     padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
     background: var(--st-coal);
     border: 1px solid var(--st-line-dark);
-    border-block-start: 3px solid var(--st-gold);
+    border-block-start: 3px solid var(--st-accent);
   }
   .form__title {
     font-family: var(--st-head-font);
@@ -212,6 +214,8 @@ import { contact, serviceOptions, whatsappQuote } from './content';
     color: var(--st-mute);
   }
   .field :is(input, select, textarea) {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     inline-size: 100%;
     min-block-size: 2.9rem;
     padding: 0.65rem 0.8rem;
@@ -220,18 +224,20 @@ import { contact, serviceOptions, whatsappQuote } from './content';
     border: 1px solid #3a3e44;
     border-radius: 0;
     font-size: 1rem;
-    accent-color: var(--st-gold);
+    accent-color: var(--st-accent);
   }
   .field select {
     appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, var(--st-gold) 50%),
-      linear-gradient(135deg, var(--st-gold) 50%, transparent 50%);
+    background-image: linear-gradient(45deg, transparent 50%, var(--st-accent) 50%),
+      linear-gradient(135deg, var(--st-accent) 50%, transparent 50%);
     background-position: calc(100% - 1.15rem) 55%, calc(100% - 0.8rem) 55%;
     background-size: 0.35rem 0.35rem;
     background-repeat: no-repeat;
     padding-inline-end: 2.25rem;
   }
   .field select option {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     background: var(--st-coal);
     color: var(--st-white);
   }
@@ -242,9 +248,9 @@ import { contact, serviceOptions, whatsappQuote } from './content';
     color: #8a8f96;
   }
   .field :is(input, select, textarea):focus-visible {
-    outline: 2px solid var(--st-gold);
+    outline: 2px solid var(--st-accent);
     outline-offset: 1px;
-    border-color: var(--st-gold);
+    border-color: var(--st-accent);
   }
   /* Only flag invalid fields after the visitor has interacted with them. */
   .field :is(input, select, textarea):user-invalid {
@@ -264,9 +270,11 @@ import { contact, serviceOptions, whatsappQuote } from './content';
     text-underline-offset: 3px;
   }
   .form__status {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding: 0.9rem 1rem;
     background: var(--st-black);
-    border-inline-start: 3px solid var(--st-gold);
+    border-inline-start: 3px solid var(--st-accent);
     font-size: 0.9375rem;
   }
   @media (min-width: 60rem) {

@@ -130,6 +130,8 @@ import { proof, whyPhotos, whyPoints } from './content';
 
   /* Google rating badge */
   .rating {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: inline-flex;
     align-items: center;
     gap: 0.9rem;
@@ -153,7 +155,7 @@ import { proof, whyPhotos, whyPoints } from './content';
   .rating__stars {
     display: inline-flex;
     gap: 2px;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rating__stars :global(svg) {
     fill: currentColor;
@@ -167,11 +169,11 @@ import { proof, whyPhotos, whyPoints } from './content';
   }
   .rating :global(.rating__arrow) {
     margin-inline-start: 0.25rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rating:hover {
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
   }
   .rating:hover :is(.rating__stars, .rating__count, :global(.rating__arrow)) {
     color: var(--st-black);
@@ -231,8 +233,7 @@ import { proof, whyPhotos, whyPoints } from './content';
     cursor: pointer;
   }
   .why__toggle:hover {
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-ink-2);
   }
   .why__toggle[hidden], .why__toggle [hidden] {
     display: none;
@@ -262,7 +263,7 @@ import { proof, whyPhotos, whyPoints } from './content';
     font-weight: 500;
     font-size: 0.9375rem;
     letter-spacing: 0.08em;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .point__title {
     flex: 1;
@@ -295,7 +296,7 @@ import { proof, whyPhotos, whyPoints } from './content';
     font-size: 3rem;
     font-weight: 600;
     line-height: 1;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .point__quote blockquote p::after {
     content: '”';

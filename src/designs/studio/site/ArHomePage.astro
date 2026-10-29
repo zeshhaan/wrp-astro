@@ -175,7 +175,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
       <h1 id="hh-title" class="hh__title">{heroLines[0]} <br />{heroLines[1]}</h1>
       <p class="hh__lede">{tr('home.heroSubtitle')}</p>
       <div class="hh__actions">
-        <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+        <a class="st-btn st-btn--primary" href={studioQuoteHref} data-quote>
           {tr('home.hero.getQuote')}
           <Icon name="arrow-right" size={18} class="flip" />
         </a>
@@ -485,6 +485,8 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
 <style>
   /* Hero: full-height photo, title and actions low on the page. */
   .hh {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     isolation: isolate;
     display: grid;
@@ -549,7 +551,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     text-decoration: none;
   }
   .hh__rating:hover {
-    border-color: var(--st-gold);
+    border-color: var(--st-accent);
   }
   .hh__rating strong {
     font-weight: 700;
@@ -558,7 +560,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   .tm__stars {
     display: inline-flex;
     gap: 0.1rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .hh__stars :global(svg),
   .tm__stars :global(svg) {
@@ -588,7 +590,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   .split__text a {
     color: var(--st-ink);
     font-weight: 600;
-    text-decoration-color: var(--st-gold);
+    text-decoration-color: var(--st-accent);
     text-underline-offset: 4px;
   }
   .split :global(.split__img img) {
@@ -622,7 +624,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     font-weight: 700;
     font-size: clamp(1.9rem, 1.4rem + 1.5vw, 2.6rem);
     line-height: 1;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .split__stat + p {
     font-size: 0.875rem;
@@ -639,12 +641,14 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     list-style: none;
   }
   .pl__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
     padding: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
     background: var(--st-card-dark);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .pl__letter {
     font-family: var(--st-mark);
@@ -652,7 +656,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     font-style: italic;
     font-size: 3.5rem;
     line-height: 0.9;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pl__title {
     font-family: var(--st-head-font);
@@ -679,7 +683,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   .pl__list :global(svg) {
     flex: none;
     margin-block-start: 0.3rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pl__btn {
     align-self: start;
@@ -713,7 +717,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     font-family: var(--st-head-font);
     font-weight: 700;
     font-size: 0.95rem;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .sv__title {
     font-family: var(--st-head-font);
@@ -744,7 +748,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     position: absolute;
     inset-inline-start: 0;
     inset-block-start: 0.15rem;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .sv__feats dd {
     display: inline;
@@ -759,7 +763,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   .sv__quote {
     margin: 1.5rem 0 0;
     padding-inline-start: 1.25rem;
-    border-inline-start: 3px solid var(--st-gold);
+    border-inline-start: 3px solid var(--st-accent);
   }
   .sv__quote blockquote {
     margin: 0;
@@ -794,6 +798,8 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     }
   }
   .pf__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -866,7 +872,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
     align-items: center;
     gap: 0.5rem;
     padding-block-end: 0.25rem;
-    border-block-end: 1px solid var(--st-gold);
+    border-block-end: 1px solid var(--st-accent);
     color: var(--st-white);
     font-size: 0.9375rem;
     text-decoration: none;
@@ -939,7 +945,7 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   .hc__list :global(svg) {
     flex: none;
     margin-block-start: 0.15rem;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .hc__label {
     font-weight: 700;
@@ -965,6 +971,6 @@ const quote = inlineReview ? inlineReview.highlightQuote || inlineReview.text.sp
   }
   .hc :global(.cf) {
     border: 1px solid var(--st-line-light);
-    border-block-start: 4px solid var(--st-gold);
+    border-block-start: 4px solid var(--st-accent);
   }
 </style>

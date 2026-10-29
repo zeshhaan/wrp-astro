@@ -181,7 +181,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
       heroForm ? (
         <LeadForm slot="aside" service={title} locale={locale} />
       ) : (
-        <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
+        <a class="st-btn st-btn--primary" href={quoteHref} data-quote>
           {getQuote}
           <Icon name="arrow-right" size={18} class="flip" />
         </a>
@@ -352,7 +352,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
                         </li>
                       ))}
                     </ul>
-                    <a class:list={['st-btn', pkg.badge ? 'st-btn--gold' : 'st-btn--dark']} href={quoteHref} data-quote>
+                    <a class:list={['st-btn', pkg.badge ? 'st-btn--primary' : 'st-btn--dark']} href={quoteHref} data-quote>
                       {ar ? t(locale, 'services.bookNow') : w.getStarted}
                     </a>
                   </li>
@@ -425,7 +425,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
               <p class="price__amount">{ar ? money(startingPrice) : `${w.startingFrom} ${startingPrice.toLocaleString()}`}</p>
               {!ar && <p class="price__note">{w.pricingNote}</p>}
               <div class="price__actions">
-                <a class="st-btn st-btn--gold" href={quoteHref} data-quote>
+                <a class="st-btn st-btn--primary" href={quoteHref} data-quote>
                   {ar ? getQuote : w.getYourQuote}
                   <Icon name="arrow-right" size={18} class="flip" />
                 </a>
@@ -515,7 +515,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     margin-block-start: -2.5rem;
     padding: 1.5rem 1.5rem 1.6rem;
     background: var(--st-white);
-    border-inline-start: 4px solid var(--st-gold);
+    border-inline-start: 4px solid var(--st-accent);
     box-shadow: 0 18px 40px -24px rgb(12 13 15 / 0.45);
   }
   .qa__text {
@@ -570,13 +570,15 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     align-items: start;
   }
   .feat__icon {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     place-items: center;
     flex: none;
     inline-size: 2.5rem;
     block-size: 2.5rem;
     background: var(--st-black);
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .feat__title {
     font-family: var(--st-head-font);
@@ -596,11 +598,13 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     display: flex;
   }
   .card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--st-card-dark);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .card :global(.card__img img) {
     inline-size: 100%;
@@ -618,7 +622,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     font-weight: 600;
     font-size: 2rem;
     line-height: 1;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .card__title {
     font-family: var(--st-head-font);
@@ -684,18 +688,20 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     border-block-start: 4px solid var(--st-ink);
   }
   .pk__card--pick {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     background: var(--st-black);
     color: var(--st-white);
     border-color: var(--st-black);
-    border-block-start-color: var(--st-gold);
+    border-block-start-color: var(--st-accent);
   }
   .pk__badge {
     position: absolute;
     inset-block-start: -0.85rem;
     inset-inline-start: 1.75rem;
     padding: 0.2rem 0.75rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-family: var(--st-head-font);
     font-weight: 500;
     font-size: 0.8125rem;
@@ -749,7 +755,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     font-variant-numeric: tabular-nums;
   }
   .pk__card--pick .pk__price {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pk__price--one {
     margin-block: 1rem 0.5rem;
@@ -771,16 +777,16 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
   .pk__feats :global(svg) {
     flex: none;
     margin-block-start: 0.15rem;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .pk__card--pick .pk__feats :global(svg) {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pk__card .st-btn {
     inline-size: 100%;
   }
-  .pk__card--pick .st-btn--gold:focus-visible {
-    outline-color: var(--st-gold);
+  .pk__card--pick .st-btn--primary:focus-visible {
+    outline-color: var(--st-accent);
   }
 
   /* Comparison table. */
@@ -795,6 +801,8 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     font-size: 0.9375rem;
   }
   .cmp__table thead th {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding: 1rem;
     background: var(--st-black);
     color: var(--st-white);
@@ -834,7 +842,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
   }
   .cmp__table :global(.cmp__yes) {
     display: inline-block;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .cmp__no {
     color: #9aa0a6;
@@ -912,7 +920,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref;
     font-weight: 600;
     font-size: 2.25rem;
     line-height: 1;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .step__title {
     font-family: var(--st-head-font);

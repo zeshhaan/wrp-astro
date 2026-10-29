@@ -144,7 +144,7 @@ const hero = copy.hero.image.src;
 
   <EndCta heading={copy.cta.h2} text={copy.cta.text} href={studioQuoteHref}>
     <div class="end-actions">
-      <a class="st-btn st-btn--gold" href={studioQuoteHref} data-quote>
+      <a class="st-btn st-btn--primary" href={studioQuoteHref} data-quote>
         {copy.cta.quote}
         <Icon name="arrow-right" size={18} class="flip" />
       </a>
@@ -182,10 +182,12 @@ const hero = copy.hero.image.src;
 
   /* Core values: a bento of photo cards that always fills its rows. */
   .value {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: flex;
     flex-direction: column;
     background: var(--st-card-dark);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .value :global(.value__photo img) {
     inline-size: 100%;
@@ -242,12 +244,14 @@ const hero = copy.hero.image.src;
     justify-items: start;
   }
   .step__n {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     place-items: center;
     inline-size: 3rem;
     block-size: 3rem;
     background: var(--st-black);
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-family: var(--st-head-font);
     font-weight: 600;
     font-size: 1.35rem;
@@ -277,6 +281,8 @@ const hero = copy.hero.image.src;
     border: 1px solid var(--st-line-dark);
   }
   .stat {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     gap: 0.4rem;
     align-content: start;
@@ -289,7 +295,7 @@ const hero = copy.hero.image.src;
     font-weight: 600;
     font-size: clamp(3rem, 2.4rem + 2.4vw, 4.5rem);
     line-height: 1;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .stat__label {
     font-family: var(--st-head-font);
@@ -303,11 +309,13 @@ const hero = copy.hero.image.src;
     font-size: 0.9375rem;
   }
   .why__box {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     gap: 0.75rem;
     padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
     background: var(--st-card-dark);
-    border-inline-start: 4px solid var(--st-gold);
+    border-inline-start: 4px solid var(--st-accent);
   }
   .why__box-title {
     font-family: var(--st-head-font);

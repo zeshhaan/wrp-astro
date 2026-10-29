@@ -81,11 +81,13 @@ const others = (await getLocalizedServices(locale))
     display: flex;
   }
   .sc__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: flex;
     flex-direction: column;
     inline-size: 100%;
     background: var(--st-card-dark);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .sc__media {
     position: relative;
@@ -149,7 +151,7 @@ const others = (await getLocalizedServices(locale))
     position: relative;
   }
   .sc__link:hover {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   :global([dir='rtl']) .sc__link :global(.sc__arrow) {
     transform: scaleX(-1);

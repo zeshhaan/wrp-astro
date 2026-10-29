@@ -8,17 +8,24 @@
   --st-black: #0c0d0f;
   --st-coal: #17191c;
   --st-card-dark: #1f2226;
-  --st-paper: #f4f4f2;
-  --st-light: #ecece9;
+  --st-paper: #f2f2f2;
+  --st-light: #e8e8e8;
   --st-white: #ffffff;
   --st-ink: #15171a;
   --st-ink-2: #4a4f56;
   --st-on-dark: #d4d7db;
   --st-mute: #a3a8ae;
-  --st-gold: #c9a45c; /* brass, from WRP's black-and-gold event balloons */
-  --st-gold-deep: #7a5a1e; /* gold for text on light sections (5.7:1) */
+  /* WRP is black and white: the accent (eyebrows, lines, ticks, stars) is white
+     on dark sections and ink on light ones (see .st-light below). */
+  --st-accent: #ffffff;
+  --st-accent-deep: #15171a;
+  --st-on-accent: var(--st-black); /* text on an accent fill */
+  /* YACO red (#ed1c24), deepened so white button text passes 4.5:1. Kept for
+     the main action only: the quote buttons. */
+  --st-red: #d4141c;
+  --st-red-hover: #b31017;
   --st-line-dark: #2c3035;
-  --st-line-light: #dcdcd8;
+  --st-line-light: #dadada;
 
   --st-head-font: var(--font-oswald), 'Oswald', 'Arial Narrow', system-ui, sans-serif;
   --st-body-font: var(--font-inter), 'Inter', system-ui, sans-serif;
@@ -45,16 +52,16 @@
   line-height: 1.6;
 }
 :where(:root[data-concept='studio']) :is(a, button, summary, [tabindex]):focus-visible {
-  outline: 3px solid var(--st-gold);
+  outline: 3px solid var(--st-accent);
   outline-offset: 3px;
 }
 :where(:root[data-concept='studio']) .st-light :is(a, button):focus-visible,
 :where(:root[data-concept='studio']) .st-white :is(a, button):focus-visible {
-  outline-color: var(--st-gold-deep);
+  outline-color: var(--st-accent-deep);
 }
 :root[data-concept='studio'] ::selection {
-  background: var(--st-gold);
-  color: var(--st-black);
+  background: var(--st-ink-2);
+  color: var(--st-white);
 }
 
 /* Layout */
@@ -82,6 +89,12 @@
   color: var(--st-ink);
   color-scheme: light;
 }
+/* On light sections the accent turns ink, so lines, ticks and stars stay visible. */
+:where(:root[data-concept='studio']) :is(.st-light, .st-white) {
+  --st-accent: var(--st-ink);
+  --st-on-accent: var(--st-white);
+}
+/* Dark cards set --st-accent back to white themselves (marked "dark surface"). */
 
 /* Section headings: eyebrow, condensed uppercase title, short intro */
 :where(:root[data-concept='studio']) .st-head {
@@ -101,10 +114,10 @@
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--st-gold);
+  color: var(--st-accent);
 }
 :where(:root[data-concept='studio']) .st-eyebrow--dark {
-  color: var(--st-gold-deep);
+  color: var(--st-accent-deep);
 }
 :where(:root[data-concept='studio']) .st-h2 {
   font-family: var(--st-head-font);
@@ -143,14 +156,14 @@
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
-:where(:root[data-concept='studio']) .st-btn--gold {
-  background: var(--st-gold);
-  border-color: var(--st-gold);
-  color: var(--st-black);
+:where(:root[data-concept='studio']) .st-btn--primary {
+  background: var(--st-red);
+  border-color: var(--st-red);
+  color: var(--st-white);
 }
-:where(:root[data-concept='studio']) .st-btn--gold:hover {
-  background: #dcbb78;
-  border-color: #dcbb78;
+:where(:root[data-concept='studio']) .st-btn--primary:hover {
+  background: var(--st-red-hover);
+  border-color: var(--st-red-hover);
 }
 :where(:root[data-concept='studio']) .st-btn--light {
   background: var(--st-white);
@@ -166,8 +179,8 @@
   color: var(--st-white);
 }
 :where(:root[data-concept='studio']) .st-btn--ghost:hover {
-  border-color: var(--st-gold);
-  color: var(--st-gold);
+  background: rgb(255 255 255 / 0.1);
+  border-color: var(--st-white);
 }
 :where(:root[data-concept='studio']) .st-btn--dark {
   background: var(--st-black);
@@ -175,9 +188,8 @@
   color: var(--st-white);
 }
 :where(:root[data-concept='studio']) .st-btn--dark:hover {
-  background: var(--st-gold);
-  border-color: var(--st-gold);
-  color: var(--st-black);
+  background: var(--st-ink-2);
+  border-color: var(--st-ink-2);
 }
 @media (prefers-reduced-motion: reduce) {
   :root[data-concept='studio'] .st-btn {
@@ -238,50 +250,4 @@
 }
 :root[data-concept='studio']:lang(ar) :is(h1, h2, h3, .st-h2) {
   line-height: 1.3;
-}
-
-/*
- * Palette trial: black, white and YACO red, no brass. Off unless the page is
- * opened with ?palette=mono (see the inline script in StudioPage), so the gold
- * Studio stays the default while the two are compared.
- */
-:root[data-concept='studio'][data-palette='mono'] {
-  --st-gold: #ffffff;
-  --st-gold-deep: var(--st-ink);
-  --st-paper: #f2f2f2;
-  --st-light: #e8e8e8;
-  --st-line-light: #dadada;
-  --st-red: #d4141c; /* YACO red (#ed1c24), deepened so white button text passes 4.5:1 */
-  --st-red-hover: #b31017;
-}
-/* On light sections the accent is ink, so lines, ticks and stars stay visible. */
-:root[data-concept='studio'][data-palette='mono'] :is(.st-light, .st-white) {
-  --st-gold: var(--st-ink);
-}
-/* Dark panels inside light sections (blog cards, the rating box) go back to white. */
-:root[data-concept='studio'][data-palette='mono'] :is(.st-light, .st-white) :is(.post, .rating) {
-  --st-gold: #ffffff;
-}
-/* The About ticks become black circles, so their check marks turn white. */
-:root[data-concept='studio'][data-palette='mono'] .about__tick {
-  color: var(--st-white);
-}
-/* Dark buttons on light sections would turn ink-on-ink on hover. */
-:root[data-concept='studio'][data-palette='mono'] :is(.navbtn:hover:not(:disabled), .why__toggle:hover) {
-  background: var(--st-ink-2);
-  color: var(--st-white);
-}
-/* Red is kept for the one action that matters: the quote buttons. */
-:root[data-concept='studio'][data-palette='mono'] :is(.st-btn--gold, .sf-tag) {
-  background: var(--st-red);
-  border-color: var(--st-red);
-  color: var(--st-white);
-}
-:root[data-concept='studio'][data-palette='mono'] :is(.st-btn--gold, .sf-tag):hover {
-  background: var(--st-red-hover);
-  border-color: var(--st-red-hover);
-}
-:root[data-concept='studio'][data-palette='mono'] ::selection {
-  background: var(--st-white);
-  color: var(--st-black);
 }

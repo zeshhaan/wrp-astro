@@ -69,10 +69,12 @@ const { link = (href: string) => href } = Astro.props;
     }
   }
   .card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: grid;
     grid-template-rows: auto 1fr;
     background: var(--st-card-dark);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
     position: relative;
   }
   .card__media {
@@ -125,7 +127,7 @@ const { link = (href: string) => href } = Astro.props;
     font-size: 1.05rem;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .card__link {
     display: inline-flex;
@@ -148,13 +150,13 @@ const { link = (href: string) => href } = Astro.props;
     inset: 0;
   }
   .card__link:hover {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .card:hover .card__media :global(img) {
     transform: scale(1.04);
   }
   .card:has(.card__link:focus-visible) {
-    outline: 3px solid var(--st-gold);
+    outline: 3px solid var(--st-accent);
     outline-offset: 3px;
   }
   .card__link:focus-visible {

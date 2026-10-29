@@ -85,7 +85,7 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
       {
         phone === 'showroom' ? (
           <div class="sf-acts sf-narrow">
-            <a class="st-btn st-btn--gold sf-acts__quote" href={quoteHref}>{w.quote}</a>
+            <a class="st-btn st-btn--primary sf-acts__quote" href={quoteHref}>{w.quote}</a>
             <button class="sf-sq sf-sq--clear" type="button" commandfor="sf-sheet" command="show-modal" aria-controls="sf-sheet">
               <Icon name="menu" size={24} />
               <span class="visually-hidden">{w.menu}</span>
@@ -146,8 +146,8 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
     inset-block-start: -4rem;
     z-index: 100;
     padding: 0.75rem 1rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-weight: 600;
   }
   .skip:focus {
@@ -369,7 +369,7 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
       inset-inline: 0;
       inset-block-end: -0.25rem;
       block-size: 1px;
-      background: var(--st-gold);
+      background: var(--st-accent);
       transform: scaleX(0);
       transition: transform 0.25s ease;
     }
@@ -380,7 +380,7 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
     }
     .sf-item:hover .sf-item__name,
     .sf-item:focus-within .sf-item__name {
-      color: var(--st-gold);
+      color: var(--st-accent);
     }
     .sf-item:hover .sf-item__name::after,
     .sf-item:focus-within .sf-item__name::after {
@@ -448,8 +448,8 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
       gap: 0.5rem;
       min-block-size: 2.75rem;
       padding-inline: 1.25rem 1rem;
-      background: var(--st-gold);
-      color: var(--st-black);
+      background: var(--st-red);
+      color: var(--st-white);
       font-family: var(--sf-font);
       font-size: 0.9375rem;
       font-weight: 500;
@@ -459,7 +459,7 @@ const sides = [nav.services.slice(0, 3), nav.services.slice(3)];
       box-shadow: 0 10px 24px rgb(0 0 0 / 0.35);
     }
     .sf-tag:hover {
-      background: #dcbb78;
+      background: var(--st-red-hover);
     }
   }
 </style>

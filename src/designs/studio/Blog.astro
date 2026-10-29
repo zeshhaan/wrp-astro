@@ -84,6 +84,8 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
   }
   /* Cover photo with an eased scrim; text sits on the dark end. */
   .post {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     isolation: isolate;
     display: grid;
@@ -94,7 +96,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     overflow: hidden;
     color: var(--st-white);
     background: var(--st-black);
-    border-block-start: 3px solid var(--st-gold);
+    border-block-start: 3px solid var(--st-accent);
   }
   .post :global(.post__cover) {
     position: absolute;
@@ -143,7 +145,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     outline: none;
   }
   .post:has(a:focus-visible) {
-    outline: 3px solid var(--st-gold-deep);
+    outline: 3px solid var(--st-accent-deep);
     outline-offset: 3px;
   }
   .post__desc {
@@ -165,12 +167,12 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-size: 0.9375rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .post:hover .post__title a {
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-thickness: 2px;
-    text-decoration-color: var(--st-gold);
+    text-decoration-color: var(--st-accent);
   }
 </style>

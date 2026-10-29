@@ -102,8 +102,8 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     inset-block-start: -4rem;
     z-index: 100;
     padding: 0.75rem 1rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-weight: 600;
   }
   .skip:focus {
@@ -201,7 +201,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     text-decoration: none;
   }
   .fs-pages a:hover {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .fs-sq {
     display: inline-grid;
@@ -227,8 +227,8 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
       min-block-size: 2.75rem;
       margin-inline-start: 0.75rem;
       padding-inline: 1.1rem 0.9rem;
-      background: var(--st-gold);
-      color: var(--st-black);
+      background: var(--st-red);
+      color: var(--st-white);
       font-family: var(--fs-font);
       font-size: 0.875rem;
       font-weight: 500;
@@ -238,7 +238,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
       white-space: nowrap;
     }
     .fs-quote:hover {
-      background: #dcbb78;
+      background: var(--st-red-hover);
     }
     .fs-logo__mark {
       block-size: 3.2rem;
@@ -331,7 +331,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
   }
   .fs-frame__price {
     overflow: hidden;
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-size: 0.6875rem;
     text-overflow: ellipsis;
     white-space: nowrap;

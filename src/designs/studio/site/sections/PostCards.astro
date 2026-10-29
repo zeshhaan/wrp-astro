@@ -120,6 +120,8 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     margin-inline: auto;
   }
   .pc__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     display: grid;
     align-content: end;
@@ -163,7 +165,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     font-family: var(--st-head-font);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pc__title {
     font-family: var(--st-head-font);
@@ -199,10 +201,10 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-size: 0.9375rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pc__card:focus-within {
-    outline: 3px solid var(--st-gold-deep);
+    outline: 3px solid var(--st-accent-deep);
     outline-offset: 3px;
   }
   @media (prefers-reduced-motion: reduce) {

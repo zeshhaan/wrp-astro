@@ -259,6 +259,8 @@ function svgMarkup(body: BodyType, mode: CarViewerOptions['mode'], uid: string) 
   return { markup: defs + inner, viewBox: `0 0 ${VIEW_W} ${h}` };
 }
 
+const FILM = '#ed1c24'; // YACO red marks the film
+
 const STYLE_ID = 'cv2d-style';
 const css = `
 .cv2d{display:block;inline-size:100%;block-size:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
@@ -283,7 +285,7 @@ const css = `
 .cv2d .cv-handle{stroke:var(--cv-stroke);stroke-width:2.2;stroke-linecap:round}
 .cv2d .cv-ground{stroke:rgb(255 255 255 / .14);stroke-width:1}
 .cv2d .cv-label{fill:#a3a8ae;font:600 15px/1 system-ui,sans-serif}
-.cv2d .cv-front{fill:#c9a45c;font-size:26px}
+.cv2d .cv-front{fill:#d4d7db;font-size:26px}
 .cv2d .cv-panel.cv-flash{animation:cv-flash .35s ease-out}
 @keyframes cv-flash{from{stroke-width:5}}
 @media (prefers-reduced-motion:reduce){.cv2d .cv-panel,.cv2d .cv-glass{transition:none}.cv2d .cv-panel.cv-flash{animation:none}}
@@ -351,8 +353,9 @@ export async function mount(el: HTMLElement, initial: CarViewerOptions): Promise
     svg.style.setProperty('--cv-paint', paint);
     svg.style.setProperty('--cv-paint-deep', shade(paint, light ? -0.22 : -0.35));
     svg.style.setProperty('--cv-stroke', light ? 'rgb(20 22 26 / .55)' : 'rgb(255 255 255 / .5)');
-    svg.style.setProperty('--cv-accent', '#c9a45c');
-    svg.style.setProperty('--cv-film-bg', light ? shade('#c9a45c', 0.45) : shade('#c9a45c', -0.45));
+    // Film is marked in YACO red, the one colour WRP uses besides black and white.
+    svg.style.setProperty('--cv-accent', FILM);
+    svg.style.setProperty('--cv-film-bg', light ? shade(FILM, 0.45) : shade(FILM, -0.45));
     svg.style.setProperty('--cv-film', `url(#${uid}-film)`);
     svg.style.setProperty('--cv-part', `url(#${uid}-part)`);
     svg.style.setProperty('--cv-wrap', opts.wrapColor ?? '#141516');

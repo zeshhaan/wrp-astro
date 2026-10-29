@@ -151,6 +151,8 @@ const slides = items.flatMap((item) =>
 
 <style>
   .pf-hero {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding-block: 8.5rem 1rem;
     background: var(--st-black);
   }
@@ -200,6 +202,8 @@ const slides = items.flatMap((item) =>
     margin-block-end: 1rem;
   }
   .pf__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     overflow: hidden;
     background: var(--st-coal);
@@ -243,7 +247,7 @@ const slides = items.flatMap((item) =>
   }
   .pf__sub {
     font-size: 0.875rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .pf__count {
     position: absolute;
@@ -316,8 +320,8 @@ const slides = items.flatMap((item) =>
     cursor: pointer;
   }
   .pf__btn:hover {
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
   }
   .pf__close {
     inset-block-start: 0.75rem;

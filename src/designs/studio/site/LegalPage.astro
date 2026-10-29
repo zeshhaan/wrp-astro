@@ -91,6 +91,8 @@ const { Body } = page;
 
 <style>
   .lg-hero {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding-block: 8.5rem 3rem;
     background: var(--st-black);
   }
@@ -156,7 +158,7 @@ const { Body } = page;
     color: var(--st-ink);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: var(--st-gold);
+    text-decoration-color: var(--st-accent);
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
   }
@@ -177,6 +179,6 @@ const { Body } = page;
     inset-block-start: 0.7em;
     inline-size: 6px;
     block-size: 6px;
-    background: var(--st-gold);
+    background: var(--st-accent);
   }
 </style>
