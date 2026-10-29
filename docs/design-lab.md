@@ -18,8 +18,7 @@ Every build has a review hub at `/design-lab/` linking to each Studio page:
 | Page | Path |
 | --- | --- |
 | Homepage | `/design-lab/studio/` |
-| Quote, step by step | `/design-lab/studio/quote/` |
-| Quote, one page (beside a 3D car) | `/design-lab/studio/quote/one-page/` |
+| Quote, one page beside a 3D car (the step-by-step version was removed) | `/design-lab/studio/quote/` |
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
 | Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
 

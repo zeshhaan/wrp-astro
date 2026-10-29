@@ -2,7 +2,7 @@
  * One-page quote: every choice in one form beside a live 3D car.
  *
  * State, prices, validation rules and the request text all come from
- * ../state.ts, shared with the step-by-step flow; this file only binds them to
+ * ../state.ts; this file only binds them to
  * one long form and a viewer that follows whichever section you are working in.
  */
 import { panels, ppfPresets, tintOptions, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';

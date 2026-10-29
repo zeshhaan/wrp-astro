@@ -8,7 +8,7 @@
  * inclusions only.
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { contact, freshQuotes, lounge, proof, services, whatsappLink } from '../../data';
+import { contact, proof, services } from '../../data';
 import { ppfPresets, tintOptions } from './panels';
 import type { Catalog, ServiceId } from './state';
 
@@ -97,28 +97,10 @@ export async function buildCatalog(): Promise<Catalog> {
       options: tintOptions.map((o) => ({ ...o, features: feat(tint, o.name) })),
     },
     contact: {
-      phoneDisplay: contact.phoneDisplay,
-      phoneHref: contact.phoneHref,
       whatsapp: contact.whatsapp,
-      whatsappHello: whatsappLink('Hi WRP, I have a question about a quote.'),
       hoursShort: contact.hoursShort,
       closed: contact.closed,
       schedule: contact.schedule,
-      address: contact.address.join(', '),
-    },
-    lounge: lounge.amenities.slice(0, 4).map((a) => a.name),
-    quotes: {
-      updates: {
-        text: 'The team kept me updated throughout the process with pictures and videos, and the workmanship is truly amazing. Car was delivered exactly on the promised time.',
-        author: 'Leno Thomas',
-      },
-      ppf: freshQuotes.find((q) => q.author === 'Siddik Akbar') ?? null,
-      wrap: freshQuotes.find((q) => q.author === 'A Khalid') ?? null,
-      // Verbatim sentence from a Google review (REVIEWS.md); spacing tidied.
-      collect: {
-        text: 'They have picked up the car from my location and delivered with very much care and timely updates.',
-        author: 'vinod kumar',
-      },
     },
   };
 }

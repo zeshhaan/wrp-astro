@@ -3,7 +3,7 @@
  * (screen order, validation, estimate, summary and WhatsApp text, Dubai dates).
  * Client-safe: no DOM at module level, no imports beyond the shared contract.
  */
-import { bodyTypes, panels, ppfPresets, tintOptions, type BodyType, type PanelId } from './panels';
+import { bodyTypes, panels, tintOptions, type BodyType, type PanelId } from './panels';
 
 export type ServiceId = 'ppf' | 'ceramic' | 'polish' | 'wash' | 'tint' | 'interior' | 'wrap';
 export const serviceOrder: ServiceId[] = ['ppf', 'ceramic', 'polish', 'wash', 'tint', 'interior', 'wrap'];
@@ -32,18 +32,11 @@ export type Catalog = {
   wash: { levels: { level: 1 | 2 | 3; name: string; tagline: string; sedan: number; suv: number; features: string[] }[] };
   tint: { options: { id: string; name: string; vlt: number; heat: string; note: string; features: string[] }[] };
   contact: {
-    phoneDisplay: string;
-    phoneHref: string;
     whatsapp: string;
-    whatsappHello: string;
     hoursShort: string;
     closed: string;
     schedule: { open: string; close: string; closedDays: number[]; timeZone: string };
-    address: string;
   };
-  lounge: string[];
-  quotes: Record<'updates' | 'collect', { text: string; author: string }> &
-    Record<'ppf' | 'wrap', { text: string; author: string } | null>;
 };
 
 export const paintChips = [
@@ -144,7 +137,7 @@ export function freshState(): QuoteState {
 
 const KEY = 'wrp-studio-quote-v1';
 
-/** `key` lets the one-page quote keep its own draft beside the step-by-step flow's. */
+/** `key` picks the localStorage entry; the quote page passes its own. */
 export function loadDraft(key = KEY): QuoteState | null {
   try {
     const raw = localStorage.getItem(key);
@@ -183,70 +176,10 @@ export function clearDraft(key = KEY) {
   }
 }
 
-/** True when a draft has enough in it to be worth offering back. */
-export function draftWorthResuming(s: QuoteState | null): s is QuoteState {
-  return !!s && !s.sent && (s.body !== null || s.services.length > 0);
-}
-
-/* ---------- Screens and steps ---------- */
-
-export const mainSteps = [
-  { n: 1, label: 'Your car', short: 'Car' },
-  { n: 2, label: 'What it needs', short: 'Services' },
-  { n: 3, label: 'Details', short: 'Details' },
-  { n: 4, label: 'When & how', short: 'When' },
-  { n: 5, label: 'Your details', short: 'You' },
-  { n: 6, label: 'Review & send', short: 'Review' },
-] as const;
-
-export function stepOf(screen: ScreenId): number {
-  if (screen === 'car') return 1;
-  if (screen === 'services' || screen === 'helper') return 2;
-  if ((serviceOrder as string[]).includes(screen)) return 3;
-  if (screen === 'when') return 4;
-  if (screen === 'you') return 5;
-  return 6;
-}
+/* ---------- Sections ---------- */
 
 export function detailScreens(s: QuoteState): ServiceId[] {
   return serviceOrder.filter((id) => s.services.includes(id));
-}
-
-/** The linear sequence the Next button walks. */
-export function sequence(s: QuoteState): ScreenId[] {
-  return ['car', 'services', ...detailScreens(s), 'when', 'you', 'review'];
-}
-
-/** Position used to decide transition direction; helper sits just after services. */
-export function orderIndex(s: QuoteState, screen: ScreenId): number {
-  if (screen === 'helper') return 1.5;
-  if (screen === 'done') return 99;
-  const i = sequence(s).indexOf(screen);
-  return i === -1 ? stepOf(screen) : i;
-}
-
-export function nextScreen(s: QuoteState, from: ScreenId): ScreenId {
-  if (from === 'helper') return 'services';
-  const seq = sequence(s);
-  const i = seq.indexOf(from);
-  return seq[Math.min(seq.length - 1, i + 1)] ?? 'car';
-}
-
-export function prevScreen(s: QuoteState, from: ScreenId): ScreenId | null {
-  if (from === 'helper') return 'services';
-  const seq = sequence(s);
-  const i = seq.indexOf(from);
-  return i > 0 ? seq[i - 1] : null;
-}
-
-/** Is a screen reachable with the answers so far? Used to validate a restored hash. */
-export function reachable(s: QuoteState, screen: ScreenId): boolean {
-  if (screen === 'done') return s.sent;
-  if (screen === 'helper') return true;
-  const seq = sequence(s);
-  const i = seq.indexOf(screen);
-  if (i === -1) return false;
-  return seq.slice(0, i).every((sc) => problem(s, sc) === null);
 }
 
 /** What's missing on a screen, as a sentence for the user, or null when complete. */
@@ -493,15 +426,3 @@ export function serviceInterest(s: QuoteState, c: Catalog): string {
     .map((id) => c.services.find((x) => x.id === id)?.name ?? id)
     .join(', ');
 }
-
-/** Pre-select services from the "Not sure" helper answers. */
-export function helperSuggest(answers: { chips: boolean; swirls: boolean; heat: boolean; clean: boolean }): ServiceId[] {
-  const out: ServiceId[] = [];
-  if (answers.chips) out.push('ppf');
-  if (answers.swirls) out.push('polish', 'ceramic');
-  if (answers.heat) out.push('tint');
-  if (answers.clean || !out.length) out.push('wash');
-  return out;
-}
-
-export const presetPanels = (id: string) => ppfPresets.find((p) => p.id === id);

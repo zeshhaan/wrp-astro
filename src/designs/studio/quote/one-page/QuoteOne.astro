@@ -1,16 +1,16 @@
 ---
 /**
- * Studio: one-page quote (/design-lab/studio/quote/one-page/).
+ * Studio: the quote page (/design-lab/studio/quote/), where every "Get a quick
+ * quote" button goes. Shereef chose it over the step-by-step flow (removed).
  *
- * The configurator take on the quote flow: the 3D car stays in view while every
- * choice sits in one scrolling panel of chips, like the car-viewer test page.
- * Same state, prices, WhatsApp text and enquiry API as the step-by-step flow
- * (../state.ts); its draft is stored under its own key.
+ * A configurator: the 3D car stays in view while every choice sits in one
+ * scrolling panel of chips, like the car-viewer test page. State, prices and
+ * the WhatsApp text come from ../state.ts.
  */
 import DesignShell from '../../../shared/DesignShell.astro';
 import Header from '../../Header.astro';
 import Footer from '../../Footer.astro';
-import QIcon from '../steps/QIcon.astro';
+import QIcon from '../QIcon.astro';
 import { buildCatalog } from '../catalog';
 import { bodyTypes, panels, wrapParts } from '../panels';
 import { interiorItems, interiorMaterials, paintChips, polishConditions, slots, wrapFinishes } from '../state';
@@ -46,8 +46,7 @@ const panelGroups = [
         <p class="qo-eyebrow">Get a quote</p>
         <h1 class="qo-h1">Build your quote</h1>
         <p class="qo-lede">
-          Pick your car and what it needs; the price builds up as you go. Takes about two minutes. Prefer one question at a
-          time? <a href="/design-lab/studio/quote/">Use the step-by-step quote</a>.
+          Pick your car and what it needs; the price builds up as you go. Takes about two minutes.
         </p>
       </div>
 
