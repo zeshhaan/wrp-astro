@@ -1,7 +1,7 @@
 /**
  * Everything the Studio reviews page shows, worked out once and shared by the
- * page and its concept directions (review-concepts/): the live page's title,
- * description and JSON-LD, the review lists, and the filters the concepts use.
+ * page and its parts: the live page's title, description and JSON-LD, the
+ * review lists, the topic filters and the sticker quotes.
  * Copy is the live src/pages/reviews.astro's, word for word.
  */
 import { getAllReviews, getReviewsWithImages, getBusiness, getMarqueeReviews, getDisplayCount, getSchemaReviews, type Review } from '@/lib/reviews';
@@ -44,7 +44,6 @@ export function reviewsPage(locale: Locale) {
   };
 
   const marquee = getMarqueeReviews();
-  const mid = Math.ceil(marquee.length / 2);
   const joinLine =
     locale === 'ar'
       ? `انضم إلى ${num(displayCount)} من العملاء الراضين الذين يثقون بـ WRP للعناية بسياراتهم.`
@@ -58,7 +57,6 @@ export function reviewsPage(locale: Locale) {
     description,
     schema,
     marquee,
-    rows: [marquee.slice(0, mid), marquee.slice(mid)],
     withImages: getReviewsWithImages(),
     textOnly: getAllReviews().filter((r) => !r.localImages?.length && r.text.length > 30),
     joinLine,
@@ -74,44 +72,26 @@ export interface ReviewFilter {
   terms?: string;
 }
 
-const serviceLabels: { tags: string[]; en: string; ar: string }[] = [
-  { tags: ['premium-car-wash'], en: 'Detailing', ar: 'التنظيف والتفصيل' },
-  { tags: ['paint-protection-film'], en: 'PPF', ar: 'PPF' },
-  { tags: ['window-film'], en: 'Tint', ar: 'التظليل' },
-  { tags: ['polish', 'ceramic-coating'], en: 'Polish & ceramic', ar: 'التلميع والسيراميك' },
-  { tags: ['leather-upholstery', 'car-mats'], en: 'Interior', ar: 'المقصورة' },
-];
-
-/** The services the reviews are tagged with, biggest first. */
-export function serviceFilters(reviews: Review[], locale: Locale): ReviewFilter[] {
-  return serviceLabels
-    .map((s) => ({
-      id: s.tags[0],
-      label: s[locale],
-      ids: reviews.filter((r) => r.serviceTags?.some((t) => s.tags.includes(t))).map((r) => r.reviewId),
-    }))
-    .filter((f) => f.ids.length > 0);
-}
-
 /**
  * Things customers keep bringing up, found in their own words. Each matches
  * the review text, so the counts are always the library's.
  */
-const topics: { id: string; en: string; terms: string }[] = [
-  { id: 'brand-new', en: '“Brand new”', terms: 'brand[- ]new|showroom|like new|very new' },
-  { id: 'professional', en: '“Professional”', terms: 'professional(?:ism|ly)?' },
-  { id: 'detail', en: '“Attention to detail”', terms: 'attention to detail|to the detail|detail-oriented|meticulous' },
-  { id: 'afzal', en: 'Afzal', terms: 'afzal' },
-  { id: 'lounge', en: 'The lounge', terms: 'lounge|waiting area|coffee|pool table|play area|relax' },
-  { id: 'price', en: 'The price', terms: 'pric(?:e|es|ing)|money|fair|reasonable|afford' },
-  { id: 'flawless', en: '“Flawless”', terms: 'flawless|perfect(?:ly|ion)?|spotless' },
+const topics: { id: string; en: string; ar: string; terms: string }[] = [
+  { id: 'brand-new', en: '“Brand new”', ar: '«كأنها جديدة»', terms: 'brand[- ]new|showroom|like new|very new' },
+  { id: 'professional', en: '“Professional”', ar: '«احترافية»', terms: 'professional(?:ism|ly)?' },
+  { id: 'detail', en: '“Attention to detail”', ar: '«الاهتمام بالتفاصيل»', terms: 'attention to detail|to the detail|detail-oriented|meticulous' },
+  { id: 'afzal', en: 'Afzal', ar: 'Afzal', terms: 'afzal' },
+  { id: 'lounge', en: 'The lounge', ar: 'الاستراحة', terms: 'lounge|waiting area|coffee|pool table|play area|relax' },
+  { id: 'price', en: 'The price', ar: 'السعر', terms: 'pric(?:e|es|ing)|money|fair|reasonable|afford' },
+  { id: 'flawless', en: '“Flawless”', ar: '«بلا عيوب»', terms: 'flawless|perfect(?:ly|ion)?|spotless' },
 ];
 
-export function topicFilters(reviews: Review[]): ReviewFilter[] {
+/** The reviews are in English on both pages, so the words matched are English; only the labels change. */
+export function topicFilters(reviews: Review[], locale: Locale): ReviewFilter[] {
   return topics
     .map((t) => {
       const re = new RegExp(`\\b(?:${t.terms})`, 'i');
-      return { id: t.id, label: t.en, terms: t.terms, ids: reviews.filter((r) => re.test(r.text)).map((r) => r.reviewId) };
+      return { id: t.id, label: t[locale], terms: t.terms, ids: reviews.filter((r) => re.test(r.text)).map((r) => r.reviewId) };
     })
     .filter((f) => f.ids.length > 1);
 }

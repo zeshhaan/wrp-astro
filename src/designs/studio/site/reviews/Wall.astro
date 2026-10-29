@@ -5,12 +5,9 @@
  * and marks its words in them; the cards reshuffle with a view transition
  * where the browser has one and motion is welcome.
  *
- * The filter is a native radio group, so it works by keyboard (arrow keys)
- * and screen readers without help; a polite status line says how many
- * reviews are showing. `look` only changes how the group is drawn:
- *  - 'gear': an H-pattern gear gate, the red knob on the chosen gear
- *  - 'stickers': tilted stickers with counts
- *  - 'chips': square toggles
+ * The filter is a native radio group drawn as tilted stickers with counts,
+ * so it works by keyboard (arrow keys) and screen readers without help; a
+ * polite status line says how many reviews are showing.
  */
 import type { Review } from '@/lib/reviews';
 import { t, type Locale } from '@/i18n/translations';
@@ -23,16 +20,15 @@ interface Props {
   filters: ReviewFilter[];
   locale?: Locale;
   limit?: number;
-  look?: 'gear' | 'stickers' | 'chips';
   /** The radio group's name for screen readers. */
   legend: string;
   allLabel: string;
   tone?: 'white' | 'paper';
 }
 
-const { reviews, filters, locale = 'en', limit = 12, look = 'chips', legend, allLabel, tone = 'white' } = Astro.props;
+const { reviews, filters, locale = 'en', limit = 12, legend, allLabel, tone = 'white' } = Astro.props;
 const num = (n: number) => n.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en');
-const group = `wall-${look}`;
+const group = 'wall-filter';
 const options = [{ id: '', label: allLabel, ids: reviews.map((r) => r.reviewId), terms: undefined as string | undefined }, ...filters];
 const status =
   locale === 'ar'
@@ -40,7 +36,7 @@ const status =
     : { one: 'Showing {n} review', many: 'Showing {n} reviews' };
 ---
 
-<div class:list={['wl', `wl--${look}`]} data-wall data-limit={limit} data-status-one={status.one} data-status-many={status.many}>
+<div class="wl" data-wall data-limit={limit} data-status-one={status.one} data-status-many={status.many}>
   <fieldset class="wl__set">
     <legend class="visually-hidden">{legend}</legend>
     <div class="wl__opts">
@@ -56,11 +52,6 @@ const status =
               data-ids={o.ids.join(' ')}
               data-terms={o.terms}
             />
-            {look === 'gear' && (
-              <span class="wl__gear" aria-hidden="true">
-                {num(i + 1)}
-              </span>
-            )}
             <span class="wl__text">
               <span class="wl__label">{o.label}</span>
               <span class="wl__count">
@@ -78,7 +69,7 @@ const status =
   <ul class="wall" role="list">
     {
       reviews.map((r, i) => (
-        <li class="wall__item" data-id={r.reviewId} data-more-review={i >= limit ? '' : undefined} hidden={i >= limit} style={`view-transition-name: rv-${look}-${i}`}>
+        <li class="wall__item" data-id={r.reviewId} data-more-review={i >= limit ? '' : undefined} hidden={i >= limit} style={`view-transition-name: rv-${i}`}>
           <ReviewCard review={r} locale={locale} max={250} tone={tone} />
         </li>
       ))
@@ -222,26 +213,11 @@ const status =
     outline-offset: 3px;
   }
 
-  /* Chips: square toggles, ink when chosen. */
-  .wl--chips .wl__opt {
-    border: 1.5px solid var(--st-ink);
-    background: transparent;
-    color: var(--st-ink);
-    transition: background-color 0.15s, color 0.15s;
-  }
-  .wl--chips .wl__opt:hover {
-    background: color-mix(in srgb, var(--st-ink) 8%, transparent);
-  }
-  .wl--chips .wl__opt:has(:checked) {
-    background: var(--st-ink);
-    color: var(--st-white);
-  }
-
   /* Stickers: tilted labels that straighten and turn red when picked. */
-  .wl--stickers .wl__opts {
+  .wl .wl__opts {
     gap: 0.75rem 0.6rem;
   }
-  .wl--stickers .wl__opt {
+  .wl .wl__opt {
     --tilt: calc((mod(var(--i), 3) - 1) * 2.5deg);
     rotate: var(--tilt);
     border: 2px solid var(--st-ink);
@@ -251,12 +227,12 @@ const status =
     box-shadow: 4px 4px 0 var(--st-ink);
     transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), translate 0.2s, box-shadow 0.2s, background-color 0.15s;
   }
-  .wl--stickers .wl__opt:hover {
+  .wl .wl__opt:hover {
     rotate: 0deg;
     translate: -2px -2px;
     box-shadow: 6px 6px 0 var(--st-ink);
   }
-  .wl--stickers .wl__opt:has(:checked) {
+  .wl .wl__opt:has(:checked) {
     rotate: 0deg;
     translate: 2px 2px;
     background: var(--st-red);
@@ -264,7 +240,7 @@ const status =
     color: var(--st-white);
     box-shadow: 2px 2px 0 var(--st-ink);
   }
-  .wl--stickers .wl__count {
+  .wl .wl__count {
     display: grid;
     place-items: center;
     min-inline-size: 1.5rem;
@@ -272,112 +248,6 @@ const status =
     padding-inline: 0.3rem;
     background: var(--st-ink);
     color: var(--st-white);
-  }
-
-  /* Gear gate: an H pattern. Gears sit at the ends of the slots, odd ones on
-     top; the chosen one gets the red knob. */
-  .wl--gear .wl__opts {
-    position: relative;
-    display: grid;
-    grid-auto-flow: column;
-    grid-template-rows: auto auto;
-    justify-content: center;
-    gap: 3.25rem 0;
-    inline-size: fit-content;
-    margin-inline: auto;
-    padding: 1.5rem 0.5rem;
-    background: var(--st-black);
-    color: var(--st-white);
-    --st-accent: var(--st-white); /* dark surface */
-  }
-  .wl--gear .wl__opts::before {
-    /* the cross slot */
-    content: '';
-    position: absolute;
-    inset-inline: 3.5rem;
-    inset-block-start: 50%;
-    block-size: 6px;
-    translate: 0 -50%;
-    background: var(--st-line-dark);
-  }
-  .wl--gear .wl__opt {
-    flex-direction: column-reverse;
-    justify-content: flex-start;
-    gap: 0.6rem;
-    inline-size: 7rem;
-    padding: 0 0.25rem;
-    text-align: center;
-    font-size: 0.8125rem;
-  }
-  .wl--gear .wl__opt:nth-child(even) {
-    flex-direction: column;
-  }
-  .wl--gear .wl__label + .wl__count {
-    margin-inline-start: 0.35rem;
-  }
-  .wl--gear .wl__text {
-    display: block;
-  }
-  .wl--gear .wl__gear::after {
-    /* the slot from this gear to the cross bar */
-    content: '';
-    position: absolute;
-    inset-inline-start: 50%;
-    inline-size: 6px;
-    block-size: calc(1.625rem + 5px);
-    translate: -50% 0;
-    background: var(--st-line-dark);
-  }
-  .wl--gear .wl__opt:nth-child(odd) .wl__gear::after {
-    inset-block-start: 100%;
-  }
-  .wl--gear .wl__opt:nth-child(even) .wl__gear::after {
-    inset-block-end: 100%;
-  }
-  .wl--gear .wl__gear {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border: 2px solid var(--st-line-dark);
-    border-radius: 50%;
-    background: var(--st-coal);
-    font-size: 1.25rem;
-    font-weight: 600;
-    transition: background-color 0.2s, border-color 0.2s, scale 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
-  }
-  .wl--gear .wl__opt:hover .wl__gear {
-    border-color: var(--st-white);
-  }
-  .wl--gear .wl__opt:has(:checked) .wl__gear {
-    background: var(--st-red);
-    border-color: var(--st-white);
-    scale: 1.15;
-    box-shadow: 0 0 0 6px rgb(212 20 28 / 0.25);
-  }
-  .wl--gear .wl__opt:has(:checked) .wl__label {
-    color: var(--st-white);
-  }
-  .wl--gear .wl__label {
-    color: var(--st-on-dark);
-  }
-  .wl--gear .wl__count {
-    color: var(--st-mute);
-  }
-  @media (max-width: 40rem) {
-    .wl--gear .wl__opt {
-      inline-size: 4.4rem;
-      font-size: 0.6875rem;
-    }
-    .wl--gear .wl__gear {
-      inline-size: 2.4rem;
-      block-size: 2.4rem;
-    }
-    .wl--gear .wl__opts::before {
-      inset-inline: 2.2rem;
-    }
   }
 
   .wall {
@@ -423,8 +293,7 @@ const status =
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .wl__opt,
-    .wl--gear .wl__gear {
+    .wl__opt {
       transition: none;
     }
     .wl :global(mark.wl-hit) {

@@ -1,6 +1,7 @@
 ---
 /**
- * Concept B, Word of mouth: the customers do the talking.
+ * The Studio reviews page's body ("Word of mouth", picked by Shereef on
+ * 29 Oct 2026 from three concepts): the customers do the talking.
  * Their own lines are stuck around the title like stickers (pick one up and
  * move it with a mouse; Tidy up puts them back), the reviews roll past in
  * huge type, customer photos are pinned up as Polaroids that open into the
@@ -16,7 +17,7 @@ import { localizeUrl } from '@/i18n/utils';
 import ReviewCard from '../sections/ReviewCard.astro';
 import ReviewScript from '../sections/ReviewScript.astro';
 import Icon from '../../Icon.astro';
-import Marquee from './Marquee.astro';
+import Ticker from './Ticker.astro';
 import Wall from './Wall.astro';
 import GoogleG from './GoogleG.astro';
 import { reviewsPage, topicFilters, stickers, pullLine } from './data';
@@ -30,14 +31,26 @@ const { locale = 'en', link } = Astro.props;
 const d = reviewsPage(locale);
 const { num } = d;
 const lines = stickers();
-const words = {
-  tidy: 'Tidy up',
-  stickers: 'Things customers said',
-  open: (name: string) => `Read ${name}’s review`,
-  close: 'Close',
-  filter: 'Show reviews that mention',
-  all: 'Everything',
-};
+const words =
+  locale === 'ar'
+    ? {
+        tidy: 'رتّبها',
+        stickers: 'من كلام عملائنا',
+        open: (name: string) => `اقرأ تقييم ${name}`,
+        close: 'إغلاق',
+        filter: 'اعرض التقييمات التي تذكر',
+        all: 'الكل',
+        stars: '٥ من ٥ نجوم',
+      }
+    : {
+        tidy: 'Tidy up',
+        stickers: 'Things customers said',
+        open: (name: string) => `Read ${name}’s review`,
+        close: 'Close',
+        filter: 'Show reviews that mention',
+        all: 'Everything',
+        stars: '5 out of 5 stars',
+      };
 ---
 
 <section class="wm st-white" data-wm>
@@ -45,7 +58,7 @@ const words = {
     <p class="wm__rating">
       <GoogleG size={28} />
       <span class="wm__score">{num(d.business.rating.toFixed(1))}</span>
-      <span class="wm__stars" role="img" aria-label="5 out of 5 stars">{Array.from({ length: 5 }, () => <Icon name="star" size={20} />)}</span>
+      <span class="wm__stars" role="img" aria-label={words.stars}>{Array.from({ length: 5 }, () => <Icon name="star" size={20} />)}</span>
     </p>
     <h1 class="wm__title">{t(locale, 'reviews.whatClientsSay')}</h1>
     <p class="wm__count">{num(d.displayCount)} {t(locale, 'reviews.verifiedOnGoogle')}</p>
@@ -71,7 +84,7 @@ const words = {
   </div>
 </section>
 
-<Marquee rows={d.rows} locale={locale} look="type" class="st-black" />
+<Ticker reviews={d.marquee} locale={locale} class="st-black" />
 
 {
   d.withImages.length > 0 && (
@@ -115,7 +128,7 @@ const words = {
       <h2 class="st-h2">{t(locale, 'reviews.allReviews')}</h2>
       <p class="st-intro">{t(locale, 'reviews.everyReview')}</p>
     </header>
-    <Wall reviews={d.textOnly} filters={topicFilters(d.textOnly)} locale={locale} look="stickers" legend={words.filter} allLabel={words.all} tone="paper" />
+    <Wall reviews={d.textOnly} filters={topicFilters(d.textOnly, locale)} locale={locale} legend={words.filter} allLabel={words.all} tone="paper" />
   </div>
 </section>
 
@@ -231,6 +244,11 @@ const words = {
     line-height: 0.88;
     text-transform: uppercase;
     letter-spacing: -0.01em;
+  }
+  /* Arabic: the title is short in words but wide, so break it over two lines too. */
+  :global(:lang(ar)) .wm__title {
+    max-inline-size: 5.5em;
+    line-height: 1.15;
   }
   .wm__count {
     font-size: 1.125rem;

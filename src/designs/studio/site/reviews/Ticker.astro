@@ -1,0 +1,237 @@
+---
+/**
+ * Two rows of the customers' own lines in huge type, drifting in opposite
+ * directions without end. Scrolling the page gives them a push: they speed up
+ * with the scroll and turn round when you scroll back up, then settle to a
+ * drift again.
+ *
+ * Moving content needs a way to stop it: the pause button stops both rows, as
+ * does pointing at them or tabbing into them. With reduced motion nothing
+ * moves; the rows scroll sideways by hand.
+ */
+import type { Review } from '@/lib/reviews';
+import { t, type Locale } from '@/i18n/translations';
+import Icon from '../../Icon.astro';
+import { pullLine } from './data';
+
+interface Props {
+  reviews: Review[];
+  locale?: Locale;
+  class?: string;
+}
+
+const { reviews, locale = 'en', class: className } = Astro.props;
+// Twenty lines short enough to show whole, split between the two rows. More
+// would only make each row a very long strip for the browser to move.
+const lines = reviews.filter((r) => !pullLine(r, 60).endsWith('…')).slice(0, 20);
+const half = Math.ceil(lines.length / 2);
+const rows = [lines.slice(0, half), lines.slice(half)];
+// A toggle with one label: pressed means paused.
+const pauseLabel = locale === 'ar' ? 'إيقاف حركة التقييمات' : 'Pause the scrolling reviews';
+---
+
+<section class:list={['tk', className]} aria-label={t(locale, 'reviews.scrollingLabel')} data-ticker>
+  {
+    rows.map((row, i) => (
+      <div class="tk__row" data-dir={i === 0 ? '1' : '-1'}>
+        <div class="tk__belt" data-belt>
+          {[0, 1].map((copy) => (
+            <ul class="tk__track" role="list" aria-hidden={copy === 1 ? 'true' : undefined} inert={copy === 1}>
+              {row.map((r) => (
+                <li class="tk__line">
+                  <q dir="auto">{pullLine(r, 60)}</q>
+                  <span class="tk__who">{r.reviewerName}</span>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+  <button type="button" class="tk__toggle" aria-pressed="false" data-ticker-toggle>
+    <span class="tk__pause"><Icon name="pause" size={18} /></span>
+    <span class="tk__play"><Icon name="play" size={18} /></span>
+    <span class="visually-hidden">{pauseLabel}</span>
+  </button>
+</section>
+
+<script>
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+  for (const tk of document.querySelectorAll<HTMLElement>('[data-ticker]')) {
+    const btn = tk.querySelector<HTMLButtonElement>('[data-ticker-toggle]')!;
+    const rtl = getComputedStyle(tk).direction === 'rtl';
+    const rows = [...tk.querySelectorAll<HTMLElement>('.tk__row')].map((row) => ({
+      dir: Number(row.dataset.dir),
+      belt: row.querySelector<HTMLElement>('[data-belt]')!,
+      track: row.querySelector<HTMLElement>('.tk__track')!,
+      x: 0,
+    }));
+
+    let paused = false;
+    let held = false;
+    let onScreen = false;
+    let push = 0; // extra speed from scrolling, px per second; its sign is the scroll direction
+    let lastY = scrollY;
+    let last = 0;
+    let frame = 0;
+
+    const drift = 45; // px per second
+    const tick = (now: number) => {
+      frame = 0;
+      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+      last = now;
+      // The push fades out; a scroll up turns the rows round while it lasts.
+      push *= Math.pow(0.04, dt);
+      const speed = paused || held ? 0 : drift + push * 0.9;
+      for (const r of rows) {
+        const w = r.track.offsetWidth;
+        if (!w) continue;
+        r.x = (((r.x - r.dir * speed * dt) % w) - w) % w; // always in (-w, 0]
+        r.belt.style.transform = `translate3d(${rtl ? -r.x : r.x}px, 0, 0)`;
+      }
+      if (onScreen && !still.matches) frame = requestAnimationFrame(tick);
+    };
+    const start = () => {
+      if (!frame && onScreen && !still.matches) {
+        last = 0;
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    // Start the second row half way along, so the rows never line up.
+    rows[1] && (rows[1].x = -rows[1].track.offsetWidth / 2);
+
+    new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      start();
+    }).observe(tk);
+    addEventListener(
+      'scroll',
+      () => {
+        const dy = scrollY - lastY;
+        lastY = scrollY;
+        if (onScreen) push = Math.max(-1600, Math.min(1600, push + dy * 6));
+      },
+      { passive: true },
+    );
+    tk.addEventListener('pointerenter', (e) => (held = e.pointerType === 'mouse'));
+    tk.addEventListener('pointerleave', () => (held = false));
+    tk.addEventListener('focusin', () => (held = true));
+    tk.addEventListener('focusout', () => (held = false));
+    btn.addEventListener('click', () => {
+      paused = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(paused));
+      tk.toggleAttribute('data-paused', paused);
+    });
+    still.addEventListener('change', () => {
+      for (const r of rows) r.belt.style.transform = '';
+      start();
+    });
+  }
+</script>
+
+<style>
+  .tk {
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 2.5rem 4.25rem;
+    overflow: hidden;
+  }
+  .tk__row {
+    overflow: hidden;
+  }
+  .tk__belt {
+    display: flex;
+    inline-size: max-content;
+    will-change: transform;
+  }
+  .tk__track {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .tk__line {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex: none;
+    padding-inline-end: 3rem;
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tk__line q {
+    font-size: clamp(2.25rem, 1.5rem + 3.5vw, 4.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    quotes: '“' '”';
+  }
+  /* Every other line is outlined. */
+  .tk__line:nth-child(even) q {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--st-white);
+  }
+  .tk__line::after {
+    content: '';
+    align-self: center;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    margin-inline-start: 2rem;
+    background: var(--st-red);
+    rotate: 45deg;
+  }
+  .tk__who {
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    color: var(--st-mute);
+  }
+
+  .tk__toggle {
+    position: absolute;
+    inset-block-end: 0.75rem;
+    inset-inline-end: var(--st-gutter-x);
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1.5px solid rgb(255 255 255 / 0.6);
+    background: var(--st-black);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .tk__toggle:hover {
+    border-color: var(--st-white);
+  }
+  .tk__play,
+  .tk[data-paused] .tk__pause {
+    display: none;
+  }
+  .tk[data-paused] .tk__play {
+    display: block;
+  }
+
+  /* No motion: the rows scroll sideways by hand instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .tk {
+      padding-block-end: 2.5rem;
+    }
+    .tk__row {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-inline: var(--st-gutter-x);
+    }
+    .tk__track[aria-hidden] {
+      display: none;
+    }
+    .tk__line {
+      scroll-snap-align: start;
+    }
+    .tk__toggle {
+      display: none;
+    }
+  }
+</style>
