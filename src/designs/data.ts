@@ -6,7 +6,7 @@
  * the lounge details from verified Google reviews (data/google-reviews.json).
  * Where a service has no published starting price we say so rather than invent one.
  */
-import { getBusiness } from '@/lib/reviews';
+import { getBusiness, getDisplayCount } from '@/lib/reviews';
 
 // Contact links go through WRP's dub.sh short links, as on the live site, so
 // clicks are counted in Dub and analytics (src/components/Analytics.astro).
@@ -73,7 +73,7 @@ export const services: Service[] = [
     name: 'Ceramic Coating',
     short: 'Ceramic',
     line: 'A hard, hydrophobic glass layer that keeps the gloss and makes every wash easier.',
-    from: 999,
+    from: 1399,
     time: '1–2 days',
     minutes: 24 * 60,
     facts: ['9H hardness', 'Water beads and rolls off', '2–7 year warranty'],
@@ -213,18 +213,18 @@ export const lounge = {
 
 const business = getBusiness();
 /**
- * Live Google Maps figures, read 27 Sep 2026: 5.0 from 130 reviews (TinyFish
- * read of the listing; Firecrawl's newest-60 pull agrees, all 5-star).
- * data/google-reviews.json is the older February scrape (68 reviews).
- * "120+" stays as the display so the copy doesn't date as reviews arrive.
+ * Live Google Maps figures, read 29 Oct 2026 via Firecrawl Maps: 5.0 from 134
+ * reviews, the newest 60 all 5-star. The count lives in data/google-reviews.json
+ * (shared with the live site), and the display rounds down ("130+") so it
+ * never overstates.
  * Google's topic chips: professional team 23, car detailing 12, attention to
  * work 9, interior cleaning 7, window tint 5, detailed wash 4, polite team 4,
  * clear explanations 3, ceramic coating 2, showroom shine 2.
  */
 export const proof = {
   rating: business.rating.toFixed(1),
-  reviewCount: 130,
-  reviewCountDisplay: '120+',
+  reviewCount: business.totalReviews,
+  reviewCountDisplay: getDisplayCount(),
   reviewsUrl: '/reviews/',
   films: [
     { name: 'Avery Dennison', logo: '/logos/avery-dennison.png' },
