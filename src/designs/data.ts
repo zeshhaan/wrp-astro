@@ -72,7 +72,7 @@ export const services: Service[] = [
     href: '/services/ceramic-coating/',
     name: 'Ceramic Coating',
     short: 'Ceramic',
-    line: 'A hard, hydrophobic glass layer that keeps the gloss and makes every wash easier.',
+    line: 'Our borophene coating: a hard, hydrophobic layer that keeps the gloss and makes every wash easier.',
     from: 1399,
     time: '1–2 days',
     minutes: 24 * 60,
