@@ -145,41 +145,41 @@ const fresh = (author: string, service: string): Review => {
 };
 
 export const reviews: Review[] = [
-  fresh('Siddik Akbar', 'Paint protection film'),
+  fresh('arun prasad', 'Matte STEK PPF, Golf GTI'),
+  fresh('xiii adventures', 'Level 2 detailing'),
   {
     text: 'The team kept me updated throughout the process with pictures and videos, and the workmanship is truly amazing. Car was delivered exactly on the promised time.',
     author: 'Leno Thomas',
     service: 'Ceramic coating, FJ Cruiser',
   },
-  fresh('Aadithya Dhanesh', 'Detailing'),
+  fresh('Ciby Koshy', 'STEK DYNOshield PPF, Jaecoo J7'),
   {
     text: 'They matched the PPF exactly with the same quality and finish as the existing film on the car, and the result is seamless — it blends in like factory installation with excellent attention to detail.',
     author: 'DhaneshKumar KV',
     service: 'PPF re-install & floor mats',
   },
+  fresh('Ashik Mubarak', 'Detailing'),
+  fresh('Siddik Akbar', 'Paint protection film'),
+  fresh('Salwa Shaikh', 'Window tinting'),
   fresh('A Khalid', 'Wrap: matte black bonnet & spoiler'),
   {
     text: 'The seat stitching quality is flawless and looks factory-finished. The full car detailing was done to perfection, and the engine compartment cleaning was incredibly thorough and professionally handled.',
     author: 'Abhi Urs',
     service: 'Upholstery & detailing',
   },
+  fresh('Shamim J Mahal', 'Bonnet paint repair & polish'),
   {
     text: 'The shine after the polish was unreal, and the interior looked cleaner than the day I bought it. They kept me updated, delivered on time, and didn’t try to push any unnecessary extras.',
     author: 'Ameena Shajahan',
     service: 'Polish & detailing',
   },
-  fresh('Muhammad Nadir', 'Interior detailing & wash'),
+  fresh('Kevin S', 'PPF, tint & floor mats'),
   {
     text: 'I choose avery dennison ppf for my car The team explained everything clearly and delivered on time. My car looks brand new and so easy to maintain now.',
     author: 'Salim Sali',
     service: 'PPF & window tint',
   },
-  {
-    text: 'The interior now looks and smells brand new, and I can see my reflection in the exterior paint.',
-    author: 'Azhar Pallikkal',
-    service: 'Interior detailing, Altima',
-  },
-  fresh('James Daniel', 'Detailing & ceramic, Tesla Model 3'),
+  fresh('Aadithya Dhanesh', 'Detailing'),
 ];
 
 /** Why choose WRP: each point is backed by what customers wrote. */
