@@ -24,7 +24,7 @@ export type Catalog = {
   ppf: {
     presets: { id: string; name: string; panels: PanelId[]; partial?: PanelId[]; note: string; features: string[] }[];
     facts: string[];
-    films: { name: string; logo: string }[];
+    films: { name: string; logo: string; lines: string[]; finishes?: string }[];
     ceramicOnFilm: string;
   };
   ceramic: { packages: { id: string; name: string; features: string[] }[]; facts: string[] };

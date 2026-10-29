@@ -226,10 +226,12 @@ export const proof = {
   reviewCount: business.totalReviews,
   reviewCountDisplay: getDisplayCount(),
   reviewsUrl: '/reviews/',
+  // The films WRP fits, as confirmed by the owner on 2026-10-29, spelled as the
+  // makers spell them. Supreme Defense is Avery Dennison's, never list it under STEK.
   films: [
-    { name: 'Avery Dennison', logo: '/logos/avery-dennison.png' },
-    { name: 'STEK', logo: '/logos/stek.png' },
-  ],
+    { name: 'Avery Dennison', logo: '/logos/avery-dennison.png', lines: ['Supreme Defense'] },
+    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
+  ] as { name: string; logo: string; lines: string[]; finishes?: string }[],
 };
 
 export type Quote = { text: string; author: string; service?: string; photo?: string };
