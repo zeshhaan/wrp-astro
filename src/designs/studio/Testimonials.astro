@@ -102,6 +102,8 @@ import { proof, reviews } from './content';
     gap: 0.5rem;
   }
   .navbtn {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     display: inline-grid;
     place-items: center;
     inline-size: 3rem;
@@ -113,8 +115,7 @@ import { proof, reviews } from './content';
     transition: background-color 0.2s;
   }
   .navbtn:hover:not(:disabled) {
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-ink-2);
   }
   .navbtn:disabled {
     background: var(--st-line-light);
@@ -127,7 +128,7 @@ import { proof, reviews } from './content';
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--st-gutter-x);
     scrollbar-width: thin;
-    scrollbar-color: var(--st-gold-deep) transparent;
+    scrollbar-color: var(--st-accent-deep) transparent;
     padding-block-end: 1rem;
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -136,7 +137,7 @@ import { proof, reviews } from './content';
     }
   }
   .track:focus-visible {
-    outline: 3px solid var(--st-gold-deep);
+    outline: 3px solid var(--st-accent-deep);
     outline-offset: -3px;
   }
   .track__list {
@@ -160,12 +161,12 @@ import { proof, reviews } from './content';
     inline-size: 100%;
     padding: 1.5rem 1.5rem 1.25rem;
     background: var(--st-paper);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .review__stars {
     display: inline-flex;
     gap: 2px;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .review blockquote {
     margin: 0;

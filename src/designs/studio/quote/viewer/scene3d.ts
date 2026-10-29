@@ -41,7 +41,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { bodyTypes, panels, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';
 
-const BRASS = '#c9a45c';
+const FILM = '#ed1c24'; // YACO red marks the film
+const NEUTRAL_LIGHT = '#dfe3ea';
 const DEFAULT_PAINT = '#7d8288';
 const FACTORY_VLT = 70;
 const PANEL_IDS = new Set<string>(panels.map((p) => p.id));
@@ -146,7 +147,7 @@ export async function createViewer(el: HTMLElement, initial: CarViewerOptions, e
   const hemi = new HemisphereLight(0xffffff, 0x202226, 0.5);
   const key = new DirectionalLight(0xffffff, 1.1);
   key.position.set(2, 8, 3);
-  const rim = new DirectionalLight(new Color(BRASS), 0.8);
+  const rim = new DirectionalLight(new Color(NEUTRAL_LIGHT), 0.8);
   rim.position.set(-6, 2.5, -4);
   scene.add(hemi, key, rim);
 
@@ -764,14 +765,14 @@ function setGlass(mat: MeshPhysicalMaterial, vlt: number) {
 }
 
 /**
- * The PPF "film": additive brass sheen, strongest at grazing angles (like a
+ * The PPF "film": additive red sheen, strongest at grazing angles (like a
  * film edge catching light) plus a faint face tint, so the paint colour still
  * reads through. Partial coverage is striped. `flash` is the tap feedback.
  */
 function makeFilmMaterial(): ShaderMaterial {
   return new ShaderMaterial({
     uniforms: {
-      color: { value: new Color(BRASS) },
+      color: { value: new Color(FILM) },
       amount: { value: 0 },
       flash: { value: 0 },
       striped: { value: 0 },
@@ -814,7 +815,7 @@ function makeFilmMaterial(): ShaderMaterial {
 
 /**
  * A dark photo studio as the reflection environment: charcoal walls, a large
- * overhead softbox, two tall strip lights and a low brass kicker. Paint and
+ * overhead softbox, two tall strip lights and a low kicker. Paint and
  * glass pick up long clean highlight lines instead of a bright room.
  */
 function makeStudioEnvironment() {
@@ -848,7 +849,7 @@ function makeStudioEnvironment() {
   const front = panel(8, 1.2, 0xf2f4f8, 2.2);
   front.position.set(13, 6, 0);
   front.rotation.y = -Math.PI / 2;
-  const kick = panel(10, 0.8, 0xc9a45c, 2.5);
+  const kick = panel(10, 0.8, 0xdfe3ea, 2.5);
   kick.position.set(-13, 1.6, 0);
   kick.rotation.y = Math.PI / 2;
   const floor = panel(30, 30, 0x0c0d0f, 1);

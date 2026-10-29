@@ -169,7 +169,7 @@ const joinLine =
     <div class="st-wrap end__inner">
       <h2 class="st-h2">{t(locale, 'reviews.readyDifference')}</h2>
       <p class="end__text">{joinLine}</p>
-      <a class="st-btn st-btn--gold" href={link(localizeUrl('/contact-us/', locale))}>
+      <a class="st-btn st-btn--primary" href={link(localizeUrl('/contact-us/', locale))}>
         {t(locale, 'home.hero.getQuote')}
         <Icon name="arrow-right" size={18} class="flip" />
       </a>
@@ -191,7 +191,7 @@ const joinLine =
   .rh {
     padding-block: 9rem 4.5rem;
     background:
-      radial-gradient(ellipse at 50% 0%, rgb(201 164 92 / 0.16), transparent 60%),
+      radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / 0.16), transparent 60%),
       var(--st-black);
     text-align: center;
   }
@@ -214,7 +214,7 @@ const joinLine =
   .rh__stars {
     display: inline-flex;
     gap: 3px;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rh__title {
     font-family: var(--st-head-font);
@@ -249,7 +249,7 @@ const joinLine =
     font-weight: 600;
     font-size: 2rem;
     line-height: 1;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rh__stats dt {
     font-size: 0.75rem;

@@ -95,12 +95,14 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     padding: 1.5rem;
     background: var(--st-paper);
     color: var(--st-ink);
-    border-block-end: 3px solid var(--st-gold);
+    border-block-end: 3px solid var(--st-accent);
   }
   .rv--white {
     background: var(--st-white);
   }
   .rv--dark {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     background: var(--st-card-dark);
     color: var(--st-white);
   }
@@ -133,10 +135,10 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
   .rv__stars {
     display: inline-flex;
     gap: 2px;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .rv--dark .rv__stars {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rv__date {
     font-size: 0.8125rem;
@@ -151,7 +153,7 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     line-height: 1.6;
   }
   .rv__text :global(mark) {
-    background: color-mix(in srgb, var(--st-gold) 35%, transparent);
+    background: color-mix(in srgb, var(--st-accent) 35%, transparent);
     color: inherit;
     padding-inline: 0.1em;
   }
@@ -164,11 +166,11 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
     cursor: pointer;
   }
   .rv--dark .rv__more {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rv__who {
     display: flex;
@@ -177,6 +179,8 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     margin-block-start: auto;
   }
   .rv__avatar {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     display: grid;
     place-items: center;

@@ -176,11 +176,13 @@ const w =
 
   /* Dialog */
   .cd {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     inline-size: min(28rem, calc(100vw - 2rem));
     max-block-size: calc(100dvh - 2rem);
     padding: 0;
     border: 1px solid var(--st-line-dark);
-    border-block-start: 3px solid var(--st-gold);
+    border-block-start: 3px solid var(--st-accent);
     border-radius: 0;
     background: var(--st-coal);
     color: var(--st-on-dark);
@@ -242,13 +244,13 @@ const w =
     block-size: 4rem;
     margin-block-end: 0.6rem;
     border-radius: 50%;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
   }
   .cd__ring {
     position: absolute;
     inset: 0;
-    border: 2px solid var(--st-gold);
+    border: 2px solid var(--st-accent);
     border-radius: 50%;
     opacity: 0;
     animation: cd-wave 2.4s ease-out infinite;
@@ -280,7 +282,7 @@ const w =
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--st-white);
-    background: rgb(201 164 92 / 0.08);
+    background: rgb(255 255 255 / 0.08);
     border-block-end: 1px solid var(--st-line-dark);
   }
   .cd__dot {
@@ -318,7 +320,7 @@ const w =
   .cd__stars {
     display: inline-flex;
     gap: 2px;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .cd__actions {
     display: grid;
@@ -345,12 +347,14 @@ const w =
     background: #3ee07b;
   }
   .cd__opt--call {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     background: var(--st-black);
     color: var(--st-white);
     border: 1px solid var(--st-line-dark);
   }
   .cd__opt--call:hover {
-    border-color: var(--st-gold);
+    border-color: var(--st-accent);
   }
   .cd__optico {
     display: grid;
@@ -362,8 +366,8 @@ const w =
     background: rgb(12 13 15 / 0.12);
   }
   .cd__opt--call .cd__optico {
-    background: rgb(201 164 92 / 0.12);
-    color: var(--st-gold);
+    background: rgb(255 255 255 / 0.12);
+    color: var(--st-accent);
   }
   .cd__opttext {
     display: grid;

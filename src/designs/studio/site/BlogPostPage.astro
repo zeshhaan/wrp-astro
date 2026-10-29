@@ -190,6 +190,8 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
 
 <style>
   .bp__head {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -235,8 +237,8 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
   }
   .bp__cat {
     padding: 0.2rem 0.6rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-family: var(--st-head-font);
     font-weight: 500;
     text-transform: uppercase;
@@ -278,7 +280,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     margin-block-end: 2.5rem;
     padding: 1.5rem;
     background: var(--st-paper);
-    border-inline-start: 4px solid var(--st-gold);
+    border-inline-start: 4px solid var(--st-accent);
     font-size: 0.9375rem;
     color: var(--st-ink-2);
   }
@@ -287,7 +289,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .bp__trust-note {
     color: var(--st-ink);
@@ -364,12 +366,12 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     color: var(--st-ink);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: var(--st-gold);
+    text-decoration-color: var(--st-accent);
     text-decoration-thickness: 2px;
     text-underline-offset: 4px;
   }
   .bp__content :global(a:hover) {
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .bp__content :global(strong) {
     font-weight: 600;
@@ -393,7 +395,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     inset-block-start: 0.7em;
     inline-size: 6px;
     block-size: 6px;
-    background: var(--st-gold);
+    background: var(--st-accent);
   }
   .bp__content :global(ol) {
     counter-reset: bp;
@@ -404,6 +406,8 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     counter-increment: bp;
   }
   .bp__content :global(ol > li)::before {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     content: counter(bp);
     position: absolute;
     inset-inline-start: 0;
@@ -413,7 +417,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     inline-size: 1.6rem;
     block-size: 1.6rem;
     background: var(--st-black);
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-family: var(--st-head-font);
     font-size: 0.85rem;
   }
@@ -424,7 +428,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     margin-inline: 0;
     padding: 1.25rem 1.5rem;
     background: var(--st-paper);
-    border-inline-start: 4px solid var(--st-gold);
+    border-inline-start: 4px solid var(--st-accent);
   }
   .bp__content :global(blockquote p) {
     color: var(--st-ink);
@@ -464,6 +468,8 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
     }
   }
   .bp__content :global(thead) {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     background: var(--st-black);
   }
   .bp__content :global(th) {

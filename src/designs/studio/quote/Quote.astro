@@ -105,12 +105,12 @@ const catalog = await buildCatalog();
             <span class="q-bar__count" data-q-count>Nothing chosen yet</span>
             <span class="q-bar__total" data-q-total>Start with your car</span>
           </button>
-          <button type="button" class="st-btn st-btn--gold q-bar__next" data-q-next>
+          <button type="button" class="st-btn st-btn--primary q-bar__next" data-q-next>
             <span data-q-next-label>Next</span>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
           </button>
           <div class="q-bar__send" data-q-send-actions hidden>
-            <a class="st-btn st-btn--gold q-bar__wa" data-q-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener">
+            <a class="st-btn st-btn--primary q-bar__wa" data-q-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener">
               <QIcon name="whatsapp" size={20} />Send on WhatsApp
             </a>
             <button type="submit" form="q-send-form" class="st-btn st-btn--light q-bar__submit">Send request</button>

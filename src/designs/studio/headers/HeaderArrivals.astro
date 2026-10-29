@@ -113,8 +113,8 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     inset-block-start: -4rem;
     z-index: 100;
     padding: 0.75rem 1rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-weight: 600;
   }
   .skip:focus {
@@ -199,7 +199,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     inset-inline: 0.85rem;
     inset-block-end: 0.5rem;
     block-size: 1px;
-    background: var(--st-gold);
+    background: var(--st-accent);
     transform: scaleX(0);
     transition: transform 0.2s ease;
   }
@@ -315,7 +315,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     grid-area: num;
     align-self: start;
     padding-block-start: 0.2rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-family: var(--st-head-font);
     font-size: 0.6875rem;
   }
@@ -338,7 +338,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
     transition: color 0.2s ease;
   }
   .ab-cell:hover .ab-cell__name {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .ab-cell:hover .ab-cell__price {
     color: var(--st-on-dark);
@@ -374,7 +374,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
         translate 0.3s ease;
     }
     .ab-rail__label {
-      color: var(--st-gold);
+      color: var(--st-accent);
       font-family: var(--ab-font);
       font-size: 0.75rem;
       letter-spacing: 0.2em;
@@ -408,8 +408,8 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
       gap: 0.5rem;
       margin-inline-start: 1.25rem;
       padding-inline: 1.25rem 1rem;
-      background: var(--st-gold);
-      color: var(--st-black);
+      background: var(--st-red);
+      color: var(--st-white);
       font-family: var(--ab-font);
       font-size: 0.9375rem;
       font-weight: 500;
@@ -419,7 +419,7 @@ const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
       white-space: nowrap;
     }
     .ab-rail__quote:hover {
-      background: #dcbb78;
+      background: var(--st-red-hover);
     }
   }
   @media (min-width: 64rem) and (max-width: 80rem) {

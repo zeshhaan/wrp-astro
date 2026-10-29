@@ -106,6 +106,8 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
     text-align: center;
   }
   .rq__photos {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
@@ -134,7 +136,7 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
   .rq__stars {
     display: inline-flex;
     gap: 2px;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .rq__quote {
     font-family: var(--st-head-font);

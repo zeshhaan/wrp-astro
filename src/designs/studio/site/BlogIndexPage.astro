@@ -210,6 +210,8 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
 
 <style>
   .bh {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding-block: 8.5rem 3rem;
     background: var(--st-black);
   }
@@ -243,7 +245,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
   .ft__label::before,
   .ft__label::after {
@@ -292,9 +294,11 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     color: var(--st-ink-2);
   }
   .ft__cat {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     padding: 0.2rem 0.55rem;
     background: var(--st-black);
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-family: var(--st-head-font);
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -318,7 +322,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     font-family: var(--st-head-font);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--st-gold-deep);
+    color: var(--st-accent-deep);
   }
 
   .bl__filters {
@@ -340,12 +344,12 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     cursor: pointer;
   }
   .bl__filter:hover {
-    border-color: var(--st-gold);
+    border-color: var(--st-accent);
   }
   .bl__filter[aria-pressed='true'] {
-    background: var(--st-gold);
-    border-color: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    border-color: var(--st-accent);
+    color: var(--st-on-accent);
   }
   .bl__grid {
     display: grid;
@@ -356,6 +360,8 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     list-style: none;
   }
   .bl__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     display: grid;
     align-content: end;
@@ -401,7 +407,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     font-family: var(--st-head-font);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .bl__title {
     font-family: var(--st-head-font);
@@ -435,10 +441,10 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-size: 0.9375rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .bl__card:focus-within {
-    outline: 3px solid var(--st-gold);
+    outline: 3px solid var(--st-accent);
     outline-offset: 3px;
   }
   .bl__empty {

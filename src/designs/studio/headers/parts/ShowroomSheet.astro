@@ -59,7 +59,7 @@ const w = nav.words;
     </ul>
   </nav>
   <div class="sr-sheet__actions">
-    <a class="st-btn st-btn--gold" href={quoteHref}>{w.quote}</a>
+    <a class="st-btn st-btn--primary" href={quoteHref}>{w.quote}</a>
     <button type="button" class="st-btn st-btn--light" data-contact-modal data-sr-close-first><Icon name="whatsapp" />{w.whatsapp}</button>
     <p class="sr-sheet__meta">
       <a href={nav.phone.href}><Icon name="phone" size={16} /><bdo dir="ltr">{nav.phone.display}</bdo></a>
@@ -154,7 +154,7 @@ const w = nav.words;
   }
   .sr-sheet__label {
     margin: 1.5rem var(--st-pad) 0.75rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -213,7 +213,7 @@ const w = nav.words;
     text-transform: var(--sr-case);
   }
   .sr-card__price {
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-size: 0.8125rem;
   }
   .sr-sheet__links {
@@ -236,7 +236,7 @@ const w = nav.words;
     text-decoration: none;
   }
   .sr-sheet__links :global(.sr-sheet__arrow) {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-sheet__actions {
     display: grid;
@@ -259,7 +259,7 @@ const w = nav.words;
     text-decoration: none;
   }
   .sr-sheet__meta :global(svg) {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-sheet__hours {
     color: var(--st-mute);

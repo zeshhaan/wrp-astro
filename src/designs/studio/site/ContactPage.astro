@@ -109,6 +109,8 @@ const Heading = copy.headingTag;
 
 <style>
   .ct {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -187,7 +189,7 @@ const Heading = copy.headingTag;
     inline-size: 2.75rem;
     block-size: 2.75rem;
     border: 1px solid var(--st-line-dark);
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .ct__list a {
     color: var(--st-white);
@@ -195,7 +197,7 @@ const Heading = copy.headingTag;
     font-size: 1.0625rem;
   }
   .ct__list a:hover {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-only {
     position: absolute;

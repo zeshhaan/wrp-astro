@@ -124,6 +124,8 @@ const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
     }
   }
   .wg__tile {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
     position: relative;
     display: block;
     inline-size: 100%;
@@ -202,8 +204,8 @@ const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
     cursor: pointer;
   }
   .wg__btn:hover {
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
   }
   .wg__close {
     inset-block-start: 0.75rem;

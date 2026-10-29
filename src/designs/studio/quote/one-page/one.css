@@ -13,7 +13,7 @@
   padding-block: 1.5rem 1rem;
 }
 .qo-eyebrow {
-  color: var(--st-gold);
+  color: var(--st-accent);
   font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -33,7 +33,7 @@
   font-size: 0.95rem;
 }
 .qo-lede a {
-  color: var(--st-gold);
+  color: var(--st-accent);
 }
 
 /* Configure: stage + panel */
@@ -61,7 +61,7 @@
   block-size: var(--qo-stage-h);
 }
 .qo-viewer :is(canvas, svg):focus-visible {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: -4px;
 }
 .qo-views {
@@ -82,9 +82,9 @@
   cursor: pointer;
 }
 .qo-view[aria-pressed='true'] {
-  border-color: var(--st-gold);
+  border-color: var(--st-accent);
   color: var(--st-paper);
-  background: #2a2418;
+  background: #26282c;
 }
 .qo-stage__hint {
   position: absolute;
@@ -143,8 +143,8 @@
   inline-size: 1.6rem;
   block-size: 1.6rem;
   border-radius: 50%;
-  border: 1px solid var(--st-gold);
-  color: var(--st-gold);
+  border: 1px solid var(--st-accent);
+  color: var(--st-accent);
   font-size: 0.8rem;
   font-family: var(--st-body-font);
   letter-spacing: 0;
@@ -213,15 +213,15 @@
   color: #7c8289;
 }
 .qo-body:has(input:checked) {
-  border-color: var(--st-gold);
-  background: #2a2418;
+  border-color: var(--st-accent);
+  background: #26282c;
 }
 .qo-body:has(input:checked) img,
 .qo-body:hover img {
   opacity: 1;
 }
 .qo-body:has(input:focus-visible) {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: 2px;
 }
 
@@ -256,12 +256,12 @@
   font-size: 0.75rem;
 }
 .qo-chip input:checked + span {
-  border-color: var(--st-gold);
+  border-color: var(--st-accent);
   color: var(--st-paper);
-  background: #2a2418;
+  background: #26282c;
 }
 .qo-chip input:focus-visible + span {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: 2px;
 }
 .qo-chip[data-disabled] > span {
@@ -310,7 +310,7 @@
   font-weight: 500;
 }
 .qo-opt__price {
-  color: var(--st-gold);
+  color: var(--st-accent);
   font-family: var(--st-head-font);
   font-size: 0.95rem;
   white-space: nowrap;
@@ -330,23 +330,23 @@
   flex: none;
 }
 .qo-opt:has(input:checked) {
-  border-color: var(--st-gold);
-  background: #2a2418;
+  border-color: var(--st-accent);
+  background: #26282c;
 }
 .qo-opt:has(input:checked) .qo-opt__tick {
-  background: var(--st-gold);
-  border-color: var(--st-gold);
+  background: var(--st-accent);
+  border-color: var(--st-accent);
   color: var(--st-black);
 }
 .qo-opt:has(input:focus-visible) {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: 2px;
 }
 
 /* Panel list */
 .qo-more summary {
   cursor: pointer;
-  color: var(--st-gold);
+  color: var(--st-accent);
   font-size: 0.85rem;
   padding-block: 0.4rem;
 }
@@ -394,7 +394,7 @@
   flex: none;
 }
 .qo-toggle a {
-  color: var(--st-gold);
+  color: var(--st-accent);
 }
 
 /* Text inputs */
@@ -432,7 +432,7 @@
   inline-size: 100%;
 }
 .qo-input :is(input, select, textarea):focus-visible {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: 1px;
 }
 .qo-input [aria-invalid='true'] {
@@ -483,11 +483,11 @@
   font-weight: 600;
 }
 .qo-day input:checked + span {
-  border-color: var(--st-gold);
-  background: #2a2418;
+  border-color: var(--st-accent);
+  background: #26282c;
 }
 .qo-day input:focus-visible + span {
-  outline: 2px solid var(--st-gold);
+  outline: 2px solid var(--st-accent);
   outline-offset: 2px;
 }
 .qo-day[data-disabled] > span {
@@ -531,7 +531,7 @@
   font-size: 0.78rem;
 }
 .qo-sum__price {
-  color: var(--st-gold);
+  color: var(--st-accent);
   font-size: 0.85rem;
   text-align: end;
   white-space: nowrap;
@@ -548,7 +548,7 @@
   font-weight: 500;
   font-size: clamp(1.3rem, 5vw, 1.6rem);
   white-space: nowrap;
-  color: var(--st-gold);
+  color: var(--st-accent);
 }
 .qo-problems {
   border: 1px solid var(--q-err);
@@ -577,7 +577,7 @@
   color: var(--st-mute);
 }
 .qo-done {
-  border: 1px solid var(--st-gold);
+  border: 1px solid var(--st-accent);
   border-radius: 10px;
   padding: 0.9rem 1rem;
   display: grid;
@@ -590,14 +590,14 @@
   font-family: var(--st-head-font);
   text-transform: uppercase;
   font-size: 1.2rem;
-  color: var(--st-gold);
+  color: var(--st-accent);
 }
 .qo-textbtn {
   justify-self: start;
   background: none;
   border: 0;
   padding: 0;
-  color: var(--st-gold);
+  color: var(--st-accent);
   text-decoration: underline;
   cursor: pointer;
   font: inherit;
@@ -631,7 +631,7 @@
 }
 .qo-bar__total {
   font-family: var(--st-head-font);
-  color: var(--st-gold);
+  color: var(--st-accent);
   font-size: 1.15rem;
 }
 .qo-bar__go {
@@ -675,7 +675,7 @@
   }
   .qo-mini__total {
     font-family: var(--st-head-font);
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-size: 1.35rem;
   }
   .qo-sec {

@@ -108,7 +108,7 @@ const first = nav.services[0];
         </ul>
       </nav>
 
-      <a class="st-btn st-btn--gold sr-cta" href={quoteHref}>{w.quote}</a>
+      <a class="st-btn st-btn--primary sr-cta" href={quoteHref}>{w.quote}</a>
       <button class="sr-menu" type="button" commandfor="sr-sheet" command="show-modal" aria-controls="sr-sheet">
         <Icon name="menu" size={24} />
         <span class="visually-hidden">{w.menu}</span>
@@ -184,8 +184,8 @@ const first = nav.services[0];
     inset-block-start: -4rem;
     z-index: 100;
     padding: 0.75rem 1rem;
-    background: var(--st-gold);
-    color: var(--st-black);
+    background: var(--st-accent);
+    color: var(--st-on-accent);
     font-weight: 600;
   }
   .skip:focus {
@@ -242,7 +242,7 @@ const first = nav.services[0];
   }
   .sr-strip__stars {
     gap: 1px !important;
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-strip__stars :global(svg) {
     fill: currentColor;
@@ -256,7 +256,7 @@ const first = nav.services[0];
     list-style: none;
   }
   .sr-strip__list :global(svg) {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-strip__lang {
     min-block-size: 2.5rem;
@@ -348,7 +348,7 @@ const first = nav.services[0];
     inset-inline: 0.75rem;
     inset-block-end: 1.4rem;
     block-size: 2px;
-    background: var(--st-gold);
+    background: var(--st-accent);
     transform: scaleX(0);
     transition: transform 0.2s ease;
   }
@@ -435,7 +435,7 @@ const first = nav.services[0];
   }
   .sr-mega__item :global(.sr-arrow) {
     grid-area: arrow;
-    color: var(--st-gold);
+    color: var(--st-accent);
     opacity: 0;
     translate: -0.4rem 0;
     transition:
@@ -443,7 +443,7 @@ const first = nav.services[0];
       translate 0.2s ease;
   }
   .sr-mega__item[aria-current] .sr-mega__name {
-    color: var(--st-gold);
+    color: var(--st-accent);
   }
   .sr-mega__item[aria-current] :global(.sr-arrow) {
     opacity: 1;
@@ -500,7 +500,7 @@ const first = nav.services[0];
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    color: var(--st-gold);
+    color: var(--st-accent);
     font-size: 0.8125rem;
   }
   .sr-mega__talk {
