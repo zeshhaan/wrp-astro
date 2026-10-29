@@ -16,6 +16,7 @@
     if (status) {
       status.hidden = false;
       status.textContent =
+        status.dataset.demoMessage ??
         'Design preview: this form is not connected yet. It will post to the live enquiry API when the redesign goes live.';
     }
   });

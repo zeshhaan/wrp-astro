@@ -57,7 +57,7 @@ export function startHeroVideo() {
   btn.addEventListener('click', () => {
     userPaused = !userPaused;
     btn.setAttribute('aria-pressed', String(userPaused));
-    btn.querySelector('[data-hero-pause-label]')!.textContent = userPaused ? 'Play background video' : 'Pause background video';
+    btn.querySelector('[data-hero-pause-label]')!.textContent = (userPaused ? btn.dataset.play : btn.dataset.pause) ?? '';
     if (userPaused) video.pause();
     else play();
   });

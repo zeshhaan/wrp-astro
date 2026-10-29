@@ -2,25 +2,47 @@
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { aboutChecklist } from './content';
+import { aboutChecklistAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'عن WRP',
+      title: 'استوديو دبي الأول لحماية الطلاء والعناية بالسيارات',
+      p1: 'WRP اختصار لـ Wrap وReinforce وProtect: غلّف، عزّز، احمِ. في استوديونا بمنطقة القصيص الصناعية ١، يركّب فنيونا المعتمدون أفلام حماية الطلاء من STEK وAvery Dennison، ويطبّقون طلاءات السيراميك بصلابة 9H، ويصحّحون الطلاء، ويظلّلون النوافذ، ويخيطون المقاعد، ويصنعون دواسات الأرضية، ويغسلون السيارات يدوياً، وكل ذلك تحت سقف واحد.',
+      p2: 'نشرح لك الخيارات ونعطيك سعراً واضحاً قبل أن نبدأ، ثم نرسل لك صوراً وفيديوهات وسيارتك عندنا. وعندما نحدد لك موعد التسليم، تكون سيارتك جاهزة في ذلك الموعد.',
+      list: aboutChecklistAr,
+      more: 'المزيد عن WRP',
+      alt: 'فنيان من WRP يعملان على كبوت لكزس سوداء أمام جدار شعار WRP',
+    }
+  : {
+      eyebrow: 'About WRP',
+      title: 'Dubai’s premier paint protection & car detailing studio',
+      p1: 'WRP stands for Wrap, Reinforce, Protect. From our studio in Al Qusais Industrial Area 1, our certified technicians fit STEK and Avery Dennison paint protection film, apply 9H ceramic coatings, correct paint, tint windows, stitch seats, make floor mats and wash cars by hand, all under one roof.',
+      p2: 'We explain the options and give you a clear price before we start, then send photos and videos while your car is in the bay. When we give you a completion time, your car is ready at that time.',
+      list: aboutChecklist,
+      more: 'More about WRP',
+      alt: 'Two WRP detailers working on the bonnet of a black Lexus in front of the WRP logo wall',
+    };
 ---
 
 <section class="about st-section st-light" id="about" aria-labelledby="about-title">
   <div class="st-wrap about__grid">
     <div class="about__text">
-      <p class="st-eyebrow st-eyebrow--dark">About WRP</p>
-      <h2 id="about-title" class="st-h2">Dubai’s premier paint protection &amp; car detailing studio</h2>
-      <p>
-        WRP stands for Wrap, Reinforce, Protect. From our studio in Al Qusais Industrial Area 1, our certified
-        technicians fit STEK and Avery Dennison paint protection film, apply 9H ceramic coatings, correct paint, tint
-        windows, stitch seats, make floor mats and wash cars by hand, all under one roof.
-      </p>
-      <p>
-        We explain the options and give you a clear price before we start, then send photos and videos while your
-        car is in the bay. When we give you a completion time, your car is ready at that time.
-      </p>
+      <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+      <h2 id="about-title" class="st-h2">{w.title}</h2>
+      <p>{w.p1}</p>
+      <p>{w.p2}</p>
       <ul class="about__list" role="list">
         {
-          aboutChecklist.map((item) => (
+          w.list.map((item) => (
             <li>
               <span class="about__tick">
                 <Icon name="check" size={16} />
@@ -30,12 +52,12 @@ import { aboutChecklist } from './content';
           ))
         }
       </ul>
-      <a class="st-btn st-btn--dark" href="/more-about-wrp/">More about WRP</a>
+      <a class="st-btn st-btn--dark" href={link('/more-about-wrp/')}>{w.more}</a>
     </div>
     <figure class="about__media">
       <Picture
         base="/portfolio/team-detailing-black-lexus-hood"
-        alt="Two WRP detailers working on the bonnet of a black Lexus in front of the WRP logo wall"
+        alt={w.alt}
         sizes="(min-width: 60rem) 40vw, 100vw"
         width={1200}
         height={1680}

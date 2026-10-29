@@ -1,17 +1,28 @@
 ---
 import Icon from './Icon.astro';
 import { contact, whatsappQuote } from './content';
+import { whatsappQuote as whatsappQuoteAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const w =
+  locale === 'ar'
+    ? { follow: 'تابع أعمالنا على إنستغرام', instagram: 'إنستغرام', whatsapp: 'واتساب', whatsappHref: whatsappQuoteAr }
+    : { follow: 'Follow the work on Instagram', instagram: 'Instagram', whatsapp: 'WhatsApp', whatsappHref: whatsappQuote };
 ---
 
 <section class="social" aria-labelledby="social-title">
   <div class="st-wrap social__inner">
-    <h2 id="social-title" class="social__title">Follow the work on Instagram {contact.instagramHandle}</h2>
+    <h2 id="social-title" class="social__title">{w.follow} <span dir="ltr">{contact.instagramHandle}</span></h2>
     <ul class="social__links" role="list">
       <li>
-        <a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />Instagram</a>
+        <a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{w.instagram}</a>
       </li>
       <li>
-        <a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a>
+        <a href={w.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />{w.whatsapp}</a>
       </li>
     </ul>
   </div>

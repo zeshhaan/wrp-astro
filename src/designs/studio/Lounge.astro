@@ -3,9 +3,34 @@ import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { lounge } from '../data';
 import { loungeList } from './content';
+import { loungeListAr, loungePhotoAr, loungeQuoteAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
 
-const photo = lounge.photos[0];
-const quote = lounge.quotes[0];
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const w =
+  locale === 'ar'
+    ? {
+        photo: loungePhotoAr,
+        eyebrow: 'أثناء الانتظار',
+        title: 'صالة WRP',
+        text: 'تنتظر في الاستوديو؟ صالتنا في الطابق العلوي تطل على ورش العمل من خلف جدار زجاجي. خذ قهوة أو كرك، شغّل المباراة، أو العب جولة بلياردو بينما نعتني بسيارتك في الأسفل.',
+        list: loungeListAr,
+        quote: `«${loungeQuoteAr.text}»`,
+        cite: `${loungeQuoteAr.author}، مراجعة على Google (مترجمة)`,
+      }
+    : {
+        photo: lounge.photos[0],
+        eyebrow: 'While you wait',
+        title: 'The WRP Lounge',
+        text: 'Waiting at the studio? Our mezzanine lounge looks down on the detailing bays through a glass wall. Grab a coffee or karak, put the match on, or play a frame of billiards while we work on your car below.',
+        list: loungeList,
+        quote: `“${lounge.quotes[0].text}”`,
+        cite: `${lounge.quotes[0].author}, Google review`,
+      };
+const photo = w.photo;
 ---
 
 <section class="lounge st-section st-dark" id="lounge" aria-labelledby="lounge-title">
@@ -15,15 +40,12 @@ const quote = lounge.quotes[0];
       <figcaption>{photo.caption}</figcaption>
     </figure>
     <div class="lounge__text">
-      <p class="st-eyebrow">While you wait</p>
-      <h2 id="lounge-title" class="st-h2">The WRP Lounge</h2>
-      <p>
-        Waiting at the studio? Our mezzanine lounge looks down on the detailing bays through a glass wall. Grab a
-        coffee or karak, put the match on, or play a frame of billiards while we work on your car below.
-      </p>
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="lounge-title" class="st-h2">{w.title}</h2>
+      <p>{w.text}</p>
       <ul class="lounge__list" role="list">
         {
-          loungeList.map((item) => (
+          w.list.map((item) => (
             <li>
               <Icon name="check" size={16} />
               {item}
@@ -32,8 +54,8 @@ const quote = lounge.quotes[0];
         }
       </ul>
       <blockquote class="lounge__quote">
-        <p>“{quote.text}”</p>
-        <footer>{quote.author}, Google review</footer>
+        <p>{w.quote}</p>
+        <footer>{w.cite}</footer>
       </blockquote>
     </div>
   </div>

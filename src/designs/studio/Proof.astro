@@ -2,6 +2,39 @@
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { proof, stats, whatsappQuote } from './content';
+import { statsAr, whatsappQuote as whatsappQuoteAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const w =
+  locale === 'ar'
+    ? {
+        alt: 'غرفة المواد في WRP مع علب أفلام STEK وعينات جلد المقاعد ودواسات الأرضية',
+        caption: 'غرفة المواد: عينات الأفلام والجلود والدواسات تراها بنفسك قبل أن تختار.',
+        eyebrow: 'الأفلام والضمانات',
+        title: 'حماية تثق بها',
+        text: 'نركّب أفلام حماية طلاء ذاتية الإصلاح من علامتين عالميتين، STEK وAvery Dennison، بضمان يصل إلى ١٠ سنوات. زُر استوديونا في القصيص لترى عينات الأفلام وتلمسها بنفسك قبل أن تختار.',
+        films: 'علامات الأفلام',
+        stats: statsAr,
+        quote: 'احصل على عرض سعر سريع',
+        whatsapp: 'راسلنا على واتساب',
+        whatsappHref: whatsappQuoteAr,
+      }
+    : {
+        alt: 'WRP materials room with STEK film boxes, leather seat samples and floor mat samples',
+        caption: 'The materials room: film, leather and mat samples you can see before you choose.',
+        eyebrow: 'Films and warranties',
+        title: 'Protection you can trust',
+        text: 'We fit self-healing paint protection film from two global brands, STEK and Avery Dennison, with up to a 10-year warranty. Visit our Al Qusais studio to see and feel the film samples before you choose.',
+        films: 'Film brands',
+        stats,
+        quote: 'Get a quick quote',
+        whatsapp: 'WhatsApp us',
+        whatsappHref: whatsappQuote,
+      };
 ---
 
 <section class="proof st-section st-dark" aria-labelledby="proof-title">
@@ -9,19 +42,16 @@ import { proof, stats, whatsappQuote } from './content';
     <figure class="proof__media">
       <Picture
         base="/review-images/venkat_k_3"
-        alt="WRP materials room with STEK film boxes, leather seat samples and floor mat samples"
+        alt={w.alt}
         sizes="(min-width: 60rem) 45vw, 100vw"
       />
-      <figcaption>The materials room: film, leather and mat samples you can see before you choose.</figcaption>
+      <figcaption>{w.caption}</figcaption>
     </figure>
     <div class="proof__text">
-      <p class="st-eyebrow">Films and warranties</p>
-      <h2 id="proof-title" class="st-h2">Protection you can trust</h2>
-      <p>
-        We fit self-healing paint protection film from two global brands, STEK and Avery Dennison, with up to a
-        10-year warranty. Visit our Al Qusais studio to see and feel the film samples before you choose.
-      </p>
-      <ul class="films" role="list" aria-label="Film brands">
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="proof-title" class="st-h2">{w.title}</h2>
+      <p>{w.text}</p>
+      <ul class="films" role="list" aria-label={w.films}>
         {
           proof.films.map((f) => (
             <li>
@@ -32,7 +62,7 @@ import { proof, stats, whatsappQuote } from './content';
       </ul>
       <dl class="stats">
         {
-          stats.map((s) => (
+          w.stats.map((s) => (
             <div class="stat">
               <dt>{s.label}</dt>
               <dd>{s.value}</dd>
@@ -41,8 +71,8 @@ import { proof, stats, whatsappQuote } from './content';
         }
       </dl>
       <div class="proof__actions">
-        <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">Get a quick quote</a>
-        <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+        <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">{w.quote}</a>
+        <a class="st-btn st-btn--light" href={w.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" />{w.whatsapp}</a>
       </div>
     </div>
   </div>
@@ -114,6 +144,10 @@ import { proof, stats, whatsappQuote } from './content';
     font-size: 2.25rem;
     line-height: 1;
     color: var(--st-white);
+  }
+  .stat dd:lang(ar) {
+    font-size: 1.75rem;
+    white-space: nowrap;
   }
   .stat dt {
     font-family: var(--st-head-font);

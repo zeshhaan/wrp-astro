@@ -4,12 +4,26 @@ import Picture from '../shared/Picture.astro';
 import { scrimStops } from '../shared/easedGradient';
 import Icon from './Icon.astro';
 import { blogIds } from './content';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? { eyebrow: 'من المدونة', title: 'أدلة ونصائح', all: 'كل المقالات', read: 'اقرأ الدليل' }
+  : { eyebrow: 'From the blog', title: 'Guides and advice', all: 'All articles', read: 'Read the guide' };
 
 const all = await getCollection('blog');
+// Arabic pages show the Arabic translation of each post (src/content/blog/ar/), where there is one.
 const posts = blogIds
-  .map((id) => all.find((p) => p.id === id))
+  .map((id) => (ar && all.find((p) => p.id === `ar/${id}`)) || all.find((p) => p.id === id))
   .filter((p): p is NonNullable<typeof p> => Boolean(p));
-const fmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const postHref = (id: string) => link(`/blog/${id.replace(/^ar\//, '')}/`);
+const fmt = new Intl.DateTimeFormat(ar ? 'ar-AE-u-nu-arab' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 /** '/foo.jpg' → '/foo' for the pre-optimised variants (Picture adds -480w.avif etc.). */
 const coverBase = (src: string) => src.replace(/\.(jpe?g|png|webp)$/i, '');
 // Eased scrim: clear over the top of the photo, dark under the text.
@@ -22,10 +36,10 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
       <div class="st-wrap">
         <div class="blog__head">
           <header class="st-head">
-            <p class="st-eyebrow st-eyebrow--dark">From the blog</p>
-            <h2 id="blog-title" class="st-h2">Guides and advice</h2>
+            <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+            <h2 id="blog-title" class="st-h2">{w.title}</h2>
           </header>
-          <a class="st-btn st-btn--dark" href="/blog/">All articles</a>
+          <a class="st-btn st-btn--dark" href={link('/blog/')}>{w.all}</a>
         </div>
         <ul class="posts" role="list">
           {posts.map((p) => {
@@ -47,11 +61,11 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
                   <time datetime={date.toISOString().slice(0, 10)}>{fmt.format(date)}</time>
                 </p>
                 <h3 class="post__title">
-                  <a href={`/blog/${p.id}/`}>{p.data.title}</a>
+                  <a href={postHref(p.id)}>{p.data.title}</a>
                 </h3>
                 <p class="post__desc">{p.data.description}</p>
                 <span class="post__more" aria-hidden="true">
-                  Read the guide <Icon name="arrow-right" size={16} />
+                  {w.read} <Icon name="arrow-right" size={16} class="flip" />
                 </span>
               </li>
             );

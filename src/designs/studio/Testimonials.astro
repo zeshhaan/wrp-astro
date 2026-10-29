@@ -1,46 +1,76 @@
 ---
 import Icon from './Icon.astro';
 import { proof, reviews } from './content';
+import { rating, reviewCount, reviewsAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'ماذا يقول عملاؤنا',
+      title: 'آراء عملائنا',
+      intro: `<strong>${rating}</strong> على Google من ${reviewCount} تقييم. هذه كلماتهم كما كتبوها بالإنجليزية، من دون تعديل.`,
+      prev: 'المراجعات السابقة',
+      next: 'المراجعات التالية',
+      region: 'مراجعات العملاء، مرّر جانبياً لرؤية المزيد',
+      stars: 'تقييم ٥ من ٥ نجوم',
+      reviews: reviewsAr,
+      more: 'اقرأ المزيد من المراجعات',
+    }
+  : {
+      eyebrow: 'What our customers say',
+      title: 'Client testimonials',
+      intro: `<strong>${proof.rating}</strong> on Google from ${proof.reviewCountDisplay} reviews. These are their words, unedited.`,
+      prev: 'Previous reviews',
+      next: 'Next reviews',
+      region: 'Customer reviews, scroll sideways for more',
+      stars: '5 out of 5 stars',
+      reviews,
+      more: 'Read more reviews',
+    };
 ---
 
 <section class="reviews st-section st-white" id="reviews" aria-labelledby="reviews-title">
   <div class="st-wrap">
     <div class="reviews__head">
       <header class="st-head">
-        <p class="st-eyebrow st-eyebrow--dark">What our customers say</p>
-        <h2 id="reviews-title" class="st-h2">Client testimonials</h2>
-        <p class="st-intro">
-          <strong>{proof.rating}</strong> on Google from {proof.reviewCountDisplay} reviews. These are their words,
-          unedited.
-        </p>
+        <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+        <h2 id="reviews-title" class="st-h2">{w.title}</h2>
+        <p class="st-intro" set:html={w.intro} />
       </header>
       <div class="reviews__nav">
         <button class="navbtn" type="button" data-prev aria-controls="review-track">
-          <Icon name="arrow-left" size={22} />
-          <span class="visually-hidden">Previous reviews</span>
+          <Icon name="arrow-left" size={22} class="flip" />
+          <span class="visually-hidden">{w.prev}</span>
         </button>
         <button class="navbtn" type="button" data-next aria-controls="review-track">
-          <Icon name="arrow-right" size={22} />
-          <span class="visually-hidden">Next reviews</span>
+          <Icon name="arrow-right" size={22} class="flip" />
+          <span class="visually-hidden">{w.next}</span>
         </button>
       </div>
     </div>
   </div>
 
-  <div class="track" id="review-track" tabindex="0" role="region" aria-label="Customer reviews, scroll sideways for more" data-track>
+  <div class="track" id="review-track" tabindex="0" role="region" aria-label={w.region} data-track>
     <ul class="track__list" role="list">
       {
-        reviews.map((r) => (
+        w.reviews.map((r) => (
           <li class="review">
             <figure>
-              <span class="review__stars" role="img" aria-label="5 out of 5 stars">
+              <span class="review__stars" role="img" aria-label={w.stars}>
                 {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
               </span>
-              <blockquote>
+              <blockquote lang="en" dir="ltr">
                 <p>{r.text}</p>
               </blockquote>
               <figcaption>
-                <span class="review__name">{r.author}</span>
+                <span class="review__name" dir="auto">{r.author}</span>
                 <span class="review__service">{r.service}</span>
               </figcaption>
             </figure>
@@ -51,7 +81,7 @@ import { proof, reviews } from './content';
   </div>
 
   <div class="st-wrap reviews__foot">
-    <a class="st-btn st-btn--dark" href={proof.reviewsUrl}>Read more reviews</a>
+    <a class="st-btn st-btn--dark" href={link(proof.reviewsUrl)}>{w.more}</a>
   </div>
 </section>
 
@@ -68,13 +98,16 @@ import { proof, reviews } from './content';
       const gap = parseFloat(getComputedStyle(track.querySelector('ul')!).columnGap) || 0;
       return card ? card.offsetWidth + gap : track.clientWidth * 0.8;
     };
+    // Right to left, scrollLeft runs from 0 down to negative values and "next" is leftwards.
+    const sign = getComputedStyle(track).direction === 'rtl' ? -1 : 1;
     const update = () => {
       const max = track.scrollWidth - track.clientWidth - 2;
-      prev.disabled = track.scrollLeft <= 2;
-      next.disabled = track.scrollLeft >= max;
+      const at = Math.abs(track.scrollLeft);
+      prev.disabled = at <= 2;
+      next.disabled = at >= max;
     };
-    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'auto' }));
-    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'auto' }));
+    prev.addEventListener('click', () => track.scrollBy({ left: -sign * step(), behavior: 'auto' }));
+    next.addEventListener('click', () => track.scrollBy({ left: sign * step(), behavior: 'auto' }));
     if ('onscrollend' in window) track.addEventListener('scrollend', update);
     else {
       let t = 0;

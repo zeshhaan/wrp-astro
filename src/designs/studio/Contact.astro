@@ -3,84 +3,154 @@ import Picture from '../shared/Picture.astro';
 import DemoForms from '../shared/DemoForms.astro';
 import Icon from './Icon.astro';
 import { contact, serviceOptions, whatsappQuote } from './content';
+import { phone, serviceOptionsAr, whatsappQuote as whatsappQuoteAr } from './contentAr';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const w =
+  locale === 'ar'
+    ? {
+        eyebrow: 'تواصل معنا',
+        title: 'احصل على عرض سعر سريع',
+        lede: 'أرسل لنا نوع سيارتك والخدمة التي تريدها، وسنعود إليك بالسعر والموعد عبر الهاتف أو البريد الإلكتروني أو واتساب، كما تفضّل.',
+        whatsapp: 'واتساب',
+        message: 'راسلنا على واتساب',
+        whatsappHref: whatsappQuoteAr,
+        call: 'اتصل',
+        phone,
+        email: 'البريد الإلكتروني',
+        studio: 'الاستوديو',
+        address: `${t(locale, 'home.contact.address1')}، ${t(locale, 'home.contact.address2')}`,
+        hoursLabel: 'ساعات العمل',
+        hours: 'من السبت إلى الخميس، من ٩:٠٠ صباحاً حتى ٩:٣٠ مساءً. الجمعة مغلق.',
+        mapAlt: 'داخل استوديو WRP، القصيص الصناعية ١',
+        map: 'افتح في خرائط Google',
+        formTitle: 'أخبرنا عن سيارتك',
+        name: 'الاسم',
+        tel: 'رقم الهاتف',
+        optional: '(اختياري)',
+        vehicle: 'نوع السيارة والموديل والسنة',
+        vehicleHint: 'مثال: تويوتا لاندكروزر 2022',
+        service: 'الخدمة',
+        choose: 'اختر خدمة',
+        options: serviceOptionsAr,
+        notes: 'هل هناك ما يجب أن نعرفه؟',
+        notesHint: 'مساحة التغطية، الموعد المناسب، اللون، الخدوش أو الأضرار الحالية',
+        submit: 'أرسل طلب عرض السعر',
+        chat: 'تفضّل المحادثة؟',
+        instead: 'بدلاً من ذلك.',
+        demo: 'معاينة تصميم: هذا النموذج غير متصل بعد. سيُرسَل إلى نظام الطلبات عند إطلاق التصميم الجديد.',
+      }
+    : {
+        eyebrow: 'Contact us',
+        title: 'Get a quick quote',
+        lede: 'Send us your car and the service you want, and we will come back to you with a price and a time by phone, email or WhatsApp, whichever you prefer.',
+        whatsapp: 'WhatsApp',
+        message: 'Message us on WhatsApp',
+        whatsappHref: whatsappQuote,
+        call: 'Call',
+        phone: contact.phoneDisplay,
+        email: 'Email',
+        studio: 'Studio',
+        address: contact.address.join(', '),
+        hoursLabel: 'Hours',
+        hours: `${contact.hours}. ${contact.closed}.`,
+        mapAlt: 'Inside the WRP studio, Al Qusais Industrial Area 1',
+        map: 'Open in Google Maps',
+        formTitle: 'Tell us about your car',
+        name: 'Name',
+        tel: 'Phone',
+        optional: '(optional)',
+        vehicle: 'Vehicle make, model, year',
+        vehicleHint: 'e.g. Toyota Land Cruiser 2022',
+        service: 'Service',
+        choose: 'Choose a service',
+        options: serviceOptions,
+        notes: 'Anything else we should know?',
+        notesHint: 'Coverage, timing, colour, current marks or damage',
+        submit: 'Send my quote request',
+        chat: 'Prefer to chat?',
+        instead: 'instead.',
+        demo: undefined,
+      };
 ---
 
 <DemoForms />
 <section class="contact st-section st-black" id="contact" aria-labelledby="contact-title">
   <div class="st-wrap contact__grid">
     <div class="contact__info">
-      <p class="st-eyebrow">Contact us</p>
-      <h2 id="contact-title" class="st-h2">Get a quick quote</h2>
-      <p class="contact__lede">
-        Send us your car and the service you want, and we will come back to you with a price and a time by phone,
-        email or WhatsApp, whichever you prefer.
-      </p>
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="contact-title" class="st-h2">{w.title}</h2>
+      <p class="contact__lede">{w.lede}</p>
       <ul class="details" role="list">
         <li>
           <Icon name="whatsapp" />
-          <div><span class="details__label">WhatsApp</span><a href={whatsappQuote} target="_blank" rel="noopener">Message us on WhatsApp</a></div>
+          <div><span class="details__label">{w.whatsapp}</span><a href={w.whatsappHref} target="_blank" rel="noopener">{w.message}</a></div>
         </li>
         <li>
           <Icon name="phone" />
-          <div><span class="details__label">Call</span><a href={contact.phoneHref}>{contact.phoneDisplay}</a></div>
+          <div><span class="details__label">{w.call}</span><a href={contact.phoneHref} dir="ltr">{w.phone}</a></div>
         </li>
         <li>
           <Icon name="mail" />
-          <div><span class="details__label">Email</span><a href={contact.emailHref}>{contact.email}</a></div>
+          <div><span class="details__label">{w.email}</span><a href={contact.emailHref}>{contact.email}</a></div>
         </li>
         <li>
           <Icon name="pin" />
-          <div><span class="details__label">Studio</span><span>{contact.address.join(', ')}</span></div>
+          <div><span class="details__label">{w.studio}</span><span>{w.address}</span></div>
         </li>
         <li>
           <Icon name="clock" />
-          <div><span class="details__label">Hours</span><span>{contact.hours}. {contact.closed}.</span></div>
+          <div><span class="details__label">{w.hoursLabel}</span><span>{w.hours}</span></div>
         </li>
       </ul>
       <a class="mapcard" href={contact.mapsUrl} target="_blank" rel="noopener">
         <Picture
           base="/review-images/tariq_murad_3"
-          alt="Inside the WRP studio, Al Qusais Industrial Area 1"
+          alt={w.mapAlt}
           sizes="(min-width: 60rem) 40vw, 100vw"
         />
-        <span class="mapcard__label"><Icon name="map" size={18} />Open in Google Maps</span>
+        <span class="mapcard__label"><Icon name="map" size={18} />{w.map}</span>
       </a>
     </div>
 
     <form class="form" id="quote" data-demo-form aria-labelledby="form-title">
-      <h3 id="form-title" class="form__title">Tell us about your car</h3>
+      <h3 id="form-title" class="form__title">{w.formTitle}</h3>
       <div class="form__grid">
         <label class="field">
-          <span>Name</span>
+          <span>{w.name}</span>
           <input name="name" type="text" autocomplete="name" required />
         </label>
         <label class="field">
-          <span>Phone</span>
+          <span>{w.tel}</span>
           <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
         </label>
         <label class="field">
-          <span>Email <small>(optional)</small></span>
+          <span>{w.email} <small>{w.optional}</small></span>
           <input name="email" type="email" autocomplete="email" />
         </label>
         <label class="field">
-          <span>Vehicle make, model, year</span>
-          <input name="vehicle" type="text" placeholder="e.g. Toyota Land Cruiser 2022" required />
+          <span>{w.vehicle}</span>
+          <input name="vehicle" type="text" placeholder={w.vehicleHint} required />
         </label>
         <label class="field field--wide">
-          <span>Service</span>
+          <span>{w.service}</span>
           <select name="service" required>
-            <option value="">Choose a service</option>
-            {serviceOptions.map((o) => <option>{o}</option>)}
+            <option value="">{w.choose}</option>
+            {w.options.map((o) => <option>{o}</option>)}
           </select>
         </label>
         <label class="field field--wide">
-          <span>Anything else we should know? <small>(optional)</small></span>
-          <textarea name="message" rows="4" placeholder="Coverage, timing, colour, current marks or damage"></textarea>
+          <span>{w.notes} <small>{w.optional}</small></span>
+          <textarea name="message" rows="4" placeholder={w.notesHint}></textarea>
         </label>
       </div>
-      <button class="st-btn st-btn--primary form__submit" type="submit">Send my quote request</button>
-      <p class="form__note">Prefer to chat? <a href={whatsappQuote} target="_blank" rel="noopener">Message us on WhatsApp</a> instead.</p>
-      <p class="form__status" data-demo-status hidden role="status"></p>
+      <button class="st-btn st-btn--primary form__submit" type="submit">{w.submit}</button>
+      <p class="form__note">{w.chat} <a href={w.whatsappHref} target="_blank" rel="noopener">{w.message}</a> {w.instead}</p>
+      <p class="form__status" data-demo-status data-demo-message={w.demo} hidden role="status"></p>
     </form>
   </div>
 </section>

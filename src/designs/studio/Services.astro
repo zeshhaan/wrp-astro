@@ -2,28 +2,43 @@
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { serviceCards } from './content';
+import { serviceCardsAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
 
 interface Props {
+  locale?: Locale;
   /** Overrides the card links, e.g. to the Studio previews of the service pages. */
   link?: (href: string) => string;
 }
-const { link = (href: string) => href } = Astro.props;
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'خدماتنا',
+      title: 'ما نقدّمه',
+      intro: 'حماية وعناية داخلية وخارجية لسيارات الاستخدام اليومي وسيارات الدفع الرباعي العائلية والسيارات الخارقة، بما في ذلك تظليل النوافذ وطلاء السيراميك في دبي. الأسعار المعروضة أسعار بداية، ونؤكد السعر النهائي بعد معاينة السيارة.',
+      cards: serviceCardsAr,
+      more: 'اعرف المزيد',
+    }
+  : {
+      eyebrow: 'Our services',
+      title: 'What we offer',
+      intro: 'Protection, detailing and interior care for daily drivers, family SUVs and supercars, including window tinting and ceramic coating in Dubai. Starting prices are shown; we confirm the final price when we see the car.',
+      cards: serviceCards,
+      more: 'Learn more',
+    };
 ---
 
 <section class="services st-section st-dark" id="services" aria-labelledby="services-title">
   <div class="st-wrap">
     <header class="st-head st-head--center">
-      <p class="st-eyebrow">Our services</p>
-      <h2 id="services-title" class="st-h2">What we offer</h2>
-      <p class="st-intro">
-        Protection, detailing and interior care for daily drivers, family SUVs and supercars, including window
-        tinting and ceramic coating in Dubai. Starting prices are shown; we confirm the final price when we see the
-        car.
-      </p>
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="services-title" class="st-h2">{w.title}</h2>
+      <p class="st-intro">{w.intro}</p>
     </header>
     <ul class="grid" role="list">
       {
-        serviceCards.map((c) => (
+        w.cards.map((c) => (
           <li class="card">
             <div class="card__media">
               <Picture
@@ -39,7 +54,7 @@ const { link = (href: string) => href } = Astro.props;
               <p class="card__line">{c.line}</p>
               <p class="card__price">{c.price}</p>
               <a class="card__link" href={link(c.href)} aria-label={c.linkLabel}>
-                Learn more <Icon name="arrow-right" size={16} />
+                {w.more} <Icon name="arrow-right" size={16} class="flip" />
               </a>
             </div>
           </li>

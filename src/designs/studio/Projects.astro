@@ -1,33 +1,61 @@
 ---
 import Picture from '../shared/Picture.astro';
 import { work } from '../data';
+import { workAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'أعمال حديثة',
+      title: 'أحدث المشاريع',
+      intro: 'بعض السيارات التي خرجت من الاستوديو مؤخراً. والمزيد في معرض أعمالنا.',
+      browse: 'تصفّح معرض الأعمال',
+      work: workAr,
+      alt: (x: (typeof workAr)[number]) => `${x.title}: ${x.what} في WRP`,
+    }
+  : {
+      eyebrow: 'Recent work',
+      title: 'Recent projects',
+      intro: 'A few of the cars that have left the studio lately. More in the portfolio.',
+      browse: 'Browse the portfolio',
+      work,
+      alt: (x: (typeof work)[number]) => `${x.title}: ${x.what.toLowerCase()} at WRP`,
+    };
+const portfolio = link('/portfolio/');
 ---
 
 <section class="projects st-section st-light" id="work" aria-labelledby="work-title">
   <div class="st-wrap">
     <div class="projects__head">
       <header class="st-head">
-        <p class="st-eyebrow st-eyebrow--dark">Recent work</p>
-        <h2 id="work-title" class="st-h2">Recent projects</h2>
-        <p class="st-intro">A few of the cars that have left the studio lately. More in the portfolio.</p>
+        <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+        <h2 id="work-title" class="st-h2">{w.title}</h2>
+        <p class="st-intro">{w.intro}</p>
       </header>
-      <a class="st-btn st-btn--dark" href="/portfolio/">Browse the portfolio</a>
+      <a class="st-btn st-btn--dark" href={portfolio}>{w.browse}</a>
     </div>
     <ul class="gallery" role="list">
       {
-        work.map((w, i) => (
+        w.work.map((x, i) => (
           <li class={`shot shot--${i}`}>
-            <a href="/portfolio/">
+            <a href={portfolio}>
               <Picture
-                base={w.image}
-                alt={`${w.title}: ${w.what.toLowerCase()} at WRP`}
+                base={x.image}
+                alt={w.alt(x)}
                 sizes={i === 0 ? '(min-width: 60rem) 38vw, 100vw' : '(min-width: 60rem) 20vw, 50vw'}
                 width={1200}
                 height={1600}
               />
               <span class="shot__label">
-                <span class="shot__title">{w.title}</span>
-                <span class="shot__what">{w.what}</span>
+                <span class="shot__title">{x.title}</span>
+                <span class="shot__what">{x.what}</span>
               </span>
             </a>
           </li>
