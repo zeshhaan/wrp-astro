@@ -8,15 +8,18 @@
  */
 import { getBusiness } from '@/lib/reviews';
 
+// Contact links go through WRP's dub.sh short links, as on the live site, so
+// clicks are counted in Dub and analytics (src/components/Analytics.astro).
 export const contact = {
   phoneDisplay: '+971 54 717 3000',
-  phoneHref: 'tel:+971547173000',
-  whatsapp: 'https://wa.me/971547173000',
+  phoneHref: 'https://dub.sh/wrp-phone',
+  whatsapp: 'https://dub.sh/wrp-wa',
   email: 'info@wrpdetailing.ae',
-  instagram: 'https://www.instagram.com/wrp_ae/',
+  emailHref: 'https://dub.sh/wrp-email',
+  instagram: 'https://dub.sh/wrp_ig',
   instagramHandle: '@wrp_ae',
   address: ['Al Qusais Industrial Area 1', 'Dubai, United Arab Emirates'],
-  mapsUrl: (getBusiness() as { googleMapsUrl?: string }).googleMapsUrl ?? 'https://maps.google.com/?q=WRP+Detailing+Solutions+Dubai',
+  mapsUrl: 'https://dub.sh/wrp-map',
   hours: 'Saturday to Thursday, 9:00 AM to 9:30 PM',
   hoursShort: 'Sat–Thu 9 AM–9:30 PM',
   closed: 'Closed Friday',
@@ -24,7 +27,7 @@ export const contact = {
   schedule: { open: '09:00', close: '21:30', closedDays: [5] as number[], timeZone: 'Asia/Dubai' },
 };
 
-/** Build a WhatsApp deep link with a prefilled message. */
+/** Build a WhatsApp link with a prefilled message (Dub passes the query string on to WhatsApp). */
 export function whatsappLink(message: string): string {
   return `${contact.whatsapp}?text=${encodeURIComponent(message)}`;
 }

@@ -26,7 +26,7 @@ import { contact, serviceOptions, whatsappQuote } from './content';
         </li>
         <li>
           <Icon name="mail" />
-          <div><span class="details__label">Email</span><a href={`mailto:${contact.email}`}>{contact.email}</a></div>
+          <div><span class="details__label">Email</span><a href={contact.emailHref}>{contact.email}</a></div>
         </li>
         <li>
           <Icon name="pin" />

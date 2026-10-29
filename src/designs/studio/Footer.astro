@@ -120,7 +120,7 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
       <h2 class="foot__h">{w.visit}</h2>
       <ul role="list">
         <li><a href={contact.phoneHref} dir="ltr">{num(contact.phoneDisplay)}</a></li>
-        <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li><a href={contact.emailHref}>{contact.email}</a></li>
         <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{w.address[0]}{ar ? '،' : ','}<br />{w.address[1]}</a></li>
         <li class="foot__hours">{w.hours}<br />{w.closed}</li>
       </ul>
