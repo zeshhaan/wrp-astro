@@ -20,7 +20,7 @@ const links = [
   <div class="st-wrap topbar__inner">
     <ul class="topbar__list" role="list">
       <li><a href={contact.phoneHref}><Icon name="phone" size={15} />{contact.phoneDisplay}</a></li>
-      <li class="topbar__email"><a href={`mailto:${contact.email}`}><Icon name="mail" size={15} />{contact.email}</a></li>
+      <li class="topbar__email"><a href={contact.emailHref}><Icon name="mail" size={15} />{contact.email}</a></li>
       <li class="topbar__addr"><a href={contact.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" size={15} />{contact.address[0]}, Dubai</a></li>
       <li class="topbar__hours"><span><Icon name="clock" size={15} />{contact.hoursShort} · {contact.closed}</span></li>
     </ul>
