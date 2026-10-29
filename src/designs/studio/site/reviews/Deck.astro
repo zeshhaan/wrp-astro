@@ -1,0 +1,760 @@
+---
+/**
+ * Concept C, The deck: reviews as a deck of cards.
+ * The hero deals the reviews one at a time: flick through with the arrows,
+ * swipe or drag the top card away, or Shuffle for a random one. Customer
+ * photos are cards you turn over (click, Enter, or just tab into one) to read
+ * the review on the back. Every review can be narrowed by service, and the
+ * quote button is the ace.
+ *
+ * Only the top card is exposed to screen readers; a polite status says which
+ * review is on top. Each review's text is in the HTML either way. Reduced
+ * motion swaps cards without throwing them.
+ */
+import { t, type Locale } from '@/i18n/translations';
+import { localizeUrl } from '@/i18n/utils';
+import { getReviewImageAlt } from '@/lib/reviews';
+import ReviewCard from '../sections/ReviewCard.astro';
+import ReviewScript from '../sections/ReviewScript.astro';
+import Icon from '../../Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import Wall from './Wall.astro';
+import GoogleG from './GoogleG.astro';
+import { reviewsPage, serviceFilters } from './data';
+
+interface Props {
+  locale?: Locale;
+  link: (href: string) => string;
+}
+
+const { locale = 'en', link } = Astro.props;
+const d = reviewsPage(locale);
+const { num } = d;
+// Deal the strongest first: photos, a highlight line, then the longer reviews.
+const score = (r: (typeof d.marquee)[number]) => (r.localImages?.length ? 3 : 0) + (r.highlightQuote ? 2 : 0) + Math.min(r.text.length / 200, 3);
+const deck = [...d.marquee].sort((a, b) => score(b) - score(a));
+const cut = (text: string, max: number) => (text.length > max ? text.slice(0, max).replace(/\s+\S*$/, '') + '…' : text);
+const words = {
+  deck: 'A deck of reviews',
+  prev: 'Previous review',
+  next: 'Next review',
+  shuffle: 'Shuffle',
+  hint: 'Swipe, drag or use the arrows',
+  turn: 'Turn over',
+  turnFor: (name: string) => `${name}’s review`,
+  filter: 'Show reviews about',
+  all: 'All',
+};
+---
+
+<section class="dh">
+  <div class="st-wrap dh__inner">
+    <div class="dh__copy">
+      <p class="dh__rating">
+        <GoogleG size={28} />
+        <span class="dh__score">{num(d.business.rating.toFixed(1))}</span>
+        <span class="dh__stars" role="img" aria-label="5 out of 5 stars">{Array.from({ length: 5 }, () => <Icon name="star" size={20} />)}</span>
+      </p>
+      <h1 class="dh__title">{t(locale, 'reviews.whatClientsSay')}</h1>
+      <p class="dh__count">{num(d.displayCount)} {t(locale, 'reviews.verifiedOnGoogle')}</p>
+      <dl class="dh__stats">
+        <div><dd>{num(d.displayCount)}</dd><dt>{t(locale, 'reviews.reviews')}</dt></div>
+        <div><dd>{num('5.0')}</dd><dt>{t(locale, 'reviews.statsRating')}</dt></div>
+        <div><dd>{num('100%')}</dd><dt>{t(locale, 'reviews.statsFiveStar')}</dt></div>
+      </dl>
+    </div>
+
+    <div class="dk" role="region" aria-roledescription="carousel" aria-label={words.deck} data-deck>
+      <ol class="dk__pile" role="list" data-pile>
+        {
+          deck.map((r, i) => (
+            <li class:list={['dk__card', i > 4 && 'is-off']} style={`--d:${Math.min(i, 4)}`} data-card={i} aria-roledescription="slide" aria-label={`${num(i + 1)} / ${num(deck.length)}`} aria-hidden={i > 0 ? 'true' : undefined} inert={i > 0}>
+              <span class="dk__corner" aria-hidden="true">
+                {num(r.stars)}
+                <Icon name="star" size={14} />
+              </span>
+              <span class="dk__corner dk__corner--end" aria-hidden="true">
+                {num(r.stars)}
+                <Icon name="star" size={14} />
+              </span>
+              {r.localImages?.length > 0 && <img class="dk__photo" src={`/${r.localImages[0]}`} alt={getReviewImageAlt(r, 0)} width="480" height="300" loading="lazy" decoding="async" draggable="false" />}
+              <p class="dk__text" dir="auto">“{cut(r.text, r.localImages?.length ? 150 : 260)}”</p>
+              <p class="dk__who">
+                <span class="dk__name">{r.reviewerName}</span>
+                <span class="dk__date" dir="auto">{r.date}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="dk__controls">
+        <button type="button" class="dk__btn" data-step="-1">
+          <Icon name="arrow-left" size={20} class="flip" />
+          <span class="visually-hidden">{words.prev}</span>
+        </button>
+        <span class="dk__count" aria-hidden="true"><b data-count>{num(1)}</b> / {num(deck.length)}</span>
+        <button type="button" class="dk__btn" data-step="1">
+          <Icon name="arrow-right" size={20} class="flip" />
+          <span class="visually-hidden">{words.next}</span>
+        </button>
+        <button type="button" class="dk__shuffle" data-shuffle>
+          <Icon name="grid" size={18} />
+          {words.shuffle}
+        </button>
+      </div>
+      <p class="dk__hint" aria-hidden="true">{words.hint}</p>
+      <p class="visually-hidden" role="status" data-deck-status></p>
+    </div>
+  </div>
+</section>
+
+{
+  d.withImages.length > 0 && (
+    <section class="st-section st-light fl">
+      <div class="st-wrap">
+        <header class="st-head st-head--center">
+          <h2 class="st-h2">{t(locale, 'reviews.seeResults')}</h2>
+          <p class="st-intro">{t(locale, 'reviews.customerPhotos')}</p>
+        </header>
+        <ul class="fl__grid" role="list">
+          {d.withImages.map((r) => (
+            <li class="fl__tile" data-tile>
+              <div class="fl__inner">
+                <figure class="fl__front">
+                  <img src={`/${r.localImages[0]}`} alt={getReviewImageAlt(r, 0)} width="400" height="500" loading="lazy" decoding="async" />
+                  <figcaption>
+                    <span class="fl__name">{r.reviewerName}</span>
+                    <span class="fl__stars" aria-hidden="true">
+                      {Array.from({ length: r.stars }, () => <Icon name="star" size={12} />)}
+                    </span>
+                  </figcaption>
+                </figure>
+                <div class="fl__back">
+                  <ReviewCard review={r} locale={locale} max={180} highlight tone="white" />
+                  {r.localImages.length > 1 && (
+                    <div class="fl__thumbs">
+                      {r.localImages.slice(1).map((img, i) => (
+                        <img src={`/${img}`} alt={getReviewImageAlt(r, i + 1)} width="120" height="90" loading="lazy" decoding="async" />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button type="button" class="fl__turn" aria-pressed="false" data-turn>
+                <Icon name="arrow-right" size={14} class="fl__turn-icon" />
+                {words.turn}
+                <span class="visually-hidden">: {words.turnFor(r.reviewerName)}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<section class="st-section st-white" id="all-reviews">
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <h2 class="st-h2">{t(locale, 'reviews.allReviews')}</h2>
+      <p class="st-intro">{t(locale, 'reviews.everyReview')}</p>
+    </header>
+    <Wall reviews={d.textOnly} filters={serviceFilters(d.textOnly, locale)} locale={locale} look="chips" legend={words.filter} allLabel={words.all} tone="paper" />
+  </div>
+</section>
+
+<section class="st-section st-black ace">
+  <div class="st-wrap">
+    <div class="ace__card">
+      <span class="ace__corner" aria-hidden="true"><WrpLogo class="ace__logo" label="" /></span>
+      <span class="ace__corner ace__corner--end" aria-hidden="true"><WrpLogo class="ace__logo" label="" /></span>
+      <h2 class="st-h2">{t(locale, 'reviews.readyDifference')}</h2>
+      <p class="ace__text">{d.joinLine}</p>
+      <a class="st-btn st-btn--primary" href={link(localizeUrl('/contact-us/', locale))}>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+    </div>
+  </div>
+</section>
+<ReviewScript />
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const lang = document.documentElement.lang === 'ar' ? 'ar-EG' : 'en';
+
+  const deckEl = document.querySelector<HTMLElement>('[data-deck]');
+  if (deckEl) {
+    const cards = [...deckEl.querySelectorAll<HTMLElement>('[data-card]')];
+    const countEl = deckEl.querySelector<HTMLElement>('[data-count]')!;
+    const statusEl = deckEl.querySelector<HTMLElement>('[data-deck-status]')!;
+    const rtl = getComputedStyle(deckEl).direction === 'rtl';
+    let order = cards.map((_, i) => i);
+    let pos = 0;
+    let busy = false;
+
+    const layout = (announce: boolean) => {
+      cards.forEach((card) => card.classList.add('is-off'));
+      for (let k = 0; k < Math.min(5, order.length); k++) {
+        const card = cards[order[(pos + k) % order.length]];
+        card.style.setProperty('--d', String(k));
+        card.classList.remove('is-off');
+      }
+      cards.forEach((card, i) => {
+        const top = i === order[pos];
+        card.toggleAttribute('inert', !top);
+        if (top) card.removeAttribute('aria-hidden');
+        else card.setAttribute('aria-hidden', 'true');
+      });
+      const place = `${(pos + 1).toLocaleString(lang)} / ${order.length.toLocaleString(lang)}`;
+      const top = cards[order[pos]];
+      top.setAttribute('aria-label', place);
+      countEl.textContent = (pos + 1).toLocaleString(lang);
+      if (announce) statusEl.textContent = `${place}: ${top.querySelector('.dk__name')!.textContent}`;
+    };
+
+    // Throw the top card off (towards `dir`), then bring the next one up.
+    const step = (by: number, dir = by) => {
+      if (busy) return;
+      const top = cards[order[pos]];
+      const next = () => {
+        pos = (pos + by + order.length) % order.length;
+        layout(true);
+      };
+      if (reduce.matches) return next();
+      busy = true;
+      top.style.setProperty('--fx', String(dir * (rtl ? -1 : 1)));
+      top.classList.add('is-out');
+      setTimeout(() => {
+        top.classList.remove('is-out');
+        top.style.translate = '';
+        top.style.rotate = '';
+        next();
+        busy = false;
+      }, 320);
+    };
+
+    for (const btn of deckEl.querySelectorAll<HTMLButtonElement>('[data-step]')) {
+      btn.addEventListener('click', () => step(Number(btn.dataset.step)));
+    }
+    deckEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if ((e.target as Element).closest('input, textarea')) return;
+      const forward = (e.key === 'ArrowRight') !== rtl;
+      step(forward ? 1 : -1);
+    });
+    deckEl.querySelector('[data-shuffle]')?.addEventListener('click', () => {
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+      pos = 0;
+      if (!reduce.matches) {
+        deckEl.classList.remove('is-shuffling');
+        void deckEl.offsetWidth;
+        deckEl.classList.add('is-shuffling');
+        for (const card of cards) {
+          card.style.setProperty('--sx', `${Math.round(Math.random() * 160 - 80)}px`);
+          card.style.setProperty('--sr', `${Math.round(Math.random() * 40 - 20)}deg`);
+        }
+      }
+      layout(true);
+    });
+
+    // Drag or swipe the top card; let go far enough and it flies off.
+    let startX = 0;
+    let startY = 0;
+    let dragging: HTMLElement | null = null;
+    deckEl.addEventListener('pointerdown', (e) => {
+      const card = (e.target as Element).closest<HTMLElement>('[data-card]');
+      if (!card || card !== cards[order[pos]] || busy) return;
+      dragging = card;
+      startX = e.clientX;
+      startY = e.clientY;
+      card.setPointerCapture(e.pointerId);
+      card.classList.add('is-held');
+    });
+    deckEl.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = (e.clientY - startY) * 0.3;
+      dragging.style.translate = `${dx}px ${dy}px`;
+      dragging.style.rotate = `${dx / 18}deg`;
+    });
+    const release = (e: PointerEvent) => {
+      if (!dragging) return;
+      const card = dragging;
+      dragging = null;
+      card.classList.remove('is-held');
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 90) {
+        const forward = dx < 0 !== rtl;
+        card.style.setProperty('--fx', String(Math.sign(dx) * (rtl ? -1 : 1)));
+        step(forward ? 1 : -1, forward !== rtl ? 1 : -1);
+      } else {
+        card.style.translate = '';
+        card.style.rotate = '';
+      }
+    };
+    deckEl.addEventListener('pointerup', release);
+    deckEl.addEventListener('pointercancel', release);
+    layout(false);
+  }
+
+  // Photo cards: turn over with the button, a click anywhere on the card, or
+  // by tabbing into the review on the back.
+  for (const tile of document.querySelectorAll<HTMLElement>('[data-tile]')) {
+    const btn = tile.querySelector<HTMLButtonElement>('[data-turn]')!;
+    const set = (on: boolean) => {
+      btn.setAttribute('aria-pressed', String(on));
+      tile.classList.toggle('is-turned', on);
+    };
+    btn.addEventListener('click', () => set(btn.getAttribute('aria-pressed') !== 'true'));
+    tile.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('button, a')) return;
+      set(!tile.classList.contains('is-turned'));
+    });
+    tile.querySelector('.fl__back')?.addEventListener('focusin', () => set(true));
+  }
+</script>
+
+<style>
+  /* Hero: the title beside the deck */
+  .dh {
+    padding-block: 8rem 4rem;
+    background:
+      radial-gradient(ellipse 50% 60% at 75% 55%, rgb(212 20 28 / 0.18), transparent 70%),
+      var(--st-black);
+    overflow: hidden;
+  }
+  .dh__inner {
+    display: grid;
+    gap: 4.5rem;
+    align-items: center;
+  }
+  @media (min-width: 60rem) {
+    .dh__inner {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .dh__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .dh__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .dh__score {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+  .dh__stars {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .dh__stars :global(svg) {
+    fill: currentColor;
+  }
+  .dh__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.8rem, 1.5rem + 5vw, 5.5rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .dh__count {
+    color: var(--st-on-dark);
+    font-size: 1.125rem;
+  }
+  .dh__stats {
+    display: flex;
+    gap: 0.6rem;
+    margin: 0.75rem 0 0;
+  }
+  .dh__stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 0.6rem;
+    inline-size: 6.5rem;
+    aspect-ratio: 5 / 7;
+    padding: 0.6rem;
+    background: var(--st-white);
+    color: var(--st-ink);
+    rotate: calc((var(--n, 0) - 1) * 4deg);
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.4);
+  }
+  .dh__stats > div:nth-child(1) {
+    --n: 0;
+  }
+  .dh__stats > div:nth-child(2) {
+    --n: 1;
+    translate: 0 -0.5rem;
+  }
+  .dh__stats > div:nth-child(3) {
+    --n: 2;
+    background: var(--st-red);
+    color: var(--st-white);
+  }
+  .dh__stats dd {
+    margin: 0;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.9rem;
+    line-height: 1;
+    text-align: end;
+  }
+  .dh__stats dt {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* The deck */
+  .dk {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+  }
+  .dk__pile {
+    position: relative;
+    display: grid;
+    inline-size: min(100%, 24rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .dk__card {
+    --d: 0;
+    --fx: 1;
+    grid-area: 1 / 1;
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    min-block-size: 25rem;
+    padding: 2.6rem 2.4rem;
+    background: var(--st-white);
+    color: var(--st-ink);
+    border: 1px solid var(--st-line-light);
+    box-shadow: 0 14px 34px rgb(0 0 0 / 0.45);
+    z-index: calc(20 - var(--d));
+    translate: calc(var(--d) * 9px) calc(var(--d) * -7px);
+    rotate: calc(var(--d) * 2.5deg);
+    touch-action: pan-y;
+    user-select: none;
+    cursor: grab;
+    transition:
+      translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      rotate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.3s;
+  }
+  .dk__card.is-off {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .dk__card:nth-child(4n + 2) {
+    background: #fafafa;
+  }
+  .dk__card.is-held {
+    cursor: grabbing;
+    transition: none;
+  }
+  .dk__card.is-out {
+    translate: calc(var(--fx) * -140%) 2rem;
+    rotate: calc(var(--fx) * -24deg);
+    opacity: 0;
+    transition-duration: 0.32s;
+  }
+  .dk.is-shuffling .dk__card {
+    animation: dk-shuffle 0.6s cubic-bezier(0.3, 1.2, 0.4, 1);
+  }
+  @keyframes dk-shuffle {
+    40% {
+      translate: var(--sx) -1rem;
+      rotate: var(--sr);
+    }
+  }
+  .dk__corner {
+    position: absolute;
+    inset-block-start: 0.7rem;
+    inset-inline-start: 0.8rem;
+    display: grid;
+    justify-items: center;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--st-red);
+  }
+  .dk__corner :global(svg) {
+    fill: currentColor;
+  }
+  .dk__corner--end {
+    inset: auto 0.8rem 0.7rem auto;
+    rotate: 180deg;
+  }
+  :global([dir='rtl']) .dk__corner--end {
+    inset: auto auto 0.7rem 0.8rem;
+  }
+  .dk__photo {
+    inline-size: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    pointer-events: none;
+  }
+  .dk__text {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+  .dk__card:not(:has(.dk__photo)) .dk__text {
+    font-size: 1.45rem;
+  }
+  .dk__who {
+    display: grid;
+    margin-block-start: auto;
+  }
+  .dk__name {
+    font-weight: 700;
+  }
+  .dk__date {
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .dk__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dk__btn,
+  .dk__shuffle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-inline-size: 3rem;
+    block-size: 3rem;
+    border: 1.5px solid rgb(255 255 255 / 0.6);
+    background: transparent;
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .dk__btn:hover,
+  .dk__shuffle:hover {
+    background: rgb(255 255 255 / 0.1);
+    border-color: var(--st-white);
+  }
+  .dk__shuffle {
+    margin-inline-start: 0.75rem;
+    padding-inline: 1rem;
+    background: var(--st-red);
+    border-color: var(--st-red);
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .dk__shuffle:hover {
+    background: var(--st-red-hover);
+    border-color: var(--st-red-hover);
+  }
+  .dk__count {
+    min-inline-size: 4.5rem;
+    text-align: center;
+    font-family: var(--st-head-font);
+    color: var(--st-on-dark);
+  }
+  .dk__count b {
+    color: var(--st-white);
+    font-weight: 600;
+  }
+  .dk__hint {
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dk__card {
+      transition: none;
+    }
+    .dk__hint {
+      display: none;
+    }
+  }
+
+  /* Photo cards that turn over */
+  .fl__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fl__tile {
+    position: relative;
+    perspective: 1400px;
+    cursor: pointer;
+  }
+  .fl__inner {
+    display: grid;
+    block-size: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.3, 1.2, 0.4, 1);
+  }
+  .fl__tile.is-turned .fl__inner {
+    transform: rotateY(180deg);
+  }
+  :global([dir='rtl']) .fl__tile.is-turned .fl__inner {
+    transform: rotateY(-180deg);
+  }
+  .fl__front,
+  .fl__back {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+  }
+  .fl__front {
+    position: relative;
+    margin: 0;
+    min-block-size: 22rem;
+    background: var(--st-black);
+  }
+  .fl__front img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .fl__front figcaption {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.25rem;
+    padding: 3rem 1rem 3.75rem;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.85));
+    color: var(--st-white);
+  }
+  .fl__name {
+    font-family: var(--st-head-font);
+    font-size: 1.25rem;
+    text-transform: uppercase;
+  }
+  .fl__stars {
+    display: inline-flex;
+    gap: 2px;
+  }
+  .fl__stars :global(svg) {
+    fill: currentColor;
+  }
+  .fl__back {
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    padding-block-end: 3.25rem;
+    background: var(--st-white);
+    transform: rotateY(180deg);
+  }
+  .fl__thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding-inline: 1.5rem;
+  }
+  .fl__thumbs img {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .fl__turn {
+    position: absolute;
+    inset-block-end: 0.75rem;
+    inset-inline-start: 0.75rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-block-size: 2.5rem;
+    padding: 0.4rem 0.85rem;
+    border: 0;
+    background: var(--st-red);
+    color: var(--st-white);
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+  .fl__turn:hover {
+    background: var(--st-red-hover);
+  }
+  .fl__turn:focus-visible {
+    outline-color: var(--st-ink);
+  }
+  .fl__tile.is-turned .fl__turn {
+    background: var(--st-black);
+  }
+  .fl__tile.is-turned .fl__turn-icon {
+    rotate: 180deg;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fl__inner {
+      transition: none;
+    }
+  }
+
+  /* The ace: the closing call to action as a playing card */
+  .ace__card {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    padding: clamp(3rem, 2rem + 4vw, 4.5rem) clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    background: var(--st-white);
+    color: var(--st-ink);
+    color-scheme: light;
+    text-align: center;
+    rotate: 2deg;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
+    transition: rotate 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .ace__card:hover,
+  .ace__card:focus-within {
+    rotate: 0deg;
+  }
+  .ace__card :focus-visible {
+    outline-color: var(--st-ink);
+  }
+  .ace__corner {
+    position: absolute;
+    inset-block-start: 0.9rem;
+    inset-inline-start: 1rem;
+    color: var(--st-ink);
+  }
+  .ace__corner--end {
+    inset: auto 1rem 0.9rem auto;
+    rotate: 180deg;
+  }
+  .ace__corner :global(.ace__logo) {
+    inline-size: 4.5rem;
+    block-size: auto;
+  }
+  .ace__text {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+    margin-block-end: 0.5rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ace__card {
+      transition: none;
+    }
+  }
+</style>

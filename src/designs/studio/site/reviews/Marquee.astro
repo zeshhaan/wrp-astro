@@ -1,0 +1,210 @@
+---
+/**
+ * Two rows of reviews drifting in opposite directions, as on the live page,
+ * now with a pause button (moving content needs one) that also stops on hover
+ * and keyboard focus. With reduced motion the rows sit still and scroll
+ * sideways by hand.
+ *  - look 'cards': the review cards, as live
+ *  - look 'type': each review's sharpest line in huge condensed type
+ */
+import type { Review } from '@/lib/reviews';
+import { t, type Locale } from '@/i18n/translations';
+import ReviewCard from '../sections/ReviewCard.astro';
+import Icon from '../../Icon.astro';
+import { pullLine } from './data';
+
+interface Props {
+  rows: Review[][];
+  locale?: Locale;
+  look?: 'cards' | 'type';
+  class?: string;
+}
+
+const { rows: allRows, locale = 'en', look = 'cards', class: className } = Astro.props;
+// In type, only reviews whose first line is short enough to show whole.
+const rows = look === 'type' ? allRows.map((row) => row.filter((r) => !pullLine(r, 70).endsWith('…'))) : allRows;
+// A toggle with one label: pressed means paused.
+const pauseLabel = locale === 'ar' ? 'إيقاف حركة التقييمات' : 'Pause the scrolling reviews';
+---
+
+<section class:list={['mq', `mq--${look}`, className]} aria-label={t(locale, 'reviews.scrollingLabel')} data-mq>
+  {
+    rows.map((row, i) => (
+      <div class:list={['mq__row', i === 1 && 'mq__row--back']}>
+        {[0, 1].map((copy) => (
+          <ul class="mq__track" role="list" aria-hidden={copy === 1 ? 'true' : undefined} inert={copy === 1}>
+            {row.map((r) =>
+              look === 'cards' ? (
+                <li class="mq__item">
+                  <ReviewCard review={r} locale={locale} max={150} highlight tone="dark" />
+                </li>
+              ) : (
+                <li class="mq__line">
+                  <q dir="auto">{pullLine(r, 70)}</q>
+                  <span class="mq__who">{r.reviewerName}</span>
+                </li>
+              ),
+            )}
+          </ul>
+        ))}
+      </div>
+    ))
+  }
+  <button type="button" class="mq__toggle" aria-pressed="false" data-mq-toggle>
+    <Icon name="pause" size={18} class="mq__pause" />
+    <Icon name="play" size={18} class="mq__play" />
+    <span class="visually-hidden">{pauseLabel}</span>
+  </button>
+</section>
+
+<script>
+  for (const mq of document.querySelectorAll<HTMLElement>('[data-mq]')) {
+    const btn = mq.querySelector<HTMLButtonElement>('[data-mq-toggle]')!;
+    btn.addEventListener('click', () => {
+      const paused = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(paused));
+      mq.toggleAttribute('data-paused', paused);
+    });
+  }
+</script>
+
+<style>
+  .mq {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    padding-block: 3.5rem;
+    overflow: hidden;
+  }
+  .mq__row {
+    display: flex;
+    inline-size: max-content;
+  }
+  .mq__track {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0 1rem 0 0;
+    list-style: none;
+    animation: mq 90s linear infinite;
+  }
+  .mq__row--back .mq__track {
+    animation-direction: reverse;
+  }
+  .mq:is(:hover, :focus-within, [data-paused]) .mq__track {
+    animation-play-state: paused;
+  }
+  .mq__item {
+    inline-size: 21rem;
+    flex: none;
+  }
+  @keyframes mq {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  :global([dir='rtl']) .mq__track {
+    padding: 0 0 0 1rem;
+    animation-name: mq-rtl;
+  }
+  @keyframes mq-rtl {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Type: one line per review, alternately solid and outlined. */
+  .mq--type {
+    gap: 0.25rem;
+    padding-block: 2.5rem;
+  }
+  .mq--type .mq__track {
+    gap: 0;
+    padding: 0;
+    animation-duration: 140s;
+  }
+  .mq__line {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex: none;
+    padding-inline-end: 3rem;
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .mq__line q {
+    font-size: clamp(2.25rem, 1.5rem + 3.5vw, 4.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    quotes: '“' '”';
+  }
+  .mq__line:nth-child(even) q {
+    color: transparent;
+    -webkit-text-stroke: 1.5px currentColor;
+  }
+    .mq__line::after {
+    content: '';
+    align-self: center;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    margin-inline-start: 2rem;
+    background: var(--st-red);
+    rotate: 45deg;
+  }
+  .mq__who {
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    color: var(--st-mute);
+  }
+
+  .mq__toggle {
+    position: absolute;
+    inset-block-end: 0.6rem;
+    inset-inline-end: var(--st-gutter-x);
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1.5px solid rgb(255 255 255 / 0.6);
+    background: var(--st-black);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .mq__toggle:hover {
+    border-color: var(--st-white);
+  }
+  .mq__play,
+  .mq[data-paused] .mq__pause {
+    display: none;
+  }
+  .mq[data-paused] .mq__play {
+    display: block;
+  }
+
+  /* No motion: the rows scroll sideways by hand instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .mq {
+      overflow: visible;
+    }
+    .mq__row {
+      inline-size: auto;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-inline: var(--st-gutter-x);
+    }
+    .mq__track {
+      animation: none;
+    }
+    .mq__track[aria-hidden] {
+      display: none;
+    }
+    .mq__item,
+    .mq__line {
+      scroll-snap-align: start;
+    }
+    .mq__toggle {
+      display: none;
+    }
+  }
+</style>

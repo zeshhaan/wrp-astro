@@ -1,0 +1,33 @@
+---
+/**
+ * One concept direction for the Studio reviews page, as the whole page: the
+ * live page's title, description and review JSON-LD, Studio's header and
+ * footer, and a bar to switch between concepts.
+ */
+export const prerender = true;
+
+import StudioPage from '@/designs/studio/site/StudioPage.astro';
+import Redline from '@/designs/studio/site/reviews/Redline.astro';
+import WordOfMouth from '@/designs/studio/site/reviews/WordOfMouth.astro';
+import Deck from '@/designs/studio/site/reviews/Deck.astro';
+import ConceptBar from '@/designs/studio/site/reviews/ConceptBar.astro';
+import { reviewConcepts, type ReviewConceptId } from '@/designs/studio/site/reviews/concepts';
+import { reviewsPage } from '@/designs/studio/site/reviews/data';
+import { toLab } from '@/designs/studio/site/routes';
+
+export function getStaticPaths() {
+  return reviewConcepts.map((c) => ({ params: { concept: c.id }, props: { id: c.id } }));
+}
+
+const { id } = Astro.props as { id: ReviewConceptId };
+const locale = 'en';
+const d = reviewsPage(locale);
+---
+
+<StudioPage title={d.title} description={d.description} locale={locale} livePath="/reviews/">
+  <script type="application/ld+json" set:html={JSON.stringify(d.schema)} />
+  {id === 'a' && <Redline locale={locale} link={toLab} />}
+  {id === 'b' && <WordOfMouth locale={locale} link={toLab} />}
+  {id === 'c' && <Deck locale={locale} link={toLab} />}
+  <ConceptBar current={id} />
+</StudioPage>
