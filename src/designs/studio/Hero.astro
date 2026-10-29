@@ -1,7 +1,46 @@
 ---
 import Icon from './Icon.astro';
 import { proof, whatsappQuote } from './content';
+import { rating, reviewCount, whatsappQuote as whatsappQuoteAr } from './contentAr';
 import { heroVideo as hv } from './heroVideo';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      pause: 'إيقاف الفيديو في الخلفية',
+      play: 'تشغيل الفيديو في الخلفية',
+      eyebrow: 'القصيص، دبي',
+      title: 'حماية الطلاء PPF والسيراميك والعناية بالسيارات في دبي',
+      lede: 'من تركيب أفلام حماية الطلاء ذاتية الإصلاح من STEK وAvery Dennison، إلى طلاءات السيراميك المتقدمة وتصحيح الطلاء على عدة مراحل وتجديد المقصورة الداخلية، ننجز كل تفصيل بإتقان ونسلّم سيارتك في موعدها من استوديونا في منطقة القصيص الصناعية ١.',
+      short: 'حماية فاخرة. تركيب احترافي. نتائج تدوم.',
+      quote: 'احصل على عرض سعر سريع',
+      whatsapp: 'راسلنا على واتساب',
+      services: 'الخدمات والأسعار',
+      whatsappHref: whatsappQuoteAr,
+      rating,
+      onGoogle: `على Google · ${reviewCount} تقييم`,
+    }
+  : {
+      pause: 'Pause background video',
+      play: 'Play background video',
+      eyebrow: 'Al Qusais, Dubai',
+      title: 'PPF, ceramic coating & car detailing in Dubai',
+      lede: 'From self-healing STEK and Avery Dennison PPF installations to advanced ceramic coatings, multi-stage paint correction and interior restoration, we do every detail right and deliver on time at our studio in Al Qusais Industrial Area 1.',
+      short: 'Premium Protection. Expert Installation. Lasting Results.',
+      quote: 'Get a quick quote',
+      whatsapp: 'WhatsApp us',
+      services: 'See services & prices',
+      whatsappHref: whatsappQuote,
+      rating: proof.rating,
+      onGoogle: `on Google · ${proof.reviewCountDisplay} reviews`,
+    };
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -34,36 +73,32 @@ import { heroVideo as hv } from './heroVideo';
       disablepictureinpicture
       tabindex="-1"></video>
   </div>
-  <button type="button" class="hero__pause" data-hero-pause aria-pressed="false" hidden>
-    <span class="visually-hidden" data-hero-pause-label>Pause background video</span>
+  <button type="button" class="hero__pause" data-hero-pause data-pause={w.pause} data-play={w.play} aria-pressed="false" hidden>
+    <span class="visually-hidden" data-hero-pause-label>{w.pause}</span>
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path class="i-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /><path class="i-play" d="M8 5.5v13l10.5-6.5z" /></svg>
   </button>
   <div class="st-wrap hero__inner">
     <div class="hero__main">
-      <p class="st-eyebrow">Al Qusais, Dubai</p>
-      <h1 id="hero-title" class="hero__title">PPF, ceramic coating &amp; car detailing in Dubai</h1>
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h1 id="hero-title" class="hero__title">{w.title}</h1>
     </div>
     <div class="hero__side">
       <p class="hero__lede">
-        <span class="hero__lede-long">
-          From self-healing STEK and Avery Dennison PPF installations to advanced ceramic coatings, multi-stage paint
-          correction and interior restoration, we do every detail right and deliver on time at our studio in Al Qusais
-          Industrial Area 1.
-        </span>
-        <span class="hero__lede-short">Premium Protection. Expert Installation. Lasting Results.</span>
+        <span class="hero__lede-long">{w.lede}</span>
+        <span class="hero__lede-short">{w.short}</span>
       </p>
       <div class="hero__actions">
-        <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">Get a quick quote <Icon name="arrow-right" size={18} /></a>
-        <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener">
-          <Icon name="whatsapp" />WhatsApp us
+        <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">{w.quote} <Icon name="arrow-right" size={18} class="flip" /></a>
+        <a class="st-btn st-btn--light" href={w.whatsappHref} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />{w.whatsapp}
         </a>
-        <a class="st-btn st-btn--ghost" href="#services">See services &amp; prices</a>
+        <a class="st-btn st-btn--ghost" href="#services">{w.services}</a>
       </div>
-      <a class="hero__rating" href={proof.reviewsUrl}>
+      <a class="hero__rating" href={link(proof.reviewsUrl)}>
         <span class="hero__stars" aria-hidden="true">
           {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
         </span>
-        <span><strong>{proof.rating}</strong> on Google · {proof.reviewCountDisplay} reviews</span>
+        <span><strong>{w.rating}</strong> {w.onGoogle}</span>
       </a>
     </div>
   </div>
@@ -168,6 +203,9 @@ import { heroVideo as hv } from './heroVideo';
     letter-spacing: 0.005em;
     max-inline-size: 14ch;
     margin-block-start: 0.75rem;
+  }
+  .hero__title:lang(ar) {
+    max-inline-size: 20ch;
   }
   .hero__lede {
     font-size: 1.0625rem;

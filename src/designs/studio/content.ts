@@ -14,6 +14,8 @@ export type Card = {
   name: string;
   line: string;
   price: string;
+  /** Starting price in AED, or null when priced after inspection (the Arabic cards format their own). */
+  from: number | null;
   href: string;
   linkLabel: string;
   image: string;
@@ -31,6 +33,7 @@ const fromService = (slug: string, over: Partial<Card> = {}): Card => {
     name: s.name,
     line: s.line,
     price: priceOf(s),
+    from: s.from,
     href: s.href,
     linkLabel: `Learn more about ${s.name}`,
     image: s.image,
@@ -57,6 +60,7 @@ export const serviceCards: Card[] = [
     name: 'Detailing',
     line: 'Level 3 detailing inside and out: iron decontamination, carpet steam extraction, an engine bay clean and a 6-month ceramic sealant.',
     price: `From ${aed(300)}`,
+    from: 300,
     href: '/services/premium-car-wash/',
     linkLabel: 'Learn more about detailing levels',
     image: '/portfolio/black-lexus-lx-570-showroom',
@@ -96,6 +100,7 @@ export const serviceCards: Card[] = [
     name: 'Wrap & styling',
     line: 'Partial vinyl wraps, bonnet accents, satin-black trim and chrome delete, fitted with clean, tucked edges.',
     price: 'Priced after inspection',
+    from: null,
     href: '/contact-us/',
     linkLabel: 'Ask about wrap and styling',
     image: '/review-images/sujith_prasad_2',
@@ -109,6 +114,7 @@ export const serviceCards: Card[] = [
     name: 'Home & architectural glass tint',
     line: 'Heat and UV protection using premium architectural film for cooler interiors and privacy.',
     price: 'Priced after inspection',
+    from: null,
     href: '/contact-us/',
     linkLabel: 'Ask about home and architectural glass tint',
     image: '/review-images/tariq_murad_2',

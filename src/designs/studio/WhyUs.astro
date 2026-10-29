@@ -2,30 +2,71 @@
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { proof, whyPhotos, whyPoints } from './content';
+import { num, rating, reviewCount, whyPhotosAr, whyPointsAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'بكلمات عملائنا',
+      title: 'لماذا تختار WRP',
+      intro: 'أكثر أربعة أشياء يذكرها عملاؤنا.',
+      rating,
+      stars: 'تقييم ٥ من ٥ نجوم',
+      count: `${reviewCount} مراجعة على Google`,
+      photos: whyPhotosAr,
+      photoNote: 'الصورة من مراجعة العميل على Google.',
+      pause: 'إيقاف الصور',
+      play: 'تشغيل الصور',
+      points: whyPointsAr,
+      review: 'مراجعة على Google (مترجمة)',
+    }
+  : {
+      eyebrow: 'In our customers’ words',
+      title: 'Why choose WRP',
+      intro: 'The four things our customers mention most.',
+      rating: proof.rating,
+      stars: '5 out of 5 stars',
+      count: `${proof.reviewCountDisplay} Google reviews`,
+      photos: whyPhotos,
+      photoNote: 'Photo from the customer’s Google review.',
+      pause: 'Pause photos',
+      play: 'Play photos',
+      points: whyPoints,
+      review: 'Google review',
+    };
+// Arabic drops the leading zero: ٠ reads as a dot.
+const pad = (n: number) => (ar ? num(n) : String(n).padStart(2, '0'));
 ---
 
 <section class="why st-section st-light" id="why" aria-labelledby="why-title">
   <div class="st-wrap why__grid">
     <div class="why__aside">
       <header class="st-head why__head">
-        <p class="st-eyebrow st-eyebrow--dark">In our customers’ words</p>
-        <h2 id="why-title" class="st-h2">Why choose WRP</h2>
-        <p class="st-intro">The four things our customers mention most.</p>
+        <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+        <h2 id="why-title" class="st-h2">{w.title}</h2>
+        <p class="st-intro">{w.intro}</p>
       </header>
-      <a class="rating" href={proof.reviewsUrl}>
-        <span class="rating__score">{proof.rating}</span>
+      <a class="rating" href={link(proof.reviewsUrl)}>
+        <span class="rating__score">{w.rating}</span>
         <span class="rating__meta">
-          <span class="rating__stars" role="img" aria-label="5 out of 5 stars">
+          <span class="rating__stars" role="img" aria-label={w.stars}>
             {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
           </span>
-          <span class="rating__count">{proof.reviewCountDisplay} Google reviews</span>
+          <span class="rating__count">{w.count}</span>
         </span>
-        <Icon name="arrow-right" size={20} class="rating__arrow" />
+        <Icon name="arrow-right" size={20} class="rating__arrow flip" />
       </a>
-      <div class="why__photos" data-fader>
+      <div class="why__photos" data-fader data-pause={w.pause} data-play={w.play}>
         <ul class="why__slides" role="list">
           {
-            whyPhotos.map((ph, i) => (
+            w.photos.map((ph, i) => (
               <li class="why__slide" data-slide aria-hidden={i === 0 ? undefined : 'true'}>
                 <figure>
                   <Picture
@@ -34,7 +75,7 @@ import { proof, whyPhotos, whyPoints } from './content';
                     alt={ph.alt}
                     sizes="(min-width: 60rem) 34vw, 100vw"
                   />
-                  <figcaption>{ph.caption} Photo from the customer’s Google review.</figcaption>
+                  <figcaption>{ph.caption} {w.photoNote}</figcaption>
                 </figure>
               </li>
             ))
@@ -43,17 +84,17 @@ import { proof, whyPhotos, whyPoints } from './content';
         <button class="why__toggle" type="button" data-toggle hidden>
           <span data-pause-icon><Icon name="pause" size={16} /></span>
           <span data-play-icon hidden><Icon name="play" size={16} /></span>
-          <span class="visually-hidden" data-toggle-label>Pause photos</span>
+          <span class="visually-hidden" data-toggle-label>{w.pause}</span>
         </button>
       </div>
     </div>
 
     <ol class="points" role="list">
       {
-        whyPoints.map((p, i) => (
+        w.points.map((p, i) => (
           <li class="point">
             <div class="point__label">
-              <span class="point__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="point__num" aria-hidden="true">{pad(i + 1)}</span>
               <h3 class="point__title">{p.title}</h3>
             </div>
             <figure class="point__quote">
@@ -61,7 +102,7 @@ import { proof, whyPhotos, whyPoints } from './content';
                 <p>{p.quote}</p>
               </blockquote>
               <figcaption>
-                <span class="point__author">{p.author}</span>, Google review
+                <span class="point__author">{p.author}</span>{ar ? '، ' : ', '}{w.review}
               </figcaption>
             </figure>
             <p class="point__body">{p.body}</p>
@@ -103,7 +144,7 @@ import { proof, whyPhotos, whyPoints } from './content';
     toggle.hidden = false;
     toggle.addEventListener('click', () => {
       paused = !paused;
-      label.textContent = paused ? 'Play photos' : 'Pause photos';
+      label.textContent = (paused ? root.dataset.play : root.dataset.pause) ?? '';
       pauseIcon.hidden = paused;
       playIcon.hidden = !paused;
       sync();
@@ -300,6 +341,16 @@ import { proof, whyPhotos, whyPoints } from './content';
   }
   .point__quote blockquote p::after {
     content: '”';
+  }
+  /* Arabic quotes take guillemets, inline: the big hanging mark is a Latin one. */
+  .point__quote blockquote:lang(ar)::before {
+    content: none;
+  }
+  .point__quote blockquote:lang(ar) p::before {
+    content: '«';
+  }
+  .point__quote blockquote:lang(ar) p::after {
+    content: '»';
   }
   .point__quote figcaption {
     margin-block-start: 0.6rem;

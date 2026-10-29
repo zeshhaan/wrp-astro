@@ -7,6 +7,7 @@
  */
 import Icon from './Icon.astro';
 import { contact, proof, whatsappQuote } from './content';
+import { phone as phoneAr } from './contentAr';
 import { toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
 
@@ -101,7 +102,7 @@ const w =
         <span class="cd__optico"><Icon name="phone" size={22} /></span>
         <span class="cd__opttext">
           <span class="cd__optname">{w.call}</span>
-          <span class="cd__opthint" dir="ltr">{num(contact.phoneDisplay)}</span>
+          <span class="cd__opthint" dir="ltr">{locale === 'ar' ? phoneAr : contact.phoneDisplay}</span>
         </span>
         <Icon name="arrow-right" size={18} class="flip" />
       </a>

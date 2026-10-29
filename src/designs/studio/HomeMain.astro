@@ -1,5 +1,5 @@
 ---
-/** The Studio homepage's sections, in order, shared by the homepage and its header candidates. */
+/** The Studio homepage's sections, in order, shared by the homepage, its Arabic twin and the header candidates. */
 import Hero from './Hero.astro';
 import About from './About.astro';
 import Services from './Services.astro';
@@ -13,17 +13,29 @@ import Social from './Social.astro';
 import Blog from './Blog.astro';
 import Contact from './Contact.astro';
 import { toLab } from './site/routes';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /**
+   * Turns a live English path into this page's link (the Arabic page, the
+   * Studio preview). Without it, service cards go to the Studio service pages
+   * and every other link to the live page.
+   */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link } = Astro.props;
 ---
 
-<Hero />
-<About />
-<Services link={toLab} />
-<CtaBanner />
-<WhyUs />
-<Proof />
-<Testimonials />
-<Projects />
-<Lounge />
-<Social />
-<Blog />
-<Contact />
+<Hero locale={locale} link={link} />
+<About locale={locale} link={link} />
+<Services locale={locale} link={link ?? toLab} />
+<CtaBanner locale={locale} />
+<WhyUs locale={locale} link={link} />
+<Proof locale={locale} />
+<Testimonials locale={locale} link={link} />
+<Projects locale={locale} link={link} />
+<Lounge locale={locale} />
+<Social locale={locale} />
+<Blog locale={locale} link={link} />
+<Contact locale={locale} />

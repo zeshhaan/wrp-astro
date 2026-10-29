@@ -3,6 +3,7 @@ import Icon from './Icon.astro';
 import WrpLogo from '@/components/WrpLogo.astro';
 import { pages } from '../data';
 import { contact, serviceCards, whatsappQuote } from './content';
+import { phone as phoneAr } from './contentAr';
 import { getHeaderNav } from './headers/nav';
 import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
@@ -119,7 +120,7 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
     <div class="foot__col">
       <h2 class="foot__h">{w.visit}</h2>
       <ul role="list">
-        <li><a href={contact.phoneHref} dir="ltr">{num(contact.phoneDisplay)}</a></li>
+        <li><a href={contact.phoneHref} dir="ltr">{ar ? phoneAr : contact.phoneDisplay}</a></li>
         <li><a href={contact.emailHref}>{contact.email}</a></li>
         <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{w.address[0]}{ar ? '،' : ','}<br />{w.address[1]}</a></li>
         <li class="foot__hours">{w.hours}<br />{w.closed}</li>
