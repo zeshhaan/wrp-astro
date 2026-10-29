@@ -105,17 +105,20 @@ export const serviceOptionsAr = [
 
 /** The English reviews' service tags in Arabic. The review texts stay as the customers wrote them. */
 const reviewService: Record<string, string> = {
-  'Paint protection film': 'فيلم حماية الطلاء',
+  'Matte STEK PPF, Golf GTI': 'فيلم STEK مطفي، جولف GTI',
+  'Level 2 detailing': 'عناية شاملة، المستوى الثاني',
   'Ceramic coating, FJ Cruiser': 'طلاء سيراميك، FJ كروزر',
-  Detailing: 'عناية شاملة',
+  'STEK DYNOshield PPF, Jaecoo J7': 'فيلم STEK DYNOshield، Jaecoo J7',
   'PPF re-install & floor mats': 'إعادة تركيب PPF ودواسات أرضية',
+  Detailing: 'عناية شاملة',
+  'Paint protection film': 'فيلم حماية الطلاء',
+  'Window tinting': 'تظليل النوافذ',
   'Wrap: matte black bonnet & spoiler': 'تغليف: كبوت وجناح خلفي بالأسود المطفي',
   'Upholstery & detailing': 'تنجيد وعناية شاملة',
+  'Bonnet paint repair & polish': 'إصلاح طلاء الكبوت وتلميعه',
   'Polish & detailing': 'تلميع وعناية شاملة',
-  'Interior detailing & wash': 'تنظيف داخلي وغسيل',
+  'PPF, tint & floor mats': 'PPF وتظليل ودواسات أرضية',
   'PPF & window tint': 'PPF وتظليل نوافذ',
-  'Interior detailing, Altima': 'تنظيف داخلي، ألتيما',
-  'Detailing & ceramic, Tesla Model 3': 'عناية شاملة وسيراميك، تسلا موديل 3',
 };
 export const reviewsAr: Review[] = reviews.map((r) => {
   const service = reviewService[r.service];
