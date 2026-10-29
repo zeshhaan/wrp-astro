@@ -72,7 +72,7 @@ export const services: Service[] = [
     href: '/services/ceramic-coating/',
     name: 'Ceramic Coating',
     short: 'Ceramic',
-    line: 'A hard, hydrophobic glass layer that keeps the gloss and makes every wash easier.',
+    line: 'Our borophene coating: a hard, hydrophobic layer that keeps the gloss and makes every wash easier.',
     from: 1399,
     time: '1–2 days',
     minutes: 24 * 60,
@@ -207,7 +207,10 @@ export const lounge = {
       text: 'The whole place gives off a comfortable, welcoming “home” feeling.',
       author: 'Mark Ban',
     },
-    { text: 'Also love the waiting area.', author: 'Shafan Maheen' },
+    {
+      text: 'The waiting area was a nice touch as well—comfortable, with a TV, complimentary coffee, and a pool table, making the wait enjoyable.',
+      author: 'Lithin Devassy',
+    },
   ],
 };
 
@@ -227,27 +230,33 @@ export const proof = {
   reviewCountDisplay: getDisplayCount(),
   reviewsUrl: '/reviews/',
   // The films WRP fits, as confirmed by the owner on 2026-10-29, spelled as the
-  // makers spell them. Supreme Defense is Avery Dennison's, never list it under STEK.
+  // makers spell them (DYNOmatte is STEK's matte DYNOshield). Supreme Defense is
+  // Avery Dennison's, never list it under STEK.
   films: [
     { name: 'Avery Dennison', logo: '/logos/avery-dennison.png', lines: ['Supreme Defense'] },
-    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
+    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'DYNOmatte', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
   ] as { name: string; logo: string; lines: string[]; finishes?: string }[],
 };
 
 export type Quote = { text: string; author: string; service?: string; photo?: string };
 
 /**
- * Written Google reviews posted since the February scrape, verbatim (typos
- * kept), newest first. `service` matches a `services[].slug` where one fits.
+ * The strongest written Google reviews since the February scrape, verbatim
+ * excerpts of whole sentences (typos kept), newest first. Picked 29 Oct 2026
+ * from the newest 80; all are also in data/google-reviews.json.
+ * `service` matches a `services[].slug` where one fits.
  */
 export const freshQuotes: (Quote & { when: string })[] = [
   { text: 'I got a PPF on my car. The service is amazing. Afzal kept me informed on the progress of the process. It’s been a really good experience with these guys.', author: 'Siddik Akbar', service: 'paint-protection-film', when: 'September 2026' },
-  { text: 'Got my car detailed at WRP, and they did an amazing job honestly. The car was super dirty when i dropped it off and they made it look brand new inside and out.', author: 'Aadithya Dhanesh', service: 'premium-car-wash', when: 'September 2026' },
+  { text: 'Got my car detailed at WRP, and they did an amazing job honestly. The car was super dirty when i dropped it off and they made it look brand new inside and out.', author: 'Aadithya Dhanesh', service: 'premium-car-wash', when: 'August 2026' },
   { text: 'I went for the Matte black hood + spoiler combo and i must say that the result is outstanding. Huge thanks to Mr. Afzal and the remaining crew members.', author: 'A Khalid', when: 'August 2026' },
-  { text: 'Very happy with their work. Got complete interior detailing done along with exterior wash for better paint. Quick turn around time too!', author: 'Muhammad Nadir', service: 'leather-upholstery', when: 'August 2026' },
-  { text: 'The team is really humble and professional, The quality of work is spot on and will definitely be going back for the detailed wash.', author: 'Sunit Gonsalves', service: 'premium-car-wash', when: 'July 2026' },
-  { text: 'Give a drity car get it clean by 24 hours car washing including cleaning inside deep cleaning best service must recommend for suv and small cars', author: 'Huzaifa Hamid', service: 'premium-car-wash', when: 'July 2026' },
-  { text: 'Nice work done quickly and professionally. Detailing and ceramic coating polish works done efficiently!', author: 'James Daniel', service: 'ceramic-coating', when: 'July 2026' },
+  { text: 'They just finished a matte finish STEK PPF job on my Golf GTI, and it has completely transformed the car. The team\'s expertise and professionalism are unmatched, but what really blew me away was the pricing—extremely fair and well below the current market rates for premium PPF.', author: 'arun prasad', service: 'paint-protection-film', when: 'July 2026' },
+  { text: 'Honestly, if you\'re sick of those cashgrab detailing shops in Dubai that charge a fortune, rush the job, and try to upsell you the second you walk in, just go to WRP. They actually took their time with it, did a flawless job, and didn\'t cut any corners.', author: 'xiii adventures', service: 'premium-car-wash', when: 'June 2026' },
+  { text: 'They used STEK Dynoshield and the final result is stunning—perfect installation and an amazing glossy finish.', author: 'Ciby Koshy', service: 'paint-protection-film', when: 'June 2026' },
+  { text: 'Absolutely thrilled with my window tinting! The team was friendly and professional. The process was smooth, the quality is outstanding, and my car looks so much better.', author: 'Salwa Shaikh', service: 'window-film', when: 'June 2026' },
+  { text: 'The attention to detail is on another level — the car looked better than when I first got it. It’s definitely on the premium side price-wise, but you can see where the money goes.', author: 'Ashik Mubarak', service: 'premium-car-wash', when: 'April 2026' },
+  { text: 'Gave my car for ppf, tinting, and floor mats. All came out well and top class. Applied perfectly and no flaws.', author: 'Kevin S', service: 'paint-protection-film', when: 'March 2026' },
+  { text: 'Shahul and his team did an amazing job and restored the car bonnet & the paint with some polishing and looked like the issue never existed!', author: 'Shamim J Mahal', service: 'polish', when: 'March 2026' },
 ];
 
 export const pages = {
