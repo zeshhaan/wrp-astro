@@ -227,10 +227,11 @@ export const proof = {
   reviewCountDisplay: getDisplayCount(),
   reviewsUrl: '/reviews/',
   // The films WRP fits, as confirmed by the owner on 2026-10-29, spelled as the
-  // makers spell them. Supreme Defense is Avery Dennison's, never list it under STEK.
+  // makers spell them (DYNOmatte is STEK's matte DYNOshield). Supreme Defense is
+  // Avery Dennison's, never list it under STEK.
   films: [
     { name: 'Avery Dennison', logo: '/logos/avery-dennison.png', lines: ['Supreme Defense'] },
-    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
+    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'DYNOmatte', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
   ] as { name: string; logo: string; lines: string[]; finishes?: string }[],
 };
 
