@@ -1,0 +1,595 @@
+---
+/**
+ * The Studio reviews page's body ("Word of mouth", picked by Shereef on
+ * 29 Oct 2026 from three concepts): the customers do the talking.
+ * Their own lines are stuck around the title like stickers (pick one up and
+ * move it with a mouse; Tidy up puts them back), the reviews roll past in
+ * huge type, customer photos are pinned up as Polaroids that open into the
+ * full review, and every review can be narrowed to what people keep bringing
+ * up, with their words lit up in red.
+ *
+ * Stickers are quotes in the page's text; moving them is only for fun, so
+ * nothing needs a drag. Polaroids open native <dialog>s (Esc closes, focus
+ * returns), and every review's full text is in the HTML either way.
+ */
+import { t, type Locale } from '@/i18n/translations';
+import { localizeUrl } from '@/i18n/utils';
+import ReviewCard from '../sections/ReviewCard.astro';
+import ReviewScript from '../sections/ReviewScript.astro';
+import Icon from '../../Icon.astro';
+import Ticker from './Ticker.astro';
+import Wall from './Wall.astro';
+import GoogleG from './GoogleG.astro';
+import { reviewsPage, topicFilters, stickers, pullLine } from './data';
+
+interface Props {
+  locale?: Locale;
+  link: (href: string) => string;
+}
+
+const { locale = 'en', link } = Astro.props;
+const d = reviewsPage(locale);
+const { num } = d;
+const lines = stickers();
+const words =
+  locale === 'ar'
+    ? {
+        tidy: 'رتّبها',
+        stickers: 'من كلام عملائنا',
+        open: (name: string) => `اقرأ تقييم ${name}`,
+        close: 'إغلاق',
+        filter: 'اعرض التقييمات التي تذكر',
+        all: 'الكل',
+        stars: '٥ من ٥ نجوم',
+      }
+    : {
+        tidy: 'Tidy up',
+        stickers: 'Things customers said',
+        open: (name: string) => `Read ${name}’s review`,
+        close: 'Close',
+        filter: 'Show reviews that mention',
+        all: 'Everything',
+        stars: '5 out of 5 stars',
+      };
+---
+
+<section class="wm st-white" data-wm>
+  <div class="st-wrap wm__inner">
+    <p class="wm__rating">
+      <GoogleG size={28} />
+      <span class="wm__score">{num(d.business.rating.toFixed(1))}</span>
+      <span class="wm__stars" role="img" aria-label={words.stars}>{Array.from({ length: 5 }, () => <Icon name="star" size={20} />)}</span>
+    </p>
+    <h1 class="wm__title">{t(locale, 'reviews.whatClientsSay')}</h1>
+    <p class="wm__count">{num(d.displayCount)} {t(locale, 'reviews.verifiedOnGoogle')}</p>
+    <dl class="wm__stats">
+      <div><dd>{num(d.displayCount)}</dd><dt>{t(locale, 'reviews.reviews')}</dt></div>
+      <div><dd>{num('5.0')}</dd><dt>{t(locale, 'reviews.statsRating')}</dt></div>
+      <div><dd>{num('100%')}</dd><dt>{t(locale, 'reviews.statsFiveStar')}</dt></div>
+    </dl>
+
+    <ul class="wm__stickers" role="list" aria-label={words.stickers} data-stickers>
+      {
+        lines.map((s, i) => (
+          <li class="wm__sticker" style={`--i:${i}`} data-sticker>
+            <blockquote>
+              <p dir="auto">“{s.line}”</p>
+            </blockquote>
+            <span class="wm__by">{s.name}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <button type="button" class="wm__tidy" data-tidy hidden>{words.tidy}</button>
+  </div>
+</section>
+
+<Ticker reviews={d.marquee} locale={locale} class="st-black" />
+
+{
+  d.withImages.length > 0 && (
+    <section class="st-section st-light pin">
+      <div class="st-wrap">
+        <header class="st-head st-head--center">
+          <h2 class="st-h2">{t(locale, 'reviews.seeResults')}</h2>
+          <p class="st-intro">{t(locale, 'reviews.customerPhotos')}</p>
+        </header>
+        <ul class="pin__board" role="list">
+          {d.withImages.map((r, i) => (
+            <li class="pin__item" style={`--i:${i}`}>
+              <button type="button" class="pin__card" aria-haspopup="dialog" aria-label={words.open(r.reviewerName)} data-pin-open={`pin-${i}`}>
+                <img src={`/${r.localImages[0]}`} alt= width="400" height="400" loading="lazy" decoding="async" />
+                <span class="pin__line" dir="auto">“{pullLine(r, 60)}”</span>
+                <span class="pin__name">{r.reviewerName}</span>
+                {r.localImages.length > 1 && (
+                  <span class="pin__more" aria-hidden="true">
+                    +{num(r.localImages.length - 1)}
+                  </span>
+                )}
+              </button>
+              <dialog class="pin__dialog" id={`pin-${i}`} aria-label={r.reviewerName}>
+                <button type="button" class="pin__close" data-close>
+                  <Icon name="close" size={22} />
+                  <span class="visually-hidden">{words.close}</span>
+                </button>
+                <ReviewCard review={r} locale={locale} highlight photos="all" tone="white" />
+              </dialog>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+<section class="st-section st-white" id="all-reviews">
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <h2 class="st-h2">{t(locale, 'reviews.allReviews')}</h2>
+      <p class="st-intro">{t(locale, 'reviews.everyReview')}</p>
+    </header>
+    <Wall reviews={d.textOnly} filters={topicFilters(d.textOnly, locale)} locale={locale} legend={words.filter} allLabel={words.all} tone="paper" />
+  </div>
+</section>
+
+<section class="st-section st-black bub">
+  <div class="st-wrap">
+    <div class="bub__bubble">
+      <h2 class="st-h2">{t(locale, 'reviews.readyDifference')}</h2>
+      <p class="bub__text">{d.joinLine}</p>
+      <a class="st-btn st-btn--primary" href={link(localizeUrl('/contact-us/', locale))}>
+        {t(locale, 'home.hero.getQuote')}
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+    </div>
+  </div>
+</section>
+<ReviewScript />
+
+<script>
+  // Stickers: with a mouse, pick one up and drop it anywhere; Tidy up puts
+  // them all back. Touch screens scroll as usual.
+  const box = document.querySelector<HTMLElement>('[data-stickers]');
+  const tidy = document.querySelector<HTMLButtonElement>('[data-tidy]');
+  const fine = matchMedia('(pointer: fine)');
+  if (box && tidy) {
+    let top = 10;
+    for (const el of box.querySelectorAll<HTMLElement>('[data-sticker]')) {
+      let sx = 0;
+      let sy = 0;
+      let dx = 0;
+      let dy = 0;
+      el.addEventListener('pointerdown', (e) => {
+        if (!fine.matches || e.button !== 0) return;
+        e.preventDefault();
+        el.setPointerCapture(e.pointerId);
+        sx = e.clientX - dx;
+        sy = e.clientY - dy;
+        el.style.zIndex = String(++top);
+        el.classList.add('is-held');
+      });
+      el.addEventListener('pointermove', (e) => {
+        if (!el.hasPointerCapture(e.pointerId)) return;
+        dx = e.clientX - sx;
+        dy = e.clientY - sy;
+        el.style.translate = `${dx}px ${dy}px`;
+      });
+      const drop = () => {
+        el.classList.remove('is-held');
+        if (dx || dy) tidy.hidden = false;
+      };
+      el.addEventListener('pointerup', drop);
+      el.addEventListener('pointercancel', drop);
+      tidy.addEventListener('click', () => {
+        dx = dy = 0;
+        el.style.translate = '';
+        el.style.zIndex = '';
+        tidy.hidden = true;
+      });
+    }
+  }
+
+  // Polaroids open their review in a dialog; a click outside or Close shuts it.
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-pin-open]')) {
+    const dialog = document.getElementById(btn.dataset.pinOpen!) as HTMLDialogElement | null;
+    if (!dialog) continue;
+    btn.addEventListener('click', () => dialog.showModal());
+    dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+</script>
+
+<style>
+  /* Hero: the title with the customers' words stuck all round it */
+  .wm {
+    position: relative;
+    padding-block: 8.5rem 4.5rem;
+    overflow: hidden;
+    text-align: center;
+  }
+  .wm__inner {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .wm__rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .wm__score {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+  .wm__stars {
+    display: inline-flex;
+    gap: 3px;
+    color: var(--st-red);
+  }
+  .wm__stars :global(svg) {
+    fill: currentColor;
+  }
+  .wm__title {
+    position: relative;
+    z-index: 1;
+    max-inline-size: 11ch;
+    font-family: var(--st-head-font);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 1.5rem + 9vw, 9rem);
+    line-height: 0.88;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  /* Arabic: the title is short in words but wide, so break it over two lines too. */
+  :global(:lang(ar)) .wm__title {
+    max-inline-size: 5.5em;
+    line-height: 1.15;
+  }
+  .wm__count {
+    font-size: 1.125rem;
+    color: var(--st-ink-2);
+  }
+  .wm__stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 2.5rem;
+    margin: 0.5rem 0 0;
+  }
+  .wm__stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+  .wm__stats dd {
+    margin: 0;
+    padding-inline: 0.15em;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    padding-block-end: 0.12em;
+    background: linear-gradient(var(--st-red), var(--st-red)) no-repeat 0 100% / 100% 0.16em;
+  }
+  .wm__stats dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--st-ink-2);
+  }
+
+  .wm__stickers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem 0.7rem;
+    margin: 2rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .wm__sticker {
+    --tilt: calc((mod(var(--i), 4) - 1.5) * 3deg);
+    position: relative;
+    display: grid;
+    gap: 0.25rem;
+    max-inline-size: 16rem;
+    padding: 0.8rem 1rem 0.7rem;
+    rotate: var(--tilt);
+    border: 2px solid var(--st-ink);
+    background: var(--st-white);
+    box-shadow: 5px 5px 0 var(--st-ink);
+    text-align: start;
+    user-select: none;
+    transition: rotate 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.2s, scale 0.2s;
+  }
+  .wm__sticker:nth-child(3n + 1) {
+    background: var(--st-red);
+    color: var(--st-white);
+  }
+  .wm__sticker:nth-child(3n + 2) {
+    background: var(--st-black);
+    color: var(--st-white);
+    border-color: var(--st-black);
+    box-shadow: 5px 5px 0 var(--st-red);
+  }
+  .wm__sticker blockquote {
+    margin: 0;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  @media (max-width: 40rem) {
+    .wm__stickers {
+      gap: 0.7rem 0.5rem;
+    }
+    .wm__sticker {
+      max-inline-size: 10.5rem;
+      padding: 0.6rem 0.7rem 0.55rem;
+      box-shadow: 4px 4px 0 var(--st-ink);
+    }
+    .wm__sticker blockquote {
+      font-size: 1rem;
+    }
+    .wm__sticker:nth-child(n + 7) {
+      display: none;
+    }
+  }
+  .wm__by {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  @media (pointer: fine) {
+    .wm__sticker {
+      cursor: grab;
+      touch-action: none;
+    }
+    .wm__sticker:hover {
+      rotate: 0deg;
+      scale: 1.04;
+    }
+    .wm__sticker.is-held {
+      cursor: grabbing;
+      rotate: calc(var(--tilt) * -2);
+      scale: 1.08;
+      box-shadow: 12px 14px 0 rgb(0 0 0 / 0.25);
+      transition: none;
+    }
+  }
+  /* Wide screens: the stickers scatter round the title. */
+  @media (min-width: 64rem) {
+    .wm__stickers {
+      position: absolute;
+      inset: -1rem var(--st-gutter-x) 0;
+      margin: 0;
+      display: block;
+      pointer-events: none;
+    }
+    .wm__sticker {
+      position: absolute;
+      max-inline-size: 15rem;
+      pointer-events: auto;
+    }
+    .wm__sticker:nth-child(1) { inset-block-start: 0; inset-inline-start: 0; }
+    .wm__sticker:nth-child(2) { inset-block-start: 1.5rem; inset-inline-end: 1rem; }
+    .wm__sticker:nth-child(3) { inset-block-start: 11rem; inset-inline-start: -1rem; }
+    .wm__sticker:nth-child(4) { inset-block-start: 10rem; inset-inline-end: -0.5rem; }
+    .wm__sticker:nth-child(5) { inset-block-end: 5rem; inset-inline-start: 3rem; }
+    .wm__sticker:nth-child(6) { inset-block-end: 4rem; inset-inline-end: 4rem; }
+    .wm__sticker:nth-child(7) { inset-block-end: -0.5rem; inset-inline-start: 18%; }
+    .wm__sticker:nth-child(8) { inset-block-end: -1rem; inset-inline-end: 20%; }
+    .wm__inner {
+      padding-block: 2rem 9rem;
+    }
+  }
+  .wm__tidy {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-end: var(--st-gutter-x);
+    z-index: 30;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid var(--st-ink);
+    background: var(--st-white);
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+  }
+  .wm__tidy[hidden] {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .wm__sticker {
+      animation: wm-slap 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+      animation-delay: calc(0.25s + var(--i) * 0.09s);
+    }
+  }
+  @keyframes wm-slap {
+    from {
+      opacity: 0;
+      scale: 1.6;
+      rotate: calc(var(--tilt) * 4);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wm__sticker {
+      transition: none;
+    }
+  }
+
+  /* Pin board: Polaroids that straighten up when you point at them */
+  .pin__board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+    gap: 2.25rem 1.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pin__item {
+    --tilt: calc((mod(var(--i) * 7, 5) - 2) * 1.6deg);
+    position: relative;
+  }
+  .pin__item::before {
+    /* tape */
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset-block-start: -0.7rem;
+    inset-inline-start: 50%;
+    inline-size: 4.5rem;
+    block-size: 1.4rem;
+    translate: -50% 0;
+    rotate: calc(var(--tilt) * -2);
+    background: rgb(212 20 28 / 0.85);
+    pointer-events: none;
+  }
+  .pin__card {
+    display: grid;
+    gap: 0.6rem;
+    inline-size: 100%;
+    padding: 0.7rem 0.7rem 1rem;
+    border: 0;
+    background: var(--st-white);
+    color: var(--st-ink);
+    text-align: start;
+    rotate: var(--tilt);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.12),
+      0 10px 24px rgb(0 0 0 / 0.12);
+    cursor: zoom-in;
+    transition: rotate 0.3s cubic-bezier(0.3, 1.5, 0.5, 1), translate 0.3s, box-shadow 0.3s;
+  }
+  .pin__card:hover,
+  .pin__card:focus-visible {
+    rotate: 0deg;
+    translate: 0 -6px;
+    box-shadow:
+      0 2px 4px rgb(0 0 0 / 0.14),
+      0 22px 40px rgb(0 0 0 / 0.2);
+  }
+  .pin__card:focus-visible {
+    outline: 3px solid var(--st-ink);
+    outline-offset: 4px;
+  }
+  .pin__card img {
+    inline-size: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--st-light);
+  }
+  .pin__line {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1.05rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .pin__name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--st-ink-2);
+  }
+  .pin__more {
+    position: absolute;
+    inset-block-start: 1.2rem;
+    inset-inline-end: 1.2rem;
+    padding: 0.2rem 0.45rem;
+    background: var(--st-black);
+    color: var(--st-white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    rotate: var(--tilt);
+  }
+  .pin__dialog {
+    inline-size: min(36rem, calc(100vw - 2rem));
+    max-block-size: calc(100dvh - 2rem);
+    padding: 0;
+    border: 0;
+    background: var(--st-white);
+    color: var(--st-ink);
+    color-scheme: light;
+    overflow: auto;
+  }
+  .pin__dialog::backdrop {
+    background: rgb(12 13 15 / 0.82);
+  }
+  .pin__close {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    float: inline-end;
+    display: grid;
+    place-items: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    margin-block-end: -3rem;
+    border: 0;
+    background: var(--st-black);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .pin__close:focus-visible {
+    outline: 3px solid var(--st-red);
+    outline-offset: -3px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pin__dialog[open] {
+      animation: pin-in 0.3s cubic-bezier(0.3, 1.3, 0.5, 1);
+    }
+  }
+  @keyframes pin-in {
+    from {
+      opacity: 0;
+      scale: 0.9;
+      rotate: -2deg;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pin__card {
+      transition: none;
+    }
+  }
+
+  /* The closing call to action, said in a speech bubble */
+  .bub__bubble {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    max-inline-size: 44rem;
+    margin-inline: auto;
+    padding: clamp(2rem, 1rem + 4vw, 3.5rem);
+    background: var(--st-white);
+    color: var(--st-ink);
+    color-scheme: light;
+    text-align: center;
+    rotate: -1.2deg;
+    box-shadow: 10px 10px 0 var(--st-red);
+  }
+  .bub__bubble::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-start: 18%;
+    border: 1.6rem solid transparent;
+    border-block-start-color: var(--st-white);
+    border-inline-start-color: var(--st-white);
+  }
+  .bub__bubble :focus-visible {
+    outline-color: var(--st-ink);
+  }
+  .bub__text {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+    margin-block-end: 0.5rem;
+  }
+</style>

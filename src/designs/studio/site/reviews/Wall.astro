@@ -1,0 +1,303 @@
+---
+/**
+ * The "All Reviews" wall with a filter on top: the first `limit` reviews, then
+ * Show all, as live. Picking a filter keeps only its reviews (all of them)
+ * and marks its words in them; the cards reshuffle with a view transition
+ * where the browser has one and motion is welcome.
+ *
+ * The filter is a native radio group drawn as tilted stickers with counts,
+ * so it works by keyboard (arrow keys) and screen readers without help; a
+ * polite status line says how many reviews are showing.
+ */
+import type { Review } from '@/lib/reviews';
+import { t, type Locale } from '@/i18n/translations';
+import ReviewCard from '../sections/ReviewCard.astro';
+import Icon from '../../Icon.astro';
+import type { ReviewFilter } from './data';
+
+interface Props {
+  reviews: Review[];
+  filters: ReviewFilter[];
+  locale?: Locale;
+  limit?: number;
+  /** The radio group's name for screen readers. */
+  legend: string;
+  allLabel: string;
+  tone?: 'white' | 'paper';
+}
+
+const { reviews, filters, locale = 'en', limit = 12, legend, allLabel, tone = 'white' } = Astro.props;
+const num = (n: number) => n.toLocaleString(locale === 'ar' ? 'ar-EG' : 'en');
+const group = 'wall-filter';
+const options = [{ id: '', label: allLabel, ids: reviews.map((r) => r.reviewId), terms: undefined as string | undefined }, ...filters];
+const status =
+  locale === 'ar'
+    ? { one: 'يظهر الآن {n} تقييم', many: 'يظهر الآن {n} تقييمات' }
+    : { one: 'Showing {n} review', many: 'Showing {n} reviews' };
+---
+
+<div class="wl" data-wall data-limit={limit} data-status-one={status.one} data-status-many={status.many}>
+  <fieldset class="wl__set">
+    <legend class="visually-hidden">{legend}</legend>
+    <div class="wl__opts">
+      {
+        options.map((o, i) => (
+          <label class="wl__opt" style={`--i:${i}`}>
+            <input
+              class="visually-hidden"
+              type="radio"
+              name={group}
+              value={o.id}
+              checked={i === 0}
+              data-ids={o.ids.join(' ')}
+              data-terms={o.terms}
+            />
+            <span class="wl__text">
+              <span class="wl__label">{o.label}</span>
+              <span class="wl__count">
+                <span class="visually-hidden">, </span>
+                {num(o.ids.length)}
+              </span>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+  </fieldset>
+  <p class="visually-hidden" role="status" data-wall-status></p>
+
+  <ul class="wall" role="list">
+    {
+      reviews.map((r, i) => (
+        <li class="wall__item" data-id={r.reviewId} data-more-review={i >= limit ? '' : undefined} hidden={i >= limit} style={`view-transition-name: rv-${i}`}>
+          <ReviewCard review={r} locale={locale} max={250} tone={tone} />
+        </li>
+      ))
+    }
+  </ul>
+  {
+    reviews.length > limit && (
+      <p class="wall__all" data-show-all-row>
+        <button type="button" class="st-btn st-btn--dark" data-show-all>
+          {t(locale, 'reviews.showAll')} {num(reviews.length)} {t(locale, 'reviews.reviewsLabel')}
+          <Icon name="chevron-down" size={18} />
+        </button>
+      </p>
+    )
+  }
+</div>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Wrap every match of `re` in the text of `root` with <mark class="wl-hit">.
+  function markTerms(root: Element, re: RegExp | null) {
+    for (const old of root.querySelectorAll('mark.wl-hit')) old.replaceWith(...old.childNodes);
+    root.normalize();
+    if (!re) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+    for (const node of nodes) {
+      const text = node.data;
+      re.lastIndex = 0;
+      if (!re.test(text)) continue;
+      re.lastIndex = 0;
+      const frag = document.createDocumentFragment();
+      let at = 0;
+      for (const m of text.matchAll(re)) {
+        frag.append(text.slice(at, m.index));
+        const hit = document.createElement('mark');
+        hit.className = 'wl-hit';
+        hit.textContent = m[0];
+        frag.append(hit);
+        at = m.index! + m[0].length;
+      }
+      frag.append(text.slice(at));
+      node.replaceWith(frag);
+    }
+  }
+
+  for (const wall of document.querySelectorAll<HTMLElement>('[data-wall]')) {
+    const items = [...wall.querySelectorAll<HTMLElement>('.wall__item')];
+    const limit = Number(wall.dataset.limit);
+    const statusEl = wall.querySelector<HTMLElement>('[data-wall-status]')!;
+    const allRow = wall.querySelector<HTMLElement>('[data-show-all-row]');
+    let expanded = false;
+
+    const apply = (input: HTMLInputElement, announce: boolean) => {
+      const keep = new Set(input.dataset.ids!.split(' '));
+      const filtered = input.value !== '';
+      const re = input.dataset.terms ? new RegExp(`\\b(?:${input.dataset.terms})`, 'gi') : null;
+      let shown = 0;
+      let rank = 0;
+      for (const item of items) {
+        const match = keep.has(item.dataset.id!);
+        const visible = match && (filtered || expanded || rank < limit);
+        if (match) rank++;
+        item.hidden = !visible;
+        if (visible) shown++;
+        markTerms(item.querySelector('.rv__text') ?? item, visible ? re : null);
+      }
+      if (allRow) allRow.hidden = filtered || expanded;
+      if (announce) {
+        const tpl = shown === 1 ? wall.dataset.statusOne! : wall.dataset.statusMany!;
+        statusEl.textContent = tpl.replace('{n}', shown.toLocaleString(document.documentElement.lang === 'ar' ? 'ar-EG' : 'en'));
+      }
+    };
+    const run = (fn: () => void) => {
+      const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+      if (doc.startViewTransition && !reduce.matches) doc.startViewTransition(fn);
+      else fn();
+    };
+
+    wall.addEventListener('change', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.type === 'radio') run(() => apply(input, true));
+    });
+    wall.querySelector('[data-show-all]')?.addEventListener('click', () => {
+      expanded = true;
+      const first = items.find((i) => i.hidden);
+      run(() => {
+        apply(wall.querySelector<HTMLInputElement>('input:checked')!, true);
+        // Focus lands on the first new review, as the button it replaces is gone.
+        if (first) {
+          first.tabIndex = -1;
+          first.focus({ preventScroll: true });
+        }
+      });
+    });
+  }
+</script>
+
+<style>
+  .wl__set {
+    margin: 0 0 2.5rem;
+    padding: 0;
+    border: 0;
+    min-inline-size: 0;
+  }
+  .wl__opts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .wl__opt {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding: 0.5rem 1rem;
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    user-select: none;
+  }
+  .wl__text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .wl__count {
+    font-family: var(--st-body-font);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .wl__opt:has(:focus-visible) {
+    outline: 3px solid var(--st-accent);
+    outline-offset: 3px;
+  }
+
+  /* Stickers: tilted labels that straighten and turn red when picked. */
+  .wl .wl__opts {
+    gap: 0.75rem 0.6rem;
+  }
+  .wl .wl__opt {
+    --tilt: calc((mod(var(--i), 3) - 1) * 2.5deg);
+    rotate: var(--tilt);
+    border: 2px solid var(--st-ink);
+    background: var(--st-white);
+    color: var(--st-ink);
+    font-size: 1.05rem;
+    box-shadow: 4px 4px 0 var(--st-ink);
+    transition: rotate 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), translate 0.2s, box-shadow 0.2s, background-color 0.15s;
+  }
+  .wl .wl__opt:hover {
+    rotate: 0deg;
+    translate: -2px -2px;
+    box-shadow: 6px 6px 0 var(--st-ink);
+  }
+  .wl .wl__opt:has(:checked) {
+    rotate: 0deg;
+    translate: 2px 2px;
+    background: var(--st-red);
+    border-color: var(--st-ink);
+    color: var(--st-white);
+    box-shadow: 2px 2px 0 var(--st-ink);
+  }
+  .wl .wl__count {
+    display: grid;
+    place-items: center;
+    min-inline-size: 1.5rem;
+    block-size: 1.5rem;
+    padding-inline: 0.3rem;
+    background: var(--st-ink);
+    color: var(--st-white);
+  }
+
+  .wall {
+    columns: 1;
+    column-gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 40rem) {
+    .wall {
+      columns: 2;
+    }
+  }
+  @media (min-width: 64rem) {
+    .wall {
+      columns: 3;
+    }
+  }
+  .wall__item {
+    break-inside: avoid;
+    margin-block-end: 1rem;
+  }
+  .wall__item[hidden],
+  .wall__all[hidden] {
+    display: none;
+  }
+  .wall__all {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 1.5rem;
+  }
+  .wl :global(mark.wl-hit) {
+    background: linear-gradient(var(--st-red), var(--st-red)) no-repeat 0 100% / 100% 100%;
+    color: var(--st-white);
+    padding-inline: 0.12em;
+    animation: wl-swipe 0.5s ease-out both;
+  }
+  @keyframes wl-swipe {
+    from {
+      background-size: 0% 100%;
+      color: inherit;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wl__opt {
+      transition: none;
+    }
+    .wl :global(mark.wl-hit) {
+      animation: none;
+    }
+  }
+</style>
