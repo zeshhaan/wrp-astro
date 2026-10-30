@@ -574,7 +574,7 @@ function onSubmit(e: SubmitEvent) {
   submitting = true;
   const data = new FormData();
   for (const [name, value] of Object.entries(quoteLeadFields(S, C))) data.set(name, value);
-  data.set('leave_blank', input('leave_blank')!.value);
+  data.set('form_check', input('form_check')!.value);
   data.set('requestId', requestId);
   data.set('page', location.pathname);
   const attribution = window.WRPAttribution?.serialize?.();

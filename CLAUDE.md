@@ -54,7 +54,7 @@ bun astro ...
 
 **Wrangler Configuration** (`wrangler.jsonc`):
 - Worker entry point: `./src/worker.ts` (Astro's `handle` plus a `scheduled` handler that retries quote lead emails)
-- Cron Trigger: every 10 minutes (`triggers.crons`)
+- Cron Trigger: every 5 minutes (`triggers.crons`)
 - Compatibility date: 2025-10-29
 - Compatibility flags: `nodejs_compat`, `global_fetch_strictly_public`
 - Assets binding: `ASSETS` (serves static files from `./dist`)

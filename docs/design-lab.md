@@ -111,26 +111,22 @@ as the live page, so the copy cannot drift.
   form, and the header's quote buttons hide while the form is on screen. It
   sends to the `quote` Astro Action (`src/actions/index.ts`), which validates
   the fields, checks a hidden honeypot, and saves to the `quote_form_leads` D1
-  table, then emails the team after the response. Missing D1 on a live site
-  is an error; missing email does not prevent the D1 save. A filled honeypot
-  (`leave_blank`) is discarded without a lead conversion and logged as
-  "Quote lead discarded by the honeypot" (page and locale only). Worker
+  table and a notification job together, then attempts to email the team.
+  Missing D1 or the outbox migration on a live site is an error; missing email
+  does not prevent the D1 save. A filled honeypot (`form_check`) is discarded
+  without a lead conversion and logged without customer details. Worker
   previews and Design Lab pages only run the checks: nothing is saved or sent
   (`quoteLeadMode` in `src/lib/quote-form-lead.ts`). The homepage form and the
   configurator send to the same action.
 
-  Email recovery (`src/lib/quote-lead-notify.ts`): each try is counted on the
-  lead (`notify_attempts`, `notify_error`) and a sent email stamps
-  `notified_at`. The request tries twice; a resend of a failed request tries
-  again; the Cron Trigger (`src/worker.ts`, every 10 minutes) retries leads
-  older than 2 minutes until 6 tries in all, then emails the lead to
-  `AGENCY_COPY_EMAIL` marked "NOT DELIVERED to WRP" and logs "Quote lead
-  notification abandoned". To list leads still owed an email:
-  `SELECT id, created_at, notify_attempts, notify_error FROM quote_form_leads
-  WHERE notified_at IS NULL`.
+  Email recovery: the Cron Trigger (`src/worker.ts`, every 5 minutes) retries
+  failed notifications and sends a backlog alert. The alert uses the same
+  email service and therefore cannot independently report an outage of that
+  service. See `docs/quote-notification-recovery.md` for monitoring, retry
+  limits and operator recovery.
 
   Go-live needs: migrations 0006 and 0007 (applied 2026-10-30) and
-  `0008_add_quote_form_notification_status.sql` applied in order to
+  `0008_add_quote_notification_outbox.sql` applied in order to
   production D1 before this code reaches main, then a real submission checked
   through D1, the inbox and GA4. The honeypot is a lightweight spam filter;
   watch the honeypot log line and revisit Turnstile if spam gets through.

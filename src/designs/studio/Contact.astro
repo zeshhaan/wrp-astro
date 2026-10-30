@@ -163,8 +163,8 @@ const w =
         </label>
       </div>
       <div class="form__honeypot" aria-hidden="true">
-        <label for="homepage-leave-blank">Leave this field empty</label>
-        <input id="homepage-leave-blank" name="leave_blank" type="text" tabindex="-1" autocomplete="off" />
+        <label for="homepage-form-check">{locale === 'ar' ? 'اترك هذا الحقل فارغًا' : 'Leave this field empty'}</label>
+        <input id="homepage-form-check" name="form_check" type="text" tabindex="-1" autocomplete="off" />
       </div>
       <button class="st-btn st-btn--primary form__submit" type="submit" disabled>{w.submit}</button>
       <noscript><p class="form__note">{w.noScript}</p></noscript>
