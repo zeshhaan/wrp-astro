@@ -62,7 +62,9 @@ export const server = {
       });
 
       // A filled hidden field is quietly discarded without recording a conversion.
-      if (isHoneypotFilled(input.form_check) || isHoneypotFilled(input.company_website)) {
+      // Older cached forms used an autofill-prone field name. Accept those
+      // submissions rather than mistake a browser-filled URL for spam.
+      if (isHoneypotFilled(input.form_check)) {
         console.warn('Quote form honeypot rejected submission', { hostname });
         return { saved: false, ignored: true };
       }
