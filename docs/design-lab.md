@@ -125,10 +125,9 @@ as the live page, so the copy cannot drift.
   service. See `docs/quote-notification-recovery.md` for monitoring, retry
   limits and operator recovery.
 
-  Go-live needs: migrations 0006 and 0007 (applied 2026-10-30) and
-  `0008_add_quote_notification_outbox.sql` applied in order to
-  production D1 before this code reaches main, then a real submission checked
-  through D1, the inbox and GA4. The honeypot is a lightweight spam filter;
+  Migrations 0006, 0007 and `0008_add_quote_notification_outbox.sql` were
+  applied in order to production D1 on 2026-10-30. Go-live needs a real
+  submission checked through D1, the inbox and GA4. The honeypot is a lightweight spam filter;
   watch the honeypot log line and revisit Turnstile if spam gets through.
 
 - `StudioPage.astro` includes the existing Tally scroll popup on live pages,

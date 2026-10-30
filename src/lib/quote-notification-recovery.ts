@@ -1,5 +1,6 @@
 import { parseLeadAttribution, serializeLeadAttribution } from './attribution';
 import type { QuoteLead } from './quote-form-lead';
+import { logQuoteEvent } from './quote-notification-dispatch';
 
 export const NOTIFICATION_MAX_ATTEMPTS = 8;
 export const NOTIFICATION_LEASE_MS = 10 * 60_000;
@@ -104,7 +105,7 @@ export async function recoverQuoteNotifications({ db, send, alert, leadId, now =
         last_error = 'delivery_failed', lease_token = NULL, lease_until = 0
         WHERE lead_id = ? AND lease_token = ?`)
         .bind(exhausted ? 'exhausted' : 'pending', now() + notificationRetryDelay(claimed.attempts), job.lead_id, token).run();
-      console.error('Quote notification delivery needs recovery', {
+      logQuoteEvent('error', 'quote_notification_delivery_failed', {
         leadId: job.lead_id, attempts: claimed.attempts, exhausted,
       });
     }
@@ -125,7 +126,7 @@ export async function recoverQuoteNotifications({ db, send, alert, leadId, now =
     .all<{ lead_id: number; attempts: number; status: string }>();
   if (!alerts.results.length) return;
   // A structured log remains available even when the email service is down.
-  console.error('Quote notification backlog needs attention', {
+  logQuoteEvent('error', 'quote_notification_backlog', {
     leadIds: alerts.results.map((row) => row.lead_id), count: alerts.results.length,
   });
   try {
@@ -134,6 +135,6 @@ export async function recoverQuoteNotifications({ db, send, alert, leadId, now =
       alert_lease_until = 0 WHERE alert_lease_token = ?`).bind(now(), alertToken).run();
   } catch {
     // Keep the lease as a cooldown; the next cron after expiry retries this alert.
-    console.error('Quote notification backlog alert could not be sent', { count: alerts.results.length });
+    logQuoteEvent('error', 'quote_notification_alert_failed', { count: alerts.results.length });
   }
 }
