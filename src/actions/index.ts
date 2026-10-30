@@ -49,6 +49,7 @@ export const server = {
       requestId: z.uuid(),
       attribution: z.string().max(4096).nullish(),
       form_check: z.string().nullish(),
+      leave_blank: z.string().nullish(),
       company_website: z.string().nullish(),
     }),
     handler: async (input, context) => {
@@ -64,7 +65,7 @@ export const server = {
       // A filled hidden field is quietly discarded without recording a conversion.
       // Older cached forms used an autofill-prone field name. Accept those
       // submissions rather than mistake a browser-filled URL for spam.
-      if (isHoneypotFilled(input.form_check)) {
+      if (isHoneypotFilled(input.form_check) || isHoneypotFilled(input.leave_blank)) {
         console.warn('Quote form honeypot rejected submission', { hostname });
         return { saved: false, ignored: true };
       }

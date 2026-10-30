@@ -53,7 +53,8 @@ bun astro ...
 - Access via `import { env } from 'cloudflare:workers'` then `env.DB`
 
 **Wrangler Configuration** (`wrangler.jsonc`):
-- Worker entry point: `./dist/_worker.js/index.js`
+- Worker entry point: `./src/worker.ts` (Astro's `handle` plus a `scheduled` handler that retries quote lead emails)
+- Cron Trigger: every 5 minutes (`triggers.crons`)
 - Compatibility date: 2025-10-29
 - Compatibility flags: `nodejs_compat`, `global_fetch_strictly_public`
 - Assets binding: `ASSETS` (serves static files from `./dist`)
