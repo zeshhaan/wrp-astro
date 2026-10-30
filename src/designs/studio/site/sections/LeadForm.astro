@@ -12,14 +12,9 @@
  *
  * It sends to the `quote` Astro Action (src/actions/index.ts) from the browser,
  * so it works on prerendered pages: the action checks the fields and the
- * Turnstile token, then saves the lead to D1 and emails the team. On Worker
+ * honeypot, then saves the lead to D1 and emails the team. On Worker
  * previews and Design Lab pages the action does the checks and stops, and the
  * thank-you panel says nothing was sent.
- *
- * Turnstile loads on the visitor's first touch of the form, not with the page,
- * and stays invisible unless Cloudflare wants an interaction. On the live
- * hostnames it uses the site key from PUBLIC_TURNSTILE_SITEKEY; elsewhere
- * Cloudflare's always-pass test key, which only the test secret accepts.
  *
  * Plain HTML first: native validation (styled only after the visitor has
  * touched a field, via :user-invalid), the right mobile keyboards and autofill
@@ -42,7 +37,6 @@ const { service, id = 'quote', locale = 'en' } = Astro.props;
 const num = (n: string | number) => toLocalNum(n, locale);
 const wa = whatsappLink(locale === 'ar' ? `مرحباً WRP، أود الحصول على عرض سعر لخدمة ${service}.` : `Hi WRP, I would like a quote for ${service}.`);
 const f = (name: string) => `${id}-${name}`;
-const sitekey = import.meta.env.PUBLIC_TURNSTILE_SITEKEY ?? '';
 // Browsers compile `pattern` with the `v` flag, where ( ) and - need escaping in a class.
 const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 
@@ -105,7 +99,6 @@ const words = locale === 'ar' ? ar : en;
   action="/contact-us/"
   aria-labelledby={f('title')}
   data-lead
-  data-sitekey={sitekey}
   data-msg-required={words.required}
   data-msg-phone={words.phoneInvalid}
   data-msg-error={words.error}
@@ -135,7 +128,10 @@ const words = locale === 'ar' ? ar : en;
       <span class="lf__track" aria-hidden="true"></span>
       {words.waInstead}
     </label>
-    <div class="lf__bot" data-lead-bot></div>
+    <div class="lf__honeypot" aria-hidden="true">
+      <label for={f('company-website')}>Company website</label>
+      <input id={f('company-website')} name="company_website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
     <button class="st-btn st-btn--primary lf__send" type="submit">
       <span class="lf__cta lf__cta--quote">{words.send} <Icon name="arrow-right" size={18} class="flip" /></span>
       <span class="lf__cta lf__cta--call"><Icon name="phone" size={18} /> {words.callMe}</span>
@@ -160,71 +156,16 @@ const words = locale === 'ar' ? ar : en;
 
 <script>
   import { actions } from 'astro:actions';
-  import { LIVE_HOSTS, QUOTE_TURNSTILE_ACTION } from '@/lib/quote-form-lead';
-  import { TURNSTILE_TEST_SITEKEY } from '@/lib/turnstile';
-
-  type Turnstile = {
-    render: (el: HTMLElement, options: Record<string, unknown>) => string;
-    reset: (widgetId: string) => void;
-    getResponse: (widgetId: string) => string | undefined;
-  };
-  const w = window as Window & { turnstile?: Turnstile };
-
-  // One copy of the Turnstile script for the page, fetched on first need.
-  let turnstileReady: Promise<Turnstile> | undefined;
-  const loadTurnstile = () =>
-    (turnstileReady ??= new Promise<Turnstile>((resolve, reject) => {
-      if (w.turnstile) return resolve(w.turnstile);
-      const script = document.createElement('script');
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-      script.async = true;
-      script.onload = () => (w.turnstile ? resolve(w.turnstile) : reject(new Error('Turnstile missing')));
-      script.onerror = () => reject(new Error('Turnstile did not load'));
-      document.head.appendChild(script);
-    }));
-
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-lead]')) {
     const body = form.querySelector<HTMLElement>('[data-lead-body]')!;
     const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
     const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
-    const bot = form.querySelector<HTMLElement>('[data-lead-bot]')!;
     const waSwitch = form.querySelector<HTMLInputElement>('[data-lead-wa]')!;
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const msg = form.dataset;
-    const sitekey = LIVE_HOSTS.includes(location.hostname) && msg.sitekey ? msg.sitekey : TURNSTILE_TEST_SITEKEY;
     // The script shows its own messages; without it the browser validates.
     form.noValidate = true;
     let requestId = crypto.randomUUID();
-
-    // Turnstile: rendered on first touch. `token` settles with the next token.
-    let widgetId: string | undefined;
-    let token: Promise<string>;
-    let settle: { resolve: (t: string) => void; reject: (e: Error) => void };
-    const nextToken = () => {
-      token = new Promise((resolve, reject) => (settle = { resolve, reject }));
-      token.catch(() => {});
-    };
-    nextToken();
-    const startBotCheck = () => {
-      if (widgetId !== undefined) return;
-      widgetId = '';
-      loadTurnstile()
-        .then((turnstile) => {
-          widgetId = turnstile.render(bot, {
-            sitekey,
-            action: QUOTE_TURNSTILE_ACTION,
-            appearance: 'interaction-only',
-            size: 'flexible',
-            theme: 'light',
-            'refresh-expired': 'auto',
-            callback: (t: string) => settle.resolve(t),
-            'error-callback': () => settle.reject(new Error('Turnstile error')),
-          });
-        })
-        .catch((e) => settle.reject(e));
-    };
-    form.addEventListener('focusin', startBotCheck, { once: true });
-    form.addEventListener('pointerdown', startBotCheck, { once: true });
 
     // Inline message under a field that fails native validation.
     const check = (input: HTMLInputElement) => {
@@ -269,9 +210,9 @@ const words = locale === 'ar' ? ar : en;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (button.disabled) return;
       error.hidden = true;
       if (!valid()) return;
-      startBotCheck();
       button.disabled = true;
       form.toggleAttribute('data-sending', true);
       try {
@@ -283,17 +224,14 @@ const words = locale === 'ar' ? ar : en;
           data.delete('vehicle');
           data.set('reply', waSwitch.checked ? 'whatsapp' : 'call');
         }
-        // Normally ready long before the click; a visible challenge can take a while.
-        const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Turnstile timeout')), 60_000));
-        data.set('cf-turnstile-response', await Promise.race([token, timeout]));
         data.set('requestId', requestId);
         data.set('page', location.pathname);
-        const attribution = w.WRPAttribution?.serialize?.();
+        const attribution = window.WRPAttribution?.serialize?.();
         if (attribution) data.set('attribution', attribution);
         const { data: result, error: failed } = await actions.quote(data);
         if (failed) throw failed;
         if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'hero' } }));
-        form.querySelector<HTMLElement>('[data-lead-preview]')!.hidden = result.saved;
+        form.querySelector<HTMLElement>('[data-lead-preview]')!.hidden = result.saved || result.ignored;
         requestId = crypto.randomUUID();
         body.hidden = true;
         done.hidden = false;
@@ -304,11 +242,6 @@ const words = locale === 'ar' ? ar : en;
       } finally {
         button.disabled = false;
         form.toggleAttribute('data-sending', false);
-        // Tokens are single-use: get a fresh one for a retry.
-        if (widgetId) {
-          nextToken();
-          w.turnstile?.reset(widgetId);
-        }
       }
     });
   }
@@ -568,8 +501,11 @@ const words = locale === 'ar' ? ar : en;
     }
   }
 
-  /* Turnstile only shows itself when it needs the visitor (interaction-only). */
-  .lf__bot:empty {
-    display: none;
+  .lf__honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
   }
 </style>

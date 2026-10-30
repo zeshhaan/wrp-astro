@@ -3,46 +3,50 @@ import { formatAttributionTouch, type LeadAttribution } from './attribution';
 /**
  * The website's own quote form (the Studio hero form). The pieces here are
  * plain functions so they can be tested; the Astro Action in src/actions wires
- * them to D1, Turnstile and Email Workers.
+ * them to D1, the honeypot and Email Workers.
  */
 
 /** Hostnames that serve the real site. Anywhere else, a lead is a dry run. */
 export const LIVE_HOSTS = ['wrpdetailing.ae', 'www.wrpdetailing.ae'];
 
-/** The Turnstile `action` the form's widget renders with, checked by Siteverify. */
-export const QUOTE_TURNSTILE_ACTION = 'quote';
+/** The field is hidden from visitors; a filled value indicates automated spam. */
+export function isHoneypotFilled(value: string | null | undefined): boolean {
+  return Boolean(value?.trim());
+}
 
 /** Lab pages are reviewed in production too; their submissions are never real leads. */
 const LAB_PREFIX = '/design-lab/';
 
-export type QuoteLeadMode = 'live' | 'dry-run';
+export type QuoteLeadMode = 'live' | 'dry-run' | 'unavailable';
 
 /**
- * Whether a submission is stored and emailed ('live') or only checked ('dry-run').
+ * Whether a submission can be stored ('live'), only checked ('dry-run'), or
+ * must fail because the live database binding is missing ('unavailable').
  *
- * Only the production Worker on a live hostname, with its D1 and EMAIL
- * bindings, from a page that is not in the Design Lab, writes a lead. Worker
- * previews (`ENVIRONMENT=preview`, no DB or EMAIL), the workers.dev hostname
- * and Lab pages all go through the same validation and bot check, then stop.
+ * Only the production Worker on a live hostname, with its D1 binding,
+ * from a page that is not in the Design Lab, writes a lead. Email is optional
+ * and never decides whether a lead can be saved. Worker
+ * previews (`ENVIRONMENT=preview`), the workers.dev hostname
+ * and Lab pages all go through the same validation and honeypot check, then stop.
  * Local dev (`astro dev`, local D1) counts as live so the full path can be run.
  */
 export function quoteLeadMode({
   hostname,
   page,
   environment,
-  hasBindings,
+  hasDatabase,
   dev = false,
 }: {
   hostname: string;
   page: string;
   environment?: string;
-  hasBindings: boolean;
+  hasDatabase: boolean;
   dev?: boolean;
 }): QuoteLeadMode {
-  if (environment === 'preview' || !hasBindings) return 'dry-run';
-  if (page.startsWith(LAB_PREFIX)) return 'dry-run';
+  if (environment === 'preview') return 'dry-run';
+  if (page.startsWith(LAB_PREFIX) || page.startsWith(`/ar${LAB_PREFIX}`)) return 'dry-run';
   if (!dev && !LIVE_HOSTS.includes(hostname)) return 'dry-run';
-  return 'live';
+  return hasDatabase ? 'live' : 'unavailable';
 }
 
 /** A UAE or international number: at least 7 digits, only phone punctuation. */
@@ -50,11 +54,18 @@ export function isPhone(value: string): boolean {
   return /^[+0-9 ()\-]{7,40}$/.test(value) && value.replace(/\D/g, '').length >= 7;
 }
 
+/** Same address shape as the contact endpoint, bounded for storage and email. */
+export function isEmail(value: string): boolean {
+  return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export type QuoteReply = 'call' | 'whatsapp';
 
 export type QuoteLead = {
   name: string | null;
   phone: string;
+  email: string | null;
+  notes: string | null;
   /** How the visitor wants the answer, when the form asked (the phone layout). */
   reply: QuoteReply | null;
   vehicle: string | null;
@@ -101,9 +112,11 @@ export function quoteLeadEmailHtml(lead: QuoteLead, outcomeActions: string, sent
               <table style="width: 100%; border-collapse: collapse; background: #fff;">
                 ${row('Name', escapeHtml(lead.name ?? 'Not given'))}
                 ${row('Phone', `<a href="tel:${phone}">${phone}</a>${wa ? ` · <a href="${wa}">WhatsApp</a>` : ''}`)}
+                ${lead.email ? row('Email', `<a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a>`) : ''}
                 ${lead.reply ? row('Reply by', lead.reply === 'call' ? '<strong>Call back</strong>' : '<strong>WhatsApp</strong>') : ''}
                 ${row('Vehicle', escapeHtml(lead.vehicle ?? 'Not provided'))}
                 ${row('Service', escapeHtml(lead.service ?? 'Not specified'))}
+                ${lead.notes ? row('Notes', escapeHtml(lead.notes).replace(/\r?\n/g, '<br>')) : ''}
                 ${row('Came from', escapeHtml(lead.page ?? 'Unknown'))}
                 ${lead.locale === 'ar' ? row('Language', 'Arabic') : ''}
                 ${lead.attribution ? row('First touch', escapeHtml(formatAttributionTouch(lead.attribution.first))) : ''}

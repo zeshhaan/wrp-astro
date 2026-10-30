@@ -84,7 +84,7 @@ export const serviceCards: Card[] = [
   // "Window Tinting" on the card for the homepage keyword; the service itself stays "Window Film".
   fromService('window-film', {
     name: 'Window Tinting',
-    line: 'Nano-ceramic window tint that blocks up to 99% of UV rays and solar heat, without blocking your phone signal.',
+    line: 'Nano-ceramic window tint that helps reduce solar heat, UV exposure and glare.',
     linkLabel: 'Learn more about window tinting',
     width: 1024,
     height: 1024,

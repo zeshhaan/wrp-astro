@@ -109,17 +109,24 @@ as the live page, so the copy cannot drift.
   only, call or WhatsApp) on phones, from one set of fields. With a form in the hero, the
   hero drops its quote button, every quote button on the page leads to the
   form, and the header's quote buttons hide while the form is on screen. It
-  sends to the `quote` Astro Action (`src/actions/index.ts`), which checks
-  Turnstile and saves to the `quote_form_leads` D1 table and emails the team.
-  Worker previews and Design Lab pages only run the checks: nothing is saved or
-  sent (`quoteLeadMode` in `src/lib/quote-form-lead.ts`).
+  sends to the `quote` Astro Action (`src/actions/index.ts`), which validates
+  the fields, checks a hidden honeypot, and saves to the `quote_form_leads` D1
+  table and attempts to email the team. Missing D1 on a live site is an error;
+  missing email does not prevent the D1 save. A filled honeypot is discarded without recording a
+  lead conversion. Worker previews and Design Lab pages only run the checks:
+  nothing is saved or sent (`quoteLeadMode` in `src/lib/quote-form-lead.ts`).
 
-  Go-live needs: migration `0006_add_quote_form_leads.sql` applied to
-  production D1, a Turnstile widget for wrpdetailing.ae and
-  www.wrpdetailing.ae, its site key as the Workers Builds build variable
-  `PUBLIC_TURNSTILE_SITEKEY` and its secret as the Worker secret
-  `TURNSTILE_SECRET`. Set both keys or neither: a secret without the site key
-  rejects every lead. Without either, leads are taken with no bot check.
+  Go-live needs: migrations `0006_add_quote_form_leads.sql` and
+  `0007_add_quote_form_contact_details.sql` applied in order to production D1,
+  and verified lead storage and notification delivery. Notification
+  failures are logged with the lead ID but have no automatic retry; arrange
+  monitoring and recovery before launch. The
+  honeypot is a lightweight spam filter; monitor spam and revisit Turnstile if
+  needed.
+
+- `StudioPage.astro` includes the existing Tally scroll popup on live pages,
+  excluding contact pages as on the current site. Design Lab pages do not load
+  the live popup or send test submissions to Tally.
 
 Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
 Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.

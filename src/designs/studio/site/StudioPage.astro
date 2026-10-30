@@ -21,6 +21,7 @@ import { Font } from 'astro:assets';
 import Schema from '@/components/Schema.astro';
 import Analytics from '@/components/Analytics.astro';
 import Attribution from '@/components/Attribution.astro';
+import TallyPopup from '@/components/TallyPopup.astro';
 import HeaderStorefront from '../headers/HeaderStorefront.astro';
 import { getHeaderNav } from '../headers/nav';
 import Footer from '../Footer.astro';
@@ -79,7 +80,7 @@ const {
 } = Astro.props;
 
 // The live URL this page stands for. In the lab it is the path without the prefix.
-const isLab = labProp || Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = labProp || Astro.url.pathname.startsWith(`${labPrefix}/`) || Astro.url.pathname.startsWith(`/ar${labPrefix}/`);
 const livePath = livePathProp ?? (isLab ? Astro.url.pathname.slice(labPrefix.length) : Astro.url.pathname);
 const lab = (href: string) => (isLab ? toLab(href) : href);
 
@@ -225,6 +226,7 @@ const altHref = lab(alternatePath);
     </main>
     <Footer home={lab('/')} serviceHref={lab} locale={locale} altHref={altHref} />
     <FloatingContact locale={locale} />
+    <TallyPopup enabled={!isLab && !livePath.includes('/contact-us')} />
     {
       heroForm && (
         <script>

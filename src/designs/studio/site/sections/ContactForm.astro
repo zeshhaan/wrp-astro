@@ -98,6 +98,7 @@ const need = (field: Field) => required.includes(field);
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (button.disabled) return;
       error.hidden = true;
       if (form.hasAttribute('data-lab')) {
         done.hidden = false;
@@ -115,7 +116,7 @@ const need = (field: Field) => required.includes(field);
         if (response.ok && result.success) {
           done.hidden = false;
           form.reset();
-          document.dispatchEvent(new Event('wrp:lead'));
+          document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'contact_page' } }));
         } else {
           error.textContent = result.error || defaultError;
           error.hidden = false;

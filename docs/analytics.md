@@ -7,18 +7,61 @@ into the studio without leaving a linked enquiry or booking record.
 
 ## Events owned by this site
 
-| Event | Trigger | method |
-| --- | --- | --- |
-| phone_click | Telephone or WRP phone short-link click | phone |
-| whatsapp_click | WhatsApp or WRP WhatsApp short-link click | whatsapp |
-| generate_lead | Successful contact API response | contact_form |
-| generate_lead | WRP Tally form submission from tally.so | tally_popup |
+| Event | Trigger | method | form_id |
+| --- | --- | --- | --- |
+| phone_click | Telephone or WRP phone short-link click | phone | unset |
+| whatsapp_click | WhatsApp or WRP WhatsApp short-link click | whatsapp | unset |
+| generate_lead | Saved Studio hero action response | contact_form | hero |
+| generate_lead | Successful existing homepage contact API response | contact_form | homepage |
+| generate_lead | Successful existing or Studio contact-page API response | contact_form | contact_page |
+| generate_lead | Successful live configurator API response | contact_form | configurator |
+| generate_lead | WRP Tally form submission from tally.so | tally_popup | tally_popup |
 
-Only event and method are pushed. Do not send names, phone numbers, email,
-messages, Tally answers or prefilled WhatsApp text to GA4. A popup appearing or
-opening the contact options is not a lead. Tally's browser event confirms a Tally
-submission, not successful delivery of its webhook/email. D1 is the operational
-lead record; browser analytics can miss submissions due to blockers or departure.
+Only event, method and the allowlisted form_id are pushed. Native `wrp:lead`
+events must specify one of `hero`, `homepage`, `contact_page` or `configurator`
+in `detail.form`; unknown values are ignored. Tally always uses the literal
+`tally_popup` after verifying the message origin and configured form ID. Do not
+send names, phone numbers, email, messages, Tally answers or prefilled WhatsApp
+text to GA4. Contact clicks set form_id to null, clearing GTM's retained value
+from any preceding lead. These changes preserve existing event names and methods.
+
+The one-page configurator still has `data-demo-form`. Its prepared live path
+attaches operational attribution and requires an HTTP success plus an explicit
+`success: true` JSON response before generating a lead event. Demo submissions,
+malformed responses, rejected requests, honeypot/dry-run hero responses, and
+WhatsApp handoffs never generate that event. Studio's homepage demo form remains
+unconnected and emits no lead event. The `homepage` value currently identifies
+the existing English and Arabic homepage forms.
+
+A popup appearing or opening the contact options is not a lead. Tally's browser
+event confirms a Tally submission, not successful delivery of its webhook/email.
+D1 is the operational lead record; browser analytics can miss submissions due to
+blockers or departure. Native forms reject repeated submits while a request is
+pending. The shared analytics listener is installed once across client-side
+navigation. No additional form-submit or server-side GA4 event is added: do not
+map GA4's automatic `form_submit` to `generate_lead`, as that can double-count and
+include rejected forms. Browser events are not an exactly-once lead ledger;
+repeated Tally messages or subsequent accepted submissions may count separately.
+
+## Required form breakdown setup
+
+The source emits form_id, but a dataLayer push alone does not forward it to GA4.
+Before relying on the form breakdown:
+
+1. Create a GTM Data Layer Variable named `DLV - form_id` using data-layer key
+   `form_id` (version 2, no default value).
+2. Add event parameter `form_id` = `{{DLV - form_id}}` to the existing WRP GA4
+   event tag. Keep `method` and its existing event trigger unchanged; do not
+   create a second conversion tag.
+3. Register an event-scoped GA4 custom dimension such as **WRP form** with event
+   parameter `form_id`, then use it to break down `generate_lead` reports.
+4. Verify the five allowed values, no value on phone/WhatsApp events, and no
+   events for rejected or demo submissions in GTM Preview and GA4 DebugView.
+
+Treat the dashboard setup as separate from a source deployment. Existing
+historical events cannot acquire this new parameter retroactively. Operational
+first/latest-source attribution remains in the lead record and is not copied
+into the GA4 payload.
 
 ## Live configuration
 

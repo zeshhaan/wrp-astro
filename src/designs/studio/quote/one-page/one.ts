@@ -38,6 +38,7 @@ const KEY = 'wrp-studio-quote-onepage-v1';
 let S: QuoteState = freshState();
 let C: Catalog;
 let form: HTMLFormElement;
+let submitting = false;
 
 type Root = Document | HTMLElement;
 const q = <T = HTMLElement>(sel: string, root: Root = document) => root.querySelector(sel) as T | null;
@@ -556,6 +557,10 @@ function fillHidden() {
 }
 
 function onSubmit(e: SubmitEvent) {
+  if (submitting) {
+    e.preventDefault();
+    return;
+  }
   const list = problems(true);
   if (list.length) {
     e.preventDefault();
@@ -573,14 +578,26 @@ function onSubmit(e: SubmitEvent) {
   e.preventDefault();
   const btn = q<HTMLButtonElement>('button[type="submit"]', form)!;
   btn.disabled = true;
-  fetch(form.action, { method: 'POST', body: new FormData(form) })
-    .then((r) => r.json().catch(() => ({ success: r.ok })) as Promise<{ success?: boolean; error?: string }>)
-    .then((res) => {
-      if (res.success) finish('form');
-      else showProblems([{ text: res.error ?? 'That didn’t send. Please try WhatsApp instead.', target: '#qo-send' }]);
+  submitting = true;
+  const data = new FormData(form);
+  const attribution = window.WRPAttribution?.serialize?.();
+  if (attribution) data.set('attribution', attribution);
+  fetch(form.action, { method: 'POST', body: data })
+    .then(async (response) => ({
+      ok: response.ok,
+      result: await response.json() as { success?: boolean; error?: string },
+    }))
+    .then(({ ok, result: res }) => {
+      if (ok && res.success === true) {
+        document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'configurator' } }));
+        finish('form');
+      } else showProblems([{ text: res.error ?? 'That didn’t send. Please try WhatsApp instead.', target: '#qo-send' }]);
     })
     .catch(() => showProblems([{ text: 'That didn’t send. Please check your connection or use WhatsApp.', target: '#qo-send' }]))
-    .finally(() => (btn.disabled = false));
+    .finally(() => {
+      btn.disabled = false;
+      submitting = false;
+    });
 }
 
 function finish(via: 'form' | 'whatsapp') {

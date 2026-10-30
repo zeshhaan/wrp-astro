@@ -17,6 +17,8 @@ import type { Locale } from '@/i18n/translations';
 
 interface Props {
   locale?: Locale;
+  /** Must be explicitly disabled when this homepage is promoted from preview. */
+  lab?: boolean;
   /**
    * Turns a live English path into this page's link (the Arabic page, the
    * Studio preview). Without it, service cards go to the Studio service pages
@@ -24,7 +26,7 @@ interface Props {
    */
   link?: (href: string) => string;
 }
-const { locale = 'en', link } = Astro.props;
+const { locale = 'en', link, lab = true } = Astro.props;
 ---
 
 <Hero locale={locale} link={link} />
@@ -38,4 +40,4 @@ const { locale = 'en', link } = Astro.props;
 <Lounge locale={locale} />
 <Social locale={locale} />
 <Blog locale={locale} link={link} />
-<Contact locale={locale} />
+<Contact locale={locale} lab={lab} />

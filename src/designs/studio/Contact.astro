@@ -1,6 +1,5 @@
 ---
 import Picture from '../shared/Picture.astro';
-import DemoForms from '../shared/DemoForms.astro';
 import Icon from './Icon.astro';
 import { contact, serviceOptions, whatsappQuote } from './content';
 import { phone, serviceOptionsAr, whatsappQuote as whatsappQuoteAr } from './contentAr';
@@ -8,8 +7,11 @@ import { t, type Locale } from '@/i18n/translations';
 
 interface Props {
   locale?: Locale;
+  /** Preview forms validate locally and never call the live action. */
+  lab?: boolean;
 }
-const { locale = 'en' } = Astro.props;
+const { locale = 'en', lab = true } = Astro.props;
+const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 const w =
   locale === 'ar'
     ? {
@@ -42,7 +44,12 @@ const w =
         submit: 'أرسل طلب عرض السعر',
         chat: 'تفضّل المحادثة؟',
         instead: 'بدلاً من ذلك.',
-        demo: 'معاينة تصميم: هذا النموذج غير متصل بعد. سيُرسَل إلى نظام الطلبات عند إطلاق التصميم الجديد.',
+        demo: 'معاينة: النموذج سليم، لكن لم يُحفظ أو يُرسل شيء.',
+        sending: 'جارٍ الإرسال…',
+        success: 'شكراً لك. وصلنا طلبك وسنتواصل معك بالسعر والموعد.',
+        error: 'تعذّر إرسال الطلب. بياناتك ما زالت هنا؛ حاول مجدداً أو راسلنا على واتساب.',
+        phoneInvalid: 'يرجى إدخال رقم جوال صحيح يتكون من 7 أرقام على الأقل.',
+        noScript: 'لإرسال طلبك، فعّل JavaScript أو راسلنا على واتساب باستخدام الرابط أدناه.',
       }
     : {
         eyebrow: 'Contact us',
@@ -74,11 +81,15 @@ const w =
         submit: 'Send my quote request',
         chat: 'Prefer to chat?',
         instead: 'instead.',
-        demo: undefined,
+        demo: 'Preview: the form checked out, but nothing was saved or sent.',
+        sending: 'Sending…',
+        success: 'Thank you. We have your request and will reply with a price and a time.',
+        error: 'We could not send your request. Your details are still here; try again or message us on WhatsApp.',
+        phoneInvalid: 'Please enter a valid mobile number with at least 7 digits.',
+        noScript: 'To send your request, enable JavaScript or use the WhatsApp link below.',
       };
 ---
 
-<DemoForms />
 <section class="contact st-section st-black" id="contact" aria-labelledby="contact-title">
   <div class="st-wrap contact__grid">
     <div class="contact__info">
@@ -117,24 +128,29 @@ const w =
       </a>
     </div>
 
-    <form class="form" id="quote" data-demo-form aria-labelledby="form-title">
+    <form
+      class="form" id="quote" data-homepage-quote data-lab={lab ? '' : undefined}
+      data-preview-message={w.demo} data-success-message={w.success} data-error-message={w.error}
+      data-sending-message={w.sending} data-phone-message={w.phoneInvalid} aria-labelledby="form-title"
+    >
+      <input type="hidden" name="locale" value={locale} />
       <h3 id="form-title" class="form__title">{w.formTitle}</h3>
       <div class="form__grid">
         <label class="field">
           <span>{w.name}</span>
-          <input name="name" type="text" autocomplete="name" required />
+          <input name="name" type="text" autocomplete="name" maxlength="100" required />
         </label>
         <label class="field">
           <span>{w.tel}</span>
-          <input name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+          <input name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern={phonePattern} maxlength="40" required />
         </label>
         <label class="field">
           <span>{w.email} <small>{w.optional}</small></span>
-          <input name="email" type="email" autocomplete="email" />
+          <input name="email" type="email" autocomplete="email" maxlength="254" />
         </label>
         <label class="field">
           <span>{w.vehicle}</span>
-          <input name="vehicle" type="text" placeholder={w.vehicleHint} required />
+          <input name="vehicle" type="text" placeholder={w.vehicleHint} maxlength="120" required />
         </label>
         <label class="field field--wide">
           <span>{w.service}</span>
@@ -145,17 +161,111 @@ const w =
         </label>
         <label class="field field--wide">
           <span>{w.notes} <small>{w.optional}</small></span>
-          <textarea name="message" rows="4" placeholder={w.notesHint}></textarea>
+          <textarea name="notes" rows="4" placeholder={w.notesHint} maxlength="5000"></textarea>
         </label>
       </div>
-      <button class="st-btn st-btn--primary form__submit" type="submit">{w.submit}</button>
+      <div class="form__honeypot" aria-hidden="true">
+        <label for="homepage-company-website">Company website</label>
+        <input id="homepage-company-website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <button class="st-btn st-btn--primary form__submit" type="submit" disabled>{w.submit}</button>
+      <noscript><p class="form__note">{w.noScript}</p></noscript>
       <p class="form__note">{w.chat} <a href={w.whatsappHref} target="_blank" rel="noopener">{w.message}</a> {w.instead}</p>
-      <p class="form__status" data-demo-status data-demo-message={w.demo} hidden role="status"></p>
+      <p class="form__status" data-homepage-status hidden role="status" tabindex="-1"></p>
+      <p class="form__status" data-homepage-error hidden role="alert"></p>
     </form>
   </div>
 </section>
 
+<script>
+  import { actions } from 'astro:actions';
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-homepage-quote]')) {
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const status = form.querySelector<HTMLElement>('[data-homepage-status]')!;
+    const error = form.querySelector<HTMLElement>('[data-homepage-error]')!;
+    const phone = form.querySelector<HTMLInputElement>('input[name=phone]')!;
+    const idleLabel = button.textContent;
+    let requestId = crypto.randomUUID();
+    let pending = false;
+    let submitted = false;
+    button.disabled = false;
+
+    form.addEventListener('input', () => {
+      phone.setCustomValidity('');
+      if (submitted) {
+        submitted = false;
+        status.hidden = true;
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (pending || submitted) return;
+      error.hidden = true;
+      status.hidden = true;
+      phone.setCustomValidity(phone.value.replace(/\D/g, '').length >= 7 ? '' : form.dataset.phoneMessage!);
+      if (!form.reportValidity()) return;
+      if (form.hasAttribute('data-lab')) {
+        status.textContent = form.dataset.previewMessage!;
+        status.hidden = false;
+        status.focus();
+        return;
+      }
+      pending = true;
+      button.disabled = true;
+      button.textContent = form.dataset.sendingMessage!;
+      form.setAttribute('aria-busy', 'true');
+      try {
+        const data = new FormData(form);
+        data.set('requestId', requestId);
+        data.set('page', location.pathname);
+        const attribution = window.WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const { data: result, error: failed } = await actions.quote(data);
+        if (failed || !result) throw failed || new Error('Missing submission result');
+        if (result.saved === true) {
+          document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'homepage' } }));
+        }
+        if (result.saved || result.ignored) {
+          status.textContent = form.dataset.successMessage!;
+          submitted = true;
+          requestId = crypto.randomUUID();
+          form.reset();
+        } else {
+          status.textContent = form.dataset.previewMessage!;
+        }
+        status.hidden = false;
+        status.focus();
+      } catch {
+        error.textContent = form.dataset.errorMessage!;
+        error.hidden = false;
+      } finally {
+        pending = false;
+        button.disabled = false;
+        button.textContent = idleLabel;
+        form.removeAttribute('aria-busy');
+      }
+    });
+  }
+</script>
+
 <style>
+  .form [hidden] {
+    display: none !important;
+  }
+  .form__honeypot {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .form__submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
   .contact__grid {
     display: grid;
     gap: 3rem 4rem;

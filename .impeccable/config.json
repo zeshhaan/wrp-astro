@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "files": [
+          "src/lib/quote-form-lead.ts"
+        ],
+        "createdAt": "2026-10-29T19:17:21.748Z",
+        "reason": "Agent: existing Arial font is used for compatibility in the lead notification email, not the website interface"
+      }
+    ]
+  }
+}

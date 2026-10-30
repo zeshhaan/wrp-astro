@@ -15,7 +15,7 @@ import { heroVideo } from '../heroVideo';
 import { labPrefix, toLab } from './routes';
 
 const locale = 'ar' as const;
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`) || Astro.url.pathname.startsWith(`/ar${labPrefix}/`);
 const local = (href: string) => {
   const path = localizeUrl(href, locale);
   return isLab ? toLab(path) : path;
@@ -33,5 +33,5 @@ const posters = [
 <StudioPage title={title} description={description} locale={locale} livePath="/ar/" preloads={posters}>
   <Schema type="WebSite" />
   <Schema type="ServiceCatalog" />
-  <HomeMain locale={locale} link={local} />
+  <HomeMain locale={locale} link={local} lab={isLab} />
 </StudioPage>
