@@ -10,7 +10,16 @@
           "src/lib/quote-form-lead.ts"
         ],
         "createdAt": "2026-10-29T19:17:21.748Z",
-        "reason": "Agent: existing Arial font is used for compatibility in the lead notification email, not the website interface"
+        "reason": "Agent: existing Arial is a compatibility font in the lead notification email, not the website interface"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/designs/studio/Contact.astro"
+        ],
+        "createdAt": "2026-10-30T14:08:15.948Z",
+        "reason": "Agent: existing logical border marks the form status message, not a card accent"
       }
     ]
   }
