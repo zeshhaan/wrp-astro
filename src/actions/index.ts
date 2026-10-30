@@ -4,6 +4,7 @@ import { env } from 'cloudflare:workers';
 import { processQuoteNotifications } from '@/lib/quote-notification-email';
 import { parseLeadAttribution } from '@/lib/attribution';
 import { saveQuoteLeadWithNotification } from '@/lib/quote-notification-recovery';
+import { dispatchQuoteNotification, logQuoteEvent } from '@/lib/quote-notification-dispatch';
 import {
   isPhone,
   isEmail,
@@ -66,13 +67,13 @@ export const server = {
       // Older cached forms used an autofill-prone field name. Accept those
       // submissions rather than mistake a browser-filled URL for spam.
       if (isHoneypotFilled(input.form_check) || isHoneypotFilled(input.leave_blank)) {
-        console.warn('Quote form honeypot rejected submission', { hostname });
+        logQuoteEvent('warn', 'quote_honeypot_rejected', { hostname });
         return { saved: false, ignored: true };
       }
 
       if (mode === 'dry-run') return { saved: false, ignored: false };
       if (mode === 'unavailable') {
-        console.error('Quote form unavailable: DB binding is missing');
+        logQuoteEvent('error', 'quote_database_unavailable');
         throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: 'Could not save the request. Please call or WhatsApp us.' });
       }
 
@@ -93,17 +94,18 @@ export const server = {
       try {
         leadId = await saveQuoteLeadWithNotification(env.DB, input.requestId, lead);
       } catch {
-        console.error('Failed to store quote form lead', { reason: 'Database write failed' });
+        logQuoteEvent('error', 'quote_database_write_failed');
         throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'Could not save the request' });
       }
 
       // The lead and notification job are already safe in D1. A cron retries
       // delivery failures independently of the visitor returning or resubmitting.
-      try {
-        await processQuoteNotifications(env, leadId);
-      } catch {
-        console.error('Quote notification deferred to scheduler', { leadId });
-      }
+      const cfContext = context.locals.cfContext;
+      await dispatchQuoteNotification(
+        () => processQuoteNotifications(env, leadId),
+        leadId,
+        cfContext ? (task) => cfContext.waitUntil(task) : undefined,
+      );
 
       return { saved: true, ignored: false };
     },

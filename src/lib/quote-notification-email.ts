@@ -4,6 +4,7 @@ import { deliverClientLeadWithAgencyCopy } from './lead-email-delivery';
 import { createLeadOutcomeLinks, leadOutcomeSigningSecretIsValid, renderLeadOutcomeActions } from './lead-outcome';
 import { quoteLeadEmailHtml, quoteLeadSubject, type QuoteLead } from './quote-form-lead';
 import { recoverQuoteNotifications, type NotificationAlert } from './quote-notification-recovery';
+import { logQuoteEvent } from './quote-notification-dispatch';
 
 const SENDER = 'noreply@wrpdetailing.ae';
 const CLIENT = 'wrp.detailing@gmail.com';
@@ -18,7 +19,7 @@ async function notify(env: Cloudflare.Env, lead: QuoteLead, leadId: number, subm
       await createLeadOutcomeLinks(SITE, { kind: 'quote', id: leadId }, env.LEAD_OUTCOME_SIGNING_SECRET),
     );
   } else {
-    console.warn('Quote form notification has no outcome links', { leadId });
+    logQuoteEvent('warn', 'quote_outcome_links_unavailable', { leadId });
   }
   const msg = createMimeMessage();
   msg.setSender({ name: 'WRP Quote Form', addr: SENDER });
@@ -29,7 +30,7 @@ async function notify(env: Cloudflare.Env, lead: QuoteLead, leadId: number, subm
     agencyRecipient: env.AGENCY_COPY_EMAIL,
     sendClient: () => env.EMAIL.send(new EmailMessage(SENDER, CLIENT, msg.asRaw())),
     sendAgency: (recipient) => env.EMAIL.send(new EmailMessage(SENDER, recipient, msg.asRaw())),
-    onAgencyError: () => console.error('Quote agency copy failed; client notification sent', { leadId }),
+    onAgencyError: () => logQuoteEvent('error', 'quote_agency_copy_failed', { leadId }),
   });
 }
 
