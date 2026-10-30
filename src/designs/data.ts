@@ -20,9 +20,9 @@ export const contact = {
   instagramHandle: '@wrp_ae',
   address: ['Al Qusais Industrial Area 1', 'Dubai, United Arab Emirates'],
   mapsUrl: 'https://dub.sh/wrp-map',
-  hours: 'Saturday to Thursday, 9:00 AM to 9:30 PM',
-  hoursShort: 'Sat–Thu 9 AM–9:30 PM',
-  closed: 'Closed Friday',
+  /** Opening hours in one line, worded the same everywhere (Shereef, 30 Oct 2026). */
+  hours: 'Open every day except Friday, 9 AM to 9:30 PM',
+  hoursAr: 'مفتوح يومياً ما عدا الجمعة، من ٩ صباحاً حتى ٩:٣٠ مساءً',
   /** Opening hours in Dubai local time (UTC+4, no DST). 5 = Friday. */
   schedule: { open: '09:00', close: '21:30', closedDays: [5] as number[], timeZone: 'Asia/Dubai' },
 };

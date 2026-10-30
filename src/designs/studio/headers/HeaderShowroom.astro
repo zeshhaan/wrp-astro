@@ -41,7 +41,7 @@ const first = nav.services[0];
       <ul class="sr-strip__list" role="list">
         <li><a href={nav.phone.href}><Icon name="phone" size={14} /><bdo dir="ltr">{nav.phone.display}</bdo></a></li>
         <li class="sr-strip__wide"><a href={nav.maps.href} target="_blank" rel="noopener"><Icon name="pin" size={14} />{nav.maps.label}</a></li>
-        <li class="sr-strip__wide"><span><Icon name="clock" size={14} />{nav.hours} · {w.closed}</span></li>
+        <li class="sr-strip__wide"><span><Icon name="clock" size={14} />{nav.hours}</span></li>
         <li><a class="sr-strip__lang" href={altHref} hreflang={nav.locale === 'ar' ? 'en' : 'ar'}>{nav.langLabel}</a></li>
       </ul>
     </div>

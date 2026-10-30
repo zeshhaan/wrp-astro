@@ -26,7 +26,7 @@ const w =
         close: 'إغلاق',
         title: t(locale, 'contact.getInTouch'),
         lede: t(locale, 'contact.teamReady'),
-        status: `${t(locale, 'nav.hours')} · الجمعة مغلق`,
+        status: contact.hoursAr,
         open: t(locale, 'contact.availableNow'),
         closedNow: 'مغلق الآن: راسلنا وسنرد عليك عند الافتتاح',
         from: t(locale, 'contact.from'),
@@ -34,7 +34,7 @@ const w =
         wa: t(locale, 'contact.messageWhatsapp'),
         waHint: t(locale, 'contact.chatInstantly'),
         call: t(locale, 'contact.callNow'),
-        foot: `${t(locale, 'contact.openHours')}. ${t(locale, 'home.contact.address1')}.`,
+        foot: `${contact.hoursAr}. ${t(locale, 'home.contact.address1')}.`,
       }
     : {
         tip: 'Chat with us',
@@ -42,7 +42,7 @@ const w =
         close: 'Close',
         title: 'Get in touch',
         lede: 'Our team is ready to help with prices, bookings and questions.',
-        status: `${contact.hoursShort} · ${contact.closed}`,
+        status: contact.hours,
         open: 'Open now: quick replies during business hours',
         closedNow: 'We’re closed right now: message us and we’ll reply when we open',
         from: 'from',
@@ -50,7 +50,7 @@ const w =
         wa: 'Message on WhatsApp',
         waHint: 'Chat with our team, usually a quick reply',
         call: 'Call now',
-        foot: `Open ${contact.hoursShort}. ${contact.closed}. Al Qusais Industrial Area 1, Dubai.`,
+        foot: `${contact.hours}. Al Qusais Industrial Area 1, Dubai.`,
       };
 ---
 

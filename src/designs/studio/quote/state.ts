@@ -33,8 +33,7 @@ export type Catalog = {
   tint: { options: { id: string; name: string; vlt: number; heat: string; note: string; features: string[] }[] };
   contact: {
     whatsapp: string;
-    hoursShort: string;
-    closed: string;
+    hours: string;
     schedule: { open: string; close: string; closedDays: number[]; timeZone: string };
   };
 };

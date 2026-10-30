@@ -22,7 +22,7 @@ const links = [
       <li><a href={contact.phoneHref}><Icon name="phone" size={15} />{contact.phoneDisplay}</a></li>
       <li class="topbar__email"><a href={contact.emailHref}><Icon name="mail" size={15} />{contact.email}</a></li>
       <li class="topbar__addr"><a href={contact.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" size={15} />{contact.address[0]}, Dubai</a></li>
-      <li class="topbar__hours"><span><Icon name="clock" size={15} />{contact.hoursShort} · {contact.closed}</span></li>
+      <li class="topbar__hours"><span><Icon name="clock" size={15} />{contact.hours}</span></li>
     </ul>
     <ul class="topbar__social" role="list">
       <li><a href={contact.instagram} target="_blank" rel="noopener" aria-label={`Instagram ${contact.instagramHandle}`}><Icon name="instagram" size={17} /></a></li>
@@ -73,7 +73,7 @@ const links = [
     <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">Get a quick quote</a>
     <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
     <a class="drawer__phone" href={contact.phoneHref}><Icon name="phone" size={18} />{contact.phoneDisplay}</a>
-    <p class="drawer__hours">{contact.hoursShort}. {contact.closed}.</p>
+    <p class="drawer__hours">{contact.hours}.</p>
   </div>
 </dialog>
 

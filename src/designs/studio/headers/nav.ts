@@ -45,7 +45,6 @@ const words = {
     close: 'Close menu',
     from: 'From',
     inspection: 'Priced after inspection',
-    closed: 'Closed Friday',
     openNow: 'Open now',
     until: 'until 9:30 PM',
     closedNow: 'Closed now',
@@ -65,7 +64,6 @@ const words = {
     close: 'إغلاق القائمة',
     from: 'من',
     inspection: 'السعر بعد المعاينة',
-    closed: 'الجمعة مغلق',
     openNow: 'مفتوح الآن',
     until: 'حتى ٩:٣٠ م',
     closedNow: 'مغلق الآن',
@@ -128,7 +126,7 @@ export async function getHeaderNav(locale: Locale) {
     // Same tracked short links as the live trust bar.
     phone: { display: num('+971 54 717 3000'), href: 'https://dub.sh/wrp-phone' },
     maps: { label: t(locale, 'home.contact.address1'), href: 'https://dub.sh/wrp-map' },
-    hours: t(locale, 'nav.hours'),
+    hours: isArabic ? contact.hoursAr : contact.hours,
     schedule: contact.schedule,
     rating: { value: num(proof.rating), count: num(proof.reviewCountDisplay), href: localizeUrl(proof.reviewsUrl, locale) },
   };
