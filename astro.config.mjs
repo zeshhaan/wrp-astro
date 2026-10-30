@@ -8,6 +8,14 @@ import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import react from '@astrojs/react';
 import robotsTxt from 'astro-robots-txt';
+import { subsetFaces } from './src/assets/fonts/subsets.mjs';
+
+/**
+ * Faces for Astro's local provider (it takes no `kind`; FontPreload.astro reads it).
+ * @param {Parameters<typeof subsetFaces>[0]} cssVariable
+ * @returns {any} the provider's `variants`, never empty
+ */
+const localFaces = (cssVariable) => subsetFaces(cssVariable).map(({ kind, ...face }) => face);
 
 /**
  * Wrap every markdown <table> in a horizontally-scrollable container so wide
@@ -111,22 +119,22 @@ export default defineConfig({
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
+    // Inter, Oswald, Montserrat and the Arabic sans are self-hosted subsets of the same
+    // upstream fonts Google Fonts served, cut down to what the site uses by
+    // scripts/fonts/subset-fonts.py (rerun it by hand when content needs new characters).
+    // Each weight has a core face (preloaded) and an extended face behind unicode-range.
     {
       name: 'Inter',
       cssVariable: '--font-inter',
-      provider: fontProviders.google(),
-      weights: [400, 500, 600, 700],
-      styles: ['normal'],
-      subsets: ['latin'],
+      provider: fontProviders.local(),
+      options: { variants: localFaces('--font-inter') },
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
       name: 'Montserrat',
       cssVariable: '--font-montserrat',
-      provider: fontProviders.google(),
-      weights: [900],
-      styles: ['italic'],
-      subsets: ['latin'],
+      provider: fontProviders.local(),
+      options: { variants: localFaces('--font-montserrat') },
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
@@ -139,12 +147,12 @@ export default defineConfig({
       fallbacks: ['serif'],
     },
     {
-      name: 'IBM Plex Sans Arabic',
+      // IBM Plex Sans Arabic, renamed: "Plex" is a Reserved Font Name under its OFL, and
+      // a subset is a modified version.
+      name: 'WRP Sans Arabic',
       cssVariable: '--font-ibm-plex-arabic',
-      provider: fontProviders.google(),
-      weights: [400, 500, 600, 700],
-      styles: ['normal'],
-      subsets: ['arabic'],
+      provider: fontProviders.local(),
+      options: { variants: localFaces('--font-ibm-plex-arabic') },
       fallbacks: ['system-ui', 'sans-serif'],
     },
     // ── Studio redesign fonts (src/designs/studio). Loaded only by the Design
@@ -152,10 +160,8 @@ export default defineConfig({
     {
       name: 'Oswald',
       cssVariable: '--font-oswald',
-      provider: fontProviders.google(),
-      weights: [400, 500, 600, 700],
-      styles: ['normal'],
-      subsets: ['latin'],
+      provider: fontProviders.local(),
+      options: { variants: localFaces('--font-oswald') },
       fallbacks: ['Arial Narrow', 'sans-serif'],
     },
   ],

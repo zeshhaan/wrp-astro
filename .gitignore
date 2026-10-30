@@ -45,3 +45,6 @@ docs/reddit_summary.txt
 .playwright-mcp/
 .claude/security/
 lh-home-after.json
+
+# font subsetting venv (scripts/fonts)
+.venv-fonts/
