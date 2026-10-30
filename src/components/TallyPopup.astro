@@ -48,10 +48,17 @@ const { enabled = true, scrollPercent = 50 } = Astro.props;
           if (!existing) document.head.appendChild(script);
         });
 
+        // A page form on screen, such as the homepage form at the foot of the
+        // page. Dialog forms are only close buttons.
+        const leadFormInView = () => [...document.querySelectorAll('form:not([method="dialog"])')].some((form) => {
+          const rect = form.getBoundingClientRect();
+          return rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+        });
+
         const openPopup = async (shouldOpen) => {
           try {
             const tally = await ensureTally();
-            if (!shouldOpen()) return;
+            if (!shouldOpen()) return false;
             const isPhone = window.matchMedia('(max-width: 767px)').matches;
             tally.openPopup(FORM_ID, {
               key: 'wrp-quote-popup',
@@ -66,10 +73,36 @@ const { enabled = true, scrollPercent = 50 } = Astro.props;
                 attribution: window.WRPAttribution?.serialize() || '',
               },
             });
+            return true;
           } catch {
             // The quote links elsewhere on the page remain available when the
             // third-party widget cannot load.
+            return false;
           }
+        };
+
+        // The popup opens halfway down, so on desktop, where it has no
+        // backdrop, it is still in the corner when the visitor reaches a page
+        // form further down, and covers that form's button. Close it then,
+        // unless they have clicked into the popup to fill it in.
+        const watchOpenPopup = () => {
+          let usingPopup = false;
+          const onBlur = () => setTimeout(() => {
+            const active = document.activeElement;
+            if (active instanceof HTMLIFrameElement && active.closest(`.tally-form-${FORM_ID}`)) usingPopup = true;
+          });
+          const onScroll = () => {
+            if (usingPopup || !leadFormInView()) return;
+            window.Tally?.closePopup(FORM_ID);
+            stop();
+          };
+          const stop = () => {
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('blur', onBlur);
+          };
+          window.addEventListener('scroll', onScroll, { passive: true });
+          window.addEventListener('blur', onBlur);
+          removeScrollListener = stop;
         };
 
         const armForPage = () => {
@@ -91,9 +124,16 @@ const { enabled = true, scrollPercent = 50 } = Astro.props;
           const onScroll = () => {
             const scrollable = document.documentElement.scrollHeight - window.innerHeight;
             if (!armed || formEngaged || scrollable <= 0 || (window.scrollY / scrollable) * 100 < scrollPercent) return;
+            // Nor open over a page form the visitor is looking at. The popup
+            // stays armed until they scroll away from it.
+            if (leadFormInView()) return;
             armed = false;
             window.removeEventListener('scroll', onScroll);
-            void openPopup(() => activePage && !formEngaged && !window.location.pathname.includes('/contact-us')).finally(cleanup);
+            void openPopup(() => activePage && !formEngaged && !leadFormInView() && !window.location.pathname.includes('/contact-us')).then((opened) => {
+              const stillHere = activePage;
+              cleanup();
+              if (opened && stillHere) watchOpenPopup();
+            });
           };
           window.addEventListener('scroll', onScroll, { passive: true });
           const cleanup = () => {
