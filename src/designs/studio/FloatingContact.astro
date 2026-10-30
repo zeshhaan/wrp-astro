@@ -34,7 +34,7 @@ const w =
         wa: t(locale, 'contact.messageWhatsapp'),
         waHint: t(locale, 'contact.chatInstantly'),
         call: t(locale, 'contact.callNow'),
-        foot: `${contact.hoursAr}. ${t(locale, 'home.contact.address1')}.`,
+        foot: [`${contact.hoursAr}.`, `${t(locale, 'home.contact.address1')}.`],
       }
     : {
         tip: 'Chat with us',
@@ -50,7 +50,7 @@ const w =
         wa: 'Message on WhatsApp',
         waHint: 'Chat with our team, usually a quick reply',
         call: 'Call now',
-        foot: `${contact.hours}. Al Qusais Industrial Area 1, Dubai.`,
+        foot: [`${contact.hours}.`, 'Al Qusais Industrial Area 1, Dubai.'],
       };
 ---
 
@@ -109,7 +109,7 @@ const w =
       </a>
     </div>
 
-    <p class="cd__foot">{w.foot}</p>
+    <p class="cd__foot">{w.foot[0]}<br />{w.foot[1]}</p>
   </div>
 </dialog>
 
