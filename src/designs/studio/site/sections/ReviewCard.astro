@@ -152,10 +152,13 @@ const images = photos === 'all' ? r.localImages : photos === 'first' ? r.localIm
     font-size: 0.975rem;
     line-height: 1.6;
   }
+  /* A yellow highlighter pen, on light and dark cards alike. */
   .rv__text :global(mark) {
-    background: color-mix(in srgb, var(--st-accent) 35%, transparent);
-    color: inherit;
-    padding-inline: 0.1em;
+    background: var(--st-marker);
+    color: var(--st-ink);
+    padding-inline: 0.12em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
   .rv__more {
     margin-block-start: 0.35rem;

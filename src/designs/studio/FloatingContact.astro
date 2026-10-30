@@ -3,7 +3,8 @@
  * Floating WhatsApp button → contact modal, after the live site's
  * src/components/WhatsAppButton.astro, in Studio's look. Uses <dialog> so focus
  * moves in, Escape closes, the page behind is inert and focus returns to the
- * button. Any element with [data-contact-modal] also opens it.
+ * button. Any element with [data-contact-modal] also opens it. The dialog is a
+ * light card (Shereef, 30 Oct 2026), so it stands out from Studio's dark pages.
  */
 import Icon from './Icon.astro';
 import { contact, proof, whatsappQuote } from './content';
@@ -175,18 +176,19 @@ const w =
     50% { opacity: 0.3; transform: scale(1.18); }
   }
 
-  /* Dialog */
+  /* Dialog: a light card over the dimmed page. */
   .cd {
-    --st-accent: var(--st-white); /* dark surface */
-    --st-on-accent: var(--st-black);
+    --st-accent: var(--st-ink); /* light surface */
+    --st-on-accent: var(--st-white);
     inline-size: min(28rem, calc(100vw - 2rem));
     max-block-size: calc(100dvh - 2rem);
     padding: 0;
-    border: 1px solid var(--st-line-dark);
-    border-block-start: 3px solid var(--st-accent);
+    border: 1px solid var(--st-line-light);
+    border-block-start: 3px solid var(--st-red);
     border-radius: 0;
-    background: var(--st-coal);
-    color: var(--st-on-dark);
+    background: var(--st-white);
+    color: var(--st-ink-2);
+    color-scheme: light;
     box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
     overflow: auto;
   }
@@ -222,12 +224,12 @@ const w =
     border: 0;
     border-radius: 0;
     background: transparent;
-    color: var(--st-mute);
+    color: var(--st-ink-2);
     cursor: pointer;
   }
   .cd__close:hover {
-    background: rgb(255 255 255 / 0.06);
-    color: var(--st-white);
+    background: var(--st-paper);
+    color: var(--st-ink);
   }
   .cd__head {
     display: grid;
@@ -235,7 +237,7 @@ const w =
     gap: 0.4rem;
     padding: 2rem 1.5rem 1.25rem;
     text-align: center;
-    border-block-end: 1px solid var(--st-line-dark);
+    border-block-end: 1px solid var(--st-line-light);
   }
   .cd__icon {
     position: relative;
@@ -268,11 +270,11 @@ const w =
     font-size: 1.75rem;
     line-height: 1.1;
     text-transform: uppercase;
-    color: var(--st-white);
+    color: var(--st-ink);
   }
   .cd__lede {
     font-size: 0.9rem;
-    color: var(--st-mute);
+    color: var(--st-ink-2);
   }
   .cd__status {
     display: flex;
@@ -282,18 +284,18 @@ const w =
     padding: 0.7rem 1.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--st-white);
-    background: rgb(255 255 255 / 0.08);
-    border-block-end: 1px solid var(--st-line-dark);
+    color: var(--st-ink);
+    background: var(--st-paper);
+    border-block-end: 1px solid var(--st-line-light);
   }
   .cd__dot {
     inline-size: 0.5rem;
     block-size: 0.5rem;
     border-radius: 50%;
-    background: var(--st-mute);
+    background: var(--st-ink-2);
   }
   .cd__status[data-open='true'] .cd__dot {
-    background: #3ee07b;
+    background: #1a9f4b;
     animation: cd-blink 2s ease-in-out infinite;
   }
   @keyframes cd-blink {
@@ -307,12 +309,12 @@ const w =
     gap: 0.35rem 0.6rem;
     padding: 0.7rem 1.5rem;
     font-size: 0.875rem;
-    color: var(--st-on-dark);
+    color: var(--st-ink-2);
     text-decoration: none;
-    border-block-end: 1px solid var(--st-line-dark);
+    border-block-end: 1px solid var(--st-line-light);
   }
   .cd__rating strong {
-    color: var(--st-white);
+    color: var(--st-ink);
   }
   .cd__rating:hover span:last-child {
     text-decoration: underline;
@@ -352,10 +354,16 @@ const w =
     --st-on-accent: var(--st-black);
     background: var(--st-black);
     color: var(--st-white);
-    border: 1px solid var(--st-line-dark);
+    border: 1px solid var(--st-black);
   }
   .cd__opt--call:hover {
-    border-color: var(--st-accent);
+    background: var(--st-ink-2);
+    border-color: var(--st-ink-2);
+  }
+  /* The call button's accent is white for its own dark fill; its focus ring
+     sits on the white card, so it stays ink. */
+  .cd__opt--call:focus-visible {
+    outline-color: var(--st-ink);
   }
   .cd__optico {
     display: grid;
@@ -384,13 +392,15 @@ const w =
   }
   .cd__opthint {
     font-size: 0.85rem;
-    opacity: 0.8;
+  }
+  .cd__opt--call .cd__opthint {
+    color: var(--st-on-dark);
   }
   .cd__foot {
     padding: 0.5rem 1.5rem 1.5rem;
     text-align: center;
     font-size: 0.8rem;
-    color: var(--st-mute);
+    color: var(--st-ink-2);
   }
 
   @media (prefers-reduced-motion: reduce) {

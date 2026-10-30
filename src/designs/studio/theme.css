@@ -24,6 +24,9 @@
      the main action only: the quote buttons. */
   --st-red: #d4141c;
   --st-red-hover: #b31017;
+  /* Highlighter yellow: only behind quoted words in reviews (<mark>), always
+     with ink text on it (about 13:1). */
+  --st-marker: #ffe14d;
   --st-line-dark: #2c3035;
   --st-line-light: #dadada;
 
