@@ -126,6 +126,7 @@ const contactPageSchema = {
           error: '',
           async submitForm(event) {
             event.preventDefault();
+            if (this.submitting) return;
             this.submitting = true;
             this.error = '';
             const form = event.target;
@@ -146,7 +147,7 @@ const contactPageSchema = {
               if (response.ok && result.success) {
                 this.success = true;
                 form.reset();
-                document.dispatchEvent(new Event('wrp:lead'));
+                document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'contact_page' } }));
               } else {
                 this.error = result.error || defaultError;
               }

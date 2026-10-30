@@ -1,10 +1,5 @@
 /// <reference types="astro/client" />
 
-interface ImportMetaEnv {
-  /** Turnstile widget site key for the quote form (public). A Workers Builds build variable. */
-  readonly PUBLIC_TURNSTILE_SITEKEY?: string;
-}
-
 interface Window {
   WRPAttribution?: {
     read: () => unknown;
@@ -27,9 +22,5 @@ declare namespace Cloudflare {
     TALLY_SIGNING_SECRET?: string;
     /** "preview" on Worker Previews (wrangler.jsonc `previews.vars`), unset in production. */
     ENVIRONMENT?: string;
-    /** Turnstile widget secret for the quote form. Without it, live quote leads skip the bot check. */
-    TURNSTILE_SECRET?: string;
-    /** Comma-separated frontend hostnames Siteverify must report. Defaults to the two live hostnames. */
-    TURNSTILE_HOSTNAMES?: string;
   }
 }

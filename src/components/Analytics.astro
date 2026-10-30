@@ -10,7 +10,9 @@ import { GTM_ID, ANALYTICS_HOSTNAMES, TALLY_FORM_ID } from '../consts';
     window.__wrpAnalyticsLoaded = true;
     window.dataLayer = window.dataLayer || [];
 
-    const track = (event, method) => window.dataLayer.push({ event, method });
+    const nativeForms = new Set(['hero', 'homepage', 'contact_page', 'configurator']);
+    // Clear form_id on contact clicks: GTM otherwise retains the last lead's value.
+    const track = (event, method, formId = null) => window.dataLayer.push({ event, method, form_id: formId });
     window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
     const script = document.createElement('script');
     script.async = true;
@@ -31,7 +33,11 @@ import { GTM_ID, ANALYTICS_HOSTNAMES, TALLY_FORM_ID } from '../consts';
     }, true);
 
     // Emitted only after the contact API confirms success. No form values sent.
-    document.addEventListener('wrp:lead', () => track('generate_lead', 'contact_form'));
+    document.addEventListener('wrp:lead', (event) => {
+      const formId = event.detail?.form;
+      if (!nativeForms.has(formId)) return;
+      track('generate_lead', 'contact_form', formId);
+    });
 
     window.addEventListener('message', (event) => {
       if (event.origin !== 'https://tally.so' || typeof event.data !== 'string') return;
@@ -39,7 +45,7 @@ import { GTM_ID, ANALYTICS_HOSTNAMES, TALLY_FORM_ID } from '../consts';
       try { message = JSON.parse(event.data); } catch { return; }
       if (message?.event !== 'Tally.FormSubmitted' ||
           message.payload?.formId !== TALLY_FORM_ID) return;
-      track('generate_lead', 'tally_popup');
+      track('generate_lead', 'tally_popup', 'tally_popup');
     });
   })();
 </script>

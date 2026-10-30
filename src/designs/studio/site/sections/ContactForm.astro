@@ -47,7 +47,7 @@ const need = (field: Field) => required.includes(field);
   data-fallback-error={p.fallbackError}
   data-network-error={p.networkError}
   data-fallback-network-error={p.fallbackNetworkError}
-  action="/api/contact"
+  action={isLab ? undefined : '/api/contact'}
   method="post"
 >
   <input type="hidden" name="locale" value={locale} />
@@ -77,7 +77,9 @@ const need = (field: Field) => required.includes(field);
     <label for={id('message')}>{label('message')}</label>
     <textarea id={id('message')} name="message" rows="4" required={need('message')} placeholder={p.placeholders.message}></textarea>
   </div>
-  <button type="submit" class="st-btn st-btn--primary cf__send">
+  {/* In the lab the button waits for the script, so a page without JavaScript
+      can never post a preview to the live endpoint. */}
+  <button type="submit" class="st-btn st-btn--primary cf__send" disabled={isLab}>
     <span class="cf__idle">{p.submit} <Icon name="arrow-right" size={18} class="flip" /></span>
     <span class="cf__busy">{p.sending}</span>
   </button>
@@ -96,8 +98,10 @@ const need = (field: Field) => required.includes(field);
     const done = form.querySelector<HTMLElement>('[data-contact-done]')!;
     const error = form.querySelector<HTMLElement>('[data-contact-error]')!;
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    button.disabled = false;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (button.disabled) return;
       error.hidden = true;
       if (form.hasAttribute('data-lab')) {
         done.hidden = false;
@@ -115,7 +119,7 @@ const need = (field: Field) => required.includes(field);
         if (response.ok && result.success) {
           done.hidden = false;
           form.reset();
-          document.dispatchEvent(new Event('wrp:lead'));
+          document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'contact_page' } }));
         } else {
           error.textContent = result.error || defaultError;
           error.hidden = false;

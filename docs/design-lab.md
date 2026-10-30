@@ -109,17 +109,30 @@ as the live page, so the copy cannot drift.
   only, call or WhatsApp) on phones, from one set of fields. With a form in the hero, the
   hero drops its quote button, every quote button on the page leads to the
   form, and the header's quote buttons hide while the form is on screen. It
-  sends to the `quote` Astro Action (`src/actions/index.ts`), which checks
-  Turnstile and saves to the `quote_form_leads` D1 table and emails the team.
-  Worker previews and Design Lab pages only run the checks: nothing is saved or
-  sent (`quoteLeadMode` in `src/lib/quote-form-lead.ts`).
+  sends to the `quote` Astro Action (`src/actions/index.ts`), which validates
+  the fields, checks a hidden honeypot, and saves to the `quote_form_leads` D1
+  table and a notification job together, then attempts to email the team.
+  Missing D1 or the outbox migration on a live site is an error; missing email
+  does not prevent the D1 save. A filled honeypot (`form_check`) is discarded
+  without a lead conversion and logged without customer details. Worker
+  previews and Design Lab pages only run the checks: nothing is saved or sent
+  (`quoteLeadMode` in `src/lib/quote-form-lead.ts`). The homepage form and the
+  configurator send to the same action.
 
-  Go-live needs: migration `0006_add_quote_form_leads.sql` applied to
-  production D1, a Turnstile widget for wrpdetailing.ae and
-  www.wrpdetailing.ae, its site key as the Workers Builds build variable
-  `PUBLIC_TURNSTILE_SITEKEY` and its secret as the Worker secret
-  `TURNSTILE_SECRET`. Set both keys or neither: a secret without the site key
-  rejects every lead. Without either, leads are taken with no bot check.
+  Email recovery: the Cron Trigger (`src/worker.ts`, every 5 minutes) retries
+  failed notifications and sends a backlog alert. The alert uses the same
+  email service and therefore cannot independently report an outage of that
+  service. See `docs/quote-notification-recovery.md` for monitoring, retry
+  limits and operator recovery.
+
+  Migrations 0006, 0007 and `0008_add_quote_notification_outbox.sql` were
+  applied in order to production D1 on 2026-10-30. Go-live needs a real
+  submission checked through D1, the inbox and GA4. The honeypot is a lightweight spam filter;
+  watch the honeypot log line and revisit Turnstile if spam gets through.
+
+- `StudioPage.astro` includes the existing Tally scroll popup on live pages,
+  excluding contact pages as on the current site. Design Lab pages do not load
+  the live popup or send test submissions to Tally.
 
 Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
 Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.

@@ -5,6 +5,7 @@
  * ../state.ts; this file only binds them to
  * one long form and a viewer that follows whichever section you are working in.
  */
+import { actions } from 'astro:actions';
 import { panels, ppfPresets, tintOptions, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';
 import {
   aed,
@@ -20,9 +21,9 @@ import {
   paintChips,
   priceClass,
   problem,
+  quoteLeadFields,
   requestText,
   saveDraft,
-  serviceInterest,
   serviceOrder,
   slotAvailable,
   vehicleText,
@@ -38,6 +39,9 @@ const KEY = 'wrp-studio-quote-onepage-v1';
 let S: QuoteState = freshState();
 let C: Catalog;
 let form: HTMLFormElement;
+let submitting = false;
+// One id per request, kept across retries so a resend never makes a second lead.
+let requestId = crypto.randomUUID();
 
 type Root = Document | HTMLElement;
 const q = <T = HTMLElement>(sel: string, root: Root = document) => root.querySelector(sel) as T | null;
@@ -48,6 +52,8 @@ const input = (name: string, value?: string) =>
 export function start() {
   C = JSON.parse(q('#qo-catalog')!.textContent || '{}') as Catalog;
   form = q<HTMLFormElement>('#qo-form')!;
+  // Sending needs this script (it builds the request), so the button waits for it.
+  q<HTMLButtonElement>('button[type="submit"]', form)!.disabled = false;
   const draft = loadDraft(KEY);
   if (draft && !draft.sent) S = draft;
   // Sensible defaults the step flow asks for on their own screens.
@@ -547,40 +553,48 @@ function onWhatsApp(e: MouseEvent) {
   finish('whatsapp');
 }
 
-function fillHidden() {
-  const set = (n: string, v: string) => (input(n)!.value = v);
-  set('vehicle', vehicleText(S));
-  set('service', serviceInterest(S, C));
-  set('service_interest', serviceInterest(S, C));
-  set('message', requestText(S, C, { whatsapp: false }));
-}
+const PREVIEW_NOTE = 'Preview: the form checked out, but nothing was saved or sent.';
 
+/**
+ * Sends the request to the `quote` Astro Action, the same one the hero form
+ * uses. On Worker Previews and Design Lab pages the action checks the fields
+ * and answers `{ saved: false }`, and the done panel says nothing was sent.
+ */
 function onSubmit(e: SubmitEvent) {
+  e.preventDefault();
+  if (submitting) return;
   const list = problems(true);
   if (list.length) {
-    e.preventDefault();
-    e.stopPropagation(); // keep the Design Lab shell from showing its preview notice
     showProblems(list);
     return;
   }
   showProblems([]);
-  fillHidden();
-  if (form.hasAttribute('data-demo-form')) {
-    // The Design Lab shell intercepts this submit after us and fills data-demo-status.
-    window.setTimeout(() => finish('form'), 0);
-    return;
-  }
-  e.preventDefault();
   const btn = q<HTMLButtonElement>('button[type="submit"]', form)!;
   btn.disabled = true;
-  fetch(form.action, { method: 'POST', body: new FormData(form) })
-    .then((r) => r.json().catch(() => ({ success: r.ok })) as Promise<{ success?: boolean; error?: string }>)
-    .then((res) => {
-      if (res.success) finish('form');
-      else showProblems([{ text: res.error ?? 'That didn’t send. Please try WhatsApp instead.', target: '#qo-send' }]);
+  submitting = true;
+  const data = new FormData();
+  for (const [name, value] of Object.entries(quoteLeadFields(S, C))) data.set(name, value);
+  data.set('form_check', input('form_check')!.value);
+  data.set('requestId', requestId);
+  data.set('page', location.pathname);
+  const attribution = window.WRPAttribution?.serialize?.();
+  if (attribution) data.set('attribution', attribution);
+  actions
+    .quote(data)
+    .then(({ data: result, error }) => {
+      if (error || !result) throw error ?? new Error('Missing submission result');
+      if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'configurator' } }));
+      requestId = crypto.randomUUID();
+      finish('form');
+      const status = q('[data-qo-status]')!;
+      status.textContent = PREVIEW_NOTE;
+      status.hidden = result.saved || result.ignored;
     })
-    .catch(() => showProblems([{ text: 'That didn’t send. Please check your connection or use WhatsApp.', target: '#qo-send' }]))
-    .finally(() => (btn.disabled = false));
+    .catch(() => showProblems([{ text: 'That didn’t send. Please try again, or send it on WhatsApp instead.', target: '#qo-send' }]))
+    .finally(() => {
+      btn.disabled = false;
+      submitting = false;
+    });
 }
 
 function finish(via: 'form' | 'whatsapp') {
@@ -603,8 +617,7 @@ function restart() {
   applyState();
   q('[data-qo-done]')!.hidden = true;
   q('[data-qo-actions]')!.hidden = false;
-  const st = q('[data-demo-status]');
-  if (st) st.hidden = true;
+  q('[data-qo-status]')!.hidden = true;
   setView('look');
   sync();
   q('#qo-car')!.scrollIntoView({ block: 'start' });

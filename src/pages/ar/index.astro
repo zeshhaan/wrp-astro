@@ -746,6 +746,7 @@ const aboutLines = t(locale, 'home.about.title').split('\n');
                 error: '',
                 async submitForm(event) {
                   event.preventDefault();
+                  if (this.submitting) return;
                   this.submitting = true;
                   this.error = '';
                   const form = event.target;
@@ -754,6 +755,8 @@ const aboutLines = t(locale, 'home.about.title').split('\n');
 
                   try {
                     const formData = new FormData(form);
+                    const attribution = window.WRPAttribution?.serialize?.();
+                    if (attribution) formData.set('attribution', attribution);
                     const response = await fetch('/api/contact', {
                       method: 'POST',
                       body: formData
@@ -764,7 +767,7 @@ const aboutLines = t(locale, 'home.about.title').split('\n');
                     if (response.ok && result.success) {
                       this.success = true;
                       form.reset();
-                      document.dispatchEvent(new Event('wrp:lead'));
+                      document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'homepage' } }));
                     } else {
                       this.error = result.error || defaultError;
                     }
