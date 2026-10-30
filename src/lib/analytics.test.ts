@@ -95,7 +95,7 @@ const submitSource = new Bun.Transpiler({ loader: 'ts' }).transformSync(
 );
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 type ActionReply = { data?: { saved: boolean; ignored: boolean }; error?: unknown };
-function configurator(reply: () => Promise<ActionReply>) {
+function configurator(reply: () => Promise<ActionReply>, honeypot = '') {
   const calls: Map<string, string>[] = [];
   const leads: unknown[] = [];
   const finished: string[] = [];
@@ -113,7 +113,7 @@ function configurator(reply: () => Promise<ActionReply>) {
     S: {},
     C: {},
     quoteLeadFields: () => ({ name: 'Sara', phone: '050 123 4567', email: '' }),
-    input: () => ({ value: '' }),
+    input: (name: string) => name === 'form_check' ? { value: honeypot } : null,
     problems: () => [],
     showProblems: (value: unknown[]) => problems.push(...value),
     q: (selector: string) => (selector === '[data-qo-status]' ? status : button),
@@ -156,9 +156,10 @@ describe('configurator live-path tracking', () => {
   });
 
   test('a discarded honeypot submission looks sent but is not a lead', async () => {
-    const c = configurator(async () => ({ data: { saved: false, ignored: true } }));
+    const c = configurator(async () => ({ data: { saved: false, ignored: true } }), 'automated input');
     c.submit();
     await settle();
+    expect(c.calls[0].get('form_check')).toBe('automated input');
     expect(c.leads).toHaveLength(0);
     expect(c.finished).toEqual(['form']);
     expect(c.status.hidden).toBe(true);
