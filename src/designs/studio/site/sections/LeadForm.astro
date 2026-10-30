@@ -1,0 +1,511 @@
+---
+/**
+ * The quote form in the hero of Studio's inner pages: a white card picked from
+ * the Design Lab candidates, in two shapes from one set of fields.
+ *
+ *  - Tablets and up, layout A "Card": name, mobile and car, one button, and
+ *    WhatsApp as the alternative.
+ *  - Phones, layout C "Callback": only the mobile number and "Call me back",
+ *    with a "WhatsApp me instead" switch, so the form doesn't fill the screen.
+ *    The fields it doesn't show are left out of the lead, and the lead says
+ *    whether to call or WhatsApp.
+ *
+ * It sends to the `quote` Astro Action (src/actions/index.ts) from the browser,
+ * so it works on prerendered pages: the action checks the fields and the
+ * honeypot, then saves the lead to D1 and emails the team. On Worker
+ * previews and Design Lab pages the action does the checks and stops, and the
+ * thank-you panel says nothing was sent.
+ *
+ * Plain HTML first: native validation (styled only after the visitor has
+ * touched a field, via :user-invalid), the right mobile keyboards and autofill
+ * (inputmode/autocomplete). Without the script the button opens the contact
+ * page instead.
+ */
+import Icon from '../../Icon.astro';
+import { proof, whatsappLink } from '../../../data';
+import { toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  /** The service this page is about, sent with the lead. */
+  service: string;
+  id?: string;
+  locale?: Locale;
+}
+
+const { service, id = 'quote', locale = 'en' } = Astro.props;
+const num = (n: string | number) => toLocalNum(n, locale);
+const wa = whatsappLink(locale === 'ar' ? `مرحباً WRP، أود الحصول على عرض سعر لخدمة ${service}.` : `Hi WRP, I would like a quote for ${service}.`);
+const f = (name: string) => `${id}-${name}`;
+// Browsers compile `pattern` with the `v` flag, where ( ) and - need escaping in a class.
+const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
+
+const en = {
+  title: 'Get a quick quote',
+  lede: 'Tell us the car and what you want done. We’ll reply with a price and a time.',
+  callTitle: 'Want a price? We’ll call you.',
+  callLede: 'Leave your number and we’ll call you back with a price.',
+  callMe: 'Call me back',
+  waInstead: 'WhatsApp me instead',
+  name: 'Your name',
+  phone: 'Mobile or WhatsApp',
+  phoneHint: '05X XXX XXXX',
+  car: 'Car (make, model, year)',
+  carHint: 'e.g. Land Cruiser 2024',
+  send: 'Get my quote',
+  sending: 'Sending…',
+  or: 'or',
+  waUs: 'WhatsApp us',
+  rating: `${proof.rating} on Google · ${proof.reviewCountDisplay} reviews`,
+  thanks: 'Thank you. We’ve got it.',
+  thanksLine: 'We’ll reply with a price and a time.',
+  previewNote: 'Preview: the form checked out, but nothing was saved or sent.',
+  error: 'Something went wrong. Please WhatsApp or call us.',
+  required: 'Please fill this in.',
+  phoneInvalid: 'Please enter a mobile number.',
+};
+// Arabic: the live site's form wording (translations form.*, home.contact.*)
+// where it has the same field, and the Studio header's Arabic quote wording.
+const ar: typeof en = {
+  title: 'احصل على عرض سعر سريع',
+  lede: 'أخبرنا بسيارتك والخدمة التي تريدها، وسنرد عليك بالسعر والموعد.',
+  callTitle: 'تريد السعر؟ سنتصل بك.',
+  callLede: 'اترك رقمك وسنعاود الاتصال بك بالسعر.',
+  callMe: 'اتصلوا بي',
+  waInstead: 'راسلوني على واتساب بدلاً من ذلك',
+  name: t('ar', 'form.name'),
+  phone: 'رقم الجوال أو واتساب',
+  phoneHint: '05X XXX XXXX',
+  car: t('ar', 'form.vehicle'),
+  carHint: t('ar', 'home.contact.vehiclePlaceholder'),
+  send: t('ar', 'services.getQuote'),
+  sending: t('ar', 'form.sending'),
+  or: 'أو',
+  waUs: 'راسلنا على واتساب',
+  rating: `${num(proof.rating)} على Google · ${num(proof.reviewCountDisplay)} ${t('ar', 'reviews.reviews')}`,
+  thanks: 'شكراً لك. وصلنا طلبك.',
+  thanksLine: 'سنرد عليك بالسعر والموعد.',
+  previewNote: 'معاينة: النموذج سليم، لكن لم يُحفظ أو يُرسل شيء.',
+  error: 'حدث خطأ. يرجى مراسلتنا على واتساب أو الاتصال بنا.',
+  required: t('ar', 'form.required'),
+  phoneInvalid: 'يرجى إدخال رقم جوال.',
+};
+const words = locale === 'ar' ? ar : en;
+---
+
+<form
+  id={id}
+  class="lf"
+  action="/contact-us/"
+  aria-labelledby={f('title')}
+  data-lead
+  data-msg-required={words.required}
+  data-msg-phone={words.phoneInvalid}
+  data-msg-error={words.error}
+>
+  <input type="hidden" name="service" value={service} />
+  <input type="hidden" name="locale" value={locale} />
+
+  <div class="lf__body" data-lead-body>
+    <header class="lf__head">
+      <h2 id={f('title')} class="lf__title"><span class="lf__wide">{words.title}</span><span class="lf__narrow">{words.callTitle}</span></h2>
+      <p class="lf__lede"><span class="lf__wide">{words.lede}</span><span class="lf__narrow">{words.callLede}</span></p>
+    </header>
+    <div class="lf__field lf__wide">
+      <label for={f('name')}>{words.name}</label>
+      <input id={f('name')} name="name" type="text" autocomplete="name" maxlength="100" required enterkeyhint="next" />
+    </div>
+    <div class="lf__field">
+      <label for={f('phone')}>{words.phone}</label>
+      <input id={f('phone')} name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder={words.phoneHint} pattern={phonePattern} required enterkeyhint="next" />
+    </div>
+    <div class="lf__field lf__wide">
+      <label for={f('car')}>{words.car}</label>
+      <input id={f('car')} name="vehicle" type="text" autocomplete="off" maxlength="120" placeholder={words.carHint} enterkeyhint="send" />
+    </div>
+    <label class="lf__switch lf__narrow">
+      <input type="checkbox" role="switch" data-lead-wa />
+      <span class="lf__track" aria-hidden="true"></span>
+      {words.waInstead}
+    </label>
+    <div class="lf__honeypot" aria-hidden="true">
+      <label for={f('form-check')}>{locale === 'ar' ? 'اترك هذا الحقل فارغًا' : 'Leave this field empty'}</label>
+      <input id={f('form-check')} name="form_check" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <button class="st-btn st-btn--primary lf__send" type="submit">
+      <span class="lf__cta lf__cta--quote">{words.send} <Icon name="arrow-right" size={18} class="flip" /></span>
+      <span class="lf__cta lf__cta--call"><Icon name="phone" size={18} /> {words.callMe}</span>
+      <span class="lf__cta lf__cta--busy">{words.sending}</span>
+    </button>
+    <p class="lf__error" role="alert" data-lead-error hidden></p>
+    <p class="lf__alt">
+      {words.or} <a href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} />{words.waUs}</a>
+      <span class="lf__dot" aria-hidden="true">·</span>
+      <span class="lf__stars" aria-hidden="true"><Icon name="star" size={13} /></span>{words.rating}
+    </p>
+  </div>
+
+  <div class="lf__done" data-lead-done hidden tabindex="-1">
+    <span class="lf__tick" aria-hidden="true"><Icon name="check" size={26} /></span>
+    <p class="lf__title">{words.thanks}</p>
+    <p class="lf__lede">{words.thanksLine}</p>
+    <p class="lf__demo" data-lead-preview hidden>{words.previewNote}</p>
+    <a class="st-btn st-btn--ghost lf__wa" href={wa} target="_blank" rel="noopener"><Icon name="whatsapp" />{words.waUs}</a>
+  </div>
+</form>
+
+<script>
+  import { actions } from 'astro:actions';
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-lead]')) {
+    const body = form.querySelector<HTMLElement>('[data-lead-body]')!;
+    const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
+    const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
+    const waSwitch = form.querySelector<HTMLInputElement>('[data-lead-wa]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const msg = form.dataset;
+    // The script shows its own messages; without it the browser validates.
+    form.noValidate = true;
+    let requestId = crypto.randomUUID();
+
+    // Inline message under a field that fails native validation.
+    const check = (input: HTMLInputElement) => {
+      const field = input.closest('.lf__field');
+      let note = field?.querySelector<HTMLElement>('.lf__note');
+      const bad = !input.checkValidity();
+      if (field && bad && !note) {
+        note = document.createElement('p');
+        note.className = 'lf__note';
+        note.id = `${input.id}-note`;
+        field.appendChild(note);
+        input.setAttribute('aria-describedby', note.id);
+      }
+      if (note) {
+        note.textContent = bad ? (input.validity.valueMissing ? msg.msgRequired! : msg.msgPhone!) : '';
+        note.hidden = !bad;
+      }
+      input.setAttribute('aria-invalid', String(bad));
+      return !bad;
+    };
+    const valid = () => {
+      // Only the fields this layout shows (phones show just the mobile number).
+      const inputs = [...form.querySelectorAll<HTMLInputElement>('.lf__field input[required], .lf__field input[pattern]')].filter(
+        (input) => input.offsetParent !== null,
+      );
+      const results = inputs.map(check);
+      const first = inputs[results.indexOf(false)];
+      first?.focus();
+      return !first;
+    };
+    // A message clears as soon as the field is fixed (while typing, so nothing
+    // shifts under the pointer on the way to the button) and appears when the
+    // visitor leaves a field they've filled in wrongly.
+    form.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.getAttribute('aria-invalid') === 'true') check(input);
+    });
+    form.addEventListener('focusout', (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.matches?.('.lf__field input') && input.value && !input.checkValidity()) check(input);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (button.disabled) return;
+      error.hidden = true;
+      if (!valid()) return;
+      button.disabled = true;
+      form.toggleAttribute('data-sending', true);
+      try {
+        const data = new FormData(form);
+        // The phone layout asks only for the number, and how to reply.
+        const callback = waSwitch.offsetParent !== null;
+        if (callback) {
+          data.delete('name');
+          data.delete('vehicle');
+          data.set('reply', waSwitch.checked ? 'whatsapp' : 'call');
+        }
+        data.set('requestId', requestId);
+        data.set('page', location.pathname);
+        const attribution = window.WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const { data: result, error: failed } = await actions.quote(data);
+        if (failed) throw failed;
+        if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'hero' } }));
+        form.querySelector<HTMLElement>('[data-lead-preview]')!.hidden = result.saved || result.ignored;
+        requestId = crypto.randomUUID();
+        body.hidden = true;
+        done.hidden = false;
+        done.focus();
+      } catch {
+        error.textContent = msg.msgError!;
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        form.toggleAttribute('data-sending', false);
+      }
+    });
+  }
+</script>
+
+<style>
+  /* The thank-you panel and messages use the hidden attribute. */
+  .lf [hidden] {
+    display: none !important;
+  }
+  .lf {
+    --lf-bg: var(--st-white);
+    --lf-ink: var(--st-ink);
+    --lf-mute: var(--st-ink-2);
+    --lf-line: #cbcbcb;
+    --lf-field: var(--st-white);
+    --lf-accent: var(--st-accent-deep);
+    /* A white card, so the accent is ink here, as on light sections. */
+    --st-accent: var(--st-ink);
+    --st-on-accent: var(--st-white);
+    container-type: inline-size;
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: 30rem;
+    margin-inline-start: auto;
+    color: var(--lf-ink);
+    color-scheme: light;
+  }
+  .lf__body,
+  .lf__done {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 0.9rem + 1.5vw, 2rem);
+    background: var(--lf-bg);
+  }
+  .lf__head {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .lf__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.9rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+  .lf__lede {
+    font-size: 0.9375rem;
+    color: var(--lf-mute);
+  }
+  .lf__field {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .lf__field label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .lf__field input {
+    inline-size: 100%;
+    min-block-size: 3rem;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--lf-line);
+    border-radius: 0;
+    background: var(--lf-field);
+    color: var(--lf-ink);
+    font-size: 1rem; /* 16px: no zoom-on-focus on iOS */
+    transition: border-color 0.15s;
+  }
+  .lf__field input::placeholder {
+    color: color-mix(in srgb, var(--lf-mute) 70%, transparent);
+  }
+  .lf__field input:focus-visible {
+    outline: 3px solid var(--st-accent);
+    outline-offset: 0;
+    border-color: var(--lf-ink);
+  }
+  /* Only after the visitor has interacted, never on first paint. */
+  .lf__field input:user-invalid,
+  .lf__field input[aria-invalid='true'] {
+    border-color: #b42318;
+  }
+  /* Made by the script, so outside Astro's scoping. */
+  .lf :global(.lf__note) {
+    font-size: 0.8125rem;
+    color: #b42318;
+  }
+  .lf__send {
+    inline-size: 100%;
+  }
+  .lf__send:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .lf__alt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    color: var(--lf-mute);
+  }
+  .lf__alt a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+    color: var(--lf-ink);
+    text-underline-offset: 3px;
+  }
+  .lf__stars {
+    color: var(--lf-accent);
+  }
+  .lf__error {
+    padding: 0.6rem 0.8rem;
+    background: #fdecea;
+    color: #8a1c13;
+    font-size: 0.875rem;
+  }
+  .lf__done {
+    justify-items: center;
+    text-align: center;
+    gap: 0.6rem;
+    padding-block: 2.5rem;
+  }
+  .lf__done:focus {
+    outline: none;
+  }
+  .lf__tick {
+    display: grid;
+    place-items: center;
+    inline-size: 3.25rem;
+    block-size: 3.25rem;
+    border-radius: 50%;
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+  }
+  .lf__demo {
+    font-size: 0.75rem;
+    color: var(--lf-mute);
+  }
+  .lf__wa {
+    margin-block-start: 0.75rem;
+  }
+  .lf .lf__wa {
+    border-color: var(--lf-ink);
+    color: var(--lf-ink);
+  }
+
+  /* White card, ink rule on top, a soft shadow off the photo. */
+  .lf__body {
+    border-block-start: 4px solid var(--st-accent);
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+
+  /* Two shapes from one form: the card from tablet width up, the callback on
+     phones. Hidden fields stay out of validation and out of the lead. */
+  @media (max-width: 47.99rem) {
+    .lf__wide {
+      display: none !important;
+    }
+  }
+  @media (min-width: 48rem) {
+    .lf__narrow {
+      display: none !important;
+    }
+  }
+
+  /* The button says what will happen: a quote, a call back, or (with the
+     WhatsApp switch on) a quote by WhatsApp. */
+  .lf__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .lf__cta--call,
+  .lf__cta--busy {
+    display: none;
+  }
+  @media (max-width: 47.99rem) {
+    .lf__cta--quote {
+      display: none;
+    }
+    .lf__cta--call {
+      display: inline-flex;
+    }
+    .lf:has([data-lead-wa]:checked) .lf__cta--call {
+      display: none;
+    }
+    .lf:has([data-lead-wa]:checked) .lf__cta--quote {
+      display: inline-flex;
+    }
+  }
+  .lf[data-sending] .lf__cta:not(.lf__cta--busy) {
+    display: none !important;
+  }
+  .lf[data-sending] .lf__cta--busy {
+    display: inline-flex;
+  }
+
+  /* "WhatsApp me instead" switch (phones). */
+  .lf__switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .lf__switch input {
+    position: absolute;
+    opacity: 0;
+    inline-size: 2.5rem;
+    block-size: 1.4rem;
+    margin: 0;
+    cursor: pointer;
+  }
+  .lf__track {
+    position: relative;
+    flex: none;
+    inline-size: 2.5rem;
+    block-size: 1.4rem;
+    border-radius: 1rem;
+    background: var(--lf-line);
+    transition: background-color 0.2s;
+  }
+  .lf__track::after {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.2rem;
+    inset-inline-start: 0.2rem;
+    inline-size: 1rem;
+    block-size: 1rem;
+    border-radius: 50%;
+    background: var(--st-white);
+    transition: translate 0.2s;
+  }
+  .lf__switch input:checked + .lf__track {
+    background: #1f8f4e;
+  }
+  .lf__switch input:checked + .lf__track::after {
+    translate: 1.1rem 0;
+  }
+  :global([dir='rtl']) .lf__switch input:checked + .lf__track::after {
+    translate: -1.1rem 0;
+  }
+  .lf__switch input:focus-visible + .lf__track {
+    outline: 3px solid var(--st-accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lf__track,
+    .lf__track::after {
+      transition: none;
+    }
+  }
+
+  .lf__honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+/**
+ * One of the site's pages in the Studio design, as the route files in
+ * src/pages render it (index.astro, wrap.astro, blog/[...slug].astro, …): the
+ * Studio template for its kind, with the copy it had in the previous design
+ * (./content/*.ts). Service pages and the quote configurator render their own.
+ */
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import type { SitePageProps } from './pages';
+import PillarPage from './PillarPage.astro';
+import AboutPage from './AboutPage.astro';
+import ContactPage from './ContactPage.astro';
+import ReviewsPage from './ReviewsPage.astro';
+import PortfolioPage from './PortfolioPage.astro';
+import BlogIndexPage from './BlogIndexPage.astro';
+import BlogPostPage from './BlogPostPage.astro';
+import ArHomePage from './ArHomePage.astro';
+import Home from '../Home.astro';
+import LegalPage, { type LegalSlug } from './LegalPage.astro';
+import { pillars } from './content/pillars';
+import { about } from './content/about';
+import { contact } from './content/contact';
+import { portfolio } from './content/portfolio';
+import { blog } from './content/blog';
+
+type Props = SitePageProps;
+
+const { kind, locale, slug } = Astro.props;
+const post = Astro.props.kind === 'post' ? Astro.props.post : undefined;
+const Content = post ? (await render(post)).Content : undefined;
+
+// Services a post links to, merged with its frontmatter list: the same rule as
+// the live blog routes.
+async function relatedServicesOf(entry: CollectionEntry<'blog'>, arabic: boolean) {
+  type Id = CollectionEntry<'blog'>['data']['relatedServices'][number];
+  const valid = new Set<Id>(['ceramic-coating', 'paint-protection-film', 'polish', 'window-film', 'premium-car-wash', 'leather-upholstery', 'car-mats', 'graphene-coating']);
+  const body = entry.body || '';
+  const mentioned = (await getCollection('services'))
+    .filter((s) => {
+      const id = arabic ? s.id.replace(/^ar\//, '') : s.id;
+      const esc = id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const patterns = [new RegExp(`/services/${esc}/?`, 'i')];
+      if (!arabic) patterns.push(new RegExp(`https?://[^\\s"']+/services/${esc}/?`, 'i'));
+      return patterns.some((rx) => rx.test(body));
+    })
+    .map((s) => s.id.replace(/^ar\//, ''));
+  return Array.from(new Set([...(entry.data.relatedServices ?? []), ...mentioned])).filter((id): id is Id => valid.has(id as Id));
+}
+const related = post ? await relatedServicesOf(post, locale === 'ar') : [];
+---
+
+{kind === 'home' && (locale === 'ar' ? <ArHomePage /> : <Home />)}
+{kind === 'pillar' && <PillarPage slug={slug as 'wrap'} copy={pillars[`${locale}/${slug}`]} locale={locale} />}
+{kind === 'about' && <AboutPage copy={about[locale]} locale={locale} />}
+{kind === 'contact' && <ContactPage copy={contact[locale]} locale={locale} />}
+{kind === 'reviews' && <ReviewsPage locale={locale} />}
+{kind === 'portfolio' && <PortfolioPage copy={portfolio[locale]} locale={locale} />}
+{kind === 'blog' && <BlogIndexPage copy={blog[locale]} locale={locale} />}
+{kind === 'legal' && <LegalPage slug={slug as LegalSlug} locale={locale} />}
+{
+  kind === 'post' && post && Content && (
+    <BlogPostPage {...post.data} relatedServices={related} locale={locale} slug={slug}>
+      <Content />
+    </BlogPostPage>
+  )
+}

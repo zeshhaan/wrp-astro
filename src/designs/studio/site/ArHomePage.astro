@@ -1,0 +1,37 @@
+---
+/**
+ * Studio's Arabic homepage: the English Studio homepage (../Home.astro) with
+ * the content writer's copy translated into Arabic (contentAr.ts and the
+ * sections' own Arabic strings), right to left, section for section. Title and
+ * description keep the live Arabic page's keywords; links go to the Arabic
+ * pages. Customer reviews stay in the words the customers wrote.
+ * The translation needs a native speaker's read before it goes live.
+ */
+import StudioPage from './StudioPage.astro';
+import HomeMain from '../HomeMain.astro';
+import Schema from '@/components/Schema.astro';
+import { localizeUrl } from '@/i18n/utils';
+import { heroVideo } from '../heroVideo';
+import { isLabPath, toLab } from './routes';
+
+const locale = 'ar' as const;
+const isLab = isLabPath(Astro.url.pathname);
+const local = (href: string) => {
+  const path = localizeUrl(href, locale);
+  return isLab ? toLab(path) : path;
+};
+
+const title = 'فيلم حماية الطلاء (PPF) في دبي | WRP Detailing Studio، القصيص';
+const description =
+  'فيلم حماية طلاء ذاتي الإصلاح من STEK وAvery Dennison، طلاء سيراميك، تظليل نوافذ وتلميع سيارات في القصيص، دبي. ضمان حتى 10 سنوات. تقييم 5.0 على Google.';
+const posters = [
+  { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
+  { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
+];
+---
+
+<StudioPage title={title} description={description} locale={locale} livePath="/ar/" preloads={posters}>
+  <Schema type="WebSite" />
+  <Schema type="ServiceCatalog" />
+  <HomeMain locale={locale} link={local} />
+</StudioPage>

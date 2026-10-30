@@ -1,0 +1,244 @@
+---
+import Icon from './Icon.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import { pages } from '../data';
+import { contact, serviceCards, whatsappQuote } from './content';
+import { phone as phoneAr } from './contentAr';
+import { getHeaderNav } from './headers/nav';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  /** The Studio homepage, for links to its sections from inner pages. Empty on the homepage itself. */
+  home?: string;
+  /** Overrides for the service page links, e.g. the Studio previews of them. */
+  serviceHref?: (href: string) => string;
+  /** Arabic pages get the Arabic footer, which links to the Arabic pages. */
+  locale?: Locale;
+  /** The same page in the other language (defaults to the other homepage). */
+  altHref?: string;
+}
+const { home = '', serviceHref = (href: string) => href, locale = 'en', altHref } = Astro.props;
+const ar = locale === 'ar';
+const num = (n: string | number) => toLocalNum(n, locale);
+
+// Arabic labels are the live site's translations wherever it has them.
+const w = ar
+  ? {
+      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التفصيل، تظليل النوافذ والتنجيد من الاستوديو الخاص بنا في القصيص، دبي.',
+      pillars: ['غلّف', 'عزّز', 'احمِ'],
+      comma: '، ',
+      services: t(locale, 'nav.services'),
+      siteLinks: 'روابط الموقع',
+      visit: 'زورونا',
+      hours: contact.hoursAr,
+      address: [t(locale, 'home.contact.address1'), t(locale, 'home.contact.address2')],
+      rights: `© ${num(new Date().getFullYear())} WRP Detailing Solutions. ${t(locale, 'footer.rights')}`,
+      other: { label: 'English', lang: 'en' },
+    }
+  : {
+      blurb: 'Paint protection film, ceramic coating, detailing, window tint and upholstery from our studio in Al Qusais, Dubai.',
+      pillars: ['Wrap', 'Reinforce', 'Protect'],
+      comma: ', ',
+      services: 'Services',
+      siteLinks: 'Site links',
+      visit: 'Visit us',
+      hours: contact.hours,
+      address: contact.address,
+      rights: `© ${new Date().getFullYear()} WRP Detailing Solutions. All rights reserved.`,
+      other: { label: 'العربية', lang: 'ar' },
+    };
+const services = ar
+  ? (await getHeaderNav(locale)).services.map((s) => ({ name: s.name, href: s.href }))
+  : serviceCards.map((c) => ({ name: c.name, href: c.href }));
+const siteLinks = ar
+  ? [
+      { label: t(locale, 'nav.portfolio'), href: localizeUrl(pages.portfolio, locale) },
+      { label: t(locale, 'nav.reviews'), href: localizeUrl(pages.reviews, locale) },
+      { label: t(locale, 'nav.blog'), href: localizeUrl(pages.blog, locale) },
+      { label: t(locale, 'nav.about'), href: localizeUrl(pages.about, locale) },
+      { label: t(locale, 'nav.contact'), href: localizeUrl(pages.contact, locale) },
+    ]
+  : [
+      { label: 'Portfolio', href: pages.portfolio },
+      { label: 'Reviews', href: pages.reviews },
+      { label: 'Blog', href: pages.blog },
+      { label: 'About WRP', href: pages.about },
+      { label: 'Contact us', href: pages.contact },
+      { label: 'The WRP Lounge', href: `${home}#lounge` },
+    ];
+// Credits has no Arabic page; Arabic visitors get the English one.
+const legal = ar
+  ? [
+      { label: t(locale, 'nav.privacy'), href: localizeUrl(pages.privacy, locale) },
+      { label: t(locale, 'nav.terms'), href: localizeUrl(pages.terms, locale) },
+      { label: t(locale, 'nav.credits'), href: pages.credits },
+    ]
+  : [
+      { label: 'Privacy', href: pages.privacy },
+      { label: 'Terms', href: pages.terms },
+      { label: 'Credits', href: pages.credits },
+    ];
+// The blurb's closing "Wrap, Reinforce, Protect." links each pillar page, so
+// they stay linked from every page (the live homepage links them; Studio's does not).
+const pillarHrefs = ['/wrap/', '/reinforce/', '/protect/'].map((href) => serviceHref(ar ? localizeUrl(href, locale) : href));
+const otherHref = altHref ?? (ar ? '/' : pages.arabic);
+---
+
+<footer class="foot">
+  <div class="st-wrap foot__grid">
+    <div class="foot__brand">
+      <WrpLogo class="foot__mark" label="WRP by YACO Automotive" />
+      <p>
+        {w.blurb}{' '}
+        {w.pillars.map((name, i) => (
+          <>
+            <a href={pillarHrefs[i]}>{name}</a>
+            {i < 2 ? w.comma : '.'}
+          </>
+        ))}
+      </p>
+      <ul class="foot__social" role="list">
+        <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{contact.instagramHandle}</a></li>
+        <li><a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a></li>
+      </ul>
+    </div>
+    <nav class="foot__col" aria-labelledby="foot-services">
+      <h2 id="foot-services" class="foot__h">{w.services}</h2>
+      <ul role="list">
+        {services.map((c) => <li><a href={serviceHref(c.href)}>{c.name}</a></li>)}
+      </ul>
+    </nav>
+    <nav class="foot__col" aria-labelledby="foot-links">
+      <h2 id="foot-links" class="foot__h">{w.siteLinks}</h2>
+      <ul role="list">
+        {siteLinks.map((l) => <li><a href={serviceHref(l.href)}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="foot__col">
+      <h2 class="foot__h">{w.visit}</h2>
+      <ul role="list">
+        <li><a href={contact.phoneHref} dir="ltr">{ar ? phoneAr : contact.phoneDisplay}</a></li>
+        <li><a href={contact.emailHref}>{contact.email}</a></li>
+        <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{w.address[0]}{ar ? '،' : ','}<br />{w.address[1]}</a></li>
+        <li class="foot__hours">{w.hours.split(/[,،] /).map((part, i) => (i ? [<br />, part] : part))}</li>
+      </ul>
+    </div>
+  </div>
+  <div class="st-wrap foot__base">
+    <p>{w.rights}</p>
+    <ul role="list">
+      {legal.map((l) => <li><a href={serviceHref(l.href)}>{l.label}</a></li>)}
+      <li><a href={otherHref} lang={w.other.lang} hreflang={w.other.lang}>{w.other.label}</a></li>
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--st-black);
+    color: var(--st-mute);
+    border-block-start: 1px solid var(--st-line-dark);
+    padding-block: 4rem 6rem;
+    font-size: 0.9375rem;
+  }
+  .foot__grid {
+    display: grid;
+    gap: 2.5rem 3rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .foot__brand,
+  .foot__grid > :last-child {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 40rem) and (max-width: 63.99rem) {
+    .foot__grid > :last-child {
+      grid-column: auto;
+    }
+    .foot__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 64rem) {
+    .foot__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    }
+    .foot__brand,
+    .foot__grid > :last-child {
+      grid-column: auto;
+    }
+  }
+  .foot__brand {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+  .foot__mark {
+    display: block;
+    block-size: 4rem;
+    inline-size: auto;
+    color: var(--st-white);
+  }
+  .foot__brand p {
+    max-inline-size: 22rem;
+  }
+  .foot__brand p a {
+    color: inherit;
+    text-decoration-color: var(--st-accent);
+    text-underline-offset: 3px;
+  }
+  .foot__brand p a:hover {
+    color: var(--st-white);
+  }
+  .foot ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .foot__social {
+    display: grid;
+    gap: 0.25rem;
+  }
+  .foot a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.5rem;
+    color: var(--st-on-dark);
+    text-decoration: none;
+  }
+  .foot a:hover {
+    color: var(--st-accent);
+  }
+  .foot__h {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--st-white);
+    padding-block-end: 0.75rem;
+    margin-block-end: 0.75rem;
+    border-block-end: 2px solid var(--st-accent);
+    inline-size: fit-content;
+    min-inline-size: 60%;
+  }
+  .foot__hours {
+    padding-block: 0.5rem;
+  }
+  .foot__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem 2rem;
+    margin-block-start: 3rem;
+    padding-block-start: 1.5rem;
+    border-block-start: 1px solid var(--st-line-dark);
+    font-size: 0.8125rem;
+  }
+  .foot__base ul {
+    display: flex;
+    gap: 1.25rem;
+  }
+</style>

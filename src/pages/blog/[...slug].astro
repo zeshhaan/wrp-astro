@@ -1,53 +1,11 @@
 ---
-import { type CollectionEntry, getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import type { GetStaticPaths } from 'astro';
+import SitePage from '@/designs/studio/site/SitePage.astro';
+import { blogPostPaths } from '@/designs/studio/site/pages';
 
 export const prerender = true;
 
-export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	// Only English posts for this route (Arabic gets /ar/blog/)
-	return posts.filter(p => !p.id.startsWith('ar/')).map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
-}
-type Props = CollectionEntry<'blog'>;
-type RelatedServiceId = CollectionEntry<'blog'>['data']['relatedServices'][number];
-
-const post = Astro.props;
-const { Content } = await render(post);
-const validServiceIds = new Set<RelatedServiceId>([
-  'ceramic-coating',
-  'paint-protection-film',
-  'polish',
-  'window-film',
-  'premium-car-wash',
-  'leather-upholstery',
-  'car-mats',
-  'graphene-coating',
-]);
-
-// Auto-detect services mentioned in the post body and merge with frontmatter
-const services = await getCollection('services');
-const body = post.body || '';
-const mentionedServiceIds = services
-  .filter((s) => {
-    const slug = s.id.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const patterns = [
-      new RegExp(`/services/${slug}/?`, 'i'),
-      new RegExp(`https?://[^\\s\"']+/services/${slug}/?`, 'i'),
-    ];
-    return patterns.some((rx) => rx.test(body));
-  })
-  .map((s) => s.id);
-
-const relatedFromFrontmatter = post.data.relatedServices ?? [];
-const relatedServices: RelatedServiceId[] = Array.from(
-  new Set([...relatedFromFrontmatter, ...mentionedServiceIds])
-).filter((id): id is RelatedServiceId => validServiceIds.has(id as RelatedServiceId));
+export const getStaticPaths = (() => blogPostPaths('en')) satisfies GetStaticPaths;
 ---
 
-<BlogPost {...post.data} relatedServices={relatedServices}>
-	<Content />
-</BlogPost>
+<SitePage {...Astro.props} />

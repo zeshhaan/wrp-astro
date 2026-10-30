@@ -1,0 +1,15 @@
+---
+export const prerender = true;
+
+import { conceptComponents, type ConceptId } from '@/designs';
+import { conceptIds } from '@/designs/registry';
+
+export function getStaticPaths() {
+  // Studio's homepage is `/` now; /design-lab/studio/ redirects there (studio/[...page].ts).
+  return conceptIds.filter((concept) => concept !== 'studio').map((concept) => ({ params: { concept } }));
+}
+
+const Page = conceptComponents[Astro.params.concept as ConceptId];
+---
+
+<Page />

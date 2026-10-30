@@ -1,5 +1,5 @@
 export const LEAD_OUTCOMES = ['booked', 'lost'] as const;
-export const LEAD_KINDS = ['contact', 'tally'] as const;
+export const LEAD_KINDS = ['contact', 'tally', 'quote'] as const;
 
 export type LeadOutcome = (typeof LEAD_OUTCOMES)[number];
 export type LeadKind = (typeof LEAD_KINDS)[number];
@@ -25,6 +25,7 @@ const MINIMUM_SECRET_LENGTH = 32;
 const TABLES: Record<LeadKind, string> = {
   contact: 'contact_submissions',
   tally: 'quote_requests',
+  quote: 'quote_form_leads',
 };
 
 function isLeadKind(value: string): value is LeadKind {

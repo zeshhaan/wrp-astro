@@ -1,0 +1,125 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { lounge } from '../data';
+import { loungeList } from './content';
+import { loungeListAr, loungePhotoAr, loungeQuoteAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const w =
+  locale === 'ar'
+    ? {
+        photo: loungePhotoAr,
+        eyebrow: 'أثناء الانتظار',
+        title: 'صالة WRP',
+        text: 'تنتظر في الاستوديو؟ صالتنا في الطابق العلوي تطل على ورش العمل من خلف جدار زجاجي. خذ قهوة أو كرك، شغّل المباراة، أو العب جولة بلياردو بينما نعتني بسيارتك في الأسفل.',
+        list: loungeListAr,
+        quote: `«${loungeQuoteAr.text}»`,
+        cite: `${loungeQuoteAr.author}، مراجعة على Google (مترجمة)`,
+      }
+    : {
+        photo: lounge.photos[0],
+        eyebrow: 'While you wait',
+        title: 'The WRP Lounge',
+        text: 'Waiting at the studio? Our mezzanine lounge looks down on the detailing bays through a glass wall. Grab a coffee or karak, put the match on, or play a frame of billiards while we work on your car below.',
+        list: loungeList,
+        quote: `“${lounge.quotes[0].text}”`,
+        cite: `${lounge.quotes[0].author}, Google review`,
+      };
+const photo = w.photo;
+---
+
+<section class="lounge st-section st-dark" id="lounge" aria-labelledby="lounge-title">
+  <div class="st-wrap lounge__grid">
+    <figure class="lounge__media">
+      <Picture base={photo.base} alt={photo.alt} sizes="(min-width: 60rem) 50vw, 100vw" />
+      <figcaption>{photo.caption}</figcaption>
+    </figure>
+    <div class="lounge__text">
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="lounge-title" class="st-h2">{w.title}</h2>
+      <p>{w.text}</p>
+      <ul class="lounge__list" role="list">
+        {
+          w.list.map((item) => (
+            <li>
+              <Icon name="check" size={16} />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <blockquote class="lounge__quote">
+        <p>{w.quote}</p>
+        <footer>{w.cite}</footer>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lounge__grid {
+    display: grid;
+    gap: 2rem 4rem;
+    align-items: center;
+  }
+  .lounge__media :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .lounge__media figcaption {
+    margin-block-start: 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  .lounge__text {
+    display: grid;
+    gap: 1.1rem;
+    max-inline-size: 36rem;
+  }
+  .lounge__text > p:not(.st-eyebrow) {
+    color: var(--st-on-dark);
+  }
+  .lounge__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lounge__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.9375rem;
+  }
+  .lounge__list :global(svg) {
+    flex: none;
+    color: var(--st-accent);
+  }
+  .lounge__quote {
+    margin: 0.5rem 0 0;
+    padding-inline-start: 1rem;
+    border-inline-start: 3px solid var(--st-accent);
+  }
+  .lounge__quote p {
+    font-style: italic;
+    color: var(--st-white);
+  }
+  .lounge__quote footer {
+    margin-block-start: 0.3rem;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  @media (min-width: 60rem) {
+    .lounge__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

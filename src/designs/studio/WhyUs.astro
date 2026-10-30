@@ -1,0 +1,420 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { proof, whyPhotos, whyPoints } from './content';
+import { num, rating, reviewCount, whyPhotosAr, whyPointsAr } from './contentAr';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      eyebrow: 'بكلمات عملائنا',
+      title: 'لماذا تختار WRP',
+      intro: 'أكثر أربعة أشياء يذكرها عملاؤنا.',
+      rating,
+      stars: 'تقييم ٥ من ٥ نجوم',
+      count: `${reviewCount} مراجعة على Google`,
+      photos: whyPhotosAr,
+      photoNote: 'الصورة من مراجعة العميل على Google.',
+      pause: 'إيقاف الصور',
+      play: 'تشغيل الصور',
+      points: whyPointsAr,
+      review: 'مراجعة على Google (مترجمة)',
+    }
+  : {
+      eyebrow: 'In our customers’ words',
+      title: 'Why choose WRP',
+      intro: 'The four things our customers mention most.',
+      rating: proof.rating,
+      stars: '5 out of 5 stars',
+      count: `${proof.reviewCountDisplay} Google reviews`,
+      photos: whyPhotos,
+      photoNote: 'Photo from the customer’s Google review.',
+      pause: 'Pause photos',
+      play: 'Play photos',
+      points: whyPoints,
+      review: 'Google review',
+    };
+// Arabic drops the leading zero: ٠ reads as a dot.
+const pad = (n: number) => (ar ? num(n) : String(n).padStart(2, '0'));
+---
+
+<section class="why st-section st-light" id="why" aria-labelledby="why-title">
+  <div class="st-wrap why__grid">
+    <div class="why__aside">
+      <header class="st-head why__head">
+        <p class="st-eyebrow st-eyebrow--dark">{w.eyebrow}</p>
+        <h2 id="why-title" class="st-h2">{w.title}</h2>
+        <p class="st-intro">{w.intro}</p>
+      </header>
+      <a class="rating" href={link(proof.reviewsUrl)}>
+        <span class="rating__score">{w.rating}</span>
+        <span class="rating__meta">
+          <span class="rating__stars" role="img" aria-label={w.stars}>
+            {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+          </span>
+          <span class="rating__count">{w.count}</span>
+        </span>
+        <Icon name="arrow-right" size={20} class="rating__arrow flip" />
+      </a>
+      <div class="why__photos" data-fader data-pause={w.pause} data-play={w.play}>
+        <ul class="why__slides" role="list">
+          {
+            w.photos.map((ph, i) => (
+              <li class="why__slide" data-slide aria-hidden={i === 0 ? undefined : 'true'}>
+                <figure>
+                  <Picture
+                    base={ph.base}
+                    widths={[480, 800]}
+                    alt={ph.alt}
+                    sizes="(min-width: 60rem) 34vw, 100vw"
+                  />
+                  <figcaption>{ph.caption} {w.photoNote}</figcaption>
+                </figure>
+              </li>
+            ))
+          }
+        </ul>
+        <button class="why__toggle" type="button" data-toggle hidden>
+          <span data-pause-icon><Icon name="pause" size={16} /></span>
+          <span data-play-icon hidden><Icon name="play" size={16} /></span>
+          <span class="visually-hidden" data-toggle-label>{w.pause}</span>
+        </button>
+      </div>
+    </div>
+
+    <ol class="points" role="list">
+      {
+        w.points.map((p, i) => (
+          <li class="point">
+            <div class="point__label">
+              <span class="point__num" aria-hidden="true">{pad(i + 1)}</span>
+              <h3 class="point__title">{p.title}</h3>
+            </div>
+            <figure class="point__quote">
+              <blockquote>
+                <p>{p.quote}</p>
+              </blockquote>
+              <figcaption>
+                <span class="point__author">{p.author}</span>{ar ? '، ' : ', '}{w.review}
+              </figcaption>
+            </figure>
+            <p class="point__body">{p.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<script>
+  // Crossfade the customer photos every few seconds. Off for reduced motion;
+  // pauses off-screen, on hover/focus, and with the pause button.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fader]')) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]');
+    if (slides.length < 2 || !toggle || matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    const label = toggle.querySelector('[data-toggle-label]')!;
+    const pauseIcon = toggle.querySelector<HTMLElement>('[data-pause-icon]')!;
+    const playIcon = toggle.querySelector<HTMLElement>('[data-play-icon]')!;
+    let current = 0;
+    let timer = 0;
+    let paused = false;
+    let visible = false;
+    let hovered = false;
+    root.classList.add('is-fading');
+    slides[0].classList.add('is-active');
+    const show = (n: number) => {
+      slides[current].classList.remove('is-active');
+      slides[current].setAttribute('aria-hidden', 'true');
+      current = n % slides.length;
+      slides[current].classList.add('is-active');
+      slides[current].removeAttribute('aria-hidden');
+    };
+    const sync = () => {
+      clearInterval(timer);
+      if (!paused && visible && !hovered) timer = window.setInterval(() => show(current + 1), 4500);
+    };
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      label.textContent = (paused ? root.dataset.play : root.dataset.pause) ?? '';
+      pauseIcon.hidden = paused;
+      playIcon.hidden = !paused;
+      sync();
+    });
+    root.addEventListener('pointerenter', () => { hovered = true; sync(); });
+    root.addEventListener('pointerleave', () => { hovered = false; sync(); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; sync(); }).observe(root);
+  }
+</script>
+
+<style>
+  .why__grid {
+    display: grid;
+    gap: 2.5rem 5rem;
+  }
+  .why__aside {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .why__head {
+    margin-block-end: 0;
+  }
+
+  /* Google rating badge */
+  .rating {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    justify-self: start;
+    padding: 0.7rem 1rem 0.7rem 0.9rem;
+    background: var(--st-black);
+    color: var(--st-white);
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .rating__score {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 2.25rem;
+    line-height: 1;
+  }
+  .rating__meta {
+    display: grid;
+    gap: 0.2rem;
+  }
+  .rating__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-accent);
+  }
+  .rating__stars :global(svg) {
+    fill: currentColor;
+  }
+  .rating__count {
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--st-on-dark);
+  }
+  .rating :global(.rating__arrow) {
+    margin-inline-start: 0.25rem;
+    color: var(--st-accent);
+  }
+  .rating:hover {
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+  }
+  .rating:hover :is(.rating__stars, .rating__count, :global(.rating__arrow)) {
+    color: var(--st-black);
+  }
+
+  .why__photos {
+    display: none;
+    position: relative;
+  }
+  .why__slides {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .why__slide {
+    grid-area: 1 / 1;
+  }
+  /* Before the script runs (or without it), only the first photo shows. */
+  .why__slide:not(:first-child) {
+    visibility: hidden;
+  }
+  .is-fading .why__slide {
+    visibility: visible;
+    opacity: 0;
+    transition: opacity 1.2s ease, visibility 0s 1.2s;
+  }
+  .is-fading .why__slide.is-active {
+    opacity: 1;
+    transition: opacity 1.2s ease, visibility 0s;
+  }
+  .why__slide figure {
+    margin: 0;
+  }
+  .why__slide :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .why__slide figcaption {
+    margin-block-start: 0.6rem;
+    padding-inline-end: 3rem;
+    font-size: 0.8125rem;
+    color: var(--st-ink-2);
+  }
+  .why__toggle {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    background: rgb(12 13 15 / 0.75);
+    color: var(--st-white);
+    border: 0;
+    cursor: pointer;
+  }
+  .why__toggle:hover {
+    background: var(--st-ink-2);
+  }
+  .why__toggle[hidden], .why__toggle [hidden] {
+    display: none;
+  }
+
+  /* The four points: label row, the customer's words large, then our promise */
+  .points {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 3px solid var(--st-ink);
+  }
+  .point {
+    display: grid;
+    gap: 1rem;
+    padding-block: 1.75rem 2rem;
+    border-block-end: 1px solid var(--st-line-light);
+  }
+  .point__label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+  .point__num {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    letter-spacing: 0.08em;
+    color: var(--st-accent-deep);
+  }
+  .point__title {
+    flex: 1;
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+  }
+  .point__quote {
+    margin: 0;
+  }
+  .point__quote blockquote {
+    position: relative;
+    margin: 0;
+    padding-inline-start: 1.6rem;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--st-ink);
+    text-wrap: balance;
+  }
+  .point__quote blockquote::before {
+    content: '“';
+    position: absolute;
+    inset-inline-start: -0.1rem;
+    inset-block-start: -0.35rem;
+    font-size: 3rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--st-accent);
+  }
+  .point__quote blockquote p::after {
+    content: '”';
+  }
+  /* Arabic quotes take guillemets, inline: the big hanging mark is a Latin one. */
+  .point__quote blockquote:lang(ar)::before {
+    content: none;
+  }
+  .point__quote blockquote:lang(ar) p::before {
+    content: '«';
+  }
+  .point__quote blockquote:lang(ar) p::after {
+    content: '»';
+  }
+  .point__quote figcaption {
+    margin-block-start: 0.6rem;
+    padding-inline-start: 1.6rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+  }
+  .point__author {
+    font-weight: 700;
+    color: var(--st-ink);
+  }
+  .point__body {
+    padding-inline-start: 1.6rem;
+    max-inline-size: 36rem;
+    color: var(--st-ink-2);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 40rem) {
+    .why__photos {
+      display: block;
+    }
+  }
+  @media (min-width: 60rem) {
+    .why__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .why__aside {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 2rem);
+    }
+    .point {
+      grid-template-columns: 13rem 1fr;
+      column-gap: 2rem;
+      padding-block: 2.25rem 2.5rem;
+    }
+    .point__label {
+      grid-row: span 2;
+      flex-direction: column;
+      align-items: start;
+      gap: 0.6rem;
+    }
+    .point__title {
+      flex: none;
+    }
+    .point__num {
+      font-size: 2.75rem;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+    .point__quote blockquote,
+    .point__quote figcaption,
+    .point__body {
+      padding-inline-start: 0;
+    }
+    .point__quote blockquote::before {
+      inset-inline-start: -1.75rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rating {
+      transition: none;
+    }
+  }
+</style>

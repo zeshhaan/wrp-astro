@@ -1,0 +1,272 @@
+/**
+ * Shared content for the Studio design (the chosen homepage direction) and its
+ * quote flows.
+ *
+ * Prices come from the `startingPrice` fields in src/content/services/*.mdx and
+ * the lounge details from verified Google reviews (data/google-reviews.json).
+ * Where a service has no published starting price we say so rather than invent one.
+ */
+import { getBusiness, getDisplayCount } from '@/lib/reviews';
+
+// Contact links go through WRP's dub.sh short links, as on the live site, so
+// clicks are counted in Dub and analytics (src/components/Analytics.astro).
+export const contact = {
+  phoneDisplay: '+971 54 717 3000',
+  phoneHref: 'https://dub.sh/wrp-phone',
+  whatsapp: 'https://dub.sh/wrp-wa',
+  email: 'info@wrpdetailing.ae',
+  emailHref: 'https://dub.sh/wrp-email',
+  instagram: 'https://dub.sh/wrp_ig',
+  instagramHandle: '@wrp_ae',
+  address: ['Al Qusais Industrial Area 1', 'Dubai, United Arab Emirates'],
+  mapsUrl: 'https://dub.sh/wrp-map',
+  /** Opening hours in one line, worded the same everywhere (Shereef, 30 Oct 2026). */
+  hours: 'Open every day except Friday, 9 AM to 9:30 PM',
+  hoursAr: 'مفتوح يومياً ما عدا الجمعة، من ٩ صباحاً حتى ٩:٣٠ مساءً',
+  /** Opening hours in Dubai local time (UTC+4, no DST). 5 = Friday. */
+  schedule: { open: '09:00', close: '21:30', closedDays: [5] as number[], timeZone: 'Asia/Dubai' },
+};
+
+/** Build a WhatsApp link with a prefilled message (Dub passes the query string on to WhatsApp). */
+export function whatsappLink(message: string): string {
+  return `${contact.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
+export type Service = {
+  slug: string;
+  href: string;
+  name: string;
+  short: string;
+  /** One-sentence plain description of what the service does. */
+  line: string;
+  /** Starting price in AED, or null when priced after inspection. */
+  from: number | null;
+  /** Typical time the car is with us, for planning a lounge visit. */
+  time: string;
+  /** Rough minutes, used by interactive "plan your visit" widgets. */
+  minutes: number;
+  /** Three concrete facts, each short enough for a spec line. */
+  facts: [string, string, string];
+  image: string;
+  imageAlt: string;
+  pillar: 'Wrap' | 'Reinforce' | 'Protect';
+};
+
+export const services: Service[] = [
+  {
+    slug: 'paint-protection-film',
+    href: '/services/paint-protection-film/',
+    name: 'Paint Protection Film',
+    short: 'PPF',
+    line: 'A clear, self-healing film that takes the stone chips and scratches so your paint doesn’t.',
+    from: 5999,
+    time: '2–4 days',
+    minutes: 2 * 24 * 60,
+    facts: ['Self-healing top coat', 'Avery Dennison & STEK films', 'Up to 10-year warranty'],
+    image: '/portfolio/porsche-boxster-spyder-gray',
+    imageAlt: 'Grey Porsche Boxster Spyder after full paint protection film at WRP',
+    pillar: 'Wrap',
+  },
+  {
+    slug: 'ceramic-coating',
+    href: '/services/ceramic-coating/',
+    name: 'Ceramic Coating',
+    short: 'Ceramic',
+    line: 'Our borophene coating: a hard, hydrophobic layer that keeps the gloss and makes every wash easier.',
+    from: 1399,
+    time: '1–2 days',
+    minutes: 24 * 60,
+    facts: ['9H hardness', 'Water beads and rolls off', '2–7 year warranty'],
+    image: '/portfolio/green-porsche-911-showroom-event',
+    imageAlt: 'Green Porsche 911 with fresh ceramic coating at a WRP showroom event',
+    pillar: 'Reinforce',
+  },
+  {
+    slug: 'window-film',
+    href: '/services/window-film/',
+    name: 'Window Film',
+    short: 'Tint',
+    line: 'Nano-ceramic tint that blocks the Dubai sun without blocking your phone signal.',
+    from: 599,
+    time: '3–5 hours',
+    minutes: 4 * 60,
+    facts: ['99% UV blocked', 'Up to 80% heat rejected', 'Signal safe'],
+    image: '/luxury-sedan-close-up-black-and-white-elegant',
+    imageAlt: 'Close-up of a luxury sedan with ceramic window film',
+    pillar: 'Protect',
+  },
+  {
+    slug: 'polish',
+    href: '/services/polish/',
+    name: 'Polish & Paint Correction',
+    short: 'Polish',
+    line: 'Machine correction that removes swirls and haze, measured with a paint-depth gauge.',
+    from: null,
+    time: '1–2 days',
+    minutes: 10 * 60,
+    facts: ['85–95% of swirls removed', 'Paint depth measured first', 'Single to multi-stage'],
+    image: '/portfolio/burgundy-lotus-showroom-display',
+    imageAlt: 'Burgundy Lotus Exige after paint correction and ceramic coating',
+    pillar: 'Reinforce',
+  },
+  {
+    slug: 'premium-car-wash',
+    href: '/services/premium-car-wash/',
+    name: 'Premium Car Wash',
+    short: 'Wash',
+    line: 'A hand wash with pH-neutral products and filtered rinse water, sealed with ceramic rather than wax.',
+    from: 100,
+    time: '1–3 hours',
+    minutes: 2 * 60,
+    facts: ['Hand wash only', 'Filtered, spot-free rinse', 'Three levels, from AED 100'],
+    image: '/portfolio/blue-subaru-wrx-sti-showroom',
+    imageAlt: 'Blue Subaru WRX STI after a premium hand wash at WRP',
+    pillar: 'Protect',
+  },
+  {
+    slug: 'leather-upholstery',
+    href: '/services/leather-upholstery/',
+    name: 'Leather & Upholstery',
+    short: 'Interior',
+    line: 'Custom seat covers, stitched upholstery and fitted floor mats, chosen from samples upstairs.',
+    from: null,
+    time: '1–3 days',
+    minutes: 24 * 60,
+    facts: ['Genuine & synthetic leather', 'Made-to-measure mats', 'Factory-grade stitching'],
+    image: '/leather-service-hero',
+    imageAlt: 'Hand-stitched leather car seat upholstery',
+    pillar: 'Wrap',
+  },
+];
+
+export const work = [
+  { title: 'Porsche Boxster Spyder', what: 'Full paint protection', image: '/portfolio/porsche-boxster-spyder-gray' },
+  { title: 'Porsche 911', what: 'Ceramic coating & detailing', image: '/portfolio/green-porsche-911-showroom-event' },
+  { title: 'Lotus Exige', what: 'Paint correction & ceramic', image: '/portfolio/burgundy-lotus-showroom-display' },
+  { title: 'Subaru WRX STI', what: 'Wash & paint protection', image: '/portfolio/blue-subaru-wrx-sti-showroom' },
+  { title: 'Lexus LX 570', what: 'Full detailing package', image: '/portfolio/black-lexus-lx-570-showroom' },
+  { title: 'Toyota Supra & Lotus', what: 'Showroom detailing', image: '/portfolio/lotus-toyota-supra-showroom-duo' },
+];
+
+/**
+ * The WRP Lounge. Replaces the old "Signature Fleet" logo wall.
+ * Everything here is either visible in customer photos or said in reviews;
+ * board games were confirmed by the owner.
+ */
+export const lounge = {
+  name: 'The WRP Lounge',
+  where: 'First floor, above the studio',
+  pitch:
+    'Stay while we work. The lounge sits on the mezzanine above the bays, behind a glass wall, so you can watch your car or ignore it completely.',
+  amenities: [
+    { name: 'Billiards', detail: 'A full-size table on the first floor.' },
+    { name: 'Board games', detail: 'A shelf of them, for a quick round or a long one.' },
+    { name: 'Coffee & karak', detail: 'Made fresh while you wait.' },
+    { name: 'Big-screen TV', detail: 'Match on, sofa ready.' },
+    { name: 'Air-conditioned', detail: 'Cool all year, even in August.' },
+    { name: 'Materials room', detail: 'Touch the leather, film and mat samples before you choose.' },
+    { name: 'Studio view', detail: 'A glass wall overlooks the bays below.' },
+  ],
+  photos: [
+    {
+      base: '/review-images/venkat_k_4',
+      alt: 'WRP lounge with a billiards table, big-screen TV and blue sofa',
+      caption: 'Billiards, a big screen and a sofa. Photo by customer Venkat K.',
+    },
+    {
+      base: '/review-images/tariq_murad_2',
+      alt: 'Glass-walled mezzanine lounge above the WRP studio bays',
+      caption: 'The mezzanine lounge, looking down on the bays. Photo by customer Tariq Murad.',
+    },
+    {
+      base: '/review-images/venkat_k_3',
+      alt: 'WRP materials room with film rolls, leather seat and floor mat samples',
+      caption: 'The materials room: films, leathers and mats. Photo by customer Venkat K.',
+    },
+    {
+      base: '/review-images/mark_ban_2',
+      alt: 'WRP studio floor with pendant lights and the glass lounge above',
+      caption: 'Pendant lights over the studio floor. Photo by customer Mark Ban.',
+    },
+  ],
+  /** Verbatim review excerpts about the lounge. */
+  quotes: [
+    {
+      text: 'It felt less like a standard garage and more like a high-end lounge.',
+      author: 'Manohar C.',
+    },
+    {
+      text: 'They even have a billiards area on the first floor, so you can relax and play while your car is being taken care of!',
+      author: 'DhaneshKumar KV',
+    },
+    {
+      text: 'The opportunity to play billiards while my car was being perfected… turning what is usually a boring wait into a genuinely enjoyable use of time.',
+      author: 'Manohar C.',
+    },
+    {
+      text: 'The whole place gives off a comfortable, welcoming “home” feeling.',
+      author: 'Mark Ban',
+    },
+    {
+      text: 'The waiting area was a nice touch as well—comfortable, with a TV, complimentary coffee, and a pool table, making the wait enjoyable.',
+      author: 'Lithin Devassy',
+    },
+  ],
+};
+
+const business = getBusiness();
+/**
+ * Live Google Maps figures, read 29 Oct 2026 via Firecrawl Maps: 5.0 from 134
+ * reviews, the newest 60 all 5-star. The count lives in data/google-reviews.json
+ * (shared with the live site), and the display rounds down ("130+") so it
+ * never overstates.
+ * Google's topic chips: professional team 23, car detailing 12, attention to
+ * work 9, interior cleaning 7, window tint 5, detailed wash 4, polite team 4,
+ * clear explanations 3, ceramic coating 2, showroom shine 2.
+ */
+export const proof = {
+  rating: business.rating.toFixed(1),
+  reviewCount: business.totalReviews,
+  reviewCountDisplay: getDisplayCount(),
+  reviewsUrl: '/reviews/',
+  // The films WRP fits, as confirmed by the owner on 2026-10-29, spelled as the
+  // makers spell them (DYNOmatte is STEK's matte DYNOshield). Supreme Defense is
+  // Avery Dennison's, never list it under STEK.
+  films: [
+    { name: 'Avery Dennison', logo: '/logos/avery-dennison.png', lines: ['Supreme Defense'] },
+    { name: 'STEK', logo: '/logos/stek.png', lines: ['DYNOshield', 'DYNOmatte', 'FORCEshield', 'C-Clear'], finishes: 'Gloss or matte' },
+  ] as { name: string; logo: string; lines: string[]; finishes?: string }[],
+};
+
+export type Quote = { text: string; author: string; service?: string; photo?: string };
+
+/**
+ * The strongest written Google reviews since the February scrape, verbatim
+ * excerpts of whole sentences (typos kept), newest first. Picked 29 Oct 2026
+ * from the newest 80; all are also in data/google-reviews.json.
+ * `service` matches a `services[].slug` where one fits.
+ */
+export const freshQuotes: (Quote & { when: string })[] = [
+  { text: 'I got a PPF on my car. The service is amazing. Afzal kept me informed on the progress of the process. It’s been a really good experience with these guys.', author: 'Siddik Akbar', service: 'paint-protection-film', when: 'September 2026' },
+  { text: 'Got my car detailed at WRP, and they did an amazing job honestly. The car was super dirty when i dropped it off and they made it look brand new inside and out.', author: 'Aadithya Dhanesh', service: 'premium-car-wash', when: 'August 2026' },
+  { text: 'I went for the Matte black hood + spoiler combo and i must say that the result is outstanding. Huge thanks to Mr. Afzal and the remaining crew members.', author: 'A Khalid', when: 'August 2026' },
+  { text: 'They just finished a matte finish STEK PPF job on my Golf GTI, and it has completely transformed the car. The team\'s expertise and professionalism are unmatched, but what really blew me away was the pricing—extremely fair and well below the current market rates for premium PPF.', author: 'arun prasad', service: 'paint-protection-film', when: 'July 2026' },
+  { text: 'Honestly, if you\'re sick of those cashgrab detailing shops in Dubai that charge a fortune, rush the job, and try to upsell you the second you walk in, just go to WRP. They actually took their time with it, did a flawless job, and didn\'t cut any corners.', author: 'xiii adventures', service: 'premium-car-wash', when: 'June 2026' },
+  { text: 'They used STEK Dynoshield and the final result is stunning—perfect installation and an amazing glossy finish.', author: 'Ciby Koshy', service: 'paint-protection-film', when: 'June 2026' },
+  { text: 'Absolutely thrilled with my window tinting! The team was friendly and professional. The process was smooth, the quality is outstanding, and my car looks so much better.', author: 'Salwa Shaikh', service: 'window-film', when: 'June 2026' },
+  { text: 'The attention to detail is on another level — the car looked better than when I first got it. It’s definitely on the premium side price-wise, but you can see where the money goes.', author: 'Ashik Mubarak', service: 'premium-car-wash', when: 'April 2026' },
+  { text: 'Gave my car for ppf, tinting, and floor mats. All came out well and top class. Applied perfectly and no flaws.', author: 'Kevin S', service: 'paint-protection-film', when: 'March 2026' },
+  { text: 'Shahul and his team did an amazing job and restored the car bonnet & the paint with some polishing and looked like the issue never existed!', author: 'Shamim J Mahal', service: 'polish', when: 'March 2026' },
+];
+
+export const pages = {
+  blog: '/blog/',
+  portfolio: '/portfolio/',
+  reviews: '/reviews/',
+  about: '/more-about-wrp/',
+  contact: '/contact-us/',
+  privacy: '/privacy/',
+  terms: '/terms/',
+  credits: '/credits/',
+  arabic: '/ar/',
+};

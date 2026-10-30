@@ -1,0 +1,393 @@
+---
+/**
+ * Header variant F, "Filmstrip": a centred masthead with the pages split
+ * either side of the logo, over a strip of six photo frames, one per service,
+ * with the name and starting price on each. Point at a frame and it opens
+ * wider to show what the service does. Once you scroll, the frames fold down
+ * into a slim row of names with a hint of the photo, so the services stay
+ * visible on every screen. On phones the strip scrolls sideways.
+ *
+ * The fold keeps the header's footprint the same (the height it gives up
+ * becomes margin), so the page under it never moves. Every destination is a
+ * plain <a href> in the server HTML.
+ */
+import Icon from '../Icon.astro';
+import Picture from '../../shared/Picture.astro';
+import WrpLogo from '@/components/WrpLogo.astro';
+import Strip from './parts/Strip.astro';
+import MenuSheet from './parts/MenuSheet.astro';
+import type { HeaderNav } from './nav';
+
+interface Props {
+  nav: HeaderNav;
+  altHref: string;
+  quoteHref: string;
+}
+
+const { nav, altHref, quoteHref } = Astro.props;
+const w = nav.words;
+const [start, end] = [nav.pages.slice(0, 3), nav.pages.slice(3)];
+---
+
+<a class="skip" href="#main">{w.skip}</a>
+
+<div class="fs" dir={nav.dir} lang={nav.locale}>
+  <Strip nav={nav} altHref={altHref} />
+  <div class="fs-sentinel" data-fs-sentinel aria-hidden="true"></div>
+
+  <header class="fs-head" data-fs-head>
+    <div class="st-wrap fs-mast">
+      <div class="fs-mast__side">
+        <button class="fs-sq fs-narrow" type="button" commandfor="fs-menu" command="show-modal" aria-controls="fs-menu">
+          <Icon name="menu" size={22} />
+          <span class="visually-hidden">{w.menu}</span>
+        </button>
+        <nav class="fs-pages" aria-label="Main">
+          <ul role="list">{start.map((p) => <li><a href={p.href}>{p.label}</a></li>)}</ul>
+        </nav>
+      </div>
+      <a class="fs-logo" href={nav.home} aria-label={w.home}>
+        <WrpLogo class="fs-logo__mark" />
+      </a>
+      <div class="fs-mast__side fs-mast__side--end">
+        <nav class="fs-pages" aria-label="More">
+          <ul role="list">{end.map((p) => <li><a href={p.href}>{p.label}</a></li>)}</ul>
+        </nav>
+        <a class="fs-quote" href={quoteHref}>{w.quote}<Icon name="arrow-right" size={16} class="fs-arrow" /></a>
+        <button class="fs-sq fs-narrow" type="button" data-contact-modal>
+          <Icon name="whatsapp" size={22} />
+          <span class="visually-hidden">{w.whatsapp}</span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="fs-film" aria-label={nav.servicesLabel}>
+      <ul role="list">
+        {
+          nav.services.map((s) => (
+            <li>
+              <a class="fs-frame" href={s.href}>
+                <Picture base={s.image} alt="" sizes="(min-width: 64rem) 30vw, 9rem" widths={[480]} class="fs-frame__img" />
+                <span class="fs-frame__text">
+                  <span class="fs-frame__name">{s.short}</span>
+                  <span class="fs-frame__price">{s.price}</span>
+                  <span class="fs-frame__line">{s.line}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<MenuSheet id="fs-menu" nav={nav} altHref={altHref} quoteHref={quoteHref} />
+
+<script>
+  // Fold the frames once the header reaches the top of the screen.
+  const sentinel = document.querySelector('[data-fs-sentinel]');
+  const head = document.querySelector<HTMLElement>('[data-fs-head]');
+  if (sentinel && head) {
+    new IntersectionObserver(([entry]) => {
+      head.toggleAttribute('data-folded', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    }).observe(sentinel);
+  }
+</script>
+
+<style>
+  .skip {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-start: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+    font-weight: 600;
+  }
+  .skip:focus {
+    inset-block-start: 0.5rem;
+  }
+
+  /* No box of its own, so the header sticks against the page, not this wrapper. */
+  .fs {
+    display: contents;
+    --fs-font: var(--st-head-font);
+    --fs-track: 0.06em;
+    --fs-case: uppercase;
+    /* Frame height open and folded; the difference becomes margin when folded. */
+    --fs-open: 5.5rem;
+    --fs-fold: 2.75rem;
+  }
+  .fs:lang(ar) {
+    --fs-font: var(--font-ibm-plex-arabic), system-ui, sans-serif;
+    --fs-track: 0;
+    --fs-case: none;
+  }
+  @media (min-width: 64rem) {
+    .fs {
+      --fs-open: 7rem;
+      --fs-fold: 3rem;
+    }
+  }
+  :global([dir='rtl'] .fs-arrow) {
+    transform: scaleX(-1);
+  }
+  .fs-sentinel {
+    block-size: 0;
+  }
+
+  .fs-head {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 50;
+    margin-block-end: 0;
+    background: var(--st-coal);
+    color: var(--st-white);
+    transition: margin-block-end 0.35s ease;
+  }
+  .fs-head[data-folded] {
+    margin-block-end: calc(var(--fs-open) - var(--fs-fold));
+  }
+
+  /* Masthead */
+  .fs-mast {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    min-block-size: 4.5rem;
+  }
+  .fs-mast__side {
+    display: flex;
+    align-items: center;
+  }
+  .fs-mast__side--end {
+    justify-content: flex-end;
+  }
+  .fs-logo {
+    display: grid;
+    align-content: center;
+    min-block-size: 2.75rem;
+    color: var(--st-white);
+  }
+  .fs-logo__mark {
+    display: block;
+    block-size: 2.6rem;
+    inline-size: auto;
+  }
+  .fs-pages,
+  .fs-quote {
+    display: none;
+  }
+  .fs-pages ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fs-pages a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 0.8rem;
+    color: var(--st-on-dark);
+    font-family: var(--fs-font);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: var(--fs-track);
+    text-transform: var(--fs-case);
+    text-decoration: none;
+  }
+  .fs-pages a:hover {
+    color: var(--st-accent);
+  }
+  .fs-sq {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--st-line-dark);
+    background: none;
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  @media (min-width: 64rem) {
+    .fs-narrow {
+      display: none;
+    }
+    .fs-pages {
+      display: block;
+    }
+    .fs-quote {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-block-size: 2.75rem;
+      margin-inline-start: 0.75rem;
+      padding-inline: 1.1rem 0.9rem;
+      background: var(--st-red);
+      color: var(--st-white);
+      font-family: var(--fs-font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: var(--fs-track);
+      text-transform: var(--fs-case);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .fs-quote:hover {
+      background: var(--st-red-hover);
+    }
+    .fs-logo__mark {
+      block-size: 3.2rem;
+    }
+  }
+  @media (min-width: 64rem) and (max-width: 76rem) {
+    .fs-pages a {
+      padding-inline: 0.55rem;
+    }
+  }
+
+  /* The strip of frames */
+  .fs-film ul {
+    display: flex;
+    margin: 0;
+    padding: 0 var(--st-gutter-x);
+    list-style: none;
+    border-block-start: 1px solid var(--st-line-dark);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--st-gutter-x);
+    scrollbar-width: none;
+  }
+  .fs-film ul::-webkit-scrollbar {
+    display: none;
+  }
+  .fs-film li {
+    flex: 0 0 9rem;
+    scroll-snap-align: start;
+    transition: flex-grow 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .fs-frame {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    block-size: var(--fs-open);
+    overflow: hidden;
+    border-inline-end: 2px solid var(--st-coal);
+    color: var(--st-white);
+    text-decoration: none;
+    transition: block-size 0.35s ease;
+  }
+  .fs-head[data-folded] .fs-frame {
+    block-size: var(--fs-fold);
+    align-items: center;
+  }
+  .fs-frame :global(.fs-frame__img) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .fs-frame :global(.fs-frame__img img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    filter: grayscale(0.35);
+    transition:
+      filter 0.4s ease,
+      opacity 0.35s ease,
+      transform 0.6s ease;
+  }
+  .fs-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.85), rgb(0 0 0 / 0.15) 75%);
+  }
+  .fs-head[data-folded] .fs-frame :global(.fs-frame__img img) {
+    opacity: 0.35;
+  }
+  .fs-frame__text {
+    display: grid;
+    gap: 0.1rem;
+    inline-size: 100%;
+    padding: 0.6rem 0.75rem;
+    min-inline-size: 0;
+  }
+  .fs-frame__name {
+    overflow: hidden;
+    font-family: var(--fs-font);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: var(--fs-track);
+    text-transform: var(--fs-case);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fs-frame__price {
+    overflow: hidden;
+    color: var(--st-accent);
+    font-size: 0.6875rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .fs-frame__line {
+    display: none;
+  }
+  .fs-head[data-folded] .fs-frame__price {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .fs-film li {
+      flex: 1 1 0;
+      min-inline-size: 0;
+    }
+    .fs-film li:last-child .fs-frame {
+      border-inline-end: 0;
+    }
+    .fs-film ul {
+      overflow: visible;
+    }
+    .fs-frame__text {
+      padding: 0.75rem 1rem;
+    }
+    .fs-frame__name {
+      font-size: 1rem;
+    }
+    .fs-frame__price {
+      font-size: 0.75rem;
+    }
+    /* Point at a frame and it opens wider to say what the service does. */
+    .fs-film li:hover,
+    .fs-film li:focus-within {
+      flex-grow: 2.4;
+    }
+    .fs-film li:hover .fs-frame :global(img),
+    .fs-film li:focus-within .fs-frame :global(img) {
+      filter: none;
+      transform: scale(1.04);
+    }
+    .fs-head:not([data-folded]) li:is(:hover, :focus-within) .fs-frame__line {
+      display: block;
+      overflow: hidden;
+      color: var(--st-on-dark);
+      font-size: 0.75rem;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fs-head,
+    .fs-frame,
+    .fs-film li {
+      transition: none;
+    }
+  }
+</style>

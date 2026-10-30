@@ -1,0 +1,305 @@
+---
+/**
+ * Studio version of a pillar page (Wrap, Reinforce, Protect), English or
+ * Arabic. Same sections in the same order as the live src/pages/<pillar>.astro,
+ * with the copy and structured data from content/pillars.ts, word for word:
+ * hero, what it is (with four feature cards), the services, the other two
+ * pillars, FAQs (FAQPage JSON-LD) and the closing call to action.
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import PageHero from './sections/PageHero.astro';
+import Faq from './sections/Faq.astro';
+import EndCta from './sections/EndCta.astro';
+import Icon from '../Icon.astro';
+import LucideIcon from '@/components/Icon.astro';
+import { localizeUrl } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import { isLabPath, studioQuoteHref, toLab } from './routes';
+import { fillSpans } from './fill';
+
+type Card = { title: string; desc: string; featured: boolean; href?: string | null; label?: string; letter?: string };
+export type PillarCopy = {
+  title: string;
+  description: string;
+  crumb: string;
+  hero: { eyebrow: string; h1: string; lede: string };
+  intro: { h2: string; paras: string[]; cards: { icon: string; title: string; desc: string }[] };
+  services: { h2: string; sub: string | null; cards: Card[] };
+  pillars: { h2: string; sub: string | null; cards: Card[] };
+  faq: { h2: string; sub: string | null; items: { q: string; a: string }[] };
+  cta: { h2: string; text: string; button: string };
+  faqSchema: object;
+};
+
+interface Props {
+  slug: 'wrap' | 'reinforce' | 'protect';
+  copy: PillarCopy;
+  locale?: Locale;
+}
+
+const { slug, copy, locale = 'en' } = Astro.props;
+const isLab = isLabPath(Astro.url.pathname);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const say = (s: string) => (s.startsWith('@t:') ? t(locale, s.slice(3) as Parameters<typeof t>[1]) : s);
+const local = (href: string) => link(localizeUrl(href, locale));
+
+// The live page's crumbs: English names its home crumb "Home"; Arabic uses the translation.
+const siteUrl = 'https://wrpdetailing.ae';
+const breadcrumbs = [
+  { name: locale === 'ar' ? t(locale, 'common.home') : 'Home', url: `${siteUrl}${localizeUrl('/', locale)}` },
+  { name: copy.crumb, url: `${siteUrl}${localizeUrl(`/${slug}/`, locale)}` },
+];
+
+// No photo on the live pages; Studio's hero takes one that fits each pillar.
+const heroImage = {
+  wrap: '/luxury-sports-car-detail-black-and-white-dramatic',
+  reinforce: '/ppf/range-rover-sport',
+  protect: '/wash-hero',
+}[slug];
+---
+
+<StudioPage
+  title={copy.title}
+  description={copy.description}
+  locale={locale}
+  livePath={localizeUrl(`/${slug}/`, locale)}
+  preloads={[
+    {
+      href: `${heroImage}-1200w.avif`,
+      type: 'image/avif',
+      imagesrcset: `${heroImage}-800w.avif 800w, ${heroImage}-1200w.avif 1200w`,
+      imagesizes: '100vw',
+    },
+  ]}
+>
+  <PageHero image={heroImage} imageAlt="" eyebrow={copy.hero.eyebrow} title={copy.hero.h1} lede={copy.hero.lede}>
+    <Breadcrumbs slot="crumbs" crumbs={breadcrumbs} link={link} />
+  </PageHero>
+
+  <section class="what st-section st-light">
+    <div class="st-wrap what__grid">
+      <div class="what__text">
+        <h2 class="st-h2">{copy.intro.h2}</h2>
+        {copy.intro.paras.map((p) => <p class="what__p">{p}</p>)}
+      </div>
+      <ul class="what__cards" role="list">
+        {
+          copy.intro.cards.map((card) => (
+            <li class="what__card">
+              <span class="what__icon">
+                <LucideIcon name={`lucide:${card.icon}`} width="22" height="22" />
+              </span>
+              <h3 class="what__title">{card.title}</h3>
+              <p class="what__desc">{card.desc}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="svc st-section st-dark">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{copy.services.h2}</h2>
+        {copy.services.sub && <p class="st-intro">{copy.services.sub}</p>}
+      </header>
+      <div class="fill">
+        <ul class="fill__grid" role="list">
+          {
+            copy.services.cards.map((card, i, all) => (
+              <li class="cell" style={fillSpans(all.length, 3)[i].style}>
+                <article class:list={['svc__card', card.featured && 'svc__card--pick']}>
+                  <h3 class="svc__title">{card.title}</h3>
+                  <p class="svc__desc">{card.desc}</p>
+                  {card.href && card.label && (
+                    <a class:list={['st-btn', card.featured ? 'st-btn--primary' : 'st-btn--ghost', 'svc__btn']} href={local(card.href)}>
+                      {card.label}
+                      <Icon name="arrow-right" size={18} class="flip" />
+                    </a>
+                  )}
+                </article>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pil st-section st-white">
+    <div class="st-wrap">
+      <header class="st-head st-head--center">
+        <h2 class="st-h2">{copy.pillars.h2}</h2>
+        {copy.pillars.sub && <p class="st-intro">{copy.pillars.sub}</p>}
+      </header>
+      <ul class="pil__grid" role="list">
+        {
+          copy.pillars.cards.map((card) => (
+            <li class="pil__card">
+              <p class="pil__letter">{card.letter}</p>
+              <div class="pil__body">
+                <h3 class="pil__title">{card.title}</h3>
+                <p class="pil__desc">{card.desc}</p>
+                {card.href && card.label && (
+                  <a class="st-btn st-btn--dark" href={local(card.href)}>
+                    {card.label}
+                    <Icon name="arrow-right" size={18} class="flip" />
+                  </a>
+                )}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Faq heading={copy.faq.h2} intro={copy.faq.sub} items={copy.faq.items} schema={copy.faqSchema} />
+
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(copy.cta.button)} href={studioQuoteHref} />
+</StudioPage>
+
+<style>
+  /* What it is: the text beside four feature cards. */
+  .what__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (min-width: 56rem) {
+    .what__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4.5rem;
+    }
+  }
+  .what__text {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .what__p {
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+  }
+  .what__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .what__card {
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+    padding: 1.5rem;
+    background: var(--st-white);
+    border-block-start: 3px solid var(--st-accent);
+  }
+  .what__icon {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    margin-block-end: 0.35rem;
+    background: var(--st-black);
+    color: var(--st-accent);
+  }
+  .what__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .what__desc {
+    font-size: 0.9rem;
+    color: var(--st-ink-2);
+  }
+
+  /* The services in this pillar, on dark. */
+  .cell {
+    container-type: inline-size;
+    display: flex;
+  }
+  .svc__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.75rem;
+    background: var(--st-card-dark);
+    border-block-end: 3px solid var(--st-line-dark);
+  }
+  .svc__card--pick {
+    border-block-end-color: var(--st-accent);
+    box-shadow: inset 0 0 0 1px var(--st-accent);
+  }
+  .svc__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.12;
+    text-transform: uppercase;
+  }
+  .svc__desc {
+    flex: 1;
+    color: var(--st-on-dark);
+    font-size: 0.9625rem;
+  }
+  .svc__btn {
+    align-self: start;
+  }
+  @container (min-width: 30rem) {
+    .svc__card {
+      padding: 2.25rem;
+    }
+  }
+
+  /* The other two pillars: a big letter beside each. */
+  .pil__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pil__card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: var(--st-paper);
+    border-inline-start: 4px solid var(--st-ink);
+  }
+  .pil__letter {
+    flex: none;
+    font-family: var(--st-mark);
+    font-weight: 900;
+    font-style: italic;
+    font-size: clamp(3.5rem, 2.5rem + 3vw, 5rem);
+    line-height: 0.9;
+    color: var(--st-accent-deep);
+  }
+  .pil__body {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+  .pil__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+  }
+  .pil__desc {
+    color: var(--st-ink-2);
+    margin-block-end: 0.5rem;
+  }
+</style>

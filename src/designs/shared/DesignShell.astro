@@ -1,0 +1,70 @@
+---
+/**
+ * Minimal document shell for Design Lab pages (the Studio redesign).
+ *
+ * Deliberately does NOT import src/styles/global.css: Studio owns its whole
+ * visual system in its own styles. Pages pass the font variables they need;
+ * only those are loaded.
+ */
+import { Font } from 'astro:assets';
+import DemoForms from './DemoForms.astro';
+import './reset.css';
+
+type FontVar =
+  | '--font-inter'
+  | '--font-oswald'
+  | '--font-montserrat'
+  | '--font-ibm-plex-arabic';
+
+interface Props {
+  concept: string;
+  title: string;
+  description: string;
+  fonts: FontVar[];
+  /** Browser UI colour; match the concept's first screen. */
+  themeColor: string;
+  /** Hero image to preload for LCP, as a responsive base path. */
+  preloadImage?: { base: string; sizes: string; widths?: number[] };
+  /** Other LCP images to preload, e.g. per-viewport hero posters (`media` picks one). */
+  preloads?: { href: string; type: string; media?: string }[];
+  colorScheme?: 'light' | 'dark' | 'light dark';
+}
+
+const { concept, title, description, fonts, themeColor, preloadImage, preloads = [], colorScheme = 'light' } = Astro.props;
+const widths = preloadImage?.widths ?? [480, 800, 1200];
+---
+
+<!doctype html>
+<html lang="en" dir="ltr" data-concept={concept}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <!-- Design Lab pages are for internal review only. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content={themeColor} />
+    <meta name="color-scheme" content={colorScheme} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    {
+      preloadImage && (
+        <link
+          rel="preload"
+          as="image"
+          type="image/avif"
+          fetchpriority="high"
+          imagesrcset={widths.map((w) => `${preloadImage.base}-${w}w.avif ${w}w`).join(', ')}
+          imagesizes={preloadImage.sizes}
+        />
+      )
+    }
+    {preloads.map((p) => <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} fetchpriority="high" />)}
+    {fonts.map((f, i) => <Font cssVariable={f} preload={i < 2} />)}
+  </head>
+  <body>
+    <slot />
+    <DemoForms />
+  </body>
+</html>

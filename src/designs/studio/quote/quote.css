@@ -1,0 +1,103 @@
+/*
+ * Studio quote page. Only loaded on /design-lab/studio/quote/ (QuoteOne.astro),
+ * together with one-page/one.css, which styles the page itself.
+ *
+ * The first block mirrors the Studio tokens and primitives from
+ * src/designs/studio/Home.astro (its <style is:global> only ships with the
+ * homepage), so Header/Footer and the flow look exactly like the rest of Studio.
+ */
+:root[data-concept='studio'] {
+  --st-black: #0c0d0f;
+  --st-coal: #17191c;
+  --st-card-dark: #1f2226;
+  --st-paper: #f2f2f2;
+  --st-white: #ffffff;
+  --st-ink: #15171a;
+  --st-on-dark: #d4d7db;
+  --st-mute: #a3a8ae;
+  --st-accent: #ffffff;
+  --st-accent-deep: #15171a;
+  --st-red: #d4141c;
+  --st-red-hover: #b31017;
+  --st-line-dark: #2c3035;
+  --st-head-font: var(--font-oswald), 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --st-body-font: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --st-mark: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+  --st-head: 4.5rem;
+  --st-max: 76rem;
+  --st-pad: 1rem;
+  --st-gutter-x: max(var(--st-pad), calc((100vw - var(--st-max)) / 2));
+  color-scheme: dark;
+
+  /* Quote-only tokens */
+  --q-card: #1b1e22;
+  --q-field: #111316;
+  --q-line: #3a3f46;
+  --q-err: #ff8f93;
+  accent-color: var(--st-accent);
+}
+@media (min-width: 48rem) {
+  :root[data-concept='studio'] {
+    --st-pad: 2rem;
+  }
+}
+:root[data-concept='studio'] body {
+  background: var(--st-black);
+  color: var(--st-white);
+  font-family: var(--st-body-font);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+:where(:root[data-concept='studio']) :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--st-accent);
+  outline-offset: 3px;
+}
+:root[data-concept='studio'] ::selection {
+  background: var(--st-ink-2, #4a4f56);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-wrap {
+  padding-inline: var(--st-gutter-x);
+}
+:where(:root[data-concept='studio']) .st-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-block-size: 3rem;
+  padding: 0.6rem 1.35rem;
+  border: 1.5px solid transparent;
+  font-family: var(--st-head-font);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+:where(:root[data-concept='studio']) .st-btn--primary {
+  background: var(--st-red);
+  border-color: var(--st-red);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--primary:hover {
+  background: var(--st-red-hover);
+  border-color: var(--st-red-hover);
+}
+:where(:root[data-concept='studio']) .st-btn--light {
+  background: var(--st-white);
+  border-color: var(--st-white);
+  color: var(--st-black);
+}
+:where(:root[data-concept='studio']) .st-btn--ghost {
+  background: transparent;
+  border-color: rgb(255 255 255 / 0.7);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--ghost:hover {
+  background: rgb(255 255 255 / 0.1);
+  border-color: var(--st-white);
+}

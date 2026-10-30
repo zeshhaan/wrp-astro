@@ -1,0 +1,211 @@
+---
+/**
+ * Studio version of the contact page (/contact-us/), English or Arabic: the
+ * live page's two halves (how to reach us, and the estimate form) with its
+ * copy and ContactPage JSON-LD from content/contact.ts. The form is the live
+ * one, field for field, and posts to the same /api/contact endpoint
+ * (sections/ContactForm.astro).
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import Picture from '../../shared/Picture.astro';
+import Icon from '../Icon.astro';
+import ContactForm, { type Field } from './sections/ContactForm.astro';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { isLabPath, toLab } from './routes';
+import { say, trail } from './say';
+
+export type ContactCopy = {
+  title: string;
+  description: string;
+  crumbs: string[];
+  headingTag: 'h1' | 'h2';
+  heading: string;
+  lede: string;
+  srAddress: string;
+  srPhone: string;
+  srEmail: string;
+  srInstagram: string;
+  address: [string, string];
+  phone: string;
+  defaultError: string;
+  fallbackError: string;
+  fallbackNetworkError: string;
+  labels: Record<Field, string>;
+  required: Field[];
+  placeholders: Record<Exclude<Field, 'service'>, string | null>;
+  submit: string;
+  sending: string;
+  thanks: string;
+  thanksText: string;
+  schema: object;
+};
+
+interface Props {
+  copy: ContactCopy;
+  locale?: Locale;
+}
+
+const { copy, locale = 'en' } = Astro.props;
+const isLab = isLabPath(Astro.url.pathname);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const s = (text: string) => say(locale, text);
+const fields = Object.keys(copy.labels) as Field[];
+const labels = Object.fromEntries(fields.map((f) => [f, s(copy.labels[f])])) as Record<Field, string>;
+const placeholders = Object.fromEntries(
+  Object.entries(copy.placeholders).map(([f, text]) => [f, text ? s(text) : undefined]),
+) as Partial<Record<Field, string>>;
+const Heading = copy.headingTag;
+---
+
+<StudioPage title={copy.title} description={copy.description} locale={locale} livePath={localizeUrl('/contact-us/', locale)}>
+  <script type="application/ld+json" set:html={JSON.stringify(copy.schema)} />
+  <section class="ct">
+    <Picture base="/luxury-car-detailing-studio-interior-minimal-black" alt="" sizes="100vw" widths={[800, 1200]} loading="eager" class="ct__bg" />
+    <div class="st-wrap ct__grid">
+      <div class="ct__info">
+        <Breadcrumbs crumbs={trail(locale, copy.crumbs, ['/', '/contact-us/'])} link={link} />
+        <Heading class="ct__title">{copy.heading}</Heading>
+        <p class="ct__lede">{copy.lede}</p>
+        <dl class="ct__list">
+          <div>
+            <dt><span class="sr-only">{copy.srAddress}</span><Icon name="pin" size={22} /></dt>
+            <dd><a href="https://dub.sh/wrp-map" target="_blank" rel="noopener noreferrer">{s(copy.address[0])}<br />{s(copy.address[1])}</a></dd>
+          </div>
+          <div>
+            <dt><span class="sr-only">{copy.srPhone}</span><Icon name="phone" size={22} /></dt>
+            <dd><a href="https://dub.sh/wrp-phone" dir="ltr">{s(copy.phone)}</a></dd>
+          </div>
+          <div>
+            <dt><span class="sr-only">{copy.srEmail}</span><Icon name="mail" size={22} /></dt>
+            <dd><a href="https://dub.sh/wrp-email">info@wrpdetailing.ae</a></dd>
+          </div>
+          <div>
+            <dt><span class="sr-only">{copy.srInstagram}</span><Icon name="instagram" size={22} /></dt>
+            <dd><a href="https://dub.sh/wrp_ig" target="_blank" rel="noopener">@wrp_ae</a></dd>
+          </div>
+        </dl>
+      </div>
+
+      <ContactForm
+        locale={locale}
+        labels={labels}
+        placeholders={placeholders}
+        required={copy.required}
+        submit={copy.submit}
+        sending={s(copy.sending)}
+        thanks={copy.thanks}
+        thanksText={copy.thanksText}
+        defaultError={s(copy.defaultError)}
+        fallbackError={copy.fallbackError}
+        networkError={s('@t:home.contact.networkError')}
+        fallbackNetworkError={copy.fallbackNetworkError}
+        marks
+      />
+    </div>
+  </section>
+</StudioPage>
+
+<style>
+  .ct {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: 8rem clamp(4rem, 3rem + 4vw, 6rem);
+    background: var(--st-black);
+  }
+  .ct :global(.ct__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .ct :global(.ct__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .ct::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to bottom, rgb(12 13 15 / 0.82), rgb(12 13 15 / 0.94));
+  }
+  .ct__grid {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+  @media (min-width: 62rem) {
+    .ct__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(24rem, 1fr);
+      gap: 5rem;
+      align-items: center;
+    }
+  }
+  .ct__info {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+  .ct__info > :global(.crumbs) {
+    margin-block-end: 0.5rem;
+  }
+  .ct__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 1.6rem + 4vw, 4.6rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+  }
+  .ct__lede {
+    max-inline-size: 34rem;
+    color: var(--st-on-dark);
+    font-size: 1.125rem;
+  }
+  .ct__list {
+    display: grid;
+    gap: 1px;
+    inline-size: 100%;
+    max-inline-size: 30rem;
+    margin: 0.75rem 0 0;
+    background: var(--st-line-dark);
+    border-block: 1px solid var(--st-line-dark);
+  }
+  .ct__list > div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1rem;
+    background: rgb(12 13 15 / 0.9);
+  }
+  .ct__list dt {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid var(--st-line-dark);
+    color: var(--st-accent);
+  }
+  .ct__list a {
+    color: var(--st-white);
+    text-decoration: none;
+    font-size: 1.0625rem;
+  }
+  .ct__list a:hover {
+    color: var(--st-accent);
+  }
+  .sr-only {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+</style>

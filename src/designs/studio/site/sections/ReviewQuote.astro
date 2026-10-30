@@ -1,0 +1,189 @@
+---
+/**
+ * One customer's review, large, beside the photos they posted with it.
+ * Studio version of src/components/reviews/ReviewBlade.astro: the same review
+ * (getBestReviewForService), the same excerpt and the same caption.
+ * More than one photo crossfades every 5 seconds (paused for reduced motion).
+ */
+import type { Review } from '@/lib/reviews';
+import { getBestReviewForService, getReviewImageAlt } from '@/lib/reviews';
+import { t, type Locale } from '@/i18n/translations';
+import Icon from '../../Icon.astro';
+
+interface Props {
+  serviceSlug?: string;
+  review?: Review;
+  locale?: Locale;
+}
+
+const { serviceSlug, review: given, locale = 'en' } = Astro.props;
+const review = given ?? (serviceSlug ? getBestReviewForService(serviceSlug) : undefined);
+const photos = review?.localImages ?? [];
+const quote = review ? review.highlightQuote || review.text.split('.').slice(0, 2).join('.') + '.' : '';
+const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+---
+
+{
+  review && (
+    <section class:list={['rq st-section st-black', photos.length === 0 && 'rq--solo']}>
+      <div class="st-wrap rq__grid">
+        {photos.length > 0 && (
+          <div class="rq__photos" data-rq-photos>
+            {photos.map((img, i) => (
+              <img
+                src={`/${img}`}
+                alt={getReviewImageAlt(review, i)}
+                width="600"
+                height="450"
+                loading="lazy"
+                decoding="async"
+                class:list={['rq__photo', i === 0 && 'is-on']}
+              />
+            ))}
+          </div>
+        )}
+        <figure class="rq__body">
+          <span class="rq__stars" role="img" aria-label={`${review.stars} out of 5 stars`}>
+            {Array.from({ length: review.stars }, () => <Icon name="star" size={18} />)}
+          </span>
+          <blockquote>
+            <p class="rq__quote">"{quote}"</p>
+          </blockquote>
+          <figcaption class="rq__who">
+            <span class="rq__avatar" aria-hidden="true">
+              <img
+                src={review.localAvatar ? `/${review.localAvatar}` : review.profilePhoto}
+                alt=""
+                width="40"
+                height="40"
+                loading="lazy"
+                onerror="this.remove()"
+              />
+              {initials}
+            </span>
+            <span>
+              <span class="rq__name">{review.reviewerName}</span>
+              <span class="rq__meta">
+                {t(locale, 'reviews.verified')} · {review.date}
+              </span>
+            </span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('[data-rq-photos]')) {
+    const photos = [...box.querySelectorAll<HTMLElement>('.rq__photo')];
+    if (photos.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) continue;
+    let i = 0;
+    setInterval(() => {
+      photos[i].classList.remove('is-on');
+      i = (i + 1) % photos.length;
+      photos[i].classList.add('is-on');
+    }, 5000);
+  }
+</script>
+
+<style>
+  .rq__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (min-width: 52rem) {
+    .rq__grid {
+      grid-template-columns: 2fr 3fr;
+      gap: 4rem;
+    }
+  }
+  .rq--solo .rq__grid {
+    grid-template-columns: 1fr;
+    max-inline-size: 48rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .rq__photos {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--st-coal);
+  }
+  .rq__photo {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.7s;
+  }
+  .rq__photo.is-on {
+    opacity: 1;
+  }
+  .rq__body {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: start;
+  }
+  .rq--solo .rq__body {
+    justify-items: center;
+  }
+  .rq__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-accent);
+  }
+  .rq__quote {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: clamp(1.6rem, 1.1rem + 1.9vw, 2.5rem);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  .rq__who {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: start;
+  }
+  .rq__avatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--st-white);
+    color: var(--st-black);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .rq__avatar img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .rq__name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+  .rq__meta {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--st-mute);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rq__photo {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+/**
+ * The closing call to action over a studio photo: heading, a line and one
+ * button (or whatever the default slot holds instead of the button).
+ */
+import Picture from '../../../shared/Picture.astro';
+import Icon from '../../Icon.astro';
+
+interface Props {
+  heading: string;
+  text?: string;
+  button?: string;
+  href?: string;
+  image?: string;
+}
+
+const { heading, text, button, href = '#', image = '/review-images/mark_ban_1' } = Astro.props;
+---
+
+<section class="end" aria-labelledby="end-title">
+  <Picture base={image} alt="" sizes="100vw" class="end__bg" />
+  <div class="st-wrap end__inner">
+    <h2 id="end-title" class="st-h2">{heading}</h2>
+    {text && <p class="end__text">{text}</p>}
+    {
+      Astro.slots.has('default') ? (
+        <slot />
+      ) : (
+        button && (
+          <a class="st-btn st-btn--primary" href={href} data-quote>
+            {button}
+            <Icon name="arrow-right" size={18} class="flip" />
+          </a>
+        )
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .end {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(4rem, 3rem + 5vw, 7rem);
+    background: var(--st-black);
+    color: var(--st-white);
+    text-align: center;
+  }
+  .end :global(.end__bg) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .end :global(.end__bg img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .end::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(12 13 15 / 0.75);
+  }
+  .end__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .end__text {
+    max-inline-size: 38rem;
+    color: var(--st-on-dark);
+    font-size: 1.0625rem;
+    margin-block-end: 0.5rem;
+  }
+</style>

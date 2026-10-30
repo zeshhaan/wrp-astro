@@ -20,5 +20,7 @@ declare namespace Cloudflare {
     LEAD_OUTCOME_SIGNING_SECRET?: string;
     /** Required by the Tally webhook, which rejects requests when it is absent. */
     TALLY_SIGNING_SECRET?: string;
+    /** "preview" on Worker Previews (wrangler.jsonc `previews.vars`), unset in production. */
+    ENVIRONMENT?: string;
   }
 }

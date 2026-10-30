@@ -1,0 +1,184 @@
+---
+/**
+ * Studio version of the legal pages: Privacy, Terms (English and Arabic) and
+ * Credits (English only, as live). Title, description, H1 and breadcrumbs are
+ * the live page's; the body is the live markup, copied into
+ * content/legal/<page>-<locale>.astro, in Studio type.
+ */
+import StudioPage from './StudioPage.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import PrivacyEn from './content/legal/privacy-en.astro';
+import PrivacyAr from './content/legal/privacy-ar.astro';
+import TermsEn from './content/legal/terms-en.astro';
+import TermsAr from './content/legal/terms-ar.astro';
+import CreditsEn from './content/legal/credits-en.astro';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { isLabPath, toLab } from './routes';
+import { trail } from './say';
+
+export type LegalSlug = 'privacy' | 'terms' | 'credits';
+
+interface Props {
+  slug: LegalSlug;
+  locale?: Locale;
+}
+
+const { slug, locale = 'en' } = Astro.props;
+const isLab = isLabPath(Astro.url.pathname);
+const link = (href: string) => (isLab ? toLab(href) : href);
+
+// The live pages' head and crumbs (crumb URLs exactly as each page publishes them).
+const pages = {
+  'privacy/en': {
+    title: 'Privacy Policy | WRP Detailing Solutions',
+    description: "WRP Detailing Solutions's privacy policy explaining how we collect and use data to improve our services",
+    h1: 'Privacy Policy',
+    crumbs: ['Home', 'Privacy Policy'],
+    crumbPath: '/privacy',
+    Body: PrivacyEn,
+  },
+  'terms/en': {
+    title: 'Terms of Service | WRP Detailing Solutions',
+    description: "Terms and conditions for using WRP Detailing Solutions's website and services",
+    h1: 'Terms of Service',
+    crumbs: ['Home', 'Terms of Service'],
+    crumbPath: '/terms',
+    Body: TermsEn,
+  },
+  'credits/en': {
+    title: 'Credits | WRP Detailing Solutions',
+    description: 'The people, 3D models, fonts and open-source software behind the WRP Detailing Solutions website.',
+    h1: 'Credits',
+    crumbs: ['Home', 'Credits'],
+    crumbPath: '/credits/',
+    Body: CreditsEn,
+  },
+  'privacy/ar': {
+    title: 'سياسة الخصوصية | WRP Detailing Studio',
+    description: 'سياسة خصوصية WRP Detailing Studio وشرح كيفية جمع البيانات واستخدامها وحمايتها عند زيارة الموقع أو إرسال طلب خدمة.',
+    h1: 'سياسة الخصوصية',
+    crumbs: ['@t:common.home', '@t:nav.privacy'],
+    crumbPath: '/privacy/',
+    Body: PrivacyAr,
+  },
+  'terms/ar': {
+    title: 'شروط الاستخدام | WRP Detailing Studio',
+    description: 'الشروط والأحكام الخاصة باستخدام موقع WRP Detailing Studio وخدماته',
+    h1: 'شروط الاستخدام',
+    crumbs: ['@t:common.home', 'الشروط'],
+    crumbPath: '/terms/',
+    Body: TermsAr,
+  },
+} as const;
+const page = pages[`${slug}/${locale}` as keyof typeof pages];
+const { Body } = page;
+---
+
+<StudioPage title={page.title} description={page.description} locale={locale} livePath={localizeUrl(`/${slug}/`, locale)}>
+  <section class="lg-hero">
+    <div class="st-wrap lg-hero__inner">
+      <Breadcrumbs crumbs={trail(locale, [...page.crumbs], ['/', page.crumbPath])} link={link} />
+      <h1 class="lg-hero__title">{page.h1}</h1>
+    </div>
+  </section>
+  <section class="lg st-white">
+    <div class="lg__col">
+      <Body link={link} />
+    </div>
+  </section>
+</StudioPage>
+
+<style>
+  .lg-hero {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    padding-block: 8.5rem 3rem;
+    background: var(--st-black);
+  }
+  .lg-hero__inner {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .lg-hero__inner > :global(.crumbs) {
+    margin-block-end: 0.75rem;
+  }
+  .lg-hero__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 1.6rem + 4vw, 4.6rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+  }
+  .lg {
+    padding-block: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+  .lg__col {
+    max-inline-size: 46rem;
+    margin-inline: auto;
+    padding-inline: var(--st-pad);
+    color: var(--st-ink-2);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+  /* The first line of every body is its "Last updated" date. */
+  .lg__col > :global(p:first-child) {
+    margin-block-end: 2rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+  }
+  .lg__col :global(:is(p, ul, ol) + :is(p, ul, ol)) {
+    margin-block-start: 1em;
+  }
+  .lg__col :global(h2) {
+    margin-block: 2.25em 0.6em;
+    padding-block-end: 0.5rem;
+    border-block-end: 2px solid var(--st-line-light);
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.85rem);
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: var(--st-ink);
+  }
+  .lg__col :global(h2:first-child) {
+    margin-block-start: 0;
+  }
+  .lg__col :global(h3) {
+    margin-block: 1.5em 0.4em;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--st-ink);
+  }
+  .lg__col :global(strong) {
+    color: var(--st-ink);
+  }
+  .lg__col :global(a) {
+    color: var(--st-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--st-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .lg__col :global(ul) {
+    display: grid;
+    gap: 0.45em;
+    padding: 0;
+    list-style: none;
+  }
+  .lg__col :global(ul > li) {
+    position: relative;
+    padding-inline-start: 1.5rem;
+  }
+  .lg__col :global(ul > li)::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0.2rem;
+    inset-block-start: 0.7em;
+    inline-size: 6px;
+    block-size: 6px;
+    background: var(--st-accent);
+  }
+</style>

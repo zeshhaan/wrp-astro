@@ -1,0 +1,284 @@
+---
+import { studioQuoteHref } from './site/routes';
+import Icon from './Icon.astro';
+import { proof, whatsappQuote } from './content';
+import { rating, reviewCount, whatsappQuote as whatsappQuoteAr } from './contentAr';
+import { heroVideo as hv } from './heroVideo';
+import type { Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+  /** Overrides the in-site links, e.g. to the Arabic Studio pages. */
+  link?: (href: string) => string;
+}
+const { locale = 'en', link = (href: string) => href } = Astro.props;
+const ar = locale === 'ar';
+const w = ar
+  ? {
+      pause: 'إيقاف الفيديو في الخلفية',
+      play: 'تشغيل الفيديو في الخلفية',
+      eyebrow: 'القصيص، دبي',
+      title: 'حماية الطلاء PPF والسيراميك والعناية بالسيارات في دبي',
+      lede: 'من تركيب أفلام حماية الطلاء ذاتية الإصلاح من STEK وAvery Dennison، إلى طلاءات السيراميك المتقدمة وتصحيح الطلاء على عدة مراحل وتجديد المقصورة الداخلية، ننجز كل تفصيل بإتقان ونسلّم سيارتك في موعدها من استوديونا في منطقة القصيص الصناعية ١.',
+      short: 'حماية فاخرة. تركيب احترافي. نتائج تدوم.',
+      quote: 'احصل على عرض سعر سريع',
+      whatsapp: 'راسلنا على واتساب',
+      services: 'الخدمات والأسعار',
+      whatsappHref: whatsappQuoteAr,
+      rating,
+      onGoogle: `على Google · ${reviewCount} تقييم`,
+    }
+  : {
+      pause: 'Pause background video',
+      play: 'Play background video',
+      eyebrow: 'Al Qusais, Dubai',
+      title: 'PPF, ceramic coating & car detailing in Dubai',
+      lede: 'From self-healing STEK and Avery Dennison PPF installations to advanced ceramic coatings, multi-stage paint correction and interior restoration, we do every detail right and deliver on time at our studio in Al Qusais Industrial Area 1.',
+      short: 'Premium Protection. Expert Installation. Lasting Results.',
+      quote: 'Get a quick quote',
+      whatsapp: 'WhatsApp us',
+      services: 'See services & prices',
+      whatsappHref: whatsappQuote,
+      rating: proof.rating,
+      onGoogle: `on Google · ${proof.reviewCountDisplay} reviews`,
+    };
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <!--
+    Background, back to front: an inlined ~30px blurred frame (paints with the HTML, no request),
+    the sharp poster (the LCP image), then the video, which only starts downloading after the
+    page has loaded and fades in once it is actually playing. Phones get a 9:16 crop.
+  -->
+  <div class="hero__media" style={`--ph-wide:url(${hv.placeholder.wide});--ph-tall:url(${hv.placeholder.tall})`} aria-hidden="true">
+    <picture>
+      <source media={hv.tallMedia} type="image/avif" srcset={hv.poster.tall.avif} />
+      <source media={hv.tallMedia} type="image/webp" srcset={hv.poster.tall.webp} />
+      <source media={hv.tallMedia} srcset={hv.poster.tall.jpg} width="720" height="1280" />
+      <source type="image/avif" srcset={hv.poster.wide.avif} />
+      <source type="image/webp" srcset={hv.poster.wide.webp} />
+      <img class="hero__poster" src={hv.poster.wide.jpg} alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+    </picture>
+    <video
+      class="hero__video"
+      data-hero-video
+      data-wide-av1={hv.video.wide.av1}
+      data-wide-h264={hv.video.wide.h264}
+      data-tall-av1={hv.video.tall.av1}
+      data-tall-h264={hv.video.tall.h264}
+      data-tall-media={hv.tallMedia}
+      muted
+      loop
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      tabindex="-1"></video>
+  </div>
+  <button type="button" class="hero__pause" data-hero-pause data-pause={w.pause} data-play={w.play} aria-pressed="false" hidden>
+    <span class="visually-hidden" data-hero-pause-label>{w.pause}</span>
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path class="i-pause" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /><path class="i-play" d="M8 5.5v13l10.5-6.5z" /></svg>
+  </button>
+  <div class="st-wrap hero__inner">
+    <div class="hero__main">
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h1 id="hero-title" class="hero__title">{w.title}</h1>
+    </div>
+    <div class="hero__side">
+      <p class="hero__lede">
+        <span class="hero__lede-long">{w.lede}</span>
+        <span class="hero__lede-short">{w.short}</span>
+      </p>
+      <div class="hero__actions">
+        <a class="st-btn st-btn--primary" href={studioQuoteHref}>{w.quote} <Icon name="arrow-right" size={18} class="flip" /></a>
+        <a class="st-btn st-btn--light" href={w.whatsappHref} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />{w.whatsapp}
+        </a>
+        <a class="st-btn st-btn--ghost" href="#services">{w.services}</a>
+      </div>
+      <a class="hero__rating" href={link(proof.reviewsUrl)}>
+        <span class="hero__stars" aria-hidden="true">
+          {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
+        </span>
+        <span><strong>{w.rating}</strong> {w.onGoogle}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    align-items: end;
+    min-block-size: min(46rem, calc(100svh - var(--st-head)));
+    padding-block: 7rem 3.5rem;
+    color: var(--st-white);
+    background: var(--st-black);
+    overflow: hidden;
+  }
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: var(--st-black);
+  }
+  /* Layer 1: the inlined blurred frame, scaled a touch so blurred edges stay off-screen. */
+  .hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--ph-wide) center / cover no-repeat;
+    filter: blur(24px);
+    transform: scale(1.1) translateZ(0);
+  }
+  .hero__poster,
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  .hero__video {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .hero__video.is-playing {
+    opacity: 1;
+  }
+  @media (max-width: 40rem) {
+    .hero__media::before {
+      background-image: var(--ph-tall);
+    }
+  }
+  .hero__pause {
+    position: absolute;
+    /* Top corner: the bottom one belongs to the floating WhatsApp/call buttons. */
+    inset-block-start: 1rem;
+    inset-inline-end: 1rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 50%;
+    background: rgb(12 13 15 / 0.45);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .hero__pause[hidden] {
+    display: none;
+  }
+  .hero__pause path {
+    fill: currentColor;
+  }
+  .hero__pause .i-play,
+  .hero__pause[aria-pressed='true'] .i-pause {
+    display: none;
+  }
+  .hero__pause[aria-pressed='true'] .i-play {
+    display: block;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, rgb(12 13 15 / 0.55) 0%, rgb(12 13 15 / 0.45) 35%, rgb(12 13 15 / 0.92) 100%),
+      linear-gradient(90deg, rgb(12 13 15 / 0.7), rgb(12 13 15 / 0.1) 70%);
+  }
+  .hero__inner {
+    display: grid;
+    gap: 1.5rem 4rem;
+    align-items: end;
+  }
+  .hero__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: clamp(2.5rem, 1.6rem + 4.2vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: 0.005em;
+    max-inline-size: 14ch;
+    margin-block-start: 0.75rem;
+  }
+  .hero__title:lang(ar) {
+    max-inline-size: 20ch;
+  }
+  .hero__lede {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--st-on-dark);
+    max-inline-size: 36rem;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 1.5rem;
+  }
+  .hero__rating {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin-block-start: 1.5rem;
+    min-block-size: 2.75rem;
+    color: var(--st-on-dark);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+  .hero__rating strong {
+    color: var(--st-white);
+  }
+  .hero__rating:hover span:last-child {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hero__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-accent);
+  }
+  /*
+    Phones: the hero fills the screen below the rating strip (2.5rem, plus 1px each for its rule
+    and the header's, which sits over the hero), content at the bottom and clear of the floating
+    WhatsApp button. The lede swaps to its short line; the long one stays in the HTML.
+  */
+  .hero__lede-short {
+    display: none;
+  }
+  @media (max-width: 40rem) {
+    .hero {
+      min-block-size: calc(100svh - 2.5rem - 2px);
+      padding-block: 5.5rem 4.75rem;
+    }
+    .hero__lede-long {
+      display: none;
+    }
+    .hero__lede-short {
+      display: inline;
+    }
+  }
+  @media (max-width: 29.99rem) {
+    .hero__actions .st-btn {
+      flex: 1 1 100%;
+    }
+  }
+  @media (min-width: 60rem) {
+    .hero {
+      padding-block: 9rem 5rem;
+    }
+    .hero__inner {
+      grid-template-columns: 1.15fr 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { startHeroVideo } from './heroVideoClient';
+  startHeroVideo();
+</script>

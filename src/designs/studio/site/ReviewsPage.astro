@@ -1,0 +1,31 @@
+---
+/**
+ * Studio version of the reviews page (/reviews/), English or Arabic. Same
+ * title, description, JSON-LD, headings and lines as the live
+ * src/pages/reviews.astro and its TestimonialWall, in Studio's "Word of
+ * mouth" design (reviews/WordOfMouth.astro): the rating hero with quote
+ * stickers, a ticker of the customers' lines, the reviews with customer
+ * photos as Polaroids, every review (the first 12, then Show all) with a
+ * topic filter, and the closing call to action.
+ */
+import StudioPage from './StudioPage.astro';
+import WordOfMouth from './reviews/WordOfMouth.astro';
+import { reviewsPage } from './reviews/data';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { isLabPath, toLab } from './routes';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' } = Astro.props;
+const isLab = isLabPath(Astro.url.pathname);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const d = reviewsPage(locale);
+---
+
+<StudioPage title={d.title} description={d.description} locale={locale} livePath={localizeUrl('/reviews/', locale)}>
+  <script type="application/ld+json" set:html={JSON.stringify(d.schema)} />
+  <WordOfMouth locale={locale} link={link} />
+</StudioPage>

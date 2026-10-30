@@ -1,0 +1,95 @@
+---
+/**
+ * Studio: a deliberately conventional detailing-studio homepage.
+ * The familiar Dubai-studio structure (contact bar, dark photo hero, about
+ * split, services grid, CTA banner, why-us, reviews carousel, gallery, blog,
+ * quote form, four-column footer, floating WhatsApp/call) in WRP's own black,
+ * and white (YACO red only on the quote buttons), with WRP's real photos,
+ * prices and Google reviews.
+ */
+import DesignShell from '../shared/DesignShell.astro';
+import HomeMain from './HomeMain.astro';
+import StudioPage from './site/StudioPage.astro';
+import Schema from '@/components/Schema.astro';
+import Footer from './Footer.astro';
+import FloatingContact from './FloatingContact.astro';
+import { heroVideo } from './heroVideo';
+import './theme.css';
+import HeaderShowroom from './headers/HeaderShowroom.astro';
+import HeaderArrivals from './headers/HeaderArrivals.astro';
+import HeaderStorefront from './headers/HeaderStorefront.astro';
+import HeaderFilmstrip from './headers/HeaderFilmstrip.astro';
+import { getHeaderNav } from './headers/nav';
+import type { HeaderVariantId } from './headers/variants';
+import type { Locale } from '@/i18n/translations';
+import { isLabPath, studioQuoteHref, toLab } from './site/routes';
+
+interface Props {
+  /**
+   * One of the header candidates (/design-lab/studio/headers/). Without it the
+   * page is the Studio homepage proper: StudioPage's head (canonical, hreflang,
+   * Open Graph, JSON-LD), with header G, footer and floating contact.
+   */
+  header?: HeaderVariantId;
+  /** Language of the header candidate. The rest of the page is English either way. */
+  locale?: Locale;
+  /** The same page in the other language, for the header's language switch. */
+  altHref?: string;
+}
+
+// The language switch goes to the Arabic homepage (site/ArHomePage.astro).
+const { header = 'g', locale = 'en', altHref = '/ar/' } = Astro.props;
+const candidate = Astro.props.header !== undefined;
+// A header candidate's service links stay inside the Design Lab.
+const link = isLabPath(Astro.url.pathname) ? toLab : (href: string) => href;
+const liveNav = await getHeaderNav(locale);
+const nav = { ...liveNav, services: liveNav.services.map((s) => ({ ...s, href: link(s.href) })) };
+const candidates = {
+  a: { Candidate: HeaderShowroom, props: {} },
+  d: { Candidate: HeaderArrivals, props: {} },
+  e: { Candidate: HeaderStorefront, props: {} },
+  f: { Candidate: HeaderFilmstrip, props: {} },
+  g: { Candidate: HeaderStorefront, props: { phone: 'showroom' } },
+  h: { Candidate: HeaderStorefront, props: { phone: 'filmstrip' } },
+} as const;
+const { Candidate, props: candidateProps } = candidates[header];
+const quoteHref = studioQuoteHref;
+const title = 'Paint Protection Film (PPF) in Dubai | WRP Detailing Studio, Al Qusais';
+const description =
+  'Self-healing STEK and Avery Dennison PPF, ceramic coating, window tint and detailing in Al Qusais, Dubai. Up to 10-year warranty. 5.0 on Google.';
+const posters = [
+  { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
+  { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
+];
+---
+
+{
+  !candidate && (
+    <StudioPage title={title} description={description} livePath="/" preloads={posters}>
+      <Schema type="WebSite" />
+      <Schema type="ServiceCatalog" />
+      <HomeMain />
+    </StudioPage>
+  )
+}
+
+{
+  candidate && (
+    <DesignShell
+      concept="studio"
+      title={title}
+      description={description}
+      fonts={['--font-oswald', '--font-inter', '--font-montserrat', ...(locale === 'ar' ? (['--font-ibm-plex-arabic'] as const) : [])]}
+      themeColor="#0c0d0f"
+      colorScheme="dark"
+      preloads={posters}
+    >
+      <Candidate nav={nav} altHref={altHref} quoteHref={quoteHref} {...candidateProps} />
+      <main id="main">
+        <HomeMain />
+      </main>
+      <Footer serviceHref={link} />
+      <FloatingContact />
+    </DesignShell>
+  )
+}

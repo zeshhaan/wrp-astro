@@ -1,0 +1,215 @@
+---
+/**
+ * Blog posts as Studio photo cards, in two modes:
+ *  - with `serviceId`: the Studio version of src/components/RelatedPosts.astro
+ *    (posts tagged with the service, newest first, up to 3);
+ *  - without: the Studio version of src/components/LatestPosts.astro (the
+ *    newest `count` posts, the page's heading and subheading, and a link to
+ *    the blog).
+ * Same selection, headings and card text as the live components.
+ */
+import Picture from '../../../shared/Picture.astro';
+import { scrimStops } from '../../../shared/easedGradient';
+import Icon from '../../Icon.astro';
+import FormattedDate from '@/components/FormattedDate.astro';
+import { localizeUrl } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+import { getLocalizedBlogPosts } from '@/i18n/content';
+
+interface Props {
+  serviceId?: string;
+  locale?: Locale;
+  link?: (href: string) => string;
+  heading?: string;
+  subheading?: string;
+  count?: number;
+  class?: string;
+}
+
+const { serviceId, locale = 'en', link = (href: string) => href, count = 3, class: className = 'st-light' } = Astro.props;
+const latest = !serviceId;
+const heading = Astro.props.heading ?? t(locale, latest ? 'blog.latestPosts' : 'blog.relatedPosts');
+const subheading = Astro.props.subheading ?? t(locale, 'blog.latestSubtitle');
+const all = await getLocalizedBlogPosts(locale);
+const related = all
+  .filter((post) => latest || post.data.relatedServices.includes(serviceId as never))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, latest ? count : 3);
+
+const categoryLabels: Record<string, string> = {
+  guide: 'Guide',
+  news: 'News',
+  update: 'Update',
+  event: 'Event',
+  listicle: 'Listicle',
+};
+const coverBase = (src: string) => src.replace(/\.(jpe?g|png|webp)$/i, '');
+const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 18, to: 78, max: 0.94 })}, rgb(12 13 15 / 0.94) 100%)`;
+---
+
+{
+  related.length > 0 && (
+    <section class:list={['pc st-section', className]} aria-labelledby="pc-title">
+      <div class="st-wrap">
+        <header class="st-head st-head--center">
+          <h2 id="pc-title" class="st-h2">{heading}</h2>
+          <p class="st-intro">{subheading}</p>
+        </header>
+        <ul class="pc__list" role="list" data-count={related.length}>
+          {related.map((post) => (
+            <li class="pc__card" style={`--scrim:${scrim}`}>
+              {post.data.heroImage && (
+                <Picture
+                  base={coverBase(post.data.heroImage)}
+                  alt={post.data.title}
+                  sizes="(min-width: 60rem) 30vw, (min-width: 40rem) 50vw, 100vw"
+                  widths={[480, 800]}
+                  width={800}
+                  height={450}
+                  class="pc__cover"
+                />
+              )}
+              <p class="pc__meta">
+                {post.data.category && <span class="pc__cat">{categoryLabels[post.data.category] || post.data.category}</span>}
+                <FormattedDate date={post.data.pubDate} locale={locale} />
+                {post.data.readingTime && <span>{post.data.readingTime} min</span>}
+              </p>
+              <h3 class="pc__title">
+                <a href={link(localizeUrl(`/blog/${post.id.replace(/^ar\//, '')}/`, locale))}>{post.data.title}</a>
+              </h3>
+              <p class="pc__desc">{post.data.description}</p>
+              <span class="pc__more" aria-hidden="true">
+                {t(locale, 'blog.readMore')} <Icon name="arrow-right" size={16} />
+              </span>
+            </li>
+          ))}
+        </ul>
+        {latest && (
+          <p class="pc__all">
+            <a class="st-btn st-btn--dark" href={link(localizeUrl('/blog/', locale))}>
+              {t(locale, 'blog.viewAll').toUpperCase()}
+              <Icon name="arrow-right" size={18} class="flip" />
+            </a>
+          </p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .pc__all {
+    margin-block-start: 2.5rem;
+    text-align: center;
+  }
+  .pc__list {
+    container-type: inline-size;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pc__list[data-count='1'] {
+    max-inline-size: 30rem;
+    margin-inline: auto;
+  }
+  .pc__list[data-count='2'] {
+    max-inline-size: 52rem;
+    margin-inline: auto;
+  }
+  .pc__card {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    position: relative;
+    display: grid;
+    align-content: end;
+    gap: 0.6rem;
+    min-block-size: 25rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--st-black);
+    color: var(--st-white);
+  }
+  .pc__card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--scrim);
+  }
+  .pc__card :global(.pc__cover) {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .pc__card :global(.pc__cover img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .pc__card:hover :global(.pc__cover img) {
+    transform: scale(1.04);
+  }
+  .pc__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--st-on-dark);
+  }
+  .pc__cat {
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--st-accent);
+  }
+  .pc__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.45rem;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+  .pc__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* The whole card is the link. */
+  .pc__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .pc__desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    color: var(--st-on-dark);
+  }
+  .pc__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-block-start: 0.25rem;
+    font-family: var(--st-head-font);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.9375rem;
+    color: var(--st-accent);
+  }
+  .pc__card:focus-within {
+    outline: 3px solid var(--st-accent-deep);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pc__card :global(.pc__cover img) {
+      transition: none;
+    }
+  }
+</style>

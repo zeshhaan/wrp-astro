@@ -1,0 +1,256 @@
+/*
+ * Studio's design tokens, layout helpers, section headings and buttons.
+ * Shared by the Studio homepage and every Studio inner page (StudioPage.astro).
+ * Everything is scoped to :root[data-concept='studio'], so it cannot reach the
+ * live site's pages.
+ */
+:root[data-concept='studio'] {
+  --st-black: #0c0d0f;
+  --st-coal: #17191c;
+  --st-card-dark: #1f2226;
+  --st-paper: #f2f2f2;
+  --st-light: #e8e8e8;
+  --st-white: #ffffff;
+  --st-ink: #15171a;
+  --st-ink-2: #4a4f56;
+  --st-on-dark: #d4d7db;
+  --st-mute: #a3a8ae;
+  /* WRP is black and white: the accent (eyebrows, lines, ticks, stars) is white
+     on dark sections and ink on light ones (see .st-light below). */
+  --st-accent: #ffffff;
+  --st-accent-deep: #15171a;
+  --st-on-accent: var(--st-black); /* text on an accent fill */
+  /* YACO red (#ed1c24), deepened so white button text passes 4.5:1. Kept for
+     the main action only: the quote buttons. */
+  --st-red: #d4141c;
+  --st-red-hover: #b31017;
+  /* Highlighter yellow: only behind quoted words in reviews (<mark>), always
+     with ink text on it (about 13:1). */
+  --st-marker: #ffe14d;
+  --st-line-dark: #2c3035;
+  --st-line-light: #dadada;
+
+  --st-head-font: var(--font-oswald), 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --st-body-font: var(--font-inter), 'Inter', system-ui, sans-serif;
+  --st-mark: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
+
+  --st-head: 4.5rem;
+  --st-max: 76rem;
+  --st-pad: 1rem;
+  --st-gutter-x: max(var(--st-pad), calc((100vw - var(--st-max)) / 2));
+
+  color-scheme: dark;
+  scroll-padding-top: calc(var(--st-head) + 0.5rem);
+}
+@media (min-width: 48rem) {
+  :root[data-concept='studio'] {
+    --st-pad: 2rem;
+  }
+}
+:root[data-concept='studio'] body {
+  background: var(--st-black);
+  color: var(--st-white);
+  font-family: var(--st-body-font);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+:where(:root[data-concept='studio']) :is(a, button, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--st-accent);
+  outline-offset: 3px;
+}
+:where(:root[data-concept='studio']) .st-light :is(a, button):focus-visible,
+:where(:root[data-concept='studio']) .st-white :is(a, button):focus-visible {
+  outline-color: var(--st-accent-deep);
+}
+:root[data-concept='studio'] ::selection {
+  background: var(--st-ink-2);
+  color: var(--st-white);
+}
+
+/* Layout */
+:where(:root[data-concept='studio']) .st-wrap {
+  padding-inline: var(--st-gutter-x);
+}
+:where(:root[data-concept='studio']) .st-section {
+  padding-block: clamp(4rem, 2.5rem + 5vw, 6.5rem);
+}
+:where(:root[data-concept='studio']) .st-dark {
+  background: var(--st-coal);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-black {
+  background: var(--st-black);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-light {
+  background: var(--st-paper);
+  color: var(--st-ink);
+  color-scheme: light;
+}
+:where(:root[data-concept='studio']) .st-white {
+  background: var(--st-white);
+  color: var(--st-ink);
+  color-scheme: light;
+}
+/* On light sections the accent turns ink, so lines, ticks and stars stay visible. */
+:where(:root[data-concept='studio']) :is(.st-light, .st-white) {
+  --st-accent: var(--st-ink);
+  --st-on-accent: var(--st-white);
+}
+/* Dark cards set --st-accent back to white themselves (marked "dark surface"). */
+
+/* Section headings: eyebrow, condensed uppercase title, short intro */
+:where(:root[data-concept='studio']) .st-head {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-end: 2.5rem;
+  max-inline-size: 44rem;
+}
+:where(:root[data-concept='studio']) .st-head--center {
+  margin-inline: auto;
+  text-align: center;
+  justify-items: center;
+}
+:where(:root[data-concept='studio']) .st-eyebrow {
+  font-family: var(--st-head-font);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--st-accent);
+}
+:where(:root[data-concept='studio']) .st-eyebrow--dark {
+  color: var(--st-accent-deep);
+}
+:where(:root[data-concept='studio']) .st-h2 {
+  font-family: var(--st-head-font);
+  font-weight: 600;
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.4rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+}
+:where(:root[data-concept='studio']) .st-intro {
+  font-size: 1.0625rem;
+  color: var(--st-ink-2);
+  max-inline-size: 40rem;
+}
+:where(:root[data-concept='studio']) :is(.st-dark, .st-black) .st-intro {
+  color: var(--st-on-dark);
+}
+
+/* Buttons */
+:where(:root[data-concept='studio']) .st-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-block-size: 3rem;
+  padding: 0.6rem 1.35rem;
+  border: 1.5px solid transparent;
+  font-family: var(--st-head-font);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+:where(:root[data-concept='studio']) .st-btn--primary {
+  background: var(--st-red);
+  border-color: var(--st-red);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--primary:hover {
+  background: var(--st-red-hover);
+  border-color: var(--st-red-hover);
+}
+:where(:root[data-concept='studio']) .st-btn--light {
+  background: var(--st-white);
+  border-color: var(--st-white);
+  color: var(--st-black);
+}
+:where(:root[data-concept='studio']) .st-btn--light:hover {
+  background: var(--st-paper);
+}
+:where(:root[data-concept='studio']) .st-btn--ghost {
+  background: transparent;
+  border-color: rgb(255 255 255 / 0.7);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--ghost:hover {
+  background: rgb(255 255 255 / 0.1);
+  border-color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--dark {
+  background: var(--st-black);
+  border-color: var(--st-black);
+  color: var(--st-white);
+}
+:where(:root[data-concept='studio']) .st-btn--dark:hover {
+  background: var(--st-ink-2);
+  border-color: var(--st-ink-2);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-concept='studio'] .st-btn {
+    transition: none;
+  }
+}
+
+/*
+ * Fill grid: card rows that are always full (spans from site/fill.ts, set on
+ * each item as --fill-wide / --fill-mid). Sized by the container, not the
+ * screen, so the same grid works full width or inside a narrower column.
+ *   <div class="fill"><ul class="fill__grid"><li style={span.style}>…
+ */
+:where(:root[data-concept='studio']) .fill {
+  container-type: inline-size;
+}
+:where(:root[data-concept='studio']) .fill__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container (min-width: 36rem) {
+  :where(:root[data-concept='studio']) .fill__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :where(:root[data-concept='studio']) .fill__grid > * {
+    grid-column: var(--fill-mid, auto);
+  }
+}
+@container (min-width: 60rem) {
+  :where(:root[data-concept='studio']) .fill__grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  :where(:root[data-concept='studio']) .fill__grid > * {
+    grid-column: var(--fill-wide, span 2);
+  }
+}
+
+/* Arrows that point "forward" turn round on right-to-left pages. */
+:root[data-concept='studio'][dir='rtl'] .flip {
+  transform: scaleX(-1);
+}
+
+/*
+ * Arabic pages: IBM Plex Sans Arabic for headings and text (Latin words in
+ * them still fall back to Oswald/Inter), no letter-spacing (it breaks the
+ * joins between Arabic letters) and taller lines for the script's height.
+ */
+:root[data-concept='studio']:lang(ar) {
+  --st-head-font: var(--font-ibm-plex-arabic), var(--font-oswald), system-ui, sans-serif;
+  --st-body-font: var(--font-ibm-plex-arabic), var(--font-inter), system-ui, sans-serif;
+}
+:root[data-concept='studio']:lang(ar) body * {
+  letter-spacing: normal;
+}
+:root[data-concept='studio']:lang(ar) :is(h1, h2, h3, .st-h2) {
+  line-height: 1.3;
+}

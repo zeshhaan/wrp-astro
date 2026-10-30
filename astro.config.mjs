@@ -62,6 +62,9 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
+      // Design Lab pages are review-only, and the quote configurator is
+      // noindex (src/designs/studio/quote/one-page/QuoteOne.astro).
+      filter: (page) => !page.includes('/design-lab/') && !/\/quote\/$/.test(page),
       customPages: [
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',
@@ -143,6 +146,17 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['arabic'],
       fallbacks: ['system-ui', 'sans-serif'],
+    },
+    // ── Studio redesign fonts (src/designs/studio). Loaded only by the Design
+    // Lab pages that ask for them via <Font>, so production pages are unaffected.
+    {
+      name: 'Oswald',
+      cssVariable: '--font-oswald',
+      provider: fontProviders.google(),
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Arial Narrow', 'sans-serif'],
     },
   ],
 });

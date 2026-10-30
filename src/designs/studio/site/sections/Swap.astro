@@ -1,0 +1,25 @@
+---
+/**
+ * Renders the slots `a` and `b` in either order, for pages whose English and
+ * Arabic versions place the same sections in a different order.
+ */
+interface Props {
+  swap?: boolean;
+}
+
+const { swap = false } = Astro.props;
+---
+
+{
+  swap ? (
+    <>
+      <slot name="b" />
+      <slot name="a" />
+    </>
+  ) : (
+    <>
+      <slot name="a" />
+      <slot name="b" />
+    </>
+  )
+}

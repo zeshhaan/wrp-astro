@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. Deployed on Cloudflare Workers with server-side rendering.
 
+Every page uses the **Studio** design (`src/designs/studio/`, see `docs/design-lab.md`): the route files in `src/pages` render Studio's page templates, and `BaseLayout.astro` with its components is the previous design, no longer used by any page.
+
 ## Development Commands
 
 ```bash
@@ -53,7 +55,8 @@ bun astro ...
 - Access via `import { env } from 'cloudflare:workers'` then `env.DB`
 
 **Wrangler Configuration** (`wrangler.jsonc`):
-- Worker entry point: `./dist/_worker.js/index.js`
+- Worker entry point: `./src/worker.ts` (Astro's `handle` plus a `scheduled` handler that retries quote lead emails)
+- Cron Trigger: every 5 minutes (`triggers.crons`)
 - Compatibility date: 2025-10-29
 - Compatibility flags: `nodejs_compat`, `global_fetch_strictly_public`
 - Assets binding: `ASSETS` (serves static files from `./dist`)

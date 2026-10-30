@@ -1,0 +1,458 @@
+---
+/**
+ * Floating WhatsApp button → contact modal, after the live site's
+ * src/components/WhatsAppButton.astro, in Studio's look. Uses <dialog> so focus
+ * moves in, Escape closes, the page behind is inert and focus returns to the
+ * button. Any element with [data-contact-modal] also opens it. The dialog is a
+ * light card (Shereef, 30 Oct 2026), so it stands out from Studio's dark pages.
+ */
+import Icon from './Icon.astro';
+import { contact, proof, whatsappQuote } from './content';
+import { phone as phoneAr } from './contentAr';
+import { toLocalNum } from '@/i18n/utils';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const num = (n: string | number) => toLocalNum(n, locale);
+// Arabic uses the live site's own contact-modal wording (translations contact.*).
+const w =
+  locale === 'ar'
+    ? {
+        tip: t(locale, 'contact.chatWithUs'),
+        sr: `${t(locale, 'contact.chatWithUs')}: ${t(locale, 'contact.messageWhatsapp')} / ${t(locale, 'contact.callNow')}`,
+        close: 'إغلاق',
+        title: t(locale, 'contact.getInTouch'),
+        lede: t(locale, 'contact.teamReady'),
+        status: contact.hoursAr,
+        open: t(locale, 'contact.availableNow'),
+        closedNow: 'مغلق الآن: راسلنا وسنرد عليك عند الافتتاح',
+        from: t(locale, 'contact.from'),
+        reviews: t(locale, 'contact.googleReviews'),
+        wa: t(locale, 'contact.messageWhatsapp'),
+        waHint: t(locale, 'contact.chatInstantly'),
+        call: t(locale, 'contact.callNow'),
+        foot: [`${contact.hoursAr}.`, `${t(locale, 'home.contact.address1')}.`],
+      }
+    : {
+        tip: 'Chat with us',
+        sr: 'Chat with us on WhatsApp or by phone',
+        close: 'Close',
+        title: 'Get in touch',
+        lede: 'Our team is ready to help with prices, bookings and questions.',
+        status: contact.hours,
+        open: 'Open now: quick replies during business hours',
+        closedNow: 'We’re closed right now: message us and we’ll reply when we open',
+        from: 'from',
+        reviews: 'Google reviews',
+        wa: 'Message on WhatsApp',
+        waHint: 'Chat with our team, usually a quick reply',
+        call: 'Call now',
+        foot: [`${contact.hours}.`, 'Al Qusais Industrial Area 1, Dubai.'],
+      };
+---
+
+<button type="button" class="fab" data-contact-open aria-haspopup="dialog" aria-controls="contact-dialog">
+  <Icon name="whatsapp" size={28} />
+  <span class="fab__tip" aria-hidden="true">{w.tip}</span>
+  <span class="visually-hidden">{w.sr}</span>
+</button>
+
+<dialog id="contact-dialog" class="cd" aria-labelledby="cd-title" data-contact-dialog data-schedule={JSON.stringify(contact.schedule)} data-open-text={w.open} data-closed-text={w.closedNow}>
+  <div class="cd__box">
+    <form method="dialog" class="cd__closeform">
+      <button class="cd__close" aria-label={w.close}>
+        <Icon name="close" size={20} />
+      </button>
+    </form>
+
+    <header class="cd__head">
+      <span class="cd__icon" aria-hidden="true">
+        <span class="cd__ring"></span><span class="cd__ring"></span><span class="cd__ring"></span>
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+        </svg>
+      </span>
+      <h2 id="cd-title" class="cd__title">{w.title}</h2>
+      <p class="cd__lede">{w.lede}</p>
+    </header>
+
+    <p class="cd__status" data-contact-status>
+      <span class="cd__dot" aria-hidden="true"></span>
+      <span data-contact-status-text>{w.status}</span>
+    </p>
+
+    <a class="cd__rating" href={proof.reviewsUrl} target="_blank" rel="noopener">
+      <span class="cd__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={15} />)}</span>
+      <span><strong>{num(proof.rating)}</strong> {w.from} <strong>{num(proof.reviewCountDisplay)}</strong> {w.reviews}</span>
+    </a>
+
+    <div class="cd__actions">
+      <a class="cd__opt cd__opt--wa" href={whatsappQuote} target="_blank" rel="noopener">
+        <span class="cd__optico"><Icon name="whatsapp" size={24} /></span>
+        <span class="cd__opttext">
+          <span class="cd__optname">{w.wa}</span>
+          <span class="cd__opthint">{w.waHint}</span>
+        </span>
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+      <a class="cd__opt cd__opt--call" href={contact.phoneHref}>
+        <span class="cd__optico"><Icon name="phone" size={22} /></span>
+        <span class="cd__opttext">
+          <span class="cd__optname">{w.call}</span>
+          <span class="cd__opthint" dir="ltr">{locale === 'ar' ? phoneAr : contact.phoneDisplay}</span>
+        </span>
+        <Icon name="arrow-right" size={18} class="flip" />
+      </a>
+    </div>
+
+    <p class="cd__foot">{w.foot[0]}<br />{w.foot[1]}</p>
+  </div>
+</dialog>
+
+<style>
+  /* Floating button */
+  .fab {
+    position: fixed;
+    inset-inline-end: max(1rem, env(safe-area-inset-right));
+    inset-block-end: max(1rem, env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    border: 0;
+    border-radius: 50%;
+    background: #25d366;
+    color: #0c0d0f;
+    box-shadow: 0 8px 22px rgb(0 0 0 / 0.4);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  @media (min-width: 48rem) {
+    .fab {
+      inset-block-end: 1.5rem;
+      inset-inline-end: 1.5rem;
+    }
+  }
+  .fab:hover {
+    background: #3ee07b;
+    transform: scale(1.06);
+  }
+  .fab::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: #25d366;
+    opacity: 0;
+    z-index: -1;
+    animation: fab-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .fab__tip {
+    position: absolute;
+    inset-inline-end: calc(100% + 0.75rem);
+    padding: 0.45rem 0.75rem;
+    background: var(--st-paper);
+    color: var(--st-black);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    translate: 4px 0;
+    pointer-events: none;
+    transition: opacity 0.2s, translate 0.2s;
+  }
+  .fab:hover .fab__tip,
+  .fab:focus-visible .fab__tip {
+    opacity: 1;
+    translate: 0 0;
+  }
+  @keyframes fab-pulse {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.18); }
+  }
+
+  /* Dialog: a light card over the dimmed page. */
+  .cd {
+    --st-accent: var(--st-ink); /* light surface */
+    --st-on-accent: var(--st-white);
+    inline-size: min(28rem, calc(100vw - 2rem));
+    max-block-size: calc(100dvh - 2rem);
+    padding: 0;
+    border: 1px solid var(--st-line-light);
+    border-block-start: 3px solid var(--st-red);
+    border-radius: 0;
+    background: var(--st-white);
+    color: var(--st-ink-2);
+    color-scheme: light;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+    overflow: auto;
+  }
+  .cd::backdrop {
+    background: rgb(0 0 0 / 0.72);
+    backdrop-filter: blur(4px);
+  }
+  .cd[open] {
+    animation: cd-in 0.25s ease-out;
+  }
+  .cd[open]::backdrop {
+    animation: cd-fade 0.25s ease-out;
+  }
+  @keyframes cd-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  }
+  @keyframes cd-fade {
+    from { opacity: 0; }
+  }
+  .cd__box {
+    position: relative;
+  }
+  .cd__closeform {
+    position: absolute;
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+  }
+  .cd__close {
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--st-ink-2);
+    cursor: pointer;
+  }
+  .cd__close:hover {
+    background: var(--st-paper);
+    color: var(--st-ink);
+  }
+  .cd__head {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    padding: 2rem 1.5rem 1.25rem;
+    text-align: center;
+    border-block-end: 1px solid var(--st-line-light);
+  }
+  .cd__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 4rem;
+    block-size: 4rem;
+    margin-block-end: 0.6rem;
+    border-radius: 50%;
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+  }
+  .cd__ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--st-accent);
+    border-radius: 50%;
+    opacity: 0;
+    animation: cd-wave 2.4s ease-out infinite;
+  }
+  .cd__ring:nth-child(2) { animation-delay: 0.8s; }
+  .cd__ring:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes cd-wave {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+  .cd__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: var(--st-ink);
+  }
+  .cd__lede {
+    font-size: 0.9rem;
+    color: var(--st-ink-2);
+  }
+  .cd__status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--st-ink);
+    background: var(--st-paper);
+    border-block-end: 1px solid var(--st-line-light);
+  }
+  .cd__dot {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border-radius: 50%;
+    background: var(--st-ink-2);
+  }
+  .cd__status[data-open='true'] .cd__dot {
+    background: #1a9f4b;
+    animation: cd-blink 2s ease-in-out infinite;
+  }
+  @keyframes cd-blink {
+    50% { opacity: 0.35; }
+  }
+  .cd__rating {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--st-ink-2);
+    text-decoration: none;
+    border-block-end: 1px solid var(--st-line-light);
+  }
+  .cd__rating strong {
+    color: var(--st-ink);
+  }
+  .cd__rating:hover span:last-child {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .cd__stars {
+    display: inline-flex;
+    gap: 2px;
+    color: var(--st-accent);
+  }
+  .cd__actions {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+  .cd__opt {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.9rem 1rem;
+    border-radius: 0;
+    text-decoration: none;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  .cd__opt:hover {
+    transform: translateY(-1px);
+  }
+  .cd__opt--wa {
+    background: #25d366;
+    color: #0c0d0f;
+  }
+  .cd__opt--wa:hover {
+    background: #3ee07b;
+  }
+  .cd__opt--call {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    background: var(--st-black);
+    color: var(--st-white);
+    border: 1px solid var(--st-black);
+  }
+  .cd__opt--call:hover {
+    background: var(--st-ink-2);
+    border-color: var(--st-ink-2);
+  }
+  /* The call button's accent is white for its own dark fill; its focus ring
+     sits on the white card, so it stays ink. */
+  .cd__opt--call:focus-visible {
+    outline-color: var(--st-ink);
+  }
+  .cd__optico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: 50%;
+    background: rgb(12 13 15 / 0.12);
+  }
+  .cd__opt--call .cd__optico {
+    background: rgb(255 255 255 / 0.12);
+    color: var(--st-accent);
+  }
+  .cd__opttext {
+    display: grid;
+    flex: 1;
+    gap: 0.1rem;
+  }
+  .cd__optname {
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .cd__opthint {
+    font-size: 0.85rem;
+  }
+  .cd__opt--call .cd__opthint {
+    color: var(--st-on-dark);
+  }
+  .cd__foot {
+    padding: 0.5rem 1.5rem 1.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--st-ink-2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fab::before,
+    .cd__ring,
+    .cd__status[data-open='true'] .cd__dot,
+    .cd[open],
+    .cd[open]::backdrop {
+      animation: none;
+    }
+    .fab,
+    .fab__tip,
+    .cd__opt {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-contact-dialog]');
+  const statusEl = dialog?.querySelector<HTMLElement>('[data-contact-status]');
+  const statusText = dialog?.querySelector<HTMLElement>('[data-contact-status-text]');
+
+  /** Open/closed right now in Dubai, whatever the visitor's time zone. */
+  function updateStatus() {
+    if (!dialog || !statusEl || !statusText) return;
+    const s = JSON.parse(dialog.dataset.schedule ?? '{}') as { open: string; close: string; closedDays: number[]; timeZone: string };
+    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: s.timeZone, weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    const now = Number(get('hour')) * 60 + Number(get('minute'));
+    const mins = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
+    const open = !s.closedDays.includes(day) && now >= mins(s.open) && now < mins(s.close);
+    statusEl.dataset.open = String(open);
+    statusText.textContent = (open ? dialog.dataset.openText : dialog.dataset.closedText) ?? '';
+  }
+
+  function openDialog() {
+    if (!dialog || dialog.open) return;
+    updateStatus();
+    dialog.showModal();
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as Element;
+    if (t.closest('[data-contact-open], [data-contact-modal]')) {
+      e.preventDefault();
+      openDialog();
+    }
+  });
+  // Click on the backdrop (outside the box) closes, like the live site.
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

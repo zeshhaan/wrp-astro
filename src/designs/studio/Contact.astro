@@ -1,0 +1,472 @@
+---
+import Picture from '../shared/Picture.astro';
+import Icon from './Icon.astro';
+import { contact, serviceOptions, whatsappQuote } from './content';
+import { phone, serviceOptionsAr, whatsappQuote as whatsappQuoteAr } from './contentAr';
+import { t, type Locale } from '@/i18n/translations';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
+const w =
+  locale === 'ar'
+    ? {
+        eyebrow: 'تواصل معنا',
+        title: 'احصل على عرض سعر سريع',
+        lede: 'أرسل لنا نوع سيارتك والخدمة التي تريدها، وسنعود إليك بالسعر والموعد عبر الهاتف أو البريد الإلكتروني أو واتساب، كما تفضّل.',
+        whatsapp: 'واتساب',
+        message: 'راسلنا على واتساب',
+        whatsappHref: whatsappQuoteAr,
+        call: 'اتصل',
+        phone,
+        email: 'البريد الإلكتروني',
+        studio: 'الاستوديو',
+        address: `${t(locale, 'home.contact.address1')}، ${t(locale, 'home.contact.address2')}`,
+        hoursLabel: 'ساعات العمل',
+        hours: `${contact.hoursAr}.`,
+        mapAlt: 'داخل استوديو WRP، القصيص الصناعية ١',
+        map: 'افتح في خرائط Google',
+        formTitle: 'أخبرنا عن سيارتك',
+        name: 'الاسم',
+        tel: 'رقم الهاتف',
+        optional: '(اختياري)',
+        vehicle: 'نوع السيارة والموديل والسنة',
+        vehicleHint: 'مثال: تويوتا لاندكروزر 2022',
+        service: 'الخدمة',
+        choose: 'اختر خدمة',
+        options: serviceOptionsAr,
+        notes: 'هل هناك ما يجب أن نعرفه؟',
+        notesHint: 'مساحة التغطية، الموعد المناسب، اللون، الخدوش أو الأضرار الحالية',
+        submit: 'أرسل طلب عرض السعر',
+        chat: 'تفضّل المحادثة؟',
+        instead: 'بدلاً من ذلك.',
+        demo: 'معاينة: النموذج سليم، لكن لم يُحفظ أو يُرسل شيء.',
+        sending: 'جارٍ الإرسال…',
+        success: 'شكراً لك. وصلنا طلبك وسنتواصل معك بالسعر والموعد.',
+        error: 'تعذّر إرسال الطلب. بياناتك ما زالت هنا؛ حاول مجدداً أو راسلنا على واتساب.',
+        phoneInvalid: 'يرجى إدخال رقم جوال صحيح يتكون من 7 أرقام على الأقل.',
+        noScript: 'لإرسال طلبك، فعّل JavaScript أو راسلنا على واتساب باستخدام الرابط أدناه.',
+      }
+    : {
+        eyebrow: 'Contact us',
+        title: 'Get a quick quote',
+        lede: 'Send us your car and the service you want, and we will come back to you with a price and a time by phone, email or WhatsApp, whichever you prefer.',
+        whatsapp: 'WhatsApp',
+        message: 'Message us on WhatsApp',
+        whatsappHref: whatsappQuote,
+        call: 'Call',
+        phone: contact.phoneDisplay,
+        email: 'Email',
+        studio: 'Studio',
+        address: contact.address.join(', '),
+        hoursLabel: 'Hours',
+        hours: `${contact.hours}.`,
+        mapAlt: 'Inside the WRP studio, Al Qusais Industrial Area 1',
+        map: 'Open in Google Maps',
+        formTitle: 'Tell us about your car',
+        name: 'Name',
+        tel: 'Phone',
+        optional: '(optional)',
+        vehicle: 'Vehicle make, model, year',
+        vehicleHint: 'e.g. Toyota Land Cruiser 2022',
+        service: 'Service',
+        choose: 'Choose a service',
+        options: serviceOptions,
+        notes: 'Anything else we should know?',
+        notesHint: 'Coverage, timing, colour, current marks or damage',
+        submit: 'Send my quote request',
+        chat: 'Prefer to chat?',
+        instead: 'instead.',
+        demo: 'Preview: the form checked out, but nothing was saved or sent.',
+        sending: 'Sending…',
+        success: 'Thank you. We have your request and will reply with a price and a time.',
+        error: 'We could not send your request. Your details are still here; try again or message us on WhatsApp.',
+        phoneInvalid: 'Please enter a valid mobile number with at least 7 digits.',
+        noScript: 'To send your request, enable JavaScript or use the WhatsApp link below.',
+      };
+---
+
+<section class="contact st-section st-black" id="contact" aria-labelledby="contact-title">
+  <div class="st-wrap contact__grid">
+    <div class="contact__info">
+      <p class="st-eyebrow">{w.eyebrow}</p>
+      <h2 id="contact-title" class="st-h2">{w.title}</h2>
+      <p class="contact__lede">{w.lede}</p>
+      <ul class="details" role="list">
+        <li>
+          <Icon name="whatsapp" />
+          <div><span class="details__label">{w.whatsapp}</span><a href={w.whatsappHref} target="_blank" rel="noopener">{w.message}</a></div>
+        </li>
+        <li>
+          <Icon name="phone" />
+          <div><span class="details__label">{w.call}</span><a href={contact.phoneHref} dir="ltr">{w.phone}</a></div>
+        </li>
+        <li>
+          <Icon name="mail" />
+          <div><span class="details__label">{w.email}</span><a href={contact.emailHref}>{contact.email}</a></div>
+        </li>
+        <li>
+          <Icon name="pin" />
+          <div><span class="details__label">{w.studio}</span><span>{w.address}</span></div>
+        </li>
+        <li>
+          <Icon name="clock" />
+          <div><span class="details__label">{w.hoursLabel}</span><span>{w.hours}</span></div>
+        </li>
+      </ul>
+      <a class="mapcard" href={contact.mapsUrl} target="_blank" rel="noopener">
+        <Picture
+          base="/review-images/tariq_murad_3"
+          alt={w.mapAlt}
+          sizes="(min-width: 60rem) 40vw, 100vw"
+        />
+        <span class="mapcard__label"><Icon name="map" size={18} />{w.map}</span>
+      </a>
+    </div>
+
+    <form
+      class="form" id="quote" data-homepage-quote
+      data-preview-message={w.demo} data-success-message={w.success} data-error-message={w.error}
+      data-sending-message={w.sending} data-phone-message={w.phoneInvalid} aria-labelledby="form-title"
+    >
+      <input type="hidden" name="locale" value={locale} />
+      <h3 id="form-title" class="form__title">{w.formTitle}</h3>
+      <div class="form__grid">
+        <label class="field">
+          <span>{w.name}</span>
+          <input name="name" type="text" autocomplete="name" maxlength="100" required />
+        </label>
+        <label class="field">
+          <span>{w.tel}</span>
+          <input name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern={phonePattern} maxlength="40" required />
+        </label>
+        <label class="field">
+          <span>{w.email} <small>{w.optional}</small></span>
+          <input name="email" type="email" autocomplete="email" maxlength="254" />
+        </label>
+        <label class="field">
+          <span>{w.vehicle}</span>
+          <input name="vehicle" type="text" placeholder={w.vehicleHint} maxlength="120" required />
+        </label>
+        <label class="field field--wide">
+          <span>{w.service}</span>
+          <select name="service" required>
+            <option value="">{w.choose}</option>
+            {w.options.map((o) => <option>{o}</option>)}
+          </select>
+        </label>
+        <label class="field field--wide">
+          <span>{w.notes} <small>{w.optional}</small></span>
+          <textarea name="notes" rows="4" placeholder={w.notesHint} maxlength="5000"></textarea>
+        </label>
+      </div>
+      <div class="form__honeypot" aria-hidden="true">
+        <label for="homepage-form-check">{locale === 'ar' ? 'اترك هذا الحقل فارغًا' : 'Leave this field empty'}</label>
+        <input id="homepage-form-check" name="form_check" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <button class="st-btn st-btn--primary form__submit" type="submit" disabled>{w.submit}</button>
+      <noscript><p class="form__note">{w.noScript}</p></noscript>
+      <p class="form__note">{w.chat} <a href={w.whatsappHref} target="_blank" rel="noopener">{w.message}</a> {w.instead}</p>
+      <p class="form__status" data-homepage-status hidden role="status" tabindex="-1"></p>
+      <p class="form__status" data-homepage-error hidden role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  import { actions } from 'astro:actions';
+
+  // Sends to the `quote` action from every page, like the hero form. The
+  // action decides what is real: Worker Previews and Design Lab pages answer
+  // `{ saved: false }` and the form shows the preview note.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-homepage-quote]')) {
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const status = form.querySelector<HTMLElement>('[data-homepage-status]')!;
+    const error = form.querySelector<HTMLElement>('[data-homepage-error]')!;
+    const phone = form.querySelector<HTMLInputElement>('input[name=phone]')!;
+    const idleLabel = button.textContent;
+    let requestId = crypto.randomUUID();
+    let pending = false;
+    let submitted = false;
+    button.disabled = false;
+
+    form.addEventListener('input', () => {
+      phone.setCustomValidity('');
+      if (submitted) {
+        submitted = false;
+        status.hidden = true;
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (pending || submitted) return;
+      error.hidden = true;
+      status.hidden = true;
+      phone.setCustomValidity(phone.value.replace(/\D/g, '').length >= 7 ? '' : form.dataset.phoneMessage!);
+      if (!form.reportValidity()) return;
+      pending = true;
+      button.disabled = true;
+      button.textContent = form.dataset.sendingMessage!;
+      form.setAttribute('aria-busy', 'true');
+      try {
+        const data = new FormData(form);
+        data.set('requestId', requestId);
+        data.set('page', location.pathname);
+        const attribution = window.WRPAttribution?.serialize?.();
+        if (attribution) data.set('attribution', attribution);
+        const { data: result, error: failed } = await actions.quote(data);
+        if (failed || !result) throw failed || new Error('Missing submission result');
+        if (result.saved === true) {
+          document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'homepage' } }));
+        }
+        if (result.saved || result.ignored) {
+          status.textContent = form.dataset.successMessage!;
+          submitted = true;
+          requestId = crypto.randomUUID();
+          form.reset();
+        } else {
+          status.textContent = form.dataset.previewMessage!;
+        }
+        status.hidden = false;
+        status.focus();
+      } catch {
+        error.textContent = form.dataset.errorMessage!;
+        error.hidden = false;
+      } finally {
+        pending = false;
+        button.disabled = false;
+        button.textContent = idleLabel;
+        form.removeAttribute('aria-busy');
+      }
+    });
+  }
+</script>
+
+<style>
+  .form [hidden] {
+    display: none !important;
+  }
+  .form__honeypot {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .form__submit:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  .contact__grid {
+    display: grid;
+    gap: 3rem 4rem;
+    align-items: start;
+  }
+  .contact__info {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .contact__lede {
+    color: var(--st-on-dark);
+    max-inline-size: 34rem;
+  }
+  .details {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0.5rem 0 0.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .details li {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+  .details li > :global(svg) {
+    flex: none;
+    margin-block-start: 0.2rem;
+    color: var(--st-accent);
+  }
+  .details div {
+    display: grid;
+  }
+  .details__label {
+    font-family: var(--st-head-font);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--st-mute);
+  }
+  .details a {
+    color: var(--st-white);
+    text-decoration: underline;
+    text-decoration-color: var(--st-accent);
+    text-underline-offset: 3px;
+    padding-block: 0.55rem;
+  }
+  .details a:hover {
+    color: var(--st-accent);
+  }
+  .mapcard {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    color: var(--st-white);
+    text-decoration: none;
+    border: 1px solid var(--st-line-dark);
+  }
+  .mapcard :global(img) {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    filter: grayscale(0.6) brightness(0.7);
+    transition: filter 0.3s;
+  }
+  .mapcard:hover :global(img) {
+    filter: none;
+  }
+  .mapcard__label {
+    position: absolute;
+    inset-inline-start: 1rem;
+    inset-block-end: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-block-size: 2.75rem;
+    padding-inline: 1rem;
+    background: var(--st-white);
+    color: var(--st-black);
+    font-family: var(--st-head-font);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.9375rem;
+  }
+
+  /* Form */
+  .form {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    background: var(--st-coal);
+    border: 1px solid var(--st-line-dark);
+    border-block-start: 3px solid var(--st-accent);
+  }
+  .form__title {
+    font-family: var(--st-head-font);
+    font-weight: 600;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+  .form__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 40rem) {
+    .form__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .field--wide {
+      grid-column: 1 / -1;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .field > span {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .field small {
+    font-weight: 400;
+    color: var(--st-mute);
+  }
+  .field :is(input, select, textarea) {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    inline-size: 100%;
+    min-block-size: 2.9rem;
+    padding: 0.65rem 0.8rem;
+    background: var(--st-black);
+    color: var(--st-white);
+    border: 1px solid #3a3e44;
+    border-radius: 0;
+    font-size: 1rem;
+    accent-color: var(--st-accent);
+  }
+  .field select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--st-accent) 50%),
+      linear-gradient(135deg, var(--st-accent) 50%, transparent 50%);
+    background-position: calc(100% - 1.15rem) 55%, calc(100% - 0.8rem) 55%;
+    background-size: 0.35rem 0.35rem;
+    background-repeat: no-repeat;
+    padding-inline-end: 2.25rem;
+  }
+  .field select option {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    background: var(--st-coal);
+    color: var(--st-white);
+  }
+  .field textarea {
+    resize: vertical;
+  }
+  .field ::placeholder {
+    color: #8a8f96;
+  }
+  .field :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--st-accent);
+    outline-offset: 1px;
+    border-color: var(--st-accent);
+  }
+  /* Only flag invalid fields after the visitor has interacted with them. */
+  .field :is(input, select, textarea):user-invalid {
+    border-color: #ff8a80;
+  }
+  .form__submit {
+    justify-self: stretch;
+    min-block-size: 3.25rem;
+    font-size: 1.05rem;
+  }
+  .form__note {
+    font-size: 0.875rem;
+    color: var(--st-mute);
+  }
+  .form__note a {
+    color: var(--st-white);
+    text-underline-offset: 3px;
+  }
+  .form__status {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    padding: 0.9rem 1rem;
+    background: var(--st-black);
+    border-inline-start: 3px solid var(--st-accent);
+    font-size: 0.9375rem;
+  }
+  @media (min-width: 60rem) {
+    .contact__grid {
+      grid-template-columns: 0.9fr 1.1fr;
+    }
+  }
+  /* Desktop: the form stays in view while the details and map scroll past.
+     Only when the whole form fits under the header, so the submit button is
+     never stuck below the fold on short laptop screens. */
+  @media (min-width: 60rem) and (min-height: 48rem) {
+    .form {
+      position: sticky;
+      inset-block-start: calc(var(--st-head) + 1rem);
+    }
+    .mapcard :global(img) {
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

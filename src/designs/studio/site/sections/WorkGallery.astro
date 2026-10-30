@@ -1,0 +1,234 @@
+---
+/**
+ * Photos of real jobs in a square grid; tapping one opens it full size in a
+ * <dialog> with previous/next (arrow keys too) and Escape to close. Studio
+ * version of the service pages' "Real-time work" gallery and its lightbox.
+ */
+import Picture from '../../../shared/Picture.astro';
+import Icon from '../../Icon.astro';
+
+interface Item {
+  image: string;
+  title?: string;
+  alt?: string;
+}
+
+interface Props {
+  heading: string;
+  subheading?: string;
+  items: Item[];
+  /** Fallback label/alt when an item has none, e.g. the service name. */
+  name: string;
+  class?: string;
+}
+
+const { heading, subheading, items, name, class: className } = Astro.props;
+const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
+---
+
+<section class:list={['wg st-section', className]} aria-labelledby="wg-title" data-wg>
+  <div class="st-wrap">
+    <header class="st-head st-head--center">
+      <h2 id="wg-title" class="st-h2">{heading}</h2>
+      {subheading && <p class="st-intro">{subheading}</p>}
+    </header>
+    <ul class="wg__grid" role="list">
+      {
+        items.map((item, i) => (
+          <li>
+            <button
+              type="button"
+              class="wg__tile"
+              data-wg-open={i}
+              data-full={`${base(item.image)}-1200w.webp`}
+              aria-label={item.title || `View ${name} work`}
+            >
+              <Picture
+                base={base(item.image)}
+                alt={item.alt || item.title || `${name} by WRP Detailing Studio in Dubai`}
+                widths={[480, 800, 1200]}
+                sizes="(min-width: 64rem) 33vw, (min-width: 40rem) 50vw, 100vw"
+                width={1200}
+                height={1200}
+              />
+              <span class="wg__zoom" aria-hidden="true"><Icon name="grid" size={18} /></span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <dialog class="wg__box" aria-label={heading} data-wg-dialog>
+    <img class="wg__full" alt="" data-wg-img />
+    <p class="wg__count" data-wg-count></p>
+    <form method="dialog">
+      <button class="wg__btn wg__close" aria-label="Close"><Icon name="close" size={22} /></button>
+    </form>
+    <button type="button" class="wg__btn wg__prev" aria-label="Previous photo" data-wg-prev><Icon name="arrow-left" size={22} /></button>
+    <button type="button" class="wg__btn wg__next" aria-label="Next photo" data-wg-next><Icon name="arrow-right" size={22} /></button>
+  </dialog>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-wg]')) {
+    const tiles = [...root.querySelectorAll<HTMLButtonElement>('[data-wg-open]')];
+    const dialog = root.querySelector<HTMLDialogElement>('[data-wg-dialog]')!;
+    const img = root.querySelector<HTMLImageElement>('[data-wg-img]')!;
+    const count = root.querySelector<HTMLElement>('[data-wg-count]')!;
+    let index = 0;
+    const show = (i: number) => {
+      index = (i + tiles.length) % tiles.length;
+      const tile = tiles[index];
+      img.src = tile.dataset.full!;
+      img.alt = tile.querySelector('img')?.alt ?? '';
+      count.textContent = `${index + 1} / ${tiles.length}`;
+    };
+    tiles.forEach((tile, i) =>
+      tile.addEventListener('click', () => {
+        show(i);
+        dialog.showModal();
+      }),
+    );
+    root.querySelector('[data-wg-prev]')!.addEventListener('click', () => show(index - 1));
+    root.querySelector('[data-wg-next]')!.addEventListener('click', () => show(index + 1));
+    dialog.addEventListener('keydown', (e) => {
+      const rtl = document.documentElement.dir === 'rtl';
+      if (e.key === 'ArrowLeft') show(index + (rtl ? 1 : -1));
+      if (e.key === 'ArrowRight') show(index + (rtl ? -1 : 1));
+    });
+    // A click on the backdrop (outside the photo and buttons) closes.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+</script>
+
+<style>
+  .wg__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 30rem) {
+    .wg__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 56rem) {
+    .wg__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .wg__tile {
+    --st-accent: var(--st-white); /* dark surface */
+    --st-on-accent: var(--st-black);
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: var(--st-coal);
+    cursor: zoom-in;
+  }
+  .wg__tile :global(img) {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .wg__tile:hover :global(img) {
+    transform: scale(1.05);
+  }
+  .wg__zoom {
+    position: absolute;
+    inset-block-end: 0.75rem;
+    inset-inline-end: 0.75rem;
+    display: grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    background: rgb(12 13 15 / 0.7);
+    color: var(--st-white);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .wg__tile:is(:hover, :focus-visible) .wg__zoom {
+    opacity: 1;
+  }
+  .wg__box {
+    inline-size: 100vw;
+    block-size: 100dvh;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    padding: 4rem 1rem;
+    border: 0;
+    background: rgb(12 13 15 / 0.96);
+    color: var(--st-white);
+  }
+  .wg__box[open] {
+    display: grid;
+    place-items: center;
+  }
+  .wg__box::backdrop {
+    background: transparent;
+  }
+  .wg__full {
+    max-inline-size: min(100%, 75rem);
+    max-block-size: calc(100dvh - 8rem);
+    inline-size: auto;
+    object-fit: contain;
+  }
+  .wg__count {
+    position: absolute;
+    inset-block-start: 1.25rem;
+    inset-inline-start: 1.25rem;
+    font-size: 0.875rem;
+    color: var(--st-mute);
+  }
+  .wg__btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    inline-size: 3rem;
+    block-size: 3rem;
+    border: 0;
+    background: rgb(255 255 255 / 0.08);
+    color: var(--st-white);
+    cursor: pointer;
+  }
+  .wg__btn:hover {
+    background: var(--st-accent);
+    color: var(--st-on-accent);
+  }
+  .wg__close {
+    inset-block-start: 0.75rem;
+    inset-inline-end: 0.75rem;
+  }
+  .wg__prev,
+  .wg__next {
+    inset-block-start: 50%;
+    translate: 0 -50%;
+  }
+  .wg__prev {
+    inset-inline-start: 0.75rem;
+  }
+  .wg__next {
+    inset-inline-end: 0.75rem;
+  }
+  :global([dir='rtl']) .wg__prev :global(svg),
+  :global([dir='rtl']) .wg__next :global(svg) {
+    transform: scaleX(-1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wg__tile :global(img) {
+      transition: none;
+    }
+  }
+</style>
