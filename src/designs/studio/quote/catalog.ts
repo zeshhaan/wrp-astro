@@ -98,8 +98,7 @@ export async function buildCatalog(): Promise<Catalog> {
     },
     contact: {
       whatsapp: contact.whatsapp,
-      hoursShort: contact.hoursShort,
-      closed: contact.closed,
+      hours: contact.hours,
       schedule: contact.schedule,
     },
   };

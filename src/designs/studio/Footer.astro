@@ -31,8 +31,7 @@ const w = ar
       services: t(locale, 'nav.services'),
       siteLinks: 'روابط الموقع',
       visit: 'زورونا',
-      hours: t(locale, 'nav.hours'),
-      closed: 'الجمعة مغلق',
+      hours: contact.hoursAr,
       address: [t(locale, 'home.contact.address1'), t(locale, 'home.contact.address2')],
       rights: `© ${num(new Date().getFullYear())} WRP Detailing Solutions. ${t(locale, 'footer.rights')}`,
       other: { label: 'English', lang: 'en' },
@@ -45,7 +44,6 @@ const w = ar
       siteLinks: 'Site links',
       visit: 'Visit us',
       hours: contact.hours,
-      closed: contact.closed,
       address: contact.address,
       rights: `© ${new Date().getFullYear()} WRP Detailing Solutions. All rights reserved.`,
       other: { label: 'العربية', lang: 'ar' },
@@ -123,7 +121,7 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
         <li><a href={contact.phoneHref} dir="ltr">{ar ? phoneAr : contact.phoneDisplay}</a></li>
         <li><a href={contact.emailHref}>{contact.email}</a></li>
         <li><a href={contact.mapsUrl} target="_blank" rel="noopener">{w.address[0]}{ar ? '،' : ','}<br />{w.address[1]}</a></li>
-        <li class="foot__hours">{w.hours}<br />{w.closed}</li>
+        <li class="foot__hours">{w.hours.split(/[,،] /).map((part, i) => (i ? [<br />, part] : part))}</li>
       </ul>
     </div>
   </div>
