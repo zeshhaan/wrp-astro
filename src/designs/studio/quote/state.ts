@@ -425,3 +425,21 @@ export function serviceInterest(s: QuoteState, c: Catalog): string {
     .map((id) => c.services.find((x) => x.id === id)?.name ?? id)
     .join(', ');
 }
+
+/**
+ * The fields the configurator sends to the `quote` Astro Action (src/actions),
+ * cut to the action's limits so a long request never fails validation. Email
+ * stays optional: an empty one is sent as '' and the action stores no email.
+ */
+export function quoteLeadFields(s: QuoteState, c: Catalog): Record<string, string> {
+  return {
+    name: s.you.name.trim().slice(0, 100),
+    phone: s.you.phone.trim(),
+    email: s.you.email.trim(),
+    reply: s.you.contact === 'call' ? 'call' : 'whatsapp',
+    vehicle: vehicleText(s).slice(0, 120),
+    service: serviceInterest(s, c).slice(0, 120),
+    notes: requestText(s, c, { whatsapp: false }).slice(0, 5000),
+    locale: 'en',
+  };
+}

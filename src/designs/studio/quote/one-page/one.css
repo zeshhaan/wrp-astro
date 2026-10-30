@@ -576,6 +576,18 @@
   font-size: 0.85rem;
   color: var(--st-mute);
 }
+.qo-status[hidden] {
+  display: none;
+}
+/* Hidden from visitors; a filled value marks a bot (see the quote action). */
+.qo-honeypot {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .qo-done {
   border: 1px solid var(--st-accent);
   border-radius: 10px;

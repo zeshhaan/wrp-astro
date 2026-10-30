@@ -129,8 +129,8 @@ const words = locale === 'ar' ? ar : en;
       {words.waInstead}
     </label>
     <div class="lf__honeypot" aria-hidden="true">
-      <label for={f('company-website')}>Company website</label>
-      <input id={f('company-website')} name="company_website" type="text" tabindex="-1" autocomplete="off" />
+      <label for={f('form-check')}>{locale === 'ar' ? 'اترك هذا الحقل فارغًا' : 'Leave this field empty'}</label>
+      <input id={f('form-check')} name="form_check" type="text" tabindex="-1" autocomplete="off" />
     </div>
     <button class="st-btn st-btn--primary lf__send" type="submit">
       <span class="lf__cta lf__cta--quote">{words.send} <Icon name="arrow-right" size={18} class="flip" /></span>

@@ -7,10 +7,8 @@ import { t, type Locale } from '@/i18n/translations';
 
 interface Props {
   locale?: Locale;
-  /** Preview forms validate locally and never call the live action. */
-  lab?: boolean;
 }
-const { locale = 'en', lab = true } = Astro.props;
+const { locale = 'en' } = Astro.props;
 const phonePattern = String.raw`[+0-9 \(\)\-]{7,40}`;
 const w =
   locale === 'ar'
@@ -129,7 +127,7 @@ const w =
     </div>
 
     <form
-      class="form" id="quote" data-homepage-quote data-lab={lab ? '' : undefined}
+      class="form" id="quote" data-homepage-quote
       data-preview-message={w.demo} data-success-message={w.success} data-error-message={w.error}
       data-sending-message={w.sending} data-phone-message={w.phoneInvalid} aria-labelledby="form-title"
     >
@@ -165,8 +163,8 @@ const w =
         </label>
       </div>
       <div class="form__honeypot" aria-hidden="true">
-        <label for="homepage-company-website">Company website</label>
-        <input id="homepage-company-website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+        <label for="homepage-form-check">{locale === 'ar' ? 'اترك هذا الحقل فارغًا' : 'Leave this field empty'}</label>
+        <input id="homepage-form-check" name="form_check" type="text" tabindex="-1" autocomplete="off" />
       </div>
       <button class="st-btn st-btn--primary form__submit" type="submit" disabled>{w.submit}</button>
       <noscript><p class="form__note">{w.noScript}</p></noscript>
@@ -180,6 +178,9 @@ const w =
 <script>
   import { actions } from 'astro:actions';
 
+  // Sends to the `quote` action from every page, like the hero form. The
+  // action decides what is real: Worker Previews and Design Lab pages answer
+  // `{ saved: false }` and the form shows the preview note.
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-homepage-quote]')) {
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const status = form.querySelector<HTMLElement>('[data-homepage-status]')!;
@@ -206,12 +207,6 @@ const w =
       status.hidden = true;
       phone.setCustomValidity(phone.value.replace(/\D/g, '').length >= 7 ? '' : form.dataset.phoneMessage!);
       if (!form.reportValidity()) return;
-      if (form.hasAttribute('data-lab')) {
-        status.textContent = form.dataset.previewMessage!;
-        status.hidden = false;
-        status.focus();
-        return;
-      }
       pending = true;
       button.disabled = true;
       button.textContent = form.dataset.sendingMessage!;
