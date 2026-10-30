@@ -15,7 +15,7 @@ import Icon from '../Icon.astro';
 import LucideIcon from '@/components/Icon.astro';
 import { localizeUrl } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
-import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { isLabPath, studioQuoteHref, toLab } from './routes';
 import { fillSpans } from './fill';
 
 type Card = { title: string; desc: string; featured: boolean; href?: string | null; label?: string; letter?: string };
@@ -39,7 +39,7 @@ interface Props {
 }
 
 const { slug, copy, locale = 'en' } = Astro.props;
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = isLabPath(Astro.url.pathname);
 const link = (href: string) => (isLab ? toLab(href) : href);
 const say = (s: string) => (s.startsWith('@t:') ? t(locale, s.slice(3) as Parameters<typeof t>[1]) : s);
 const local = (href: string) => link(localizeUrl(href, locale));

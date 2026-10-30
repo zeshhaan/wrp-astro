@@ -8,7 +8,7 @@
 import Icon from '../../Icon.astro';
 import ServiceOptions from '@/components/ServiceOptions.astro';
 import type { Locale } from '@/i18n/translations';
-import { labPrefix } from '../routes';
+import { isLabPath } from '../routes';
 
 export type Field = 'name' | 'email' | 'phone' | 'vehicle' | 'service' | 'message';
 
@@ -33,7 +33,7 @@ interface Props {
 
 const p = Astro.props;
 const { locale, required, idPrefix = '' } = p;
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = isLabPath(Astro.url.pathname);
 const label = (field: Field) => `${p.labels[field]}${p.marks && required.includes(field) ? ' *' : ''}`;
 const id = (field: Field) => `${idPrefix}${field}`;
 const need = (field: Field) => required.includes(field);

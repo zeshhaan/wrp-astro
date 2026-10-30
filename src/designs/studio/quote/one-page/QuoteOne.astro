@@ -1,15 +1,16 @@
 ---
 /**
- * Studio: the quote page (/design-lab/studio/quote/), where every "Get a quick
- * quote" button goes. Shereef chose it over the step-by-step flow (removed).
+ * Studio: the quote page (/quote/), where every "Get a quick quote" button
+ * goes. Shereef chose it over the step-by-step flow (removed).
  *
  * A configurator: the 3D car stays in view while every choice sits in one
  * scrolling panel of chips, like the car-viewer test page. State, prices and
  * the WhatsApp text come from ../state.ts.
+ *
+ * noindex: a tool rather than a page to rank, and English only, so there is
+ * no Arabic twin for its hreflang pair.
  */
-import DesignShell from '../../../shared/DesignShell.astro';
-import Header from '../../Header.astro';
-import Footer from '../../Footer.astro';
+import StudioPage from '../../site/StudioPage.astro';
 import QIcon from '../QIcon.astro';
 import { buildCatalog } from '../catalog';
 import { bodyTypes, panels, wrapParts } from '../panels';
@@ -31,15 +32,12 @@ const panelGroups = [
 ] as const;
 ---
 
-<DesignShell
-  concept="studio"
+<StudioPage
+  app
+  noindex
   title="Get a quote on one page · WRP Detailing Dubai"
   description="Choose your car, the services and the details on one page, see the price build up on a 3D car, and send it on WhatsApp."
-  fonts={['--font-oswald', '--font-inter', '--font-montserrat']}
-  themeColor="#0c0d0f"
-  colorScheme="dark"
 >
-  <Header />
   <main id="main" class="qo" tabindex="-1" data-qo>
     <form id="qo-form" class="qo-form" method="post" novalidate aria-label="Quote request">
       <div class="st-wrap qo-head">
@@ -466,11 +464,10 @@ const panelGroups = [
   </main>
 
   <p class="visually-hidden" aria-live="polite" data-qo-live></p>
-  <Footer />
 
   <script type="application/json" id="qo-catalog" set:html={JSON.stringify(catalog).replace(/</g, '\\u003c')} />
   <script>
     import { start } from './one';
     start();
   </script>
-</DesignShell>
+</StudioPage>

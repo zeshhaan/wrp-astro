@@ -22,7 +22,7 @@ import HeaderFilmstrip from './headers/HeaderFilmstrip.astro';
 import { getHeaderNav } from './headers/nav';
 import type { HeaderVariantId } from './headers/variants';
 import type { Locale } from '@/i18n/translations';
-import { toLab } from './site/routes';
+import { isLabPath, studioQuoteHref, toLab } from './site/routes';
 
 interface Props {
   /**
@@ -37,12 +37,13 @@ interface Props {
   altHref?: string;
 }
 
-// The language switch goes to the Arabic Studio homepage (site/ArHomePage.astro).
-const { header = 'g', locale = 'en', altHref = '/design-lab/studio/ar/' } = Astro.props;
+// The language switch goes to the Arabic homepage (site/ArHomePage.astro).
+const { header = 'g', locale = 'en', altHref = '/ar/' } = Astro.props;
 const candidate = Astro.props.header !== undefined;
-// Service links stay inside the Design Lab, on the Studio service pages.
+// A header candidate's service links stay inside the Design Lab.
+const link = isLabPath(Astro.url.pathname) ? toLab : (href: string) => href;
 const liveNav = await getHeaderNav(locale);
-const nav = { ...liveNav, services: liveNav.services.map((s) => ({ ...s, href: toLab(s.href) })) };
+const nav = { ...liveNav, services: liveNav.services.map((s) => ({ ...s, href: link(s.href) })) };
 const candidates = {
   a: { Candidate: HeaderShowroom, props: {} },
   d: { Candidate: HeaderArrivals, props: {} },
@@ -52,7 +53,7 @@ const candidates = {
   h: { Candidate: HeaderStorefront, props: { phone: 'filmstrip' } },
 } as const;
 const { Candidate, props: candidateProps } = candidates[header];
-const quoteHref = '/design-lab/studio/quote/';
+const quoteHref = studioQuoteHref;
 const title = 'Paint Protection Film (PPF) in Dubai | WRP Detailing Studio, Al Qusais';
 const description =
   'Self-healing STEK and Avery Dennison PPF, ceramic coating, window tint and detailing in Al Qusais, Dubai. Up to 10-year warranty. 5.0 on Google.';
@@ -60,13 +61,11 @@ const posters = [
   { href: heroVideo.poster.tall.avif, type: 'image/avif', media: heroVideo.tallMedia },
   { href: heroVideo.poster.wide.avif, type: 'image/avif', media: `not all and ${heroVideo.tallMedia}` },
 ];
-// The homepage is always a lab preview for now, also at `/` on the Studio
-// Worker Preview. At go-live it drops `lab` and its head is the live homepage's.
 ---
 
 {
   !candidate && (
-    <StudioPage lab title={title} description={description} livePath="/" preloads={posters}>
+    <StudioPage title={title} description={description} livePath="/" preloads={posters}>
       <Schema type="WebSite" />
       <Schema type="ServiceCatalog" />
       <HomeMain />
@@ -89,7 +88,7 @@ const posters = [
       <main id="main">
         <HomeMain />
       </main>
-      <Footer serviceHref={toLab} />
+      <Footer serviceHref={link} />
       <FloatingContact />
     </DesignShell>
   )

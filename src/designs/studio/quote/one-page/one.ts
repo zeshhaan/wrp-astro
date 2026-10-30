@@ -83,7 +83,7 @@ export function start() {
 function fixHeaderLinks() {
   qa<HTMLAnchorElement>('.head a[href^="#"], .drawer a[href^="#"], .foot a[href^="#"]').forEach((a) => {
     const id = a.getAttribute('href')!.slice(1);
-    if (!document.getElementById(id) || id === 'main') a.href = `/design-lab/studio/${id === 'main' ? '' : `#${id}`}`;
+    if (!document.getElementById(id) || id === 'main') a.href = `/${id === 'main' ? '' : `#${id}`}`;
   });
 }
 

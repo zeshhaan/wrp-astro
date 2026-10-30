@@ -12,6 +12,17 @@
 .qo-head {
   padding-block: 1.5rem 1rem;
 }
+/* Phones: the site header (G) lies over the top of the page, as it does over
+   the other pages' heroes, so the heading starts below it. */
+@media (max-width: 71.99rem) {
+  .qo-head {
+    padding-block-start: calc(var(--st-head) + 1.5rem);
+  }
+}
+/* The header's quote buttons lead here; on this page they would point at itself. */
+:root[data-concept='studio'] :is(.sf-tag, .sf-acts__quote) {
+  display: none;
+}
 .qo-eyebrow {
   color: var(--st-accent);
   font-size: 0.75rem;

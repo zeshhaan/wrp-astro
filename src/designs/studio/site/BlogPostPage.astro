@@ -15,7 +15,7 @@ import Picture from '../../shared/Picture.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
-import { labPrefix, toLab } from './routes';
+import { isLabPath, toLab } from './routes';
 
 type Props = CollectionEntry<'blog'>['data'] & {
   locale: Locale;
@@ -24,7 +24,7 @@ type Props = CollectionEntry<'blog'>['data'] & {
 };
 
 const { title, description, pubDate, updatedDate, heroImage, category, author, readingTime, tags, relatedServices, locale, slug } = Astro.props;
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = isLabPath(Astro.url.pathname);
 const link = (href: string) => (isLab ? toLab(href) : href);
 const num = (n: string | number) => toLocalNum(n, locale);
 const site = 'https://wrpdetailing.ae';

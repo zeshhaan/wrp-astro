@@ -11,8 +11,8 @@
  *    no analytics, and its canonical and hreflang point at the live URL it will
  *    replace (the path with /design-lab/studio taken off), so the head can be
  *    diffed against the live page.
- *  - at the live URL when the redesign goes live. Nothing here changes; the
- *    route file just renders this instead of BaseLayout.
+ *  - at the live URL, as every page now does (the route files in src/pages
+ *    render this instead of BaseLayout).
  *
  * Never imports src/styles/global.css: Studio owns its whole visual system.
  */
@@ -28,7 +28,7 @@ import Footer from '../Footer.astro';
 import FloatingContact from '../FloatingContact.astro';
 import { getDir, getOgLocale, getAlternateUrl } from '@/i18n/utils';
 import type { Locale } from '@/i18n/translations';
-import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { isLabPath, labPrefix, studioQuoteHref, toLab } from './routes';
 import '../../shared/reset.css';
 import '../theme.css';
 import './hero-form.css';
@@ -56,6 +56,11 @@ interface Props {
   livePath?: string;
   /** Render as a Design Lab preview (noindex, no analytics, links kept in the lab) whatever the URL, e.g. the homepage on a Worker Preview. */
   lab?: boolean;
+  /**
+   * The page brings its own <main id="main"> and has no floating contact or
+   * Tally popup: the quote configurator, whose own bar sits at the bottom.
+   */
+  app?: boolean;
   /** LCP images to preload (the page hero). */
   preloads?: { href: string; type: string; media?: string; imagesrcset?: string; imagesizes?: string }[];
 }
@@ -77,10 +82,11 @@ const {
   heroForm = false,
   livePath: livePathProp,
   lab: labProp = false,
+  app = false,
 } = Astro.props;
 
 // The live URL this page stands for. In the lab it is the path without the prefix.
-const isLab = labProp || Astro.url.pathname.startsWith(`${labPrefix}/`) || Astro.url.pathname.startsWith(`/ar${labPrefix}/`);
+const isLab = labProp || isLabPath(Astro.url.pathname);
 const livePath = livePathProp ?? (isLab ? Astro.url.pathname.slice(labPrefix.length) : Astro.url.pathname);
 const lab = (href: string) => (isLab ? toLab(href) : href);
 
@@ -221,12 +227,18 @@ const altHref = lab(alternatePath);
   </head>
   <body>
     <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={heroForm ? '#quote' : studioQuoteHref} phone="showroom" />
-    <main id="main">
-      <slot />
-    </main>
+    {
+      app ? (
+        <slot />
+      ) : (
+        <main id="main">
+          <slot />
+        </main>
+      )
+    }
     <Footer home={lab('/')} serviceHref={lab} locale={locale} altHref={altHref} />
-    <FloatingContact locale={locale} />
-    <TallyPopup enabled={!isLab && !livePath.includes('/contact-us')} />
+    {!app && <FloatingContact locale={locale} />}
+    <TallyPopup enabled={!isLab && !app && !livePath.includes('/contact-us')} />
     {
       heroForm && (
         <script>

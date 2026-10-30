@@ -12,24 +12,25 @@ import Lounge from './Lounge.astro';
 import Social from './Social.astro';
 import Blog from './Blog.astro';
 import Contact from './Contact.astro';
-import { toLab } from './site/routes';
+import { isLabPath, toLab } from './site/routes';
 import type { Locale } from '@/i18n/translations';
 
 interface Props {
   locale?: Locale;
   /**
    * Turns a live English path into this page's link (the Arabic page, the
-   * Studio preview). Without it, service cards go to the Studio service pages
-   * and every other link to the live page.
+   * Design Lab). Without it, links are the live paths.
    */
   link?: (href: string) => string;
 }
 const { locale = 'en', link } = Astro.props;
+// Service cards on a Design Lab page (a header candidate) stay in the lab.
+const serviceLink = link ?? (isLabPath(Astro.url.pathname) ? toLab : undefined);
 ---
 
 <Hero locale={locale} link={link} />
 <About locale={locale} link={link} />
-<Services locale={locale} link={link ?? toLab} />
+<Services locale={locale} link={serviceLink} />
 <CtaBanner locale={locale} />
 <WhyUs locale={locale} link={link} />
 <Proof locale={locale} />

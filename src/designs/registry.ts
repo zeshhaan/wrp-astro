@@ -1,11 +1,9 @@
 /**
- * Design Lab registry. Studio is the chosen homepage direction (October 2026);
- * the other concepts (Mezzanine, The Menu and earlier rounds) were removed.
- *
- * The homepage lives in src/designs/<id>/Home.astro and is reachable at
- * /design-lab/<id>/ on any build. A build with PUBLIC_WRP_DESIGN=<id> also
- * serves it at `/`, which is how it gets its own Worker Preview URL
- * (see docs/design-lab.md).
+ * Design Lab registry. Studio was the chosen direction (October 2026) and is
+ * now the site's design, so its homepage is `/`; the other concepts
+ * (Mezzanine, The Menu and earlier rounds) were removed. The registry still
+ * names the design-studio Worker Preview (scripts/preview-designs.mjs), which
+ * now shows the same site as the branch Preview.
  */
 export type Concept = {
   id: 'studio';

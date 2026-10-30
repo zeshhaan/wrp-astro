@@ -28,7 +28,7 @@ import LucideIcon from '@/components/Icon.astro';
 import ServiceSchema from '@/components/ServiceSchema.astro';
 import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
-import { labPrefix, toLab, studioQuoteHref } from './routes';
+import { isLabPath, studioQuoteHref, toLab } from './routes';
 import { fillSpans } from './fill';
 import Swap from './sections/Swap.astro';
 
@@ -41,7 +41,7 @@ interface Props {
 
 const { service, locale = 'en', heroForm = true } = Astro.props;
 const slug = service.id.replace(/^ar\//, '');
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`);
+const isLab = isLabPath(Astro.url.pathname);
 const link = (href: string) => (isLab ? toLab(href) : href);
 const {
   title,
