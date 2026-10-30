@@ -1,24 +1,16 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro/zod';
 import { env } from 'cloudflare:workers';
-import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext/browser';
-import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
 import { parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
-import {
-  createLeadOutcomeLinks,
-  leadOutcomeSigningSecretIsValid,
-  renderLeadOutcomeActions,
-} from '@/lib/lead-outcome';
 import {
   isPhone,
   isEmail,
   isHoneypotFilled,
-  quoteLeadEmailHtml,
   quoteLeadMode,
-  quoteLeadSubject,
   type QuoteLead,
 } from '@/lib/quote-form-lead';
+import { quoteLeadMailer } from '@/lib/quote-lead-email';
+import { notifyQuoteLead, renotifyQuoteLeadByRequest } from '@/lib/quote-lead-notify';
 
 const optionalText = (max: number) =>
   z
@@ -37,7 +29,8 @@ export const server = {
    *
    * Order of work: validate, check the honeypot, then, only for a live lead, save
    * to D1 and email the team. The insert is idempotent on the form's request
-   * id, so a double press or a resend never makes a second row or email attempt.
+   * id, so a double press or a resend never makes a second row; a resend only
+   * retries an email that failed (src/lib/quote-lead-notify.ts).
    * Worker previews and Design Lab pages stop after validation and answer
    * `{ saved: false }` (see quoteLeadMode), so they never touch the
    * production database or inbox.
@@ -56,10 +49,17 @@ export const server = {
       page: optionalText(300),
       requestId: z.uuid(),
       attribution: z.string().max(4096).nullish(),
-      company_website: z.string().nullish(),
+      leave_blank: z.string().nullish(),
     }),
     handler: async (input, context) => {
       const hostname = context.url.hostname;
+      // Work the visitor need not wait for runs after the response (waitUntil);
+      // without a Workers context (tests, odd runtimes) it is awaited.
+      const inBackground = async (work: Promise<unknown>) => {
+        const cf = context.locals.cfContext;
+        if (cf) cf.waitUntil(work);
+        else await work;
+      };
       const mode = quoteLeadMode({
         hostname,
         page: input.page ?? '',
@@ -68,8 +68,12 @@ export const server = {
         dev: import.meta.env.DEV,
       });
 
-      // A filled hidden field is quietly discarded without recording a conversion.
-      if (isHoneypotFilled(input.company_website)) return { saved: false, ignored: true };
+      // A filled hidden field marks a bot: discard it without a conversion, but
+      // log it (no customer details) so a real visitor caught by it shows up.
+      if (isHoneypotFilled(input.leave_blank)) {
+        console.warn(JSON.stringify({ message: 'Quote lead discarded by the honeypot', hostname, page: input.page, locale: input.locale, mode }));
+        return { saved: false, ignored: true };
+      }
 
       if (mode === 'dry-run') return { saved: false, ignored: false };
       if (mode === 'unavailable') {
@@ -112,8 +116,12 @@ export const server = {
             serializeLeadAttribution(lead.attribution),
           )
           .run();
-        // Seen this request before: the first one was saved. Email is best-effort.
-        if (!inserted.meta.changes) return { saved: true, ignored: false };
+        // Seen this request before: the first one was saved. If its email has
+        // not gone out yet, this resend tries again.
+        if (!inserted.meta.changes) {
+          if (env.EMAIL) await inBackground(renotifyQuoteLeadByRequest(env.DB, quoteLeadMailer(context.url.origin), input.requestId));
+          return { saved: true, ignored: false };
+        }
         leadId = Number(inserted.meta.last_row_id);
         if (!Number.isSafeInteger(leadId) || leadId < 1) throw new Error('Quote lead insert returned no id');
       } catch (dbError) {
@@ -121,47 +129,16 @@ export const server = {
         throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'Could not save the request' });
       }
 
-      // Email is optional: the lead is already safe in D1. Record its ID so
-      // operators can locate a saved lead without logging customer details.
+      // Email never decides whether a lead counts: it is already safe in D1.
+      // Two tries now, after the response; the Cron Trigger retries the rest
+      // (src/lib/quote-lead-notify.ts).
       if (!env.EMAIL) {
-        console.error('Quote form notification not sent', { leadId, reason: 'EMAIL binding is missing' });
+        console.error(JSON.stringify({ message: 'Quote lead notification not sent', leadId, reason: 'EMAIL binding is missing' }));
       } else {
-        try {
-          await notify(lead, leadId, context.url.href);
-        } catch (emailError) {
-          console.error('Quote form notification not sent', {
-            leadId,
-            reason: 'Email delivery failed',
-            errorType: emailError instanceof Error ? emailError.name : 'UnknownError',
-          });
-        }
+        await inBackground(notifyQuoteLead(env.DB, quoteLeadMailer(context.url.origin), lead, leadId, new Date(), { tries: 2 }));
       }
 
       return { saved: true, ignored: false };
     },
   }),
 };
-
-async function notify(lead: QuoteLead, leadId: number, requestUrl: string) {
-  let outcomeActions = '';
-  if (leadOutcomeSigningSecretIsValid(env.LEAD_OUTCOME_SIGNING_SECRET)) {
-    outcomeActions = renderLeadOutcomeActions(
-      await createLeadOutcomeLinks(requestUrl, { kind: 'quote', id: leadId }, env.LEAD_OUTCOME_SIGNING_SECRET),
-    );
-  } else {
-    console.warn('Quote form notification has no outcome links', { leadId, reason: 'Outcome signing secret is unavailable' });
-  }
-
-  const msg = createMimeMessage();
-  msg.setSender({ name: 'WRP Quote Form', addr: 'noreply@wrpdetailing.ae' });
-  msg.setRecipient('wrp.detailing@gmail.com');
-  msg.setSubject(quoteLeadSubject(lead));
-  msg.addMessage({ contentType: 'text/html', data: quoteLeadEmailHtml(lead, outcomeActions, new Date()) });
-
-  await deliverClientLeadWithAgencyCopy({
-    agencyRecipient: env.AGENCY_COPY_EMAIL,
-    sendClient: () => env.EMAIL.send(new EmailMessage('noreply@wrpdetailing.ae', 'wrp.detailing@gmail.com', msg.asRaw())),
-    sendAgency: (recipient) => env.EMAIL.send(new EmailMessage('noreply@wrpdetailing.ae', recipient, msg.asRaw())),
-    onAgencyError: (error) => console.error('Agency copy failed (quote lead email was still sent):', error),
-  });
-}
