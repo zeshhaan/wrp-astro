@@ -18,12 +18,13 @@ type StoredQuote = {
   source_url: string | null;
   locale: 'en' | 'ar';
   attribution_json: string | null;
+  created_at: string;
 };
 
 export type NotificationAlert = { leadId: number; attempts: number; status: string };
 type RecoveryOptions = {
   db: D1Database;
-  send: (lead: QuoteLead, leadId: number) => Promise<void>;
+  send: (lead: QuoteLead, leadId: number, submittedAt: Date) => Promise<void>;
   alert?: (leads: NotificationAlert[]) => Promise<void>;
   leadId?: number;
   now?: () => number;
@@ -86,12 +87,13 @@ export async function recoverQuoteNotifications({ db, send, alert, leadId, now =
     try {
       const row = await db.prepare('SELECT * FROM quote_form_leads WHERE id = ?').bind(job.lead_id).first<StoredQuote>();
       if (!row) throw new Error('MissingLead');
+      const submittedAt = new Date(`${row.created_at.replace(' ', 'T')}Z`);
       await send({
         name: row.name, phone: row.phone, email: row.email, notes: row.notes,
         reply: row.reply_by, vehicle: row.vehicle, service: row.service_interest,
         page: row.source_url, locale: row.locale,
         attribution: parseLeadAttribution(row.attribution_json),
-      }, row.id);
+      }, row.id, Number.isNaN(submittedAt.getTime()) ? new Date(now()) : submittedAt);
       await db.prepare(`UPDATE quote_notification_outbox SET status = 'sent', sent_at = ?,
         last_error = NULL, lease_token = NULL, lease_until = 0
         WHERE lead_id = ? AND lease_token = ?`)

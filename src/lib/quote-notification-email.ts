@@ -10,7 +10,7 @@ const CLIENT = 'wrp.detailing@gmail.com';
 const OPERATOR = 'work.zeeshan@gmail.com';
 const SITE = 'https://www.wrpdetailing.ae';
 
-async function notify(env: Cloudflare.Env, lead: QuoteLead, leadId: number): Promise<void> {
+async function notify(env: Cloudflare.Env, lead: QuoteLead, leadId: number, submittedAt: Date): Promise<void> {
   if (!env.EMAIL) throw new Error('EmailBindingUnavailable');
   let outcomeActions = '';
   if (leadOutcomeSigningSecretIsValid(env.LEAD_OUTCOME_SIGNING_SECRET)) {
@@ -24,7 +24,7 @@ async function notify(env: Cloudflare.Env, lead: QuoteLead, leadId: number): Pro
   msg.setSender({ name: 'WRP Quote Form', addr: SENDER });
   msg.setRecipient(CLIENT);
   msg.setSubject(`[Lead #${leadId}] ${quoteLeadSubject(lead)}`);
-  msg.addMessage({ contentType: 'text/html', data: quoteLeadEmailHtml(lead, outcomeActions, new Date()) });
+  msg.addMessage({ contentType: 'text/html', data: quoteLeadEmailHtml(lead, outcomeActions, submittedAt) });
   await deliverClientLeadWithAgencyCopy({
     agencyRecipient: env.AGENCY_COPY_EMAIL,
     sendClient: () => env.EMAIL.send(new EmailMessage(SENDER, CLIENT, msg.asRaw())),
@@ -53,7 +53,7 @@ export async function processQuoteNotifications(env: Cloudflare.Env, leadId?: nu
   if (env.ENVIRONMENT === 'preview' || !env.DB) return;
   await recoverQuoteNotifications({
     db: env.DB,
-    send: (lead, id) => notify(env, lead, id),
+    send: (lead, id, submittedAt) => notify(env, lead, id, submittedAt),
     // Requests process their own job; scheduled runs also monitor the backlog.
     alert: leadId === undefined ? (leads) => alertOperator(env, leads) : undefined,
     leadId,

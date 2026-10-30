@@ -18,7 +18,8 @@ function fixture(withOutbox = true) {
   sqlite.exec(`CREATE TABLE quote_form_leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT, request_id TEXT UNIQUE NOT NULL,
     name TEXT, phone TEXT, email TEXT, notes TEXT, reply_by TEXT, vehicle TEXT,
-    service_interest TEXT, source_url TEXT, locale TEXT, attribution_json TEXT
+    service_interest TEXT, source_url TEXT, locale TEXT, attribution_json TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
   if (withOutbox) sqlite.exec(readFileSync(new URL('../../migrations/0008_add_quote_notification_outbox.sql', import.meta.url), 'utf8'));
   class Statement {
@@ -119,6 +120,15 @@ describe('quote notification recovery', () => {
     sqlite.exec(readFileSync(new URL('../../migrations/0008_add_quote_notification_outbox.sql', import.meta.url), 'utf8'));
     await saveQuoteLeadWithNotification(db, 'old-request', lead);
     expect(sqlite.query('SELECT count(*) AS total FROM quote_notification_outbox').get().total).toBe(0);
+  });
+
+  test('retry email retains the original submission time', async () => {
+    const { db, sqlite } = fixture();
+    await saveQuoteLeadWithNotification(db, 'request-date', lead);
+    sqlite.exec("UPDATE quote_form_leads SET created_at = '2026-10-01 08:30:00'");
+    let submittedAt: Date | undefined;
+    await recoverQuoteNotifications({ db, send: async (_lead, _id, date) => { submittedAt = date; } });
+    expect(submittedAt?.toISOString()).toBe('2026-10-01T08:30:00.000Z');
   });
 
   test('persistent send failures exhaust the retry budget and alert before exhaustion', async () => {
