@@ -12,10 +12,10 @@ import HomeMain from '../HomeMain.astro';
 import Schema from '@/components/Schema.astro';
 import { localizeUrl } from '@/i18n/utils';
 import { heroVideo } from '../heroVideo';
-import { labPrefix, toLab } from './routes';
+import { isLabPath, toLab } from './routes';
 
 const locale = 'ar' as const;
-const isLab = Astro.url.pathname.startsWith(`${labPrefix}/`) || Astro.url.pathname.startsWith(`/ar${labPrefix}/`);
+const isLab = isLabPath(Astro.url.pathname);
 const local = (href: string) => {
   const path = localizeUrl(href, locale);
   return isLab ? toLab(path) : path;

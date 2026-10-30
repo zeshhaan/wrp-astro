@@ -1,4 +1,5 @@
 ---
+import { studioQuoteHref } from './site/routes';
 import Icon from './Icon.astro';
 import { proof, whatsappQuote } from './content';
 import { rating, reviewCount, whatsappQuote as whatsappQuoteAr } from './contentAr';
@@ -88,7 +89,7 @@ const w = ar
         <span class="hero__lede-short">{w.short}</span>
       </p>
       <div class="hero__actions">
-        <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">{w.quote} <Icon name="arrow-right" size={18} class="flip" /></a>
+        <a class="st-btn st-btn--primary" href={studioQuoteHref}>{w.quote} <Icon name="arrow-right" size={18} class="flip" /></a>
         <a class="st-btn st-btn--light" href={w.whatsappHref} target="_blank" rel="noopener">
           <Icon name="whatsapp" />{w.whatsapp}
         </a>

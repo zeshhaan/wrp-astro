@@ -1,4 +1,5 @@
 ---
+import { studioQuoteHref } from './site/routes';
 import Picture from '../shared/Picture.astro';
 import Icon from './Icon.astro';
 import { contact } from './content';
@@ -38,7 +39,7 @@ const w =
     <h2 id="cta-title" class="st-h2">{w.title}</h2>
     <p class="cta__text">{w.text}</p>
     <div class="cta__actions">
-      <a class="st-btn st-btn--primary" href="/design-lab/studio/quote/">{w.quote}</a>
+      <a class="st-btn st-btn--primary" href={studioQuoteHref}>{w.quote}</a>
       <a class="st-btn st-btn--ghost" href={contact.mapsUrl} target="_blank" rel="noopener">
         <Icon name="pin" />{w.directions}
       </a>

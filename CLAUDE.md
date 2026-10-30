@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an Astro-based website for WRP (Wrap, Reinforce, Protect), a premium car detailing studio in Dubai. Deployed on Cloudflare Workers with server-side rendering.
 
+Every page uses the **Studio** design (`src/designs/studio/`, see `docs/design-lab.md`): the route files in `src/pages` render Studio's page templates, and `BaseLayout.astro` with its components is the previous design, no longer used by any page.
+
 ## Development Commands
 
 ```bash

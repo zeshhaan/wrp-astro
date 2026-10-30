@@ -1,5 +1,13 @@
 # Design Lab: the Studio redesign
 
+> **Studio is the site's design.** Every live URL (English and Arabic) renders
+> its Studio page; the previous BaseLayout pages are gone from `src/pages`.
+> The quote configurator is at `/quote/`. Old preview links under
+> `/design-lab/studio/` redirect (301) to the live page
+> (`src/pages/design-lab/studio/[...page].ts`); only the header candidates and
+> the car viewer still render under the lab. The notes below describe how the
+> redesign was reviewed and where its code lives.
+
 **Studio** is the chosen direction for the new wrpdetailing.ae (October 2026): a
 conventional detailing-studio site, modelled on the structure of Apex Detail
 Studio (Dubai). It uses the real content: prices from `src/content/services`,
@@ -13,25 +21,25 @@ the git history of this branch.
 
 ## Where to look
 
-Every build has a review hub at `/design-lab/` linking to each Studio page:
+Every build has a review hub at `/design-lab/`:
 
 | Page | Path |
 | --- | --- |
-| Homepage | `/design-lab/studio/` |
-| Quote, one page beside a 3D car (the step-by-step version was removed) | `/design-lab/studio/quote/` |
+| Homepage | `/` |
+| Quote, one page beside a 3D car (the step-by-step version was removed) | `/quote/` |
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
 | Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
 
-These pages are `noindex`, excluded from the
-sitemap, and their forms never send leads.
+Design Lab pages are `noindex`, excluded from the sitemap, and their forms
+never send leads. The quote page is `noindex` too (a tool, English only) and
+left out of the sitemap, but it is a live page: its submissions are real.
 
-Studio also has its own Cloudflare **Worker Preview** where it is served at `/`,
-exactly as it would be on wrpdetailing.ae:
+Cloudflare **Worker Previews** of the branch:
 
 | Preview | Serves |
 | --- | --- |
-| `design-studio` | Studio at `/` |
-| the branch's own Preview | the Design Lab under `/design-lab/` |
+| `design-studio` | the same site as the branch Preview (it used to serve Studio at `/` before Studio was the site) |
+| the branch's own Preview | the site, with the Design Lab under `/design-lab/` |
 
 URLs follow `https://<preview>-wrp-astro.<subdomain>.workers.dev`. They update on
 every push to the branch they track.
@@ -41,8 +49,10 @@ every push to the branch they track.
 - `src/designs/studio/Home.astro`: the Studio homepage, self-contained (own styles and
   fonts, no Tailwind or global.css); its quote flows live in `src/designs/studio/quote/`. Shared content in `src/designs/data.ts`, shell in
   `src/designs/shared/`.
-- `PUBLIC_WRP_DESIGN=<id>` at build time makes `src/pages/index.astro` rewrite `/`
-  to that design. Unset in production, so the live homepage is unchanged.
+- The route files in `src/pages` render `src/designs/studio/site/SitePage.astro`
+  (homepages, Wrap/Reinforce/Protect, about, contact, reviews, portfolio, blog,
+  legal), `site/ServicePage.astro` (services) or `quote/one-page/QuoteOne.astro`
+  (`/quote/`). `PUBLIC_WRP_DESIGN` no longer changes anything.
 - `wrangler.jsonc` has a `previews` block. It deliberately omits the production
   D1 database and email binding, so a Preview cannot create a real lead.
 
@@ -77,28 +87,25 @@ whose looping copies are spans, not links). All of them
 render the live navigation's link set from `headers/nav.ts` (six service
 pages, Portfolio, Reviews, About, Blog, Contact) as plain `<a href>` links in
 the HTML, in English or Arabic (RTL). Shereef picked G, so it is the Studio homepage's
-header (`Home.astro` defaults its `header` prop to `g`); the other candidates
-stay in the lab for now. The quote pages still use the older `Header.astro`.
+header (`Home.astro` defaults its `header` prop to `g`), and every page has it,
+the quote page included; the other candidates stay in the lab.
 
 ## Studio inner pages
 
-The rest of the site is being rebuilt in Studio one group at a time, each page
-keeping its live copy word for word. A Studio page renders at its live path
-under `/design-lab/studio/` (for example `/design-lab/studio/services/polish/`
-for `/services/polish/`) and reads the same content entries and translations
-as the live page, so the copy cannot drift.
+Every page was rebuilt in Studio keeping its copy word for word, reviewed at
+its live path under `/design-lab/studio/`, then moved to the live path itself.
+The pages read the same content entries and translations as before, so the
+copy cannot drift.
 
 - `src/designs/studio/site/StudioPage.astro`: the document shell. Its `<head>`
   is the live BaseLayout's (title, description, canonical, OG/Twitter,
   hreflang, LocalBusiness and SiteNavigationElement JSON-LD, RSS, analytics),
-  around Studio's header G, footer and floating contact. Under the lab prefix it
-  is `noindex, nofollow` without analytics, and its canonical and hreflang
-  already point at the live URL, so the head can be diffed against the live
-  page. At go-live the live route renders the Studio page instead of
-  BaseLayout and nothing in the shell changes.
-- `src/designs/studio/site/routes.ts`: the lab prefix, the temporary quote URL,
-  and which live paths have a Studio version (links to those stay inside the
-  preview).
+  around Studio's header G, footer and floating contact. On a Design Lab page
+  it is `noindex, nofollow` without analytics. `app` is for the quote
+  configurator: the page brings its own `<main>`, with no floating contact or
+  Tally popup.
+- `src/designs/studio/site/routes.ts`: the quote URL, and the lab prefix with
+  `toLab`, which keeps the header candidates' links inside the lab.
 - `src/designs/studio/site/ServicePage.astro` + `sections/`: the service page
   template and the sections it shares with later pages.
 - `src/designs/studio/theme.css`: Studio's tokens, layout helpers, headings and
@@ -134,13 +141,9 @@ as the live page, so the copy cannot drift.
   excluding contact pages as on the current site. Design Lab pages do not load
   the live popup or send test submissions to Tally.
 
-Rollout order: service pages (done in English), Wrap/Reinforce/Protect, About,
-Contact and Reviews, Portfolio and Blog, the legal pages, then the homepage.
-Each group gets its Arabic RTL version once the English look is approved.
+## Left over from the review period
 
-## Next: going live
-
-Roll Studio out to every page (services, blog, portfolio, reviews, contact, and
-the Arabic site) and make it the homepage, then delete `src/designs/`,
-`src/pages/design-lab/` and the design Previews. Choose between the two quote
-flows before then, or keep both.
+The previous design's layouts and components (`src/layouts/BaseLayout.astro`,
+`src/components/Navigation.astro`, …) are no longer used by any page and can be
+deleted, along with the header candidates, `toLab`, `DesignShell` and the
+design Previews, once nobody needs to compare against them.

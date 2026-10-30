@@ -1,17 +1,19 @@
 /**
- * Where Studio's inner pages live while they are being reviewed.
+ * Studio is the live design: every page renders at its live path, and links
+ * are the live paths they already are.
  *
- * Each Studio page renders at its live path under `labPrefix` (for example
- * /design-lab/studio/services/polish/ for /services/polish/). Pages listed in
- * `previewed` already have a Studio version, so links to them from a Studio
- * preview stay inside the preview; every other link goes to the live page.
- * When the redesign goes live this file is deleted and the links are the live
- * paths they already are.
+ * `labPrefix` is what is left of the review period. The old previews under it
+ * (/design-lab/studio/services/polish/ and so on) redirect to the live page
+ * (src/pages/design-lab/studio/[...page].ts); only the header candidates and
+ * the car viewer still render there, and their links go through `toLab`.
  */
 export const labPrefix = '/design-lab/studio';
 
-/** The quote flow. Temporary until the redesign gives it a permanent URL. */
-export const studioQuoteHref = `${labPrefix}/quote/`;
+/** The quote configurator, where every "Get a quick quote" button goes. */
+export const studioQuoteHref = '/quote/';
+
+/** Whether a page is a Design Lab page, which keeps its links in the lab. */
+export const isLabPath = (pathname: string) => pathname.startsWith(`${labPrefix}/`) || pathname.startsWith(`/ar${labPrefix}/`);
 
 /** Live paths that have a Studio version under labPrefix (the Arabic /ar/ twin included unless noted). */
 const previewed: RegExp[] = [/^\/$/, /^\/services\/[a-z-]+\/$/, /^\/(wrap|reinforce|protect)\/$/, /^\/more-about-wrp\/$/, /^\/contact-us\/$/, /^\/reviews\/$/, /^\/portfolio\/$/, /^\/blog\/([a-z0-9-]+\/)?$/, /^\/(privacy|terms|credits)\/$/];
