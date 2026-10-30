@@ -14,7 +14,7 @@ into the studio without leaving a linked enquiry or booking record.
 | generate_lead | Saved Studio hero action response | contact_form | hero |
 | generate_lead | Successful existing homepage contact API response | contact_form | homepage |
 | generate_lead | Successful existing or Studio contact-page API response | contact_form | contact_page |
-| generate_lead | Successful live configurator API response | contact_form | configurator |
+| generate_lead | Saved Studio configurator action response | contact_form | configurator |
 | generate_lead | WRP Tally form submission from tally.so | tally_popup | tally_popup |
 
 Only event, method and the allowlisted form_id are pushed. Native `wrp:lead`
@@ -25,13 +25,13 @@ send names, phone numbers, email, messages, Tally answers or prefilled WhatsApp
 text to GA4. Contact clicks set form_id to null, clearing GTM's retained value
 from any preceding lead. These changes preserve existing event names and methods.
 
-The one-page configurator still has `data-demo-form`. Its prepared live path
-attaches operational attribution and requires an HTTP success plus an explicit
-`success: true` JSON response before generating a lead event. Demo submissions,
-malformed responses, rejected requests, honeypot/dry-run hero responses, and
-WhatsApp handoffs never generate that event. Studio's homepage demo form remains
-unconnected and emits no lead event. The `homepage` value currently identifies
-the existing English and Arabic homepage forms.
+The one-page configurator and the Studio homepage form send to the same
+`quote` Astro Action as the hero form, and generate a lead event only when the
+action answers `saved: true`. Worker Previews and Design Lab pages answer
+`saved: false` (the form shows its preview note), so they never count. Rejected
+requests, missing results, honeypot responses and WhatsApp handoffs never
+generate the event either. The `homepage` value identifies both the existing
+homepage forms and the Studio homepage form.
 
 A popup appearing or opening the contact options is not a lead. Tally's browser
 event confirms a Tally submission, not successful delivery of its webhook/email.

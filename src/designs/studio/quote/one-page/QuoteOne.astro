@@ -41,7 +41,7 @@ const panelGroups = [
 >
   <Header />
   <main id="main" class="qo" tabindex="-1" data-qo>
-    <form id="qo-form" class="qo-form" method="post" action="/api/contact" data-demo-form novalidate aria-label="Quote request">
+    <form id="qo-form" class="qo-form" method="post" novalidate aria-label="Quote request">
       <div class="st-wrap qo-head">
         <p class="qo-eyebrow">Get a quote</p>
         <h1 class="qo-h1">Build your quote</h1>
@@ -431,6 +431,10 @@ const panelGroups = [
             <span>WRP may contact me about this quote by WhatsApp, phone or email. <a href="/privacy/" target="_blank" rel="noopener">Privacy policy</a></span>
           </label>
           <p class="qo-err" id="qo-consent-err">Please tick this so we can reply to you.</p>
+          <div class="qo-honeypot" aria-hidden="true">
+            <label for="qo-company-website">Company website</label>
+            <input id="qo-company-website" name="company_website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
         </section>
 
         <section class="qo-sec qo-send" id="qo-send" aria-labelledby="qo-send-h">
@@ -439,20 +443,15 @@ const panelGroups = [
           <div class="qo-problems" data-qo-problems role="alert" hidden></div>
           <div class="qo-actions" data-qo-actions>
             <a class="st-btn st-btn--primary" data-qo-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener"><QIcon name="whatsapp" size={20} />Send on WhatsApp</a>
-            <button type="submit" class="st-btn st-btn--light">Send request</button>
+            <button type="submit" class="st-btn st-btn--light" disabled>Send request</button>
           </div>
           <p class="qo-help">This is a request, not a booking: nothing is charged. We reply with a price for your car and confirm the time.</p>
-          <p class="qo-status" data-demo-status role="status" hidden></p>
+          <p class="qo-status" data-qo-status role="status" hidden></p>
           <div class="qo-done" data-qo-done hidden>
             <p class="qo-done__title" data-qo-done-title>Request sent</p>
             <p data-qo-done-text></p>
             <button type="button" class="qo-textbtn" data-qo-restart>Start a new quote</button>
           </div>
-          <input type="hidden" name="vehicle" />
-          <input type="hidden" name="service" />
-          <input type="hidden" name="service_interest" />
-          <input type="hidden" name="message" />
-          <input type="hidden" name="locale" value="en" />
         </section>
       </div>
     </form>
