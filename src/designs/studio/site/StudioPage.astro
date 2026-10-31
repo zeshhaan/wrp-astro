@@ -214,7 +214,7 @@ const altHref = lab(alternatePath);
     <Font cssVariable="--font-montserrat" />
     {isArabic && <Font cssVariable="--font-ibm-plex-arabic" />}
     {
-      /* Preload core files only. Arabic pages draw Latin text with the Arabic face's
+      /* Preload the Latin or Arabic files only. Arabic pages draw Latin text with the Arabic face's
          fallback (see --st-body-font in theme.css), never with Oswald or Inter. */
       isArabic ? (
         <FontPreload cssVariable="--font-ibm-plex-arabic" />

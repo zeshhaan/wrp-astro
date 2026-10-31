@@ -1,9 +1,9 @@
 ---
 /**
- * Preload links for a self-hosted font family's core files only.
+ * Preload links for a self-hosted font family's main (Latin or Arabic) files only.
  *
- * `<Font preload>` would also preload every extended file, which a page should only
- * download when it shows one of that file's characters. Astro's `fontData` lists a
+ * `<Font preload>` would also preload the Cyrillic and Greek files, which a page should
+ * only download when it shows one of their characters. Astro's `fontData` lists a
  * family's faces in the order astro.config.mjs registered them, which is the order
  * subsetFaces() returns, so the two line up face by face.
  */
@@ -20,7 +20,7 @@ const data = fontData[cssVariable];
 if (!data || data.length !== faces.length) {
   throw new Error(`FontPreload: ${cssVariable} has ${data?.length} faces in fontData, expected ${faces.length}`);
 }
-const hrefs = [...new Set(faces.flatMap((face, i) => (face.kind === 'core' ? [data[i].src[0].url] : [])))];
+const hrefs = [...new Set(faces.flatMap((face, i) => (face.main ? [data[i].src[0].url] : [])))];
 ---
 
 {hrefs.map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}

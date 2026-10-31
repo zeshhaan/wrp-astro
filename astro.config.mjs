@@ -11,11 +11,11 @@ import robotsTxt from 'astro-robots-txt';
 import { subsetFaces } from './src/assets/fonts/subsets.mjs';
 
 /**
- * Faces for Astro's local provider (it takes no `kind`; FontPreload.astro reads it).
+ * Faces for Astro's local provider (it takes no `main`; FontPreload.astro reads it).
  * @param {Parameters<typeof subsetFaces>[0]} cssVariable
  * @returns {any} the provider's `variants`, never empty
  */
-const localFaces = (cssVariable) => subsetFaces(cssVariable).map(({ kind, ...face }) => face);
+const localFaces = (cssVariable) => subsetFaces(cssVariable).map(({ main, ...face }) => face);
 
 /**
  * Wrap every markdown <table> in a horizontally-scrollable container so wide
@@ -122,7 +122,8 @@ export default defineConfig({
     // Inter, Oswald, Montserrat and the Arabic sans are self-hosted subsets of the same
     // upstream fonts Google Fonts served, cut down to what the site uses by
     // scripts/fonts/subset-fonts.py (rerun it by hand when content needs new characters).
-    // Each weight has a core face (preloaded) and an extended face behind unicode-range.
+    // One file per script: Latin or Arabic (preloaded), plus Cyrillic and Greek behind
+    // unicode-range, downloaded only by pages that show them.
     {
       name: 'Inter',
       cssVariable: '--font-inter',

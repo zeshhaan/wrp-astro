@@ -17,17 +17,24 @@ Rerun it when:
     (the @font-face weights themselves live in src/assets/fonts/subsets.mjs);
   - you move to a newer upstream font (bump GOOGLE_FONTS_COMMIT and the hashes).
 
-Each font becomes two files. The *core* file holds ASCII plus the punctuation most pages
-use and is preloaded. The *extended* file holds everything else we keep (Latin-1,
-Latin Extended-A and any other character the site uses) behind `unicode-range`, so a
-browser only downloads it on a page that contains one of its characters. Both files
-are faces of the same CSS family, so the generated fallback face sits after both of them
-in the font stack and never draws a character the extended file has.
+Each font becomes one file per writing system, never more: a word is always drawn from
+one file. Text split across two files of a script loses kerning at the seam, can't
+compose marks typed separately from their letter, shapes Persian and Urdu letters
+differently from the Arabic around them, and shows a system font in the middle of a
+word while the second file loads. So the cut is by script:
+  - the Latin file (Inter, Oswald, Montserrat) or the Arabic file (the Arabic sans) is
+    preloaded and holds the whole script as we serve it: Latin-1 and Latin Extended-A,
+    or the Arabic block (Persian and Urdu letters and Quranic marks included);
+  - Cyrillic and Greek, where the font has them, get files of their own behind
+    `unicode-range`, which a browser downloads only for a page that shows them.
+All of a font's files are faces of one CSS family, so the generated fallback face sits
+after them in the font stack.
 
 What is kept is chosen to render exactly like the Google Fonts files the site used to
 load, which were cut from the same upstream versions pinned here:
   - a font only claims characters it drew before (Google's subset) plus the rest of
-    Latin-1 and Latin Extended-A, which no page uses yet;
+    Latin-1 and Latin Extended-A, Cyrillic and Greek (all unused today, kept so names
+    in those languages are drawn in the site's fonts);
   - only OpenType features that were in Google's file AND are on by default in browsers
     or turned on by the site's CSS;
   - axis ranges start at the lowest weight the site's @font-face rules use; Inter's
@@ -90,16 +97,20 @@ GOOGLE_ARABIC = ranges((0x0600, 0x06FF), (0x0750, 0x077F), (0x0870, 0x088E), (0x
                        (0x10EC2, 0x10EC4), (0x10EFC, 0x10EFF), (0x1EE00, 0x1EEF1))
 LATIN_1 = ranges((0x00A0, 0x00FF))
 LATIN_EXT_A = ranges((0x0100, 0x017F))
-ARABIC_BLOCK = ranges((0x0600, 0x06FF))
-
 ASCII = ranges((0x0020, 0x007E))
+LATIN = ASCII | LATIN_1 | LATIN_EXT_A
+# The Arabic block: Arabic, Persian and Urdu letters, harakat and Quranic marks, digits.
+ARABIC = ranges((0x0600, 0x06FF))
 # Curly quotes, dashes and the ellipsis: the punctuation most pages use.
 PUNCTUATION = ranges(0x2018, 0x2019, 0x201C, 0x201D, 0x2013, 0x2014, 0x2026)
-# Arabic letters, harakat, tatweel, Arabic-Indic digits and separators, Arabic comma,
-# semicolon and question mark, plus the joiners. Every Arabic page uses nearly all of
-# these, and marks or lam-alef pairs split across two files would not combine.
-ARABIC_CORE = ranges(0x060C, 0x061B, 0x061F, (0x0621, 0x063A), (0x0640, 0x0652), (0x0660, 0x066C),
-                     (0x200C, 0x200F))
+# Google's "cyrillic" and "cyrillic-ext" subsets (U+0301 is the stress mark) and the
+# Greek and Greek Extended blocks.
+CYRILLIC = ranges(0x0301, (0x0400, 0x052F), (0x1C80, 0x1C8A), 0x20B4, 0x2116, (0x2DE0, 0x2DFF), (0xA640, 0xA69F),
+                  (0xFE2E, 0xFE2F))
+GREEK = ranges((0x0370, 0x0377), (0x037A, 0x037F), (0x0384, 0x038A), 0x038C, (0x038E, 0x03A1), (0x03A3, 0x03FF),
+               (0x1F00, 0x1FFF))
+# A script file is only cut if the font has the script's basic alphabet.
+ALPHABET = {'cyrillic': ranges((0x0410, 0x044F)), 'greek': ranges((0x0391, 0x03A1), (0x03A3, 0x03A9), (0x03B1, 0x03C9))}
 
 # Features browsers turn on by default for these scripts (plus the ones the site's CSS
 # turns on: `font-variant-numeric: tabular-nums` -> tnum), intersected with what each
@@ -123,7 +134,7 @@ FEATURES = {
 # Astro sizes each family's generated fallback face (size-adjust etc.) from the first font
 # file, by measuring the widths of Latin letters and the space. Google's Arabic file had
 # a space glyph outside its unicode-range, and the space weighs 15% of that measure, so
-# the Arabic core files carry it too (not listed in unicode-range, as before). Without it
+# the Arabic file carries it too (not listed in unicode-range, as before). Without it
 # the fallback face that draws Latin text on Arabic pages would change size.
 ARABIC_METRICS_ONLY = ranges(0x0020)
 
@@ -131,25 +142,25 @@ ARABIC_METRICS_ONLY = ranges(0x0020)
 # a name without it (OFL 1.1, condition 3).
 ARABIC_NAME = 'WRP Sans Arabic'
 
+# One file per script: (script, claim: what the file may draw, keep: kept even if unused).
+# The first is the preloaded file; the others load only where a page uses them. Any
+# other character the site uses is added to the file whose claim has it.
+LATIN_FILES = [('latin', GOOGLE_LATIN | LATIN, LATIN | PUNCTUATION), ('cyrillic', CYRILLIC, CYRILLIC),
+               ('greek', GREEK, GREEK)]
+
 FONTS = [
-    # axes: instancer limits. claim: what the font may draw (else it falls back, as before).
-    # keep: kept even if unused. core / core_extra: what goes in the preloaded file.
+    # axes: instancer limits. files: see LATIN_FILES.
     # The site uses Inter at 400-700, but the range stops at 900: cutting the top would
     # re-quantise every 700 delta (up to 0.9/2048 em of drift at 500-700) for ~1.3 KB.
     # Starting at 400, the default, drops the thin master exactly.
     dict(id='inter', source='Inter[opsz,wght].ttf', axes={'opsz': 14, 'wght': (400, 900)},
-         # © and · sit in every page's footer. ° is on two blog pages only, but in the
-         # extended file "45°C" lost its kerning and shifted the rest of the line. á is
-         # "Lamborghini Huracán" in the quote form's car list, drawn once picked.
-         core_extra=ranges(0x00A9, 0x00B7, 0x00B0, 0x00E1),
-         claim=GOOGLE_LATIN | LATIN_1 | LATIN_EXT_A, keep=LATIN_1 | LATIN_EXT_A, features='inter'),
-    dict(id='oswald', source='Oswald[wght].ttf', axes={'wght': (400, 700)},
-         core_extra=set(), claim=GOOGLE_LATIN | LATIN_1 | LATIN_EXT_A, keep=LATIN_1 | LATIN_EXT_A, features='oswald'),
+         files=LATIN_FILES, features='inter'),
+    dict(id='oswald', source='Oswald[wght].ttf', axes={'wght': (400, 700)}, files=LATIN_FILES, features='oswald'),
     dict(id='montserrat-900-italic', source='Montserrat-Italic[wght].ttf', axes={'wght': 900},
-         core_extra=set(), claim=GOOGLE_LATIN | LATIN_1 | LATIN_EXT_A, keep=LATIN_1 | LATIN_EXT_A, features='montserrat'),
+         files=LATIN_FILES, features='montserrat'),
 ] + [
     dict(id=f'wrp-sans-arabic-{w}', source=f'IBMPlexSansArabic-{n}.ttf', axes={},
-         core=ARABIC_CORE, metrics_only=ARABIC_METRICS_ONLY, claim=GOOGLE_ARABIC, keep=ARABIC_BLOCK, features='arabic',
+         files=[('arabic', GOOGLE_ARABIC, ARABIC)], metrics_only=ARABIC_METRICS_ONLY, features='arabic',
          rename=(ARABIC_NAME, style))
     for w, n, style in ((400, 'Regular', 'Regular'), (500, 'Medium', 'Medium'), (600, 'SemiBold', 'SemiBold'),
                         (700, 'Bold', 'Bold'))
@@ -338,24 +349,26 @@ def runs_in(texts, cps):
     return sorted(out)
 
 
-def print_boundary_warnings(manifest, pages):
-    """Kerning and contextual forms don't work between two font files, so text next to an
-    extended-file character can shift. List the extended characters pages use, so they can
-    be moved to the core if the shift shows."""
+def from_unicode_range(rs):
+    out = set()
+    for r in rs:
+        a, _, b = r[2:].partition('-')
+        out.update(range(int(a, 16), int(b or a, 16) + 1))
+    return out
+
+
+def print_on_demand_pages(manifest, pages):
+    """List pages whose text makes a browser download a file that isn't preloaded (a
+    Cyrillic or Greek file), so their weight is no surprise."""
     lines = []
-    for fid, parts in manifest.items():
-        ext = set()
-        for r in parts.get('ext', {}).get('unicodeRange', []):
-            a, _, b = r[2:].partition('-')
-            ext.update(range(int(a, 16), int(b or a, 16) + 1))
-        for c in sorted(ext):
-            on = [p for p, chars in pages.items() if c in chars]
+    for fid, files in manifest.items():
+        for f in files[1:]:
+            cps = from_unicode_range(f['unicodeRange'])
+            on = [p for p, chars in pages.items() if chars & cps]
             if on:
-                lines.append(f'  {fid}: U+{c:04X} {chr(c)} on {len(on)} page(s), e.g. {on[0]}')
+                lines.append(f'  {f["file"]}: {len(on)} page(s), e.g. {on[0]}')
     if lines:
-        print('\nExtended-file characters in page text (pages that use one download the extended file,'
-              '\nand kerning between it and its neighbours is lost; pixel-diff those pages, and move a'
-              '\ncharacter into the core if text shifts). Only fonts that actually draw it matter:')
+        print('\nPages that download a file on demand (only if the font draws that text there):')
         print('\n'.join(lines))
 
 
@@ -374,11 +387,10 @@ def main():
         for spec in FONTS:
             cmap = set(instance(spec).getBestCmap())
             have = set()
-            for part in committed.get(spec['id'], {}).values():
-                for r in part['unicodeRange']:
-                    a, _, b = r[2:].partition('-')
-                    have.update(range(int(a, 16), int(b or a, 16) + 1))
-            need = sorted(used & spec['claim'] & cmap - have)
+            for f in committed.get(spec['id'], []):
+                have |= from_unicode_range(f['unicodeRange'])
+            claim = set().union(*(c for _, c, _ in spec['files']))
+            need = sorted(used & claim & cmap - have)
             if need:
                 lacking[spec['id']] = need
         for k, v in lacking.items():
@@ -386,24 +398,22 @@ def main():
         print('rerun without --check to add them' if lacking else 'subsets cover every character the site uses')
         return 1 if lacking else 0
 
-    manifest, report = {}, []
+    manifest, report, written = {}, [], set()
     for spec in FONTS:
         full = instance(spec)
         cmap = set(full.getBestCmap())
-        claim = spec['claim'] & cmap
-        core_set = spec.get('core') or (ASCII | PUNCTUATION | spec['core_extra'])
-        keep = (spec['keep'] | core_set | used) & claim
-        core = core_set & keep
-        ext = keep - core
-        manifest[spec['id']] = {}
-        for kind, cps in (('core', core), ('ext', ext)):
-            if not cps:
+        manifest[spec['id']] = []
+        taken = set()
+        for i, (script, claim, keep) in enumerate(spec['files']):
+            cps = (keep | used) & claim & cmap
+            if script in ALPHABET and not ALPHABET[script] <= cmap:
                 continue
-            extra = spec.get('metrics_only', set()) if kind == 'core' else set()
+            assert not cps & taken, f'{spec["id"]} {script}: overlaps another file at {sorted(cps & taken)[:10]}'
+            taken |= cps
+            extra = spec.get('metrics_only', set()) if i == 0 else set()
             font = cut(full, cps, FEATURES[spec['features']] & (DEFAULT_ON | {'tnum'}), spec.get('rename'), extra)
             got = set(font.getBestCmap())
-            assert got == cps | extra, f'{spec["id"]} {kind}: cmap differs from the plan by {sorted(got ^ cps)[:10]}'
-            got = cps
+            assert got == cps | extra, f'{spec["id"]} {script}: cmap differs from the plan by {sorted(got ^ cps)[:10]}'
             assert not any(t in font for t in ('fpgm', 'prep', 'cvt ', 'cvar', 'hdmx', 'VDMX')), 'hinting left'
             assert 'gasp' in font, 'gasp table dropped'
             if 'fvar' in font:
@@ -415,13 +425,17 @@ def main():
                     assert getattr(font[t], attr) == getattr(full[t], attr), f'{spec["id"]}: {t}.{attr} changed'
             bad, n = shape_check(full, font, runs_in(texts, cps) + [''.join(chr(c) for c in sorted(cps))])
             if bad:
-                sys.exit(f'{spec["id"]} {kind}: subset shapes differently from the full font:\n  ' + '\n  '.join(bad[:10]))
-            file = f'{spec["id"]}-{kind}.woff2'
+                sys.exit(f'{spec["id"]} {script}: subset shapes differently from the full font:\n  ' + '\n  '.join(bad[:10]))
+            file = f'{spec["id"]}-{script}.woff2'
             OUT.mkdir(parents=True, exist_ok=True)
             font.save(OUT / file)
-            manifest[spec['id']][kind] = {'file': file, 'unicodeRange': to_unicode_range(got)}
-            report.append(f'  {file:34} {len(got):4} chars {font["maxp"].numGlyphs:4} glyphs '
+            written.add(file)
+            manifest[spec['id']].append({'script': script, 'file': file, 'unicodeRange': to_unicode_range(cps)})
+            report.append(f'  {file:38} {len(cps):4} chars {font["maxp"].numGlyphs:4} glyphs '
                           f'{(OUT / file).stat().st_size:6} B  shaping checked ({n} glyph outlines)')
+    for stale in OUT.glob('*.woff2'):
+        if stale.name not in written:
+            stale.unlink()
     (OUT / 'manifest.json').write_text(json.dumps({
         '//': 'Generated by scripts/fonts/subset-fonts.py from dist/client. Do not edit; rerun the script.',
         'source': f'github.com/google/fonts@{GOOGLE_FONTS_COMMIT}',
@@ -429,7 +443,7 @@ def main():
     }, indent=2, ensure_ascii=False) + '\n')
     print('\n'.join(report))
     print(f'wrote {OUT.relative_to(ROOT)}/')
-    print_boundary_warnings(manifest, pages)
+    print_on_demand_pages(manifest, pages)
     return 0
 
 
