@@ -143,7 +143,9 @@ public/                         # Static assets (images, favicon)
   - `--font-inter`: Inter (body sans-serif)
   - `--font-montserrat`: Montserrat 900 italic (logo)
   - `--font-noto-naskh`: Noto Naskh Arabic (Arabic serif)
-  - `--font-ibm-plex-arabic`: IBM Plex Sans Arabic (Arabic sans)
+  - `--font-ibm-plex-arabic`: IBM Plex Sans Arabic (Arabic sans), served renamed as "WRP Sans Arabic"
+  - `--font-oswald`: Oswald (Studio headings)
+- **Self-hosted font subsets**: Inter, Oswald, Montserrat and the Arabic sans are served from `src/assets/fonts/` (Astro local provider), cut by `scripts/fonts/subset-fonts.py`, which is run by hand and never by the build. Each font is cut into one file per script, never more: a preloaded Latin (or Arabic) file holding the whole script as served, plus Cyrillic and Greek files behind `unicode-range`. Never split one script across files: words then mix fonts (lost kerning, unjoined Persian/Urdu letters, marks in a system font). Run `.venv-fonts/bin/python scripts/fonts/subset-fonts.py --check` after a build when content adds new characters (symbols, letters beyond Latin-1/Latin Extended-A or the Arabic block); rerun without `--check` if it lists any, and commit the output. Preload with `FontPreload.astro`, not `<Font preload>` (which would preload the Cyrillic and Greek files too).
 - **Responsive Design**: Mobile-first approach
 - **Path Alias**: `@/*` maps to `./src/*` (configured in tsconfig.json)
 
