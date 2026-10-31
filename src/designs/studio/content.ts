@@ -45,7 +45,7 @@ const fromService = (slug: string, over: Partial<Card> = {}): Card => {
 };
 
 /**
- * Service cards, in the owner's order of emphasis. "Detailing" is the Level 3
+ * Service cards, in the content brief's order (Linear WRP-139), with its copy word for word. "Detailing" is the Level 3
  * detail from premium-car-wash.mdx (AED 300 sedan / 325 SUV), shown as its own
  * card because customers ask for it by name; it links to the wash page where the
  * levels are listed.
@@ -53,12 +53,22 @@ const fromService = (slug: string, over: Partial<Card> = {}): Card => {
 export const serviceCards: Card[] = [
   fromService('paint-protection-film', {
     name: 'Paint Protection Film (PPF)',
-    line: 'Clear, self-healing film that protects your paint from stone chips, sand and the GCC heat.',
+    line: 'Clear, self-healing TPU film engineered to protect against high-impact stone chips, sand abrasion, and severe GCC heat.',
+  }),
+  fromService('polish', {
+    name: 'Paint Correction & Polish',
+    line: 'Multi-stage machine polishing to remove swirl marks, heavy scratches, and oxidation, measured with paint depth gauges.',
+    linkLabel: 'Learn more about paint correction and polish',
+  }),
+  fromService('ceramic-coating', {
+    line: 'Hydrophobic nano-ceramic glass layer providing ultra-high gloss, chemical resistance, and effortless maintenance washing.',
+    width: 1179,
+    height: 2091,
   }),
   {
     key: 'detailing',
     name: 'Detailing',
-    line: 'Level 3 detailing inside and out: iron decontamination, carpet steam extraction, an engine bay clean and a 6-month ceramic sealant.',
+    line: 'Level 3 interior and exterior detailing: iron decontamination, carpet steam extraction, engine bay deep clean, and 6-month sealant.',
     price: `From ${aed(300)}`,
     from: 300,
     href: '/services/premium-car-wash/',
@@ -68,37 +78,31 @@ export const serviceCards: Card[] = [
     width: 1200,
     height: 1269,
   },
-  fromService('polish', {
-    line: 'Multi-stage machine polishing that removes swirl marks, scratches and oxidation, checked with a paint-depth gauge.',
-  }),
-  fromService('ceramic-coating', {
-    line: 'Hydrophobic ceramic glass layer for high gloss, chemical resistance and easier washes.',
-    width: 1179,
-    height: 2091,
-  }),
   fromService('leather-upholstery', {
-    line: 'Custom seat covers, hand-stitched leather upholstery and fitted floor mats, crafted in our mezzanine design lab.',
+    line: 'Custom seat covers, hand-stitched leather upholstery, and custom-fitted floor mats crafted in our mezzanine design lab.',
     width: 1199,
     height: 800,
   }),
   // "Window Tinting" on the card for the homepage keyword; the service itself stays "Window Film".
   fromService('window-film', {
     name: 'Window Tinting',
+    // The brief's line claims "up to 99% of UV rays and solar heat"; held back until the film's
+    // total solar heat figure is confirmed (the service page says up to 80%).
     line: 'Nano-ceramic window tint that helps reduce solar heat, UV exposure and glare.',
     linkLabel: 'Learn more about window tinting',
     width: 1024,
     height: 1024,
   }),
   fromService('premium-car-wash', {
-    line: 'Safe hand wash with pH-neutral shampoo, microfiber mitts and a filtered deionized rinse, sealed with ceramic spray.',
+    line: 'Safe-touch wash with pH-neutral shampoos, scratch-free microfiber, and filtered deionized rinse water sealed with ceramic spray.',
     image: '/portfolio/team-washing-subaru-sti-foam',
     alt: 'WRP team hand washing a blue Subaru WRX STI covered in foam',
     height: 1471,
   }),
   {
     key: 'wrap',
-    name: 'Wrap & styling',
-    line: 'Partial vinyl wraps, bonnet accents, satin-black trim and chrome delete, fitted with clean, tucked edges.',
+    name: 'Custom Wrap & Styling',
+    line: 'Partial vinyl wraps, bonnet accents, satin black trim conversions, and chrome delete packages installed with zero-edge precision.',
     price: 'Priced after inspection',
     from: null,
     href: '/contact-us/',
@@ -111,7 +115,7 @@ export const serviceCards: Card[] = [
   // No service page yet, so the card goes to the contact form. Placeholder studio photo until there is one of tint work.
   {
     key: 'architectural-tint',
-    name: 'Home & architectural glass tint',
+    name: 'Home Window Tint or Architectural Glass Tint',
     line: 'Heat and UV protection using premium architectural film for cooler interiors and privacy.',
     price: 'Priced after inspection',
     from: null,
@@ -248,11 +252,12 @@ export const stats = [
   { value: '6 days', label: 'Open Sat–Thu' },
 ];
 
+// Word for word from the content brief (Linear WRP-139), in sentence case.
 export const aboutChecklist = [
-  'Official STEK self-healing paint protection film, plus Avery Dennison',
+  'Official STEK paint protection film (self-healing technology)',
   'Up to 10-year manufacturer & installation warranty',
-  'Multi-layer 9H ceramic coatings with 2 to 7-year warranties',
-  'Safe-touch hand wash with filtered deionized water',
+  'Multi-layer 9H ceramic coatings with 2 to 7-year defense',
+  'Safe-touch hand washes using filtered deionized water',
 ];
 
 /** Blog posts to feature (ids in src/content/blog); only ones that exist are shown. */
