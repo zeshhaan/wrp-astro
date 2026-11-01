@@ -1,0 +1,41 @@
+---
+/**
+ * A portfolio design candidate (Design Lab only): the same page shell, copy,
+ * breadcrumbs and closing call to action as the live Studio portfolio
+ * (../PortfolioPage.astro), with the hero and the work shown one of three new
+ * ways. The live page is unchanged until one is picked.
+ */
+import StudioPage from '../StudioPage.astro';
+import EndCta from '../sections/EndCta.astro';
+import Showroom from './Showroom.astro';
+import Logbook from './Logbook.astro';
+import Inspection from './Inspection.astro';
+import Lightbox from './Lightbox.astro';
+import LabBar from './LabBar.astro';
+import { loadPortfolio } from './data';
+import { portfolio } from '../content/portfolio';
+import { localizeUrl } from '@/i18n/utils';
+import type { Locale } from '@/i18n/translations';
+import { isLabPath, studioQuoteHref, toLab } from '../routes';
+import { say } from '../say';
+import type { PortfolioConceptId } from './concepts';
+
+interface Props {
+  concept: PortfolioConceptId;
+  locale?: Locale;
+}
+
+const { concept, locale = 'en' } = Astro.props;
+const copy = portfolio[locale];
+const isLab = isLabPath(Astro.url.pathname);
+const link = (href: string) => (isLab ? toLab(href) : href);
+const data = await loadPortfolio(locale);
+const Body = { a: Showroom, b: Logbook, c: Inspection }[concept];
+---
+
+<StudioPage title={copy.title} description={copy.description} locale={locale} livePath={localizeUrl('/portfolio/', locale)}>
+  <Body copy={copy} locale={locale} data={data} link={link} />
+  <Lightbox slides={data.slides} label={copy.h1} />
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(locale, copy.cta.button)} href={studioQuoteHref} />
+  {isLab && <LabBar concept={concept} locale={locale} />}
+</StudioPage>
