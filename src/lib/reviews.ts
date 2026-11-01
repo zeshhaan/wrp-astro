@@ -18,6 +18,12 @@ export interface Review {
   serviceTags: string[];
   highlightQuote: string;
   featured: boolean;
+  /**
+   * Show this review's photos on the portfolio page too, under its first
+   * service tag: `true` for all of them, or the photo numbers to show
+   * ([1, 3] = the 1st and 3rd photo). Leave it out for none.
+   */
+  portfolio?: boolean | number[];
 }
 
 export interface ReviewBusiness {

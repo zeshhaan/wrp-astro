@@ -13,6 +13,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 6
 heroImage: /premium-tint-hero.jpg
+portfolio: true
 relatedServices:
   - window-film
 ---

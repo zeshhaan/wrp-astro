@@ -1,12 +1,13 @@
 ---
 /**
- * The portfolio lightbox, shared by every portfolio design: every project's
- * photos in one sequence, opened at the photo a `[data-pf-open="<index>"]`
- * button names, with the project's title and subtitle as the caption. Arrow
- * keys (mirrored on Arabic pages), swipes and the thumbnail strip move it.
+ * The portfolio lightbox: every photo on the page in one sequence, opened at
+ * the photo a `[data-pf-open="<index>"]` button names, with its title and
+ * subtitle as the caption. Arrow keys (mirrored on Arabic pages), swipes and
+ * the thumbnail strip move it.
  */
 import Icon from '../../Icon.astro';
-import type { Slide } from './data';
+
+export type Slide = { src: string; thumb?: string; title: string; subtitle: string };
 
 interface Props {
   slides: Slide[];
@@ -27,7 +28,7 @@ const { slides, label } = Astro.props;
       slides.map((s, i) => (
         <li>
           <button type="button" class="lb__thumb" data-lb-go={i} aria-label={`${s.title} ${i + 1}`}>
-            <img src={s.src.replace('-1200w.webp', '-480w.webp')} alt="" loading="lazy" width="48" height="64" />
+            <img src={s.thumb ?? s.src} alt="" loading="lazy" width="48" height="64" />
           </button>
         </li>
       ))

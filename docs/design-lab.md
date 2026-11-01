@@ -29,7 +29,6 @@ Every build has a review hub at `/design-lab/`:
 | Quote, one page beside a 3D car (the step-by-step version was removed) | `/quote/` |
 | 3D car viewer (test page) | `/design-lab/studio/car-viewer/` |
 | Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
-| Portfolio page designs | `/design-lab/studio/portfolio-concepts/` (`a/` Showroom, `b/` Logbook, `c/` Inspection light, Arabic at `…/ar/`) |
 
 Design Lab pages are `noindex`, excluded from the sitemap, and their forms
 never send leads. The quote page is `noindex` too (a tool, English only) and
@@ -90,17 +89,6 @@ pages, Portfolio, Reviews, About, Blog, Contact) as plain `<a href>` links in
 the HTML, in English or Arabic (RTL). Shereef picked G, so it is the Studio homepage's
 header (`Home.astro` defaults its `header` prop to `g`), and every page has it,
 the quote page included; the other candidates stay in the lab.
-
-## Portfolio page designs
-
-`src/designs/studio/site/portfolio/` holds three candidate designs for
-`/portfolio/`, listed in `concepts.ts` and rendered by `PortfolioConcept.astro`
-around the same shell, copy (`site/content/portfolio.ts`), breadcrumbs and
-closing call to action as the live `PortfolioPage.astro`: A Showroom
-(`Showroom.astro`), B Logbook (`Logbook.astro`), C Inspection light
-(`Inspection.astro`). They share `data.ts` (the projects in the live order,
-plus each entry's description and services) and `Lightbox.astro`. The live
-page is unchanged until one is picked; the others are deleted then.
 
 ## Studio inner pages
 
