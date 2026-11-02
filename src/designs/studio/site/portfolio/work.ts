@@ -1,5 +1,6 @@
 /**
- * The portfolio page's photos, grouped by the detailing work they show.
+ * The portfolio page's photos: one mixed feed of our detailing work, each
+ * photo tagged with the service it shows.
  *
  * Nothing here is a hand-kept list of portfolio photos. The page gathers the
  * photos the site already uses, wherever a `portfolio` switch says so:
@@ -18,14 +19,20 @@
  * The switches live in the English files; the Arabic page reads the same
  * switches and uses the Arabic titles where an Arabic twin exists.
  * A photo used in more than one place is shown once.
+ *
+ * The feed blends the services evenly (PPF, ceramic, tint, … side by side
+ * rather than in blocks) and puts the portfolio projects, which show the cars
+ * more than the work, after the work photos. Photo sizes come from
+ * data/image-sizes.json (scripts/image-sizes.mjs).
  */
 import { getCollection } from 'astro:content';
 import { getAllReviews } from '@/lib/reviews';
 import { getLocalizedPortfolio } from '@/i18n/content';
 import { localizeUrl } from '@/i18n/utils';
 import { t, type Locale, type TranslationKey } from '@/i18n/translations';
+import imageSizes from '../../../../../data/image-sizes.json';
 
-/** The order the services appear in on the page (car wash last, as in the navigation). */
+/** The services, in navigation order (car wash last); the blend starts with PPF. */
 const ORDER = ['paint-protection-film', 'ceramic-coating', 'window-film', 'polish', 'leather-upholstery', 'premium-car-wash'] as const;
 type ServiceSlug = (typeof ORDER)[number];
 const isService = (s: string | undefined): s is ServiceSlug => !!s && (ORDER as readonly string[]).includes(s);
@@ -53,15 +60,9 @@ export type WorkPhoto = {
   note?: string;
 };
 
-export type WorkGroup = {
-  slug: ServiceSlug;
-  /** The service page's title, e.g. "Paint Protection Film (PPF)". */
-  name: string;
-  short: string;
-  href: string;
-  photos: WorkPhoto[];
-  /** Index of this group's first photo in the one lightbox sequence. */
-  start: number;
+export type FeedPhoto = WorkPhoto & {
+  /** The service it shows: short name (e.g. "PPF") and page link. */
+  service: { slug: ServiceSlug; short: string; href: string };
 };
 
 const stripExt = (src: string) => src.replace(/^\/?/, '/').replace(/\.(webp|jpe?g|png|avif)$/i, '');
@@ -73,19 +74,34 @@ function widthsOf(base: string): number[] {
   return [480, 800, 1200];
 }
 
+const sizes: Record<string, number[]> = imageSizes;
+
 /** A photo of the work, or null if this path was already used. */
-function photo(seen: Set<string>, src: string, rest: Omit<WorkPhoto, 'base' | 'widths' | 'width' | 'height'> & { width?: number; height?: number }): WorkPhoto | null {
+function photo(seen: Set<string>, src: string, rest: Omit<WorkPhoto, 'base' | 'widths' | 'width' | 'height'>): WorkPhoto | null {
   const base = stripExt(src);
   if (seen.has(base)) return null;
   seen.add(base);
-  const portrait = base.startsWith('/review-images/') || base.startsWith('/portfolio/');
-  return { base, widths: widthsOf(base), width: rest.width ?? (portrait ? 900 : 1200), height: rest.height ?? (portrait ? 1200 : 900), ...rest };
+  const [width, height] = sizes[base] ?? [1200, 900]; // run scripts/image-sizes.mjs for new photos
+  return { base, widths: widthsOf(base), width, height, ...rest };
+}
+
+/**
+ * Blend lists evenly: each photo is placed by how far through its own list it
+ * is, so a service with 12 photos and one with 3 both run the whole length.
+ */
+function blend<T>(lists: T[][]): T[] {
+  return lists
+    .flatMap((list, l) => list.map((item, i) => ({ item, at: i / list.length, l })))
+    .sort((a, b) => a.at - b.at || a.l - b.l)
+    .map((x) => x.item);
 }
 
 export async function loadWork(locale: Locale) {
   const ar = locale === 'ar';
   const seen = new Set<string>();
-  const buckets = new Map<ServiceSlug, WorkPhoto[]>(ORDER.map((s) => [s, []]));
+  const work = new Map<ServiceSlug, WorkPhoto[]>(ORDER.map((s) => [s, []]));
+  const cars = new Map<ServiceSlug, WorkPhoto[]>(ORDER.map((s) => [s, []]));
+  let buckets = work;
   const add = (slug: string | undefined, p: WorkPhoto | null) => {
     if (p && isService(slug)) buckets.get(slug)!.push(p);
   };
@@ -139,7 +155,8 @@ export async function loadWork(locale: Locale) {
     }
   }
 
-  // 4. The portfolio projects (showroom and event photos), last in their group.
+  // 4. The portfolio projects (showroom and event photos), after the work.
+  buckets = cars;
   const projects = (await getLocalizedPortfolio(locale)).sort((a, b) => {
     if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
     return b.data.completionDate.getTime() - a.data.completionDate.getTime();
@@ -157,24 +174,12 @@ export async function loadWork(locale: Locale) {
     }
   }
 
-  let start = 0;
-  const groups: WorkGroup[] = [];
-  for (const slug of ORDER) {
-    const photos = buckets.get(slug)!;
-    if (!photos.length) continue;
-    groups.push({
-      slug,
-      name: serviceLocal(slug)?.data.title ?? slug,
-      short: t(locale, shortKey[slug]),
-      href: localizeUrl(`/services/${slug}/`, locale),
-      photos,
-      start,
-    });
-    start += photos.length;
-  }
+  const tag = (slug: ServiceSlug) => ({ slug, short: t(locale, shortKey[slug]), href: localizeUrl(`/services/${slug}/`, locale) });
+  const feed = (m: Map<ServiceSlug, WorkPhoto[]>) => blend(ORDER.map((slug) => m.get(slug)!.map((p): FeedPhoto => ({ ...p, service: tag(slug) }))));
+  const photos = [...feed(work), ...feed(cars)];
 
   const big = (p: WorkPhoto) => `${p.base}-${p.widths[p.widths.length - 1]}w.webp`;
-  const slides = groups.flatMap((g) => g.photos.map((p) => ({ src: big(p), thumb: `${p.base}-480w.webp`, title: p.title, subtitle: [g.short, p.note].filter(Boolean).join(' · ') })));
+  const slides = photos.map((p) => ({ src: big(p), thumb: `${p.base}-480w.webp`, title: p.title, subtitle: [p.service.short, p.note].filter(Boolean).join(' · '), href: p.service.href }));
 
-  return { groups, slides, viewService: t(locale, 'services.viewService') };
+  return { photos, slides, viewService: t(locale, 'services.viewService') };
 }

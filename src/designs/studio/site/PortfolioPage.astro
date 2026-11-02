@@ -1,19 +1,21 @@
 ---
 /**
  * Studio version of the portfolio (/portfolio/), English or Arabic: the live
- * page's copy word for word, then our work grouped by service (PPF, ceramic
- * coating, window film, …), each group linking to its service page. The
- * photos are gathered from the whole site wherever a `portfolio` switch says
- * so (service pages, blog posts, reviews, portfolio projects): see
- * ./portfolio/work.ts. One lightbox holds every photo on the page.
+ * page's copy word for word, then all our work in one masonry wall, each
+ * photo tagged with its service. The photos are gathered from the whole site
+ * wherever a `portfolio` switch says so (service pages, blog posts, reviews,
+ * portfolio projects): see ./portfolio/work.ts. One lightbox holds them all.
+ *
+ * The wall is server-rendered in full (CSS columns without JavaScript). The
+ * inline script lays it out Pinterest-style, left to right into the shortest
+ * column, shows the first photos and adds more as the visitor scrolls.
  */
 import StudioPage from './StudioPage.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
 import EndCta from './sections/EndCta.astro';
 import Lightbox from './portfolio/Lightbox.astro';
 import Picture from '../../shared/Picture.astro';
-import Icon from '../Icon.astro';
-import { localizeUrl, toLocalNum } from '@/i18n/utils';
+import { localizeUrl } from '@/i18n/utils';
 import type { Locale } from '@/i18n/translations';
 import { loadWork } from './portfolio/work';
 import { isLabPath, studioQuoteHref, toLab } from './routes';
@@ -36,8 +38,7 @@ interface Props {
 const { copy, locale = 'en' } = Astro.props;
 const isLab = isLabPath(Astro.url.pathname);
 const link = (href: string) => (isLab ? toLab(href) : href);
-const num = (n: number) => toLocalNum(String(n), locale);
-const { groups, slides, viewService } = await loadWork(locale);
+const { photos, slides, viewService } = await loadWork(locale);
 ---
 
 <StudioPage title={copy.title} description={copy.description} locale={locale} livePath={localizeUrl('/portfolio/', locale)}>
@@ -49,68 +50,102 @@ const { groups, slides, viewService } = await loadWork(locale);
     </div>
   </section>
 
-  <nav class="pf-jump" aria-label={copy.h1}>
+  <div class="pf st-black">
     <div class="st-wrap">
-      <ul class="pf-jump__list" role="list">
+      <div class="pf__wall" role="list" aria-label={copy.h1} data-pf-wall>
         {
-          groups.map((g) => (
-            <li>
-              <a class="pf-jump__chip" href={`#${g.slug}`}>
-                {g.short} <span class="pf-jump__n">{num(g.photos.length)}</span>
-              </a>
-            </li>
+          photos.map((p, i) => (
+            <div class="pf__item" role="listitem" data-pf-item style={`--r: ${(p.height / p.width).toFixed(4)}`}>
+              <div class="pf__card">
+                <Picture
+                  base={p.base}
+                  widths={p.widths}
+                  alt={p.alt}
+                  sizes="(min-width: 110rem) 20vw, (min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw"
+                  width={p.width}
+                  height={p.height}
+                  loading={i < 4 ? 'eager' : 'lazy'}
+                  class="pf__photo"
+                />
+                <span class="pf__tag">{p.service.short}</span>
+                <div class="pf__caption">
+                  <h2 class="pf__title">{p.title}</h2>
+                  {p.note && <p class="pf__sub">{p.note}</p>}
+                </div>
+                <button type="button" class="pf__open" data-pf-open={i} aria-label={`${p.title}, ${p.service.short}`} />
+              </div>
+            </div>
           ))
         }
-      </ul>
+      </div>
+      <div class="pf__end" data-pf-end aria-hidden="true"></div>
     </div>
-  </nav>
-
-  <div class="pf st-black">
-    {
-      groups.map((g, gi) => (
-        <section class="pf__group" id={g.slug} aria-labelledby={`${g.slug}-t`}>
-          <div class="st-wrap">
-            <header class="pf__head">
-              <h2 class="pf__h2" id={`${g.slug}-t`}>
-                {g.name}
-              </h2>
-              <span class="pf__count" aria-hidden="true">
-                <Icon name="camera" size={16} /> {num(g.photos.length)}
-              </span>
-              <a class="pf__more" href={link(g.href)}>
-                {viewService} <Icon name="arrow-right" size={18} class="flip" />
-              </a>
-            </header>
-            <ul class="pf__grid" role="list">
-              {g.photos.map((p, i) => (
-                <li class="pf__item">
-                  <div class="pf__card">
-                    <Picture
-                      base={p.base}
-                      widths={p.widths}
-                      alt={p.alt}
-                      sizes="(min-width: 64rem) 33vw, 50vw"
-                      width={p.width}
-                      height={p.height}
-                      loading={gi === 0 && i < 3 ? 'eager' : 'lazy'}
-                      class="pf__photo"
-                    />
-                    <div class="pf__caption">
-                      <h3 class="pf__title">{p.title}</h3>
-                      {p.note && <p class="pf__sub">{p.note}</p>}
-                    </div>
-                    <button type="button" class="pf__open" data-pf-open={g.start + i} aria-label={p.title} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ))
-    }
   </div>
+  <script is:inline>
+    (() => {
+      // Pinterest-style wall: photos go left to right (right to left in
+      // Arabic) into the shortest column, judged by each photo's shape (--r =
+      // height / width), so nothing moves once placed. The first FIRST photos
+      // show at once; STEP more join each time the end of the wall nears.
+      const FIRST = 16;
+      const STEP = 12;
+      const wall = document.querySelector('[data-pf-wall]');
+      const end = document.querySelector('[data-pf-end]');
+      if (!wall || !end || !('IntersectionObserver' in window)) return;
+      const items = [...wall.querySelectorAll('[data-pf-item]')];
+      const ratio = (el) => parseFloat(el.style.getPropertyValue('--r')) || 1;
+      const cols = () => parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 2;
+      let shown = Math.min(FIRST, items.length);
+      let lanes = [];
+      let heights = [];
+      const place = (from, to, fresh) => {
+        for (let k = from; k < to; k++) {
+          const lane = heights.indexOf(Math.min(...heights));
+          heights[lane] += ratio(items[k]) + 0.04; // + the gap, roughly
+          if (fresh) items[k].classList.add('is-new');
+          lanes[lane].append(items[k]);
+        }
+      };
+      const layout = () => {
+        const n = cols();
+        lanes = Array.from({ length: n }, () => {
+          const lane = document.createElement('div');
+          lane.className = 'pf__lane';
+          lane.setAttribute('role', 'none');
+          return lane;
+        });
+        heights = lanes.map(() => 0);
+        place(0, shown, false);
+        wall.replaceChildren(...lanes);
+        wall.classList.add('is-lanes');
+      };
+      layout();
+      let n = cols();
+      addEventListener('resize', () => {
+        if (cols() !== n) {
+          n = cols();
+          items.forEach((el) => el.classList.remove('is-new'));
+          layout();
+        }
+      });
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          const next = Math.min(shown + STEP, items.length);
+          place(shown, next, true);
+          shown = next;
+          io.unobserve(end);
+          // Observing again reports at once if the end is still near, so a
+          // tall screen keeps filling.
+          if (shown < items.length) requestAnimationFrame(() => io.observe(end));
+        },
+        { rootMargin: '0px 0px 800px 0px' },
+      );
+      if (shown < items.length) io.observe(end);
+    })();
+  </script>
 
-  <Lightbox slides={slides} label={copy.h1} />
+  <Lightbox slides={slides} label={copy.h1} linkLabel={viewService} />
 
   <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(locale, copy.cta.button)} href={studioQuoteHref} />
 </StudioPage>
@@ -143,123 +178,68 @@ const { groups, slides, viewService } = await loadWork(locale);
     font-size: 1.125rem;
   }
 
-  /* Service chips: jump to a group; sticky under the header while scrolling. */
-  .pf-jump {
-    position: sticky;
-    inset-block-start: var(--st-head);
-    z-index: 5;
-    background: rgb(12 13 15 / 0.92);
-    backdrop-filter: blur(8px);
-    border-block-end: 1px solid var(--st-line-dark);
-  }
-  .pf-jump__list {
-    display: flex;
-    gap: 0.5rem;
-    margin: 0;
-    padding-block: 0.75rem;
-    overflow-x: auto;
-    list-style: none;
-    scrollbar-width: none;
-  }
-  .pf-jump__chip {
-    display: inline-flex;
-    gap: 0.5rem;
-    align-items: center;
-    min-block-size: 2.75rem;
-    padding: 0.45rem 1rem;
-    border: 1px solid var(--st-line-dark);
-    border-radius: 999px;
-    background: var(--st-coal);
-    color: var(--st-on-dark);
-    font-family: var(--st-head-font);
-    font-size: 0.95rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .pf-jump__chip:hover {
-    border-color: var(--st-white);
-    color: var(--st-white);
-  }
-  .pf-jump__n {
-    font-size: 0.75rem;
-    opacity: 0.6;
-  }
-
   .pf {
-    padding-block: 1rem 4rem;
+    padding-block: 2rem 4rem;
   }
-  .pf__group {
-    padding-block-start: 3rem;
-    scroll-margin-block-start: calc(var(--st-head) + 4.5rem);
-  }
-  .pf__head {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    align-items: baseline;
-    margin-block-end: 1.25rem;
-    padding-block-end: 1rem;
-    border-block-end: 1px solid var(--st-line-dark);
-  }
-  .pf__h2 {
-    font-family: var(--st-head-font);
-    font-weight: 600;
-    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.5rem);
-    line-height: 1.05;
-    text-transform: uppercase;
-  }
-  .pf__count {
-    display: inline-flex;
-    gap: 0.35rem;
-    align-items: center;
-    color: var(--st-mute);
-    font-size: 0.9375rem;
-  }
-  .pf__more {
-    display: inline-flex;
-    gap: 0.4rem;
-    align-items: center;
-    margin-inline-start: auto;
-    color: var(--st-white);
-    font-family: var(--st-head-font);
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    text-decoration: none;
-  }
-  .pf__more:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
-  }
-  /* Two columns even on phones, so each service is a short scroll. */
-  .pf__grid {
-    columns: 2;
-    column-gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  /* Columns: 2 on phones, then 3, 4 and 5 as the screen widens. Without
+     JavaScript the wall is plain CSS columns; the script turns it into
+     lanes filled left to right. */
+  .pf__wall {
+    --cols: 2;
+    --gap: 0.5rem;
+    columns: var(--cols);
+    column-gap: var(--gap);
   }
   @media (min-width: 40rem) {
-    .pf__grid {
-      column-gap: 1rem;
+    .pf__wall {
+      --gap: 1rem;
     }
   }
-  @media (min-width: 64rem) {
-    .pf__grid {
-      columns: 3;
+  @media (min-width: 48rem) {
+    .pf__wall {
+      --cols: 3;
     }
+  }
+  @media (min-width: 80rem) {
+    .pf__wall {
+      --cols: 4;
+    }
+  }
+  @media (min-width: 110rem) {
+    .pf__wall {
+      --cols: 5;
+    }
+  }
+  .pf__wall.is-lanes {
+    display: flex;
+    gap: var(--gap);
+    align-items: flex-start;
+    columns: auto;
+  }
+  .pf__wall :global(.pf__lane) {
+    display: grid;
+    flex: 1 1 0;
+    gap: var(--gap);
+    min-inline-size: 0;
   }
   .pf__item {
     break-inside: avoid;
-    margin-block-end: 0.5rem;
+    margin-block-end: var(--gap);
   }
-  @media (min-width: 40rem) {
-    .pf__item {
-      margin-block-end: 1rem;
+  .is-lanes .pf__item {
+    margin-block-end: 0;
+  }
+  .pf__item.is-new {
+    animation: pf-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes pf-in {
+    from {
+      opacity: 0;
+      translate: 0 1rem;
     }
+  }
+  .pf__end {
+    block-size: 1px;
   }
   .pf__card {
     --st-accent: var(--st-white); /* dark surface */
@@ -268,6 +248,17 @@ const { groups, slides, viewService } = await loadWork(locale);
     overflow: hidden;
     background: var(--st-coal);
     color: var(--st-white);
+  }
+  .pf__card :global(.pf__photo img) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 1 / var(--r);
+    object-fit: cover;
+    transition: transform 0.6s;
+  }
+  .pf__card:hover :global(.pf__photo img) {
+    transform: scale(1.04);
   }
   /* The whole card opens the lightbox. */
   .pf__open {
@@ -281,13 +272,27 @@ const { groups, slides, viewService } = await loadWork(locale);
   .pf__open:focus-visible {
     outline-offset: -3px;
   }
-  .pf__card :global(.pf__photo img) {
-    inline-size: 100%;
-    block-size: auto;
-    transition: transform 0.6s;
+  /* The service the photo shows, top corner. */
+  .pf__tag {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+    padding: 0.2rem 0.55rem;
+    background: rgb(12 13 15 / 0.72);
+    backdrop-filter: blur(6px);
+    color: var(--st-white);
+    font-family: var(--st-head-font);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-inline-start: 2px solid var(--st-red);
   }
-  .pf__card:hover :global(.pf__photo img) {
-    transform: scale(1.04);
+  @media (min-width: 40rem) {
+    .pf__tag {
+      inset-block-start: 0.75rem;
+      inset-inline-start: 0.75rem;
+      font-size: 0.75rem;
+    }
   }
   .pf__caption {
     position: absolute;
@@ -300,13 +305,13 @@ const { groups, slides, viewService } = await loadWork(locale);
   }
   @media (min-width: 40rem) {
     .pf__caption {
-      padding: 3.5rem 1.25rem 1.1rem;
+      padding: 3rem 1rem 0.9rem;
     }
   }
   .pf__title {
     font-family: var(--st-head-font);
     font-weight: 600;
-    font-size: clamp(0.95rem, 0.8rem + 0.7vw, 1.4rem);
+    font-size: clamp(0.9rem, 0.8rem + 0.4vw, 1.15rem);
     line-height: 1.15;
     text-transform: uppercase;
     /* Long blog titles stop at two lines. */
@@ -317,13 +322,15 @@ const { groups, slides, viewService } = await loadWork(locale);
     overflow: hidden;
   }
   .pf__sub {
-    font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-    color: var(--st-accent);
+    font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.85rem);
+    color: var(--st-on-dark);
   }
   @media (prefers-reduced-motion: reduce) {
-    .pf__card :global(.pf__photo img),
-    .pf-jump__chip {
+    .pf__card :global(.pf__photo img) {
       transition: none;
+    }
+    .pf__item.is-new {
+      animation: none;
     }
   }
 </style>

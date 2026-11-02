@@ -2,26 +2,38 @@
 /**
  * The portfolio lightbox: every photo on the page in one sequence, opened at
  * the photo a `[data-pf-open="<index>"]` button names, with its title and
- * subtitle as the caption. Arrow keys (mirrored on Arabic pages), swipes and
- * the thumbnail strip move it.
+ * subtitle as the caption, and a link to the slide's service page when it has
+ * one. Arrow keys (mirrored on Arabic pages), swipes and the thumbnail strip
+ * move it.
  */
 import Icon from '../../Icon.astro';
 
-export type Slide = { src: string; thumb?: string; title: string; subtitle: string };
+export type Slide = { src: string; thumb?: string; title: string; subtitle: string; href?: string };
 
 interface Props {
   slides: Slide[];
   label: string;
+  /** Text of the link to a slide's `href`, e.g. "View Service". */
+  linkLabel?: string;
 }
 
-const { slides, label } = Astro.props;
+const { slides, label, linkLabel } = Astro.props;
 ---
 
 <dialog class="lb" aria-label={label} data-lb>
   <p class="lb__n" data-lb-n></p>
   <figure class="lb__fig">
     <img class="lb__full" alt="" data-lb-img />
-    <figcaption class="lb__cap"><strong data-lb-title></strong> <span data-lb-sub></span></figcaption>
+    <figcaption class="lb__cap">
+      <span><strong data-lb-title></strong> <span data-lb-sub></span></span>
+      {
+        linkLabel && (
+          <a class="lb__link" data-lb-link hidden>
+            {linkLabel} <Icon name="arrow-right" size={16} class="flip" />
+          </a>
+        )
+      }
+    </figcaption>
   </figure>
   <ol class="lb__thumbs" role="list" data-lb-thumbs>
     {
@@ -45,11 +57,12 @@ const { slides, label } = Astro.props;
 <script>
   const dialog = document.querySelector<HTMLDialogElement>('[data-lb]');
   if (dialog) {
-    const slides = JSON.parse(dialog.querySelector('[data-lb-slides]')!.textContent!) as { src: string; title: string; subtitle: string }[];
+    const slides = JSON.parse(dialog.querySelector('[data-lb-slides]')!.textContent!) as { src: string; title: string; subtitle: string; href?: string }[];
     const img = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
     const title = dialog.querySelector<HTMLElement>('[data-lb-title]')!;
     const sub = dialog.querySelector<HTMLElement>('[data-lb-sub]')!;
     const n = dialog.querySelector<HTMLElement>('[data-lb-n]')!;
+    const link = dialog.querySelector<HTMLAnchorElement>('[data-lb-link]');
     const thumbs = [...dialog.querySelectorAll<HTMLButtonElement>('[data-lb-go]')];
     let index = 0;
     const show = (i: number) => {
@@ -60,6 +73,10 @@ const { slides, label } = Astro.props;
       title.textContent = slide.title;
       sub.textContent = slide.subtitle;
       n.textContent = `${index + 1} / ${slides.length}`;
+      if (link) {
+        link.hidden = !slide.href;
+        if (slide.href) link.href = slide.href;
+      }
       thumbs.forEach((t, k) => t.toggleAttribute('aria-current', k === index));
       const strip = thumbs[index]?.closest('ol');
       if (strip) {
@@ -135,6 +152,11 @@ const { slides, label } = Astro.props;
     user-select: none;
   }
   .lb__cap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    align-items: baseline;
+    justify-content: center;
     font-size: 0.9375rem;
     color: var(--st-on-dark);
     text-align: center;
@@ -145,6 +167,21 @@ const { slides, label } = Astro.props;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--st-white);
+  }
+  .lb__link {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    color: var(--st-white);
+    font-family: var(--st-head-font);
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .lb__link[hidden] {
+    display: none;
   }
   .lb__thumbs {
     display: flex;
