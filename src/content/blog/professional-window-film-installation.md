@@ -12,6 +12,7 @@ tags:
 author: WRP Detailing Studio
 readingTime: 7
 heroImage: /window-film-install-hero.jpg
+portfolio: true
 relatedServices:
   - window-film
 ---

@@ -16,6 +16,9 @@ const blog = defineCollection({
 			author: z.string().default('WRP Detailing Solutions'),
 			readingTime: z.number().optional(),
 			featured: z.boolean().default(false),
+			// Show the hero photo on the portfolio page too, under the post's
+			// first related service. Only for photos of our own work.
+			portfolio: z.boolean().default(false),
 			lang: z.enum(['en', 'ar']).default('en'),
 			relatedServices: z.array(z.enum([
 				'ceramic-coating',
@@ -101,6 +104,8 @@ const services = defineCollection({
 				solution: z.string().optional(),
 				image: z.string().optional(),
 				imageAlt: z.string().optional(),
+				// Show this card's photo on the portfolio page too (under this service).
+				portfolio: z.boolean().default(false),
 			})),
 		}).optional(),
 		// Process steps
@@ -125,6 +130,9 @@ const services = defineCollection({
 				image: z.string(), // base path without extension if using responsive variants
 				title: z.string().optional(),
 				alt: z.string().optional(),
+				// Client work, so it is on the portfolio page too (under this
+				// service) unless switched off with `portfolio: false`.
+				portfolio: z.boolean().default(true),
 			})),
 		}).optional(),
 		// FAQs

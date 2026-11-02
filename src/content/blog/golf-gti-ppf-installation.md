@@ -12,6 +12,7 @@ author: WRP Detailing Studio
 readingTime: 6
 featured: false
 heroImage: /golf-gti-hero.jpg
+portfolio: true
 relatedServices:
   - paint-protection-film
 ---
