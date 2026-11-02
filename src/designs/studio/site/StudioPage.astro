@@ -19,6 +19,7 @@
 import { SEO } from 'astro-seo';
 import { Font } from 'astro:assets';
 import Schema from '@/components/Schema.astro';
+import FontPreload from '../../shared/FontPreload.astro';
 import Analytics from '@/components/Analytics.astro';
 import Attribution from '@/components/Attribution.astro';
 import TallyPopup from '@/components/TallyPopup.astro';
@@ -208,10 +209,22 @@ const altHref = lab(alternatePath);
         <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} imagesrcset={p.imagesrcset} imagesizes={p.imagesizes} fetchpriority="high" />
       ))
     }
-    <Font cssVariable="--font-oswald" preload />
-    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-oswald" />
+    <Font cssVariable="--font-inter" />
     <Font cssVariable="--font-montserrat" />
-    {isArabic && <Font cssVariable="--font-ibm-plex-arabic" preload />}
+    {isArabic && <Font cssVariable="--font-ibm-plex-arabic" />}
+    {
+      /* Preload the Latin or Arabic files only. Arabic pages draw Latin text with the Arabic face's
+         fallback (see --st-body-font in theme.css), never with Oswald or Inter. */
+      isArabic ? (
+        <FontPreload cssVariable="--font-ibm-plex-arabic" />
+      ) : (
+        <>
+          <FontPreload cssVariable="--font-oswald" />
+          <FontPreload cssVariable="--font-inter" />
+        </>
+      )
+    }
 
     {
       !isLab && (
