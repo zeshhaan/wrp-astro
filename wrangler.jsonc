@@ -29,6 +29,14 @@
 			"database_id": "45b2fc45-c9ed-45f4-ad9f-2a29b35b263d"
 		}
 	],
+	/**
+	 * Lead CRM (zeshhaan/leads-crm): each website lead is handed over to it
+	 * (src/lib/crm-handoff.ts). Production talks to WRP's private CRM,
+	 * `wrp-crm`, behind Cloudflare Access; previews talk to the public demo.
+	 */
+	"services": [
+		{ "binding": "CRM", "service": "wrp-crm", "entrypoint": "LeadIntake" }
+	],
 	"workers_dev": true,
 	"routes": [
 		{
@@ -58,9 +66,9 @@
 	 *
 	 * The production D1 database (DB) and the EMAIL binding are deliberately
 	 * left out, so a Preview can never write a real lead or email a customer:
-	 * /api/contact returns its normal 500 error there, and the quote form's
-	 * Astro Action (src/actions) runs its checks and then saves and sends
-	 * nothing. Bind a staging D1 here if a Preview ever needs a working form.
+	 * the contact form (/api/contact) and the quote form's Astro Action
+	 * (src/actions) run their checks, then only send a marked test lead to the
+	 * demo CRM (CRM below) and save or email nothing.
 	 *
 	 * The Astro adapter adds SESSION (KV) and IMAGES bindings to this block at
 	 * build time. Previews don't auto-provision KV, so SESSION points at a
@@ -75,6 +83,12 @@
 				"binding": "SESSION",
 				"id": "1699339660f84d6b90ba9268a8018e76"
 			}
+		],
+		// The demo CRM (demo data, public), never WRP's real one: a preview's test
+		// leads show up at https://leads-crm.zeeshanmh215.workers.dev, marked
+		// "Sent from: Website preview".
+		"services": [
+			{ "binding": "CRM", "service": "leads-crm", "entrypoint": "LeadIntake" }
 		]
 	}
 	/**
