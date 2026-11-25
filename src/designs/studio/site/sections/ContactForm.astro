@@ -91,12 +91,10 @@ const need = (field: Field) => required.includes(field);
 </form>
 
 <script>
-  import { guardForm } from '@/lib/turnstile-client';
   // The live form's behaviour without Alpine: send to /api/contact, then show
   // thanks or the error. In the Design Lab it stops after the browser's own
   // field checks, so a preview never reaches the lead inbox.
   for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
-    const guard = guardForm(form);
     const done = form.querySelector<HTMLElement>('[data-contact-done]')!;
     const error = form.querySelector<HTMLElement>('[data-contact-error]')!;
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
@@ -116,7 +114,6 @@ const need = (field: Field) => required.includes(field);
         const data = new FormData(form);
         const attribution = (window as unknown as { WRPAttribution?: { serialize?: () => string } }).WRPAttribution?.serialize?.();
         if (attribution) data.set('attribution', attribution);
-        await guard.addTo(data);
         const response = await fetch('/api/contact', { method: 'POST', body: data });
         const result = (await response.json()) as { success?: boolean; error?: string };
         if (response.ok && result.success) {

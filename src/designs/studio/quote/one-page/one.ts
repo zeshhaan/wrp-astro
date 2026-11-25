@@ -6,7 +6,6 @@
  * one long form and a viewer that follows whichever section you are working in.
  */
 import { actions } from 'astro:actions';
-import { guardForm, type FormGuard } from '@/lib/turnstile-client';
 import { panels, ppfPresets, tintOptions, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';
 import {
   aed,
@@ -41,7 +40,6 @@ let S: QuoteState = freshState();
 let C: Catalog;
 let form: HTMLFormElement;
 let submitting = false;
-let guard: FormGuard;
 // One id per request, kept across retries so a resend never makes a second lead.
 let requestId = crypto.randomUUID();
 
@@ -54,7 +52,6 @@ const input = (name: string, value?: string) =>
 export function start() {
   C = JSON.parse(q('#qo-catalog')!.textContent || '{}') as Catalog;
   form = q<HTMLFormElement>('#qo-form')!;
-  guard = guardForm(form);
   // Sending needs this script (it builds the request), so the button waits for it.
   q<HTMLButtonElement>('button[type="submit"]', form)!.disabled = false;
   const draft = loadDraft(KEY);
@@ -582,9 +579,8 @@ function onSubmit(e: SubmitEvent) {
   data.set('page', location.pathname);
   const attribution = window.WRPAttribution?.serialize?.();
   if (attribution) data.set('attribution', attribution);
-  guard
-    .addTo(data)
-    .then(() => actions.quote(data))
+  actions
+    .quote(data)
     .then(({ data: result, error }) => {
       if (error || !result) throw error ?? new Error('Missing submission result');
       if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'configurator' } }));
