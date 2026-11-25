@@ -19,8 +19,13 @@
 		"binding": "ASSETS",
 		"directory": "./dist"
 	},
+	// Issues groups errors and 5xx responses (e.g. a broken quote form); a
+	// Cloudflare notification policy emails new issues.
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"issues": {
+			"enabled": true
+		}
 	},
 	"d1_databases": [
 		{
