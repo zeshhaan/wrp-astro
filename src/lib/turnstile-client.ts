@@ -4,9 +4,10 @@
  * The script loads only when a visitor starts on a form (first focus or tap),
  * so pages without an enquiry stay as light as before. On submit we ask for a
  * token. Most visitors never see anything; Cloudflare shows a small checkbox
- * above the button only when it is unsure. If no token arrives in time (script
- * blocked, slow network), the form still sends without one: the server lets
- * that through, so a lead is never lost to the check itself.
+ * above the button only when it is unsure, and then waits up to 45 seconds for
+ * the tick. If no token arrives in time (script blocked, slow network, box left
+ * unticked), the form still sends without one: the server lets that through,
+ * so a lead is never lost to the check itself.
  */
 import { TURNSTILE_SITE_KEY } from '@/consts';
 
@@ -50,13 +51,19 @@ export interface FormGuard {
   addTo: (data: FormData) => Promise<void>;
 }
 
-export function guardForm(form: HTMLElement, waitMs = 8000): FormGuard {
+export function guardForm(form: HTMLElement, waitMs = 8000, interactiveWaitMs = 45000): FormGuard {
   let widgetId: string | undefined;
   let pending: ((token: string | null) => void) | null = null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
   const settle = (token: string | null) => {
+    clearTimeout(timer);
     const done = pending;
     pending = null;
     done?.(token);
+  };
+  const wait = (ms: number) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => settle(null), ms);
   };
 
   const ensureWidget = async (): Promise<boolean> => {
@@ -86,6 +93,10 @@ export function guardForm(form: HTMLElement, waitMs = 8000): FormGuard {
           return true;
         },
         'expired-callback': () => undefined,
+        // Cloudflare wants a tick in the box: give the visitor time to do it.
+        'before-interactive-callback': () => {
+          if (pending) wait(interactiveWaitMs);
+        },
         'timeout-callback': () => settle(null),
       });
     } catch {
@@ -106,7 +117,7 @@ export function guardForm(form: HTMLElement, waitMs = 8000): FormGuard {
     settle(null);
     const result = new Promise<string | null>((resolve) => {
       pending = resolve;
-      setTimeout(() => settle(null), waitMs);
+      wait(waitMs);
     });
     try {
       // Tokens are single use: start from a clean widget every time.
