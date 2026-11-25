@@ -177,13 +177,11 @@ const w =
 
 <script>
   import { actions } from 'astro:actions';
-  import { guardForm } from '@/lib/turnstile-client';
 
   // Sends to the `quote` action from every page, like the hero form. The
   // action decides what is real: Worker Previews and Design Lab pages answer
   // `{ saved: false }` and the form shows the preview note.
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-homepage-quote]')) {
-    const guard = guardForm(form);
     const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
     const status = form.querySelector<HTMLElement>('[data-homepage-status]')!;
     const error = form.querySelector<HTMLElement>('[data-homepage-error]')!;
@@ -219,7 +217,6 @@ const w =
         data.set('page', location.pathname);
         const attribution = window.WRPAttribution?.serialize?.();
         if (attribution) data.set('attribution', attribution);
-        await guard.addTo(data);
         const { data: result, error: failed } = await actions.quote(data);
         if (failed || !result) throw failed || new Error('Missing submission result');
         if (result.saved === true) {

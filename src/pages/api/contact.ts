@@ -10,7 +10,6 @@ import {
   renderLeadOutcomeActions,
 } from '@/lib/lead-outcome';
 import { contactToCrmLead, crmBinding, handOffLeads } from '@/lib/crm-handoff';
-import { checkTurnstile, turnstileBlocks, TURNSTILE_FIELD } from '@/lib/turnstile';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   let locale = 'en';
@@ -56,30 +55,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Turnstile (soft rollout, see turnstile.ts): only a rejected token blocks.
-    const turnstile = await checkTurnstile({
-      token: formData.get(TURNSTILE_FIELD),
-      secret: env.TURNSTILE_SECRET_KEY,
-      ip: request.headers.get('CF-Connecting-IP'),
-    });
-    if (turnstile.verdict !== 'pass' && turnstile.verdict !== 'skipped') {
-      console.warn(JSON.stringify({ event: `contact_turnstile_${turnstile.verdict}`, codes: turnstile.codes.join(',') }));
-    }
-    if (turnstileBlocks(turnstile)) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: isArabic
-            ? 'تعذر تأكيد الطلب. يرجى المحاولة مرة أخرى، أو التواصل معنا عبر الهاتف أو واتساب.'
-            : 'We could not confirm the request. Please try again, or call or WhatsApp us.'
-        }),
-        {
-          status: 403,
           headers: { 'Content-Type': 'application/json' }
         }
       );
