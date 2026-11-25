@@ -5,6 +5,7 @@ import { processQuoteNotifications } from '@/lib/quote-notification-email';
 import { parseLeadAttribution } from '@/lib/attribution';
 import { saveQuoteLeadWithNotification } from '@/lib/quote-notification-recovery';
 import { dispatchQuoteNotification, logQuoteEvent } from '@/lib/quote-notification-dispatch';
+import { crmBinding, handOffLeads, quoteToCrmLead } from '@/lib/crm-handoff';
 import {
   isPhone,
   isEmail,
@@ -29,11 +30,12 @@ export const server = {
    * number and how to reply).
    *
    * Order of work: validate, check the honeypot, then, only for a live lead, save
-   * to D1 and email the team. The insert is idempotent on the form's request
+   * to D1, email the team and hand a copy to the CRM (src/lib/crm-handoff.ts). The insert is idempotent on the form's request
    * id, so a double press or resend reuses the same lead and durable email job.
    * Worker previews and Design Lab pages stop after validation and answer
    * `{ saved: false }` (see quoteLeadMode), so they never touch the
-   * production database or inbox.
+   * production database or inbox. Previews do send a marked test lead to the
+   * demo CRM they are bound to.
    */
   quote: defineAction({
     accept: 'form',
@@ -71,12 +73,6 @@ export const server = {
         return { saved: false, ignored: true };
       }
 
-      if (mode === 'dry-run') return { saved: false, ignored: false };
-      if (mode === 'unavailable') {
-        logQuoteEvent('error', 'quote_database_unavailable');
-        throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: 'Could not save the request. Please call or WhatsApp us.' });
-      }
-
       const lead: QuoteLead = {
         name: input.name,
         phone: input.phone,
@@ -89,6 +85,27 @@ export const server = {
         locale: input.locale,
         attribution: parseLeadAttribution(input.attribution),
       };
+      const crm = crmBinding(env);
+
+      if (mode === 'dry-run') {
+        // A Worker Preview has no database or email, but it is bound to the demo
+        // CRM, so a test lead can be followed into the CRM. Nothing else runs.
+        if (env.ENVIRONMENT === 'preview' && crm) {
+          const test = quoteToCrmLead(lead, { externalId: `preview-quote:${input.requestId}` });
+          test.details = [...(test.details ?? []), { label: 'Sent from', value: `Website preview (${hostname})` }];
+          try {
+            const result = await crm.addLead(test);
+            if (!result.ok) logQuoteEvent('warn', 'crm_preview_lead_rejected', { fields: result.issues.map((i) => i.path).join(',') });
+          } catch {
+            logQuoteEvent('warn', 'crm_preview_lead_failed');
+          }
+        }
+        return { saved: false, ignored: false };
+      }
+      if (mode === 'unavailable') {
+        logQuoteEvent('error', 'quote_database_unavailable');
+        throw new ActionError({ code: 'SERVICE_UNAVAILABLE', message: 'Could not save the request. Please call or WhatsApp us.' });
+      }
 
       let leadId: number;
       try {
@@ -106,6 +123,14 @@ export const server = {
         leadId,
         cfContext ? (task) => cfContext.waitUntil(task) : undefined,
       );
+
+      // Then a copy to the CRM. Failures are retried by the cron (src/lib/crm-handoff.ts).
+      if (crm) {
+        const handoff = handOffLeads({ db: env.DB, crm, only: { kind: 'quote', id: leadId } })
+          .catch(() => logQuoteEvent('error', 'crm_handoff_deferred', { leadId }));
+        if (cfContext) cfContext.waitUntil(handoff);
+        else await handoff;
+      }
 
       return { saved: true, ignored: false };
     },
