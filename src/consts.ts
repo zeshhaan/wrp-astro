@@ -53,4 +53,8 @@ export const ANALYTICS_HOSTNAMES = ['wrpdetailing.ae', 'www.wrpdetailing.ae'];
 
 // Tally requires a form ID to open a popup. Keep the production default in one
 // place and allow preview builds to target another form without editing code.
+/** Turnstile (free bot check) on the lead forms. Public by design; the secret is a Worker secret.
+ * Local dev uses Cloudflare's always-pass test key, since the real one only works on our domains. */
+export const TURNSTILE_SITE_KEY: string = import.meta.env.DEV ? '1x00000000000000000000AA' : '0x4AAAAAAGSwQVN2dTkb-7wD';
+
 export const TALLY_FORM_ID: string = import.meta.env.PUBLIC_TALLY_FORM_ID || 'Gxa89p';

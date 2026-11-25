@@ -156,7 +156,9 @@ const words = locale === 'ar' ? ar : en;
 
 <script>
   import { actions } from 'astro:actions';
+  import { guardForm } from '@/lib/turnstile-client';
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-lead]')) {
+    const guard = guardForm(form);
     const body = form.querySelector<HTMLElement>('[data-lead-body]')!;
     const done = form.querySelector<HTMLElement>('[data-lead-done]')!;
     const error = form.querySelector<HTMLElement>('[data-lead-error]')!;
@@ -228,6 +230,7 @@ const words = locale === 'ar' ? ar : en;
         data.set('page', location.pathname);
         const attribution = window.WRPAttribution?.serialize?.();
         if (attribution) data.set('attribution', attribution);
+        await guard.addTo(data);
         const { data: result, error: failed } = await actions.quote(data);
         if (failed) throw failed;
         if (result.saved) document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'hero' } }));

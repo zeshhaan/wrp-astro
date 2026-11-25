@@ -121,6 +121,7 @@ function configurator(reply: () => Promise<ActionReply>, honeypot = '') {
     CustomEvent: class { constructor(public type: string, public options: unknown) {} },
     window: { WRPAttribution: { serialize: () => 'attribution-fixture' }, setTimeout },
     document: { dispatchEvent: (event: unknown) => leads.push(event) },
+    guard: { addTo: async (data: Map<string, string>) => { data.set('cf-turnstile-response', 'turnstile-fixture'); } },
     actions: { quote: (data: Map<string, string>) => { calls.push(data); return reply(); } },
     finish: (via: string) => finished.push(via),
   };
@@ -133,12 +134,13 @@ describe('configurator live-path tracking', () => {
     const c = configurator(async () => ({ data: { saved: true, ignored: false } }));
     c.submit();
     c.submit();
+    await settle();
     expect(c.calls).toHaveLength(1);
     expect(c.calls[0].get('attribution')).toBe('attribution-fixture');
+    expect(c.calls[0].get('cf-turnstile-response')).toBe('turnstile-fixture');
     expect(c.calls[0].get('email')).toBe('');
     expect(c.calls[0].get('requestId')).toBe('request-0');
     expect(c.calls[0].get('page')).toBe('/design-lab/studio/quote/');
-    await settle();
     expect(c.leads).toEqual([{ type: 'wrp:lead', options: { detail: { form: 'configurator' } } }]);
     expect(c.finished).toEqual(['form']);
     expect(c.status.hidden).toBe(true);
@@ -180,6 +182,7 @@ describe('configurator live-path tracking', () => {
       expect(c.problems).toHaveLength(1);
       expect(c.button.disabled).toBe(false);
       c.submit();
+      await settle();
       expect(c.calls[1].get('requestId')).toBe(c.calls[0].get('requestId'));
     }
   });

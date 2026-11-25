@@ -13,6 +13,7 @@ import {
   quoteLeadMode,
   type QuoteLead,
 } from '@/lib/quote-form-lead';
+import { checkTurnstile, turnstileBlocks, TURNSTILE_FIELD } from '@/lib/turnstile';
 
 const optionalText = (max: number) =>
   z
@@ -54,6 +55,7 @@ export const server = {
       form_check: z.string().nullish(),
       leave_blank: z.string().nullish(),
       company_website: z.string().nullish(),
+      [TURNSTILE_FIELD]: z.string().max(4096).nullish(),
     }),
     handler: async (input, context) => {
       const hostname = context.url.hostname;
@@ -71,6 +73,19 @@ export const server = {
       if (isHoneypotFilled(input.form_check) || isHoneypotFilled(input.leave_blank)) {
         logQuoteEvent('warn', 'quote_honeypot_rejected', { hostname });
         return { saved: false, ignored: true };
+      }
+
+      // Turnstile (soft rollout, see turnstile.ts): only a rejected token blocks.
+      const turnstile = await checkTurnstile({
+        token: input[TURNSTILE_FIELD],
+        secret: env.TURNSTILE_SECRET_KEY,
+        ip: context.request.headers.get('CF-Connecting-IP'),
+      });
+      if (turnstile.verdict !== 'pass' && turnstile.verdict !== 'skipped') {
+        logQuoteEvent('warn', `quote_turnstile_${turnstile.verdict}`, { hostname, codes: turnstile.codes.join(',') });
+      }
+      if (turnstileBlocks(turnstile)) {
+        throw new ActionError({ code: 'FORBIDDEN', message: 'Could not confirm the request. Please try again, or call or WhatsApp us.' });
       }
 
       const lead: QuoteLead = {
