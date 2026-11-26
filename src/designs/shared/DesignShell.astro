@@ -8,6 +8,7 @@
  */
 import { Font } from 'astro:assets';
 import DemoForms from './DemoForms.astro';
+import FontPreload from './FontPreload.astro';
 import './reset.css';
 
 type FontVar =
@@ -61,7 +62,8 @@ const widths = preloadImage?.widths ?? [480, 800, 1200];
       )
     }
     {preloads.map((p) => <link rel="preload" as="image" href={p.href} type={p.type} media={p.media} fetchpriority="high" />)}
-    {fonts.map((f, i) => <Font cssVariable={f} preload={i < 2} />)}
+    {fonts.map((f) => <Font cssVariable={f} />)}
+    {fonts.slice(0, 2).map((f) => <FontPreload cssVariable={f} />)}
   </head>
   <body>
     <slot />
