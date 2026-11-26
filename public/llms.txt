@@ -16,6 +16,7 @@
 - [Homepage](https://wrpdetailing.ae/): Main landing page for WRP Detailing Studio in Dubai.
 - [Blog Index](https://wrpdetailing.ae/blog/): English blog index for guides on PPF, ceramic coating, tint, paint correction, and upholstery care.
 - [Contact](https://wrpdetailing.ae/contact-us/): Contact page with phone, email, and showroom directions.
+- [Get a quote](https://wrpdetailing.ae/quote/): Choose your car and detailing services and request a quote from the studio.
 - [About](https://wrpdetailing.ae/more-about-wrp/): Brand story, philosophy, and studio positioning.
 - [Portfolio](https://wrpdetailing.ae/portfolio/): Selected detailing, PPF, and ceramic coating case studies.
 - [Reviews](https://wrpdetailing.ae/reviews/): Customer review and testimonial hub.
