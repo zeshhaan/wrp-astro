@@ -11,6 +11,13 @@
   X-XSS-Protection: 1; mode=block
   Link: </llms.txt>; rel="describedby"; type="text/plain", </llms-full.txt>; rel="describedby"; type="text/plain"
 
+# The llms files hold Arabic. Without a charset, readers such as Cloudflare's
+# Search for Agents crawler decode them as Latin-1 and the Arabic turns to junk.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+
 # Cache static assets aggressively
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
