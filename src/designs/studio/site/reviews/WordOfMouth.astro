@@ -62,6 +62,7 @@ const words =
     </p>
     <h1 class="wm__title">{t(locale, 'reviews.whatClientsSay')}</h1>
     <p class="wm__count">{num(d.displayCount)} {t(locale, 'reviews.verifiedOnGoogle')}</p>
+    {locale === 'ar' && <p>نعرض التقييمات هنا كما كتبها أصحابها على Google، بلغتها الأصلية.</p>}
     <dl class="wm__stats">
       <div><dd>{num(d.displayCount)}</dd><dt>{t(locale, 'reviews.reviews')}</dt></div>
       <div><dd>{num('5.0')}</dd><dt>{t(locale, 'reviews.statsRating')}</dt></div>
@@ -98,7 +99,7 @@ const words =
           {d.withImages.map((r, i) => (
             <li class="pin__item" style={`--i:${i}`}>
               <button type="button" class="pin__card" aria-haspopup="dialog" aria-label={words.open(r.reviewerName)} data-pin-open={`pin-${i}`}>
-                <img src={`/${r.localImages[0]}`} alt= width="400" height="400" loading="lazy" decoding="async" />
+                <img src={`/${r.localImages[0]}`} alt="" width="400" height="400" loading="lazy" decoding="async" />
                 <span class="pin__line" dir="auto">“{pullLine(r, 60)}”</span>
                 <span class="pin__name">{r.reviewerName}</span>
                 {r.localImages.length > 1 && (

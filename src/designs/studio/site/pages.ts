@@ -1,4 +1,5 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getBaseSlug, getLocalizedBlogPosts } from '@/i18n/content';
 import type { Locale } from '@/i18n/translations';
 
 /** What a route file in src/pages passes to SitePage.astro. */
@@ -10,23 +11,15 @@ export type SitePageProps =
 
 /**
  * The blog post routes' getStaticPaths: English posts at /blog/<id>/; Arabic
- * at /ar/blog/<id>/, falling back to the English post where there is no
- * translation.
+ * at /ar/blog/<id>/ once an Arabic entry exists.
  */
 export async function blogPostPaths(locale: Locale) {
-  const posts = await getCollection('blog');
-  const arPosts = posts.filter((p) => p.id.startsWith('ar/'));
-  const enPosts = posts.filter((p) => !p.id.startsWith('ar/'));
-  const arSlugs = new Set(arPosts.map((p) => p.id.replace('ar/', '')));
-  const list =
-    locale === 'en'
-      ? enPosts.map((post) => ({ slug: post.id, post }))
-      : [
-          ...arPosts.map((post) => ({ slug: post.id.replace('ar/', ''), post })),
-          ...enPosts.filter((p) => !arSlugs.has(p.id)).map((post) => ({ slug: post.id, post })),
-        ];
-  return list.map(({ slug, post }) => ({
-    params: { slug },
-    props: { kind: 'post', locale, slug, post } satisfies SitePageProps,
-  }));
+  const posts = await getLocalizedBlogPosts(locale);
+  return posts.map((post) => {
+    const slug = getBaseSlug(post.id);
+    return {
+      params: { slug },
+      props: { kind: 'post', locale, slug, post } satisfies SitePageProps,
+    };
+  });
 }

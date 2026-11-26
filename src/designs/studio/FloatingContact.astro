@@ -85,7 +85,7 @@ const w =
       <span data-contact-status-text>{w.status}</span>
     </p>
 
-    <a class="cd__rating" href={proof.reviewsUrl} target="_blank" rel="noopener">
+    <a class="cd__rating" href={locale === 'ar' ? '/ar/reviews/' : proof.reviewsUrl} target="_blank" rel="noopener">
       <span class="cd__stars" aria-hidden="true">{Array.from({ length: 5 }, () => <Icon name="star" size={15} />)}</span>
       <span><strong>{num(proof.rating)}</strong> {w.from} <strong>{num(proof.reviewCountDisplay)}</strong> {w.reviews}</span>
     </a>

@@ -31,7 +31,7 @@ const schema = {
 const visible = (url: string) => link(new URL(url).pathname + new URL(url).hash);
 ---
 
-<nav aria-label="Breadcrumb" class:list={['crumbs', className]}>
+<nav aria-label={Astro.currentLocale === 'ar' ? 'مسار الصفحة' : 'Breadcrumb'} class:list={['crumbs', className]}>
   <ol role="list">
     {
       crumbs.map((crumb, index) => (

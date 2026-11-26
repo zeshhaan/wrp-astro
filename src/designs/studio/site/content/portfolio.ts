@@ -19,7 +19,7 @@ export const portfolio: Record<'en' | 'ar', PortfolioCopy> = {
   },
   ar: {
     title: 'أعمالنا | WRP Detailing Studio',
-    description: 'استكشف مجموعة من مشاريع WRP Detailing Studio في تظليل النوافذ وطلاء السيراميك وفيلم حماية الطلاء والتفصيل الفاخر للسيارات.',
+    description: 'استكشف مجموعة من مشاريع WRP Detailing Studio في تظليل النوافذ وطلاء السيراميك وفيلم حماية الطلاء والعناية بالسيارات.',
     crumbs: ['@t:common.home', '@t:portfolio.title'],
     h1: 'أعمالنا',
     lede: 'نماذج من الأعمال التي نفذناها لسيارات مميزة في دبي. كل مشروع يعكس دقتنا في التنفيذ والتزامنا بالنتيجة النهائية.',

@@ -168,7 +168,7 @@ export async function loadWork(locale: Locale) {
         photo(seen, src, {
           title: p.data.title,
           note: p.data.subtitle,
-          alt: `${p.data.title} ${p.data.subtitle} - Professional car detailing work completed at WRP Detailing Studio luxury automotive studio`,
+          alt: ar ? `${p.data.title}، ${p.data.subtitle}، في استوديو WRP بدبي` : `${p.data.title} ${p.data.subtitle} - Professional car detailing work completed at WRP Detailing Studio luxury automotive studio`,
         }),
       );
     }

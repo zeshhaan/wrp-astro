@@ -14,6 +14,7 @@ interface Item {
 }
 
 interface Props {
+  locale: 'ar' | 'en';
   heading: string;
   subheading?: string;
   items: Item[];
@@ -22,7 +23,7 @@ interface Props {
   class?: string;
 }
 
-const { heading, subheading, items, name, class: className } = Astro.props;
+const { locale, heading, subheading, items, name, class: className } = Astro.props;
 const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
 ---
 
@@ -41,11 +42,11 @@ const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
               class="wg__tile"
               data-wg-open={i}
               data-full={`${base(item.image)}-1200w.webp`}
-              aria-label={item.title || `View ${name} work`}
+              aria-label={item.title || (locale === 'ar' ? `عرض صورة من أعمالنا في ${name}` : `View ${name} work`)}
             >
               <Picture
                 base={base(item.image)}
-                alt={item.alt || item.title || `${name} by WRP Detailing Studio in Dubai`}
+                alt={item.alt || item.title || name}
                 widths={[480, 800, 1200]}
                 sizes="(min-width: 64rem) 33vw, (min-width: 40rem) 50vw, 100vw"
                 width={1200}
@@ -63,10 +64,10 @@ const base = (src: string) => src.replace(/\.(jpe?g|png|webp|avif)$/i, '');
     <img class="wg__full" alt="" data-wg-img />
     <p class="wg__count" data-wg-count></p>
     <form method="dialog">
-      <button class="wg__btn wg__close" aria-label="Close"><Icon name="close" size={22} /></button>
+      <button class="wg__btn wg__close" aria-label={locale === 'ar' ? 'إغلاق' : 'Close'}><Icon name="close" size={22} /></button>
     </form>
-    <button type="button" class="wg__btn wg__prev" aria-label="Previous photo" data-wg-prev><Icon name="arrow-left" size={22} /></button>
-    <button type="button" class="wg__btn wg__next" aria-label="Next photo" data-wg-next><Icon name="arrow-right" size={22} /></button>
+    <button type="button" class="wg__btn wg__prev" aria-label={locale === 'ar' ? 'الصورة السابقة' : 'Previous photo'} data-wg-prev><Icon name="arrow-left" size={22} /></button>
+    <button type="button" class="wg__btn wg__next" aria-label={locale === 'ar' ? 'الصورة التالية' : 'Next photo'} data-wg-next><Icon name="arrow-right" size={22} /></button>
   </dialog>
 </section>
 

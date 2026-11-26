@@ -57,7 +57,7 @@ const words = {
     home: 'WRP by YACO Automotive, home',
   },
   ar: {
-    quote: 'احصل على عرض سعر سريع',
+    quote: 'اطلب عرض سعر',
     whatsapp: 'راسلنا على واتساب',
     call: 'اتصل بنا',
     menu: 'القائمة',

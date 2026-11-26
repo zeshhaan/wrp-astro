@@ -14,11 +14,11 @@ export function reviewsPage(locale: Locale) {
   const num = (n: string | number) => toLocalNum(n, locale);
   const title =
     locale === 'ar'
-      ? `تقييمات العملاء | WRP Detailing Studio - ${toLocalNum(displayCount, 'ar')} تقييمات جوجل`
+      ? `آراء العملاء في WRP | تقييمات Google`
       : `Client Reviews | WRP Detailing Studio – ${business.rating.toFixed(1)} Stars, ${displayCount} Google Reviews`;
   const description =
     locale === 'ar'
-      ? `اقرأ ${toLocalNum(displayCount, 'ar')} من تقييمات جوجل الموثقة لعملاء WRP Detailing Studio. تقييم ${toLocalNum(business.rating.toFixed(1), 'ar')} نجوم لخدمات التلميع وطلاء السيراميك وPPF وتظليل النوافذ في دبي.`
+      ? `اقرأ تجارب عملائنا مع حماية الطلاء والسيراميك والتلميع والتظليل في دبي، وشاهد الصور التي شاركوها بعد استلام سياراتهم.`
       : `Read ${displayCount} verified Google reviews from WRP Detailing Studio clients. ${business.rating.toFixed(1)}-star rated car detailing, PPF, ceramic coating, and window tinting in Dubai.`;
 
   // The live page's AggregateRating + Review JSON-LD, built the same way.

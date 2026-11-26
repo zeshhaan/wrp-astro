@@ -32,7 +32,7 @@ const w = nav.words;
     <WrpLogo class="ms__logo" label="WRP by YACO Automotive" />
     <span aria-hidden="true"></span>
   </div>
-  <nav aria-label="Main (mobile)">
+  <nav aria-label={nav.locale === 'ar' ? 'القائمة الرئيسية' : 'Main (mobile)'}>
     {
       services && (
         <ul role="list" class="ms__services">

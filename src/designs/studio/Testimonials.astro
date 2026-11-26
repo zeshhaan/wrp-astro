@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import { translatedExcerpt } from './review-excerpts-ar';
 import { proof, reviews } from './content';
 import { rating, reviewCount, reviewsAr } from './contentAr';
 import type { Locale } from '@/i18n/translations';
@@ -15,7 +16,7 @@ const w = ar
   ? {
       eyebrow: 'ماذا يقول عملاؤنا',
       title: 'آراء عملائنا',
-      intro: `<strong>${rating}</strong> على Google من ${reviewCount} تقييم. هذه كلماتهم كما كتبوها بالإنجليزية، من دون تعديل.`,
+      intro: `<strong>${rating}</strong> على Google من ${reviewCount} تقييم. ترجمنا هذه المقتطفات إلى العربية، ويمكنك قراءة كلام كل عميل بلغته الأصلية.`,
       prev: 'المراجعات السابقة',
       next: 'المراجعات التالية',
       region: 'مراجعات العملاء، مرّر جانبياً لرؤية المزيد',
@@ -60,22 +61,26 @@ const w = ar
   <div class="track" id="review-track" tabindex="0" role="region" aria-label={w.region} data-track>
     <ul class="track__list" role="list">
       {
-        w.reviews.map((r) => (
+        w.reviews.map((r) => {
+          const translation = ar ? translatedExcerpt(r.text) : undefined;
+          return (
           <li class="review">
             <figure>
               <span class="review__stars" role="img" aria-label={w.stars}>
                 {Array.from({ length: 5 }, () => <Icon name="star" size={16} />)}
               </span>
-              <blockquote lang="en" dir="ltr">
-                <p>{r.text}</p>
+              <blockquote lang={translation ? 'ar' : 'en'} dir={translation ? 'rtl' : 'ltr'}>
+                <p>{translation ?? r.text}</p>
               </blockquote>
               <figcaption>
                 <span class="review__name" dir="auto">{r.author}</span>
                 <span class="review__service">{r.service}</span>
               </figcaption>
+              {translation && <details><summary>اقرأ النص الأصلي</summary><p lang="en" dir="ltr">{r.text}</p></details>}
             </figure>
           </li>
-        ))
+        );
+        })
       }
     </ul>
   </div>
@@ -119,6 +124,9 @@ const w = ar
 </script>
 
 <style>
+  details { margin-block-start: 1rem; font-size: 0.9rem; }
+  summary { cursor: pointer; text-decoration: underline; }
+  details p { margin-block-start: 0.5rem; }
   .reviews__head {
     display: flex;
     flex-wrap: wrap;

@@ -2,11 +2,8 @@
 
 > **Studio is the site's design.** Every live URL (English and Arabic) renders
 > its Studio page; the previous BaseLayout pages are gone from `src/pages`.
-> The quote configurator is at `/quote/`. Old preview links under
-> `/design-lab/studio/` redirect (301) to the live page
-> (`src/pages/design-lab/studio/[...page].ts`); only the header candidates and
-> the car viewer still render under the lab. The notes below describe how the
-> redesign was reviewed and where its code lives.
+> The quote configurator is at `/quote/`. Run `bun dev` to open the design lab
+> locally. Astro registers routes from `src/dev/design-lab/` in dev mode only.
 
 **Studio** is the chosen direction for the new wrpdetailing.ae (October 2026): a
 conventional detailing-studio site, modelled on the structure of Apex Detail
@@ -21,7 +18,7 @@ the git history of this branch.
 
 ## Where to look
 
-Every build has a review hub at `/design-lab/`:
+The local development server has a review hub at `/design-lab/`:
 
 | Page | Path |
 | --- | --- |
@@ -39,7 +36,7 @@ Cloudflare **Worker Previews** of the branch:
 | Preview | Serves |
 | --- | --- |
 | `design-studio` | the same site as the branch Preview (it used to serve Studio at `/` before Studio was the site) |
-| the branch's own Preview | the site, with the Design Lab under `/design-lab/` |
+| the branch's own Preview | the same public routes as production |
 
 URLs follow `https://<preview>-wrp-astro.<subdomain>.workers.dev`. They update on
 every push to the branch they track.
@@ -68,7 +65,7 @@ branch Preview, then rebuilds with `PUBLIC_WRP_DESIGN=studio` and publishes
 **By hand.** With `wrangler login` (Wrangler ≥ 4.135):
 
 ```sh
-bun run preview:designs                 # design-studio + the lab
+bun run preview:designs                 # design-studio
 bun run preview:designs -- --dry-run    # print the commands
 ```
 

@@ -125,7 +125,7 @@ const highPrice = hasRealPricing
   : undefined;
 const quickAnswerDescription = description ? `${description.charAt(0).toLowerCase()}${description.slice(1).replace(/\.$/, '')}` : title;
 const quickAnswer = ar
-  ? `إجابة سريعة: خدمة ${title} في WRP Detailing Studio بدبي مناسبة لمن يريد ${description ? description.replace(/\.$/, '') : title}.${startingPrice ? ` الأسعار تبدأ من ${num(startingPrice.toLocaleString())} د.إ.` : ''}`
+  ? `${description.replace(/[.، ]+$/, '')}. ${startingPrice ? `تبدأ الأسعار من ${num(startingPrice.toLocaleString())} د.إ.` : 'نحدّد السعر بعد معاينة السيارة.'}`
   : service.data.quickAnswer
     ? service.data.quickAnswer
     : `${title} at WRP Detailing Studio in Dubai is for owners who want ${quickAnswerDescription}.${startingPrice ? ` Pricing starts from AED ${startingPrice.toLocaleString()}.` : ''}`;
@@ -310,8 +310,8 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref(locale);
       }
 
       {
-        !ar && realTimeWork && realTimeWork.items.length > 0 && (
-          <WorkGallery heading={realTimeWork.heading} subheading={realTimeWork.subheading} items={realTimeWork.items} name={title} class="st-white" />
+        realTimeWork && realTimeWork.items.length > 0 && (
+          <WorkGallery locale={locale} heading={realTimeWork.heading} subheading={realTimeWork.subheading} items={realTimeWork.items} name={title} class="st-white" />
         )
       }
     </Fragment>
@@ -321,7 +321,7 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref(locale);
           <section class="pk st-section st-light">
             <div class="st-wrap">
               <header class="st-head st-head--center">
-                <h2 class="st-h2">{packagesHeading || (ar ? t(locale, 'services.process') : w.packages)}</h2>
+                <h2 class="st-h2">{packagesHeading || (ar ? 'الباقات' : w.packages)}</h2>
                 {(packagesSubheading || !ar) && <p class="st-intro">{packagesSubheading || w.packagesSub}</p>}
               </header>
               <ul class="pk__grid" role="list">
