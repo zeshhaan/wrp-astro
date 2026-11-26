@@ -4,6 +4,7 @@ import { describe, expect, test } from 'bun:test';
 import { Database } from 'bun:sqlite';
 import { readFileSync } from 'node:fs';
 import { NOTIFICATION_LEASE_MS, NOTIFICATION_MAX_ATTEMPTS, notificationRetryDelay, recoverQuoteNotifications, saveQuoteLeadWithNotification } from './quote-notification-recovery';
+import { sqliteD1 } from './test/sqlite-d1';
 import type { QuoteLead } from './quote-form-lead';
 
 const lead: QuoteLead = {
@@ -22,22 +23,7 @@ function fixture(withOutbox = true) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
   if (withOutbox) sqlite.exec(readFileSync(new URL('../../migrations/0008_add_quote_notification_outbox.sql', import.meta.url), 'utf8'));
-  class Statement {
-    values: (string | number | null)[] = [];
-    constructor(readonly sql: string) {}
-    bind(...values: (string | number | null)[]) { this.values = values; return this; }
-    execute() {
-      const result = sqlite.query(this.sql).run(...this.values);
-      return { success: true, meta: { changes: result.changes, last_row_id: Number(result.lastInsertRowid) }, results: [] };
-    }
-    async run() { return this.execute(); }
-    async first() { return sqlite.query(this.sql).get(...this.values); }
-    async all() { return { results: sqlite.query(this.sql).all(...this.values), success: true }; }
-  }
-  const db = {
-    prepare: (sql: string) => new Statement(sql),
-    batch: async (statements: Statement[]) => sqlite.transaction(() => statements.map((statement) => statement.execute()))(),
-  } as unknown as D1Database;
+  const db = sqliteD1(sqlite);
   const job = () => sqlite.query('SELECT * FROM quote_notification_outbox').get();
   return { db, sqlite, job };
 }

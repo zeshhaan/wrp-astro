@@ -1,14 +1,8 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext/browser';
-import { deliverClientLeadWithAgencyCopy } from '@/lib/lead-email-delivery';
-import { formatAttributionTouch, parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
-import {
-  createLeadOutcomeLinks,
-  leadOutcomeSigningSecretIsValid,
-  renderLeadOutcomeActions,
-} from '@/lib/lead-outcome';
+import { parseLeadAttribution, serializeLeadAttribution } from '@/lib/attribution';
+import { saveContactWithNotifications } from '@/lib/contact-notification-recovery';
+import { processContactNotifications } from '@/lib/contact-notification-email';
 import { contactToCrmLead, crmBinding, handOffLeads } from '@/lib/crm-handoff';
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -89,158 +83,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return thanks();
     }
 
-    // Save to D1 database
     const db = env.DB;
-
-    const inserted = await db.prepare(`
-      INSERT INTO contact_submissions
-        (name, email, phone, vehicle, service_interest, message, attribution_json)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(
-      name,
-      email,
-      phone || null,
-      vehicle || null,
-      service || null,
-      message,
-      serializeLeadAttribution(attribution),
-    ).run();
-    const leadId = Number(inserted.meta.last_row_id);
-    if (!Number.isSafeInteger(leadId) || leadId < 1) throw new Error('Contact lead insert returned no id');
-
-    // Send email notification
-    try {
-      if (!leadOutcomeSigningSecretIsValid(env.LEAD_OUTCOME_SIGNING_SECRET)) {
-        throw new Error('LEAD_OUTCOME_SIGNING_SECRET is missing or too short');
-      }
-      const outcomeActions = renderLeadOutcomeActions(
-        await createLeadOutcomeLinks(
-          request.url,
-          { kind: 'contact', id: leadId },
-          env.LEAD_OUTCOME_SIGNING_SECRET,
-        ),
-      );
-
-      // Create smart, descriptive subject line with fallbacks
-      let subjectLine = 'New Estimate Request';
-
-      if (service && vehicle) {
-        // Best case: has both service and vehicle
-        subjectLine = `Estimate Request: ${service} for ${vehicle} from ${name}`;
-      } else if (service) {
-        // Has service but no vehicle
-        subjectLine = `Estimate Request: ${service} from ${name}`;
-      } else if (vehicle) {
-        // Has vehicle but no service
-        subjectLine = `Estimate Request: ${vehicle} - ${name}`;
-      } else {
-        // Minimal info
-        subjectLine = `Estimate Request from ${name}`;
-      }
-
-      const msg = createMimeMessage();
-      msg.setSender({ name: 'WRP Contact Form', addr: 'noreply@wrpdetailing.ae' });
-      msg.setRecipient('wrp.detailing@gmail.com');
-      msg.setSubject(subjectLine);
-      msg.addMessage({
-        contentType: 'text/html',
-        data: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #000; color: #fff; padding: 20px; text-align: center; }
-              .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
-              table { width: 100%; border-collapse: collapse; background: white; }
-              th { background: #f0f0f0; padding: 12px; text-align: left; font-weight: bold; border-bottom: 2px solid #ddd; }
-              td { padding: 12px; border-bottom: 1px solid #eee; }
-              .message-box { background: white; padding: 15px; margin-top: 15px; border-left: 4px solid #000; }
-              .footer { text-align: center; padding: 15px; color: #666; font-size: 12px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1 style="margin: 0;">🚗 New Estimate Request</h1>
-              </div>
-              <div class="content">
-                <table>
-                  <tr>
-                    <th>Field</th>
-                    <th>Details</th>
-                  </tr>
-                  <tr>
-                    <td><strong>Name</strong></td>
-                    <td>${escapeHtml(name)}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Email</strong></td>
-                    <td><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Phone</strong></td>
-                    <td>${phone ? `<a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>` : 'Not provided'}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Vehicle</strong></td>
-                    <td>${escapeHtml(vehicle || 'Not provided')}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Service Interest</strong></td>
-                    <td>${escapeHtml(service || 'Not specified')}</td>
-                  </tr>
-                  ${attribution ? `
-                  <tr>
-                    <td><strong>First touch</strong></td>
-                    <td>${escapeHtml(formatAttributionTouch(attribution.first))}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Latest source</strong></td>
-                    <td>${escapeHtml(formatAttributionTouch(attribution.last))}</td>
-                  </tr>` : ''}
-                </table>
-                <div class="message-box">
-                  <strong>Message:</strong><br><br>
-                  ${escapeHtml(message).replace(/\n/g, '<br>')}
-                </div>
-                ${outcomeActions}
-              </div>
-              <div class="footer">
-                <p>Submitted via wrpdetailing.ae contact form on ${new Date().toLocaleString('en-AE', { timeZone: 'Asia/Dubai' })}</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `,
-      });
-
-      const emailMessage = new EmailMessage(
-        'noreply@wrpdetailing.ae',
-        'wrp.detailing@gmail.com',
-        msg.asRaw()
-      );
-
-      // Email Workers accepts one envelope recipient per EmailMessage. Reusing
-      // the MIME body preserves BCC semantics because its To header still names
-      // the client. The helper always finishes this send before attempting the
-      // optional agency copy, and contains any copy-only failure.
-      await deliverClientLeadWithAgencyCopy({
-        agencyRecipient: env.AGENCY_COPY_EMAIL,
-        sendClient: () => env.EMAIL.send(emailMessage),
-        sendAgency: (recipient) =>
-          env.EMAIL.send(
-            new EmailMessage('noreply@wrpdetailing.ae', recipient, msg.asRaw())
-          ),
-        onAgencyError: (error) =>
-          console.error('Agency copy failed (client lead email was still sent):', error),
-      });
-    } catch (emailError) {
-      // Log email error but don't fail the request
-      console.error('Failed to send email notification:', emailError);
-    }
+    const leadId = await saveContactWithNotifications(db, {
+      name, email, phone: phone || null, vehicle: vehicle || null, service_interest: service || null,
+      message, attribution_json: serializeLeadAttribution(attribution),
+    }, env.AGENCY_COPY_EMAIL);
+    const notify = processContactNotifications(env, leadId)
+      .catch(() => console.error(JSON.stringify({ event: 'contact_notification_deferred', leadId })));
+    if (locals.cfContext) locals.cfContext.waitUntil(notify);
+    else await notify;
 
     // Then a copy to the CRM. Failures are retried by the cron (src/lib/crm-handoff.ts).
     if (crm) {
@@ -268,12 +119,3 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
   }
 };
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
