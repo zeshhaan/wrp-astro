@@ -62,9 +62,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      // Design Lab pages are review-only, and the quote configurator is
-      // noindex (src/designs/studio/quote/one-page/QuoteOne.astro).
-      filter: (page) => !page.includes('/design-lab/') && !/\/quote\/$/.test(page),
+      // The Arabic quote URL serves a copy of the English configurator.
+      filter: (page) => !page.includes('/design-lab/') && !page.endsWith('/ar/quote/'),
       customPages: [
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',

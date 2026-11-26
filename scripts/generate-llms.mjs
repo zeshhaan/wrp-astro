@@ -15,6 +15,7 @@ const STATIC_PAGES = [
   { title: 'Homepage', url: `${SITE_URL}/`, description: 'Main landing page for WRP Detailing Studio in Dubai.' },
   { title: 'Blog Index', url: `${SITE_URL}/blog/`, description: 'English blog index for guides on PPF, ceramic coating, tint, paint correction, and upholstery care.' },
   { title: 'Contact', url: `${SITE_URL}/contact-us/`, description: 'Contact page with phone, email, and showroom directions.' },
+  { title: 'Get a quote', url: `${SITE_URL}/quote/`, description: 'Choose your car and detailing services and request a quote from the studio.' },
   { title: 'About', url: `${SITE_URL}/more-about-wrp/`, description: 'Brand story, philosophy, and studio positioning.' },
   { title: 'Portfolio', url: `${SITE_URL}/portfolio/`, description: 'Selected detailing, PPF, and ceramic coating case studies.' },
   { title: 'Reviews', url: `${SITE_URL}/reviews/`, description: 'Customer review and testimonial hub.' },

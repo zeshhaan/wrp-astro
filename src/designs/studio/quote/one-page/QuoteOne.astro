@@ -7,8 +7,7 @@
  * scrolling panel of chips, like the car-viewer test page. State, prices and
  * the WhatsApp text come from ../state.ts.
  *
- * noindex: a tool rather than a page to rank, and English only, so there is
- * no Arabic twin for its hreflang pair.
+ * The configurator is currently available in English only.
  */
 import StudioPage from '../../site/StudioPage.astro';
 import QIcon from '../QIcon.astro';
@@ -18,6 +17,10 @@ import { interiorItems, interiorMaterials, paintChips, polishConditions, slots, 
 import { carModels } from '../models';
 import '../quote.css';
 import './one.css';
+
+interface Props {
+  noindex?: boolean;
+}
 
 const catalog = await buildCatalog();
 const thisYear = 2026;
@@ -34,7 +37,9 @@ const panelGroups = [
 
 <StudioPage
   app
-  noindex
+  noindex={Astro.props.noindex}
+  livePath="/quote/"
+  hasAlternateLocale={false}
   title="Get a quote on one page · WRP Detailing Dubai"
   description="Choose your car, the services and the details on one page, see the price build up on a 3D car, and send it on WhatsApp."
 >
