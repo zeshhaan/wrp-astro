@@ -3,6 +3,8 @@
  * (screen order, validation, estimate, summary and WhatsApp text, Dubai dates).
  * Client-safe: no DOM at module level, no imports beyond the shared contract.
  */
+import type { Locale } from '@/i18n/translations';
+import { latinDigits, quoteAmount, quoteLabel, quoteNumber } from './labels';
 import { bodyTypes, panels, tintOptions, type BodyType, type PanelId } from './panels';
 
 export type ServiceId = 'ppf' | 'ceramic' | 'polish' | 'wash' | 'tint' | 'interior' | 'wrap';
@@ -11,6 +13,7 @@ export const serviceOrder: ServiceId[] = ['ppf', 'ceramic', 'polish', 'wash', 't
 export type ScreenId = 'car' | 'services' | 'helper' | ServiceId | 'when' | 'you' | 'review' | 'done';
 
 export type Catalog = {
+  locale?: Locale;
   services: {
     id: ServiceId;
     name: string;
@@ -213,7 +216,7 @@ export function problem(s: QuoteState, screen: ScreenId): string | null {
 
 /* ---------- Pricing (only prices the live site shows) ---------- */
 
-export const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
+export const aed = quoteAmount;
 
 export function priceClass(s: QuoteState): 'sedan' | 'suv' | null {
   return bodyTypes.find((b) => b.id === s.body)?.priceClass ?? null;
@@ -222,6 +225,9 @@ export function priceClass(s: QuoteState): 'sedan' | 'suv' | null {
 export type Line = { id: ServiceId; title: string; detail: string[]; price: string; amount: number | null; exact: boolean };
 
 export function lines(s: QuoteState, c: Catalog, verbose = false): Line[] {
+  const locale = c.locale ?? 'en';
+  const ar = locale === 'ar';
+  const label = (text: string) => quoteLabel(text, locale);
   const cls = priceClass(s);
   return detailScreens(s).map((id) => {
     const svc = c.services.find((x) => x.id === id)!;
@@ -235,58 +241,59 @@ export function lines(s: QuoteState, c: Catalog, verbose = false): Line[] {
         else if (s.ppf.panels.length)
           detail.push(
             verbose || s.ppf.panels.length <= 3
-              ? `Custom coverage (${panels.filter((p) => s.ppf.panels.includes(p.id)).map((p) => p.label.toLowerCase()).join(', ')})`
-              : `Custom coverage, ${s.ppf.panels.length} panels`,
+              ? `${ar ? 'تغطية مخصّصة' : 'Custom coverage'} (${panels.filter((p) => s.ppf.panels.includes(p.id)).map((p) => label(p.label).toLowerCase()).join(ar ? '، ' : ', ')})`
+              : ar ? `عدد الأجزاء المحددة للتغطية: ${quoteNumber(s.ppf.panels.length, locale)}` : `Custom coverage, ${s.ppf.panels.length} panels`,
           );
-        else detail.push('Coverage to choose');
-        detail.push(`${s.ppf.finish === 'matte' ? 'Matte' : 'Gloss'} finish`);
-        detail.push(s.ppf.film === 'avery' ? 'Avery Dennison film' : s.ppf.film === 'stek' ? 'STEK film' : 'Film: recommend for me');
-        if (s.ppf.ceramicTop) detail.push('+ ceramic coating on the film');
+        else detail.push(ar ? 'لم تُحدَّد التغطية' : 'Coverage to choose');
+        detail.push(ar ? (s.ppf.finish === 'matte' ? 'لمسة مطفية' : 'لمسة لامعة') : `${s.ppf.finish === 'matte' ? 'Matte' : 'Gloss'} finish`);
+        const film = { avery: ar ? 'فيلم Avery Dennison' : 'Avery Dennison film', stek: ar ? 'فيلم STEK' : 'STEK film', recommend: ar ? 'نوع الفيلم حسب توصيتكم' : 'Film: recommend for me' };
+        detail.push(film[s.ppf.film]);
+        if (s.ppf.ceramicTop) detail.push((ar ? 'إضافة سيراميك فوق الفيلم' : '+ ceramic coating on the film'));
         break;
       }
       case 'ceramic': {
         const pkg = c.ceramic.packages.find((p) => p.id === s.ceramic.pkg);
-        detail.push(pkg ? pkg.name : 'Package: recommend for me');
-        if (s.ceramic.wheelsGlass) detail.push('+ wheels & glass');
+        detail.push(pkg ? pkg.name : (ar ? 'الباقة حسب توصيتكم' : 'Package: recommend for me'));
+        if (s.ceramic.wheelsGlass) detail.push((ar ? 'إضافة الجنوط والزجاج' : '+ wheels & glass'));
         break;
       }
       case 'polish': {
         const cond = polishConditions.find((p) => p.id === s.polish.condition);
         if (cond) {
-          detail.push(cond.label);
+          detail.push(label(cond.label));
           const pkg = cond.pkg >= 0 ? c.polish.packages[cond.pkg] : null;
-          detail.push(pkg ? `Likely ${pkg.name}` : 'We’ll measure and suggest');
+          detail.push(pkg ? `${ar ? 'الباقة المتوقعة' : 'Likely'} ${pkg.name}` : (ar ? 'نقيس سماكة الطلاء ونقترح المعالجة المناسبة' : 'We’ll measure and suggest'));
         }
         break;
       }
       case 'wash': {
         const lv = c.wash.levels.find((l) => l.level === s.wash.level);
         if (lv) {
-          detail.push(`${lv.name}, ${lv.tagline}`);
+          detail.push([lv.name, lv.tagline].join(ar ? '، ' : ', '));
           amount = cls === 'suv' ? lv.suv : lv.sedan;
           exact = !!cls;
         }
         break;
       }
       case 'tint': {
-        const o = tintOptions.find((t) => t.id === s.tint.option);
-        if (o) detail.push(`${o.name}, ${o.vlt}% VLT`);
+        const o = c.tint.options.find((t) => t.id === s.tint.option) ?? tintOptions.find((t) => t.id === s.tint.option);
+        if (o) detail.push(ar ? `${label(o.name)}، نفاذ الضوء ${quoteNumber(o.vlt, locale)}٪` : `${o.name}, ${o.vlt}% VLT`);
         break;
       }
       case 'interior': {
-        detail.push(...interiorItems.filter((i) => s.interior.items.includes(i.id)).map((i) => i.label));
+        detail.push(...interiorItems.filter((i) => s.interior.items.includes(i.id)).map((i) => label(i.label)));
         const m = interiorMaterials.find((x) => x.id === s.interior.material);
-        if (m && m.id !== 'unsure') detail.push(m.label);
+        if (m && m.id !== 'unsure') detail.push(label(m.label));
         break;
       }
       case 'wrap': {
-        const names = panels.filter((p) => s.wrap.parts.includes(p.id)).map((p) => p.label);
-        if (names.length) detail.push(`${wrapFinishes.find((f) => f.id === s.wrap.finish)?.label ?? ''}: ${names.join(', ')}`);
-        if (s.wrap.chromeDelete) detail.push('Chrome delete');
+        const names = panels.filter((p) => s.wrap.parts.includes(p.id)).map((p) => label(p.label));
+        if (names.length) detail.push(`${label(wrapFinishes.find((f) => f.id === s.wrap.finish)?.label ?? '')}: ${names.join(ar ? '، ' : ', ')}`);
+        if (s.wrap.chromeDelete) detail.push((ar ? 'تغطية الكروم' : 'Chrome delete'));
         break;
       }
     }
-    const price = amount === null ? 'Priced after inspection' : exact ? aed(amount) : `From ${aed(amount)}`;
+    const price = amount === null ? (ar ? 'يُحدَّد بعد المعاينة' : 'Priced after inspection') : exact ? aed(amount, locale) : `${ar ? 'ابتداءً من' : 'From'} ${aed(amount, locale)}`;
     return { id, title: svc.name, detail, price, amount, exact };
   });
 }
@@ -301,9 +308,11 @@ export function estimate(s: QuoteState, c: Catalog, verbose = false) {
 
 export function estimateLabel(s: QuoteState, c: Catalog): string {
   const e = estimate(s, c);
-  if (!e.count) return 'Nothing chosen yet';
-  if (!e.total) return 'Priced after inspection';
-  return `${e.anyFrom || e.inspect ? 'from ' : ''}${aed(e.total)}`;
+  const ar = c.locale === 'ar';
+  if (!e.count) return ar ? 'لم تحدد أي خيارات بعد' : 'Nothing chosen yet';
+  if (!e.total) return ar ? 'يُحدَّد بعد المعاينة' : 'Priced after inspection';
+  const from = ar ? 'ابتداءً من ' : 'from ';
+  return `${e.anyFrom || e.inspect ? from : ''}${aed(e.total, c.locale)}`;
 }
 
 /* ---------- Dubai calendar ---------- */
@@ -334,9 +343,9 @@ export function weekday(date: string): number {
   const [y, m, d] = date.split('-').map(Number);
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
-export function formatDay(date: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' }) {
+export function formatDay(date: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' }, locale: Locale = 'en') {
   const [y, m, d] = date.split('-').map(Number);
-  return new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d)));
+  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-AE-u-ca-gregory-nu-arab' : 'en-GB', { ...opts, timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d)));
 }
 
 /** Last booking start today: 20:00 Dubai (brief: today disabled after 8 PM). */
@@ -344,7 +353,7 @@ export const TODAY_CUTOFF = 20 * 60;
 
 export type DayOption = { date: string; disabled: boolean; reason: string; top: string; mid: string; bottom: string };
 
-export function bookableDays(now: DubaiNow, closedDays: number[], count = 21): DayOption[] {
+export function bookableDays(now: DubaiNow, closedDays: number[], count = 21, locale: Locale = 'en'): DayOption[] {
   const out: DayOption[] = [];
   for (let i = 0; i < count; i++) {
     const date = addDays(now.date, i);
@@ -354,10 +363,10 @@ export function bookableDays(now: DubaiNow, closedDays: number[], count = 21): D
     out.push({
       date,
       disabled: closed || late,
-      reason: closed ? 'Closed' : late ? 'Too late' : '',
-      top: i === 0 ? 'Today' : i === 1 ? 'Tmrw' : formatDay(date, { weekday: 'short' }),
-      mid: formatDay(date, { day: 'numeric' }),
-      bottom: formatDay(date, { month: 'short' }),
+      reason: closed ? (locale === 'ar' ? 'مغلق' : 'Closed') : late ? (locale === 'ar' ? 'انتهى الوقت' : 'Too late') : '',
+      top: i === 0 ? (locale === 'ar' ? 'اليوم' : 'Today') : i === 1 ? (locale === 'ar' ? 'غداً' : 'Tmrw') : formatDay(date, { weekday: 'short' }, locale),
+      mid: formatDay(date, { day: 'numeric' }, locale),
+      bottom: formatDay(date, { month: 'short' }, locale),
     });
   }
   return out;
@@ -373,22 +382,25 @@ export function slotAvailable(slotId: string, day: string | null, now: DubaiNow)
 
 /* ---------- Text for the summary, WhatsApp and the enquiry form ---------- */
 
-export function vehicleText(s: QuoteState): string {
+export function vehicleText(s: QuoteState, locale: Locale = 'en'): string {
   const body = bodyTypes.find((b) => b.id === s.body)?.label ?? '';
   const colour = s.paint === 'other' ? s.paintOther.trim() : paintChips.find((p) => p.id === s.paint)?.label ?? '';
-  const car = [s.make.trim(), s.year === 'older' ? '(older)' : s.year].filter(Boolean).join(' ');
-  return [car, colour && colour.toLowerCase(), body].filter(Boolean).join(', ');
+  const car = [s.make.trim(), s.year === 'older' ? (locale === 'ar' ? '(طراز أقدم)' : '(older)') : s.year].filter(Boolean).join(' ');
+  return [car, colour && (s.paint === 'other' ? colour : quoteLabel(colour, locale)).toLowerCase(), quoteLabel(body, locale)].filter(Boolean).join(locale === 'ar' ? '، ' : ', ');
 }
 
-export function whenText(s: QuoteState): string {
+export function whenText(s: QuoteState, locale: Locale = 'en'): string {
   const parts: string[] = [];
-  if (s.when.day) parts.push(formatDay(s.when.day, { weekday: 'long', day: 'numeric', month: 'long' }));
+  if (s.when.day) parts.push(formatDay(s.when.day, { weekday: 'long', day: 'numeric', month: 'long' }, locale));
   const slot = slots.find((x) => x.id === s.when.slot);
-  if (slot) parts.push(`${slot.label.toLowerCase()} (${slot.range})`);
-  return parts.join(', ');
+  if (slot) parts.push(`${quoteLabel(slot.label, locale).toLowerCase()} (${quoteLabel(slot.range, locale)})`);
+  return parts.join(locale === 'ar' ? '، ' : ', ');
 }
 
-export function handoverText(s: QuoteState): string {
+export function handoverText(s: QuoteState, locale: Locale = 'en'): string {
+  if (locale === 'ar') return s.when.handover === 'collect'
+    ? `أرغب في استلام السيارة${s.when.area.trim() ? ` من ${s.when.area.trim()}` : ' من موقعي'} (بانتظار التأكيد)`
+    : 'سأوصل السيارة إلى الاستوديو';
   return s.when.handover === 'collect'
     ? `Please collect my car${s.when.area.trim() ? ` from ${s.when.area.trim()}` : ''} (on request, to confirm)`
     : 'I’ll drop the car off at the studio';
@@ -399,6 +411,22 @@ export function requestText(s: QuoteState, c: Catalog, opts: { whatsapp: boolean
   const b = (t: string) => (opts.whatsapp ? `*${t}*` : t);
   const e = estimate(s, c, true);
   const out: string[] = [];
+  if (c.locale === 'ar') {
+    if (opts.whatsapp) out.push('مرحباً WRP، أود الحصول على عرض سعر لسيارتي.', '');
+    out.push(`${b('السيارة:')} ${vehicleText(s, 'ar') || '—'}`, b('الخدمات المطلوبة:'));
+    for (const line of e.lines) {
+      out.push(`• ${line.title}${line.detail.length ? `: ${line.detail.join('، ')}` : ''} (${line.price})`);
+    }
+    if (e.count) out.push(`${b('التكلفة التقديرية:')} ${estimateLabel(s, c)}${e.total && e.inspect ? '، إضافة إلى خدمات يُحدَّد سعرها بعد المعاينة' : ''}`);
+    if (s.when.day || s.when.slot) out.push(`${b('الموعد المطلوب:')} ${whenText(s, 'ar')}`);
+    out.push(`${b('تسليم السيارة:')} ${handoverText(s, 'ar')}`);
+    if (s.you.name.trim()) out.push(`${b('الاسم:')} ${s.you.name.trim()}`);
+    if (s.you.phone.trim()) out.push(`${b('الجوال:')} ${s.you.phone.trim()}`);
+    if (s.you.email.trim()) out.push(`${b('البريد الإلكتروني:')} ${s.you.email.trim()}`);
+    out.push(`${b('أفضّل التواصل عبر:')} ${s.you.contact === 'call' ? 'مكالمة هاتفية' : 'واتساب'}`);
+    if (s.you.notes.trim()) out.push(`${b('ملاحظات:')} ${s.you.notes.trim()}`);
+    return out.join('\n');
+  }
   if (opts.whatsapp) out.push('Hi WRP, I’d like a quote please.', '');
   out.push(`${b('Car:')} ${vehicleText(s) || '—'}`);
   out.push(b('Services:'));
@@ -434,12 +462,12 @@ export function serviceInterest(s: QuoteState, c: Catalog): string {
 export function quoteLeadFields(s: QuoteState, c: Catalog): Record<string, string> {
   return {
     name: s.you.name.trim().slice(0, 100),
-    phone: s.you.phone.trim(),
+    phone: latinDigits(s.you.phone.trim()),
     email: s.you.email.trim(),
     reply: s.you.contact === 'call' ? 'call' : 'whatsapp',
-    vehicle: vehicleText(s).slice(0, 120),
+    vehicle: vehicleText(s, c.locale).slice(0, 120),
     service: serviceInterest(s, c).slice(0, 120),
     notes: requestText(s, c, { whatsapp: false }).slice(0, 5000),
-    locale: 'en',
+    locale: c.locale ?? 'en',
   };
 }

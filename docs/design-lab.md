@@ -31,8 +31,8 @@ Every build has a review hub at `/design-lab/`:
 | Header candidates | `/design-lab/studio/headers/` (each at `headers/a/`, `d/` … `h/`, Arabic at `…/ar/`) |
 
 Design Lab pages are `noindex`, excluded from the sitemap, and their forms
-never send leads. The public English quote page is in the sitemap and accepts
-real enquiries. Its English-language copy at `/ar/quote/` carries `noindex`.
+never send leads. The English and Arabic quote pages are in the sitemap and accept
+real enquiries at `/quote/` and `/ar/quote/`.
 
 Cloudflare **Worker Previews** of the branch:
 

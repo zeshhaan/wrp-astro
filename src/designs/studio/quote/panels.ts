@@ -10,6 +10,8 @@
  * Keep ids stable: they are stored in saved drafts.
  */
 
+import type { Locale } from '@/i18n/translations';
+
 export type BodyType = 'sedan' | 'coupe' | 'suv' | 'pickup';
 
 export const bodyTypes: { id: BodyType; label: string; hint: string; priceClass: 'sedan' | 'suv' }[] = [
@@ -119,6 +121,7 @@ export const tintOptions: { id: string; name: string; vlt: number; heat: string;
 export type ViewerMode = 'ppf' | 'wrap' | 'tint' | 'look';
 
 export interface CarViewerOptions {
+  locale?: Locale;
   body: BodyType;
   mode: ViewerMode;
   selected: ReadonlySet<PanelId>;

@@ -40,7 +40,6 @@ interface Props {
   locale?: Locale;
   ogImage?: string;
   noindex?: boolean;
-  hasAlternateLocale?: boolean;
   ogType?: 'website' | 'article';
   publishedTime?: string | Date;
   modifiedTime?: string | Date;
@@ -73,7 +72,6 @@ const {
   locale = 'en',
   ogImage,
   noindex = false,
-  hasAlternateLocale = true,
   ogType = 'website',
   publishedTime,
   modifiedTime,
@@ -136,7 +134,7 @@ const extendMeta = [
   { name: 'ICBM', content: '25.2854, 55.3781' },
   { name: 'googlebot', content: robotsOff ? 'noindex, nofollow' : robotsFull },
   { name: 'bingbot', content: robotsOff ? 'noindex, nofollow' : robotsFull },
-  ...(hasAlternateLocale ? [{ property: 'og:locale:alternate', content: alternateOgLocale }] : []),
+  { property: 'og:locale:alternate', content: alternateOgLocale },
   ...articleMeta,
   ...(ogType === 'article' && articleSection
     ? [
@@ -197,7 +195,7 @@ const altHref = lab(alternatePath);
     <Schema type="SiteNavigationElement" />
 
     <link rel="alternate" hreflang="en-AE" href={isArabic ? alternateUrl : canonicalURL} />
-    {hasAlternateLocale && <link rel="alternate" hreflang="ar-AE" href={isArabic ? canonicalURL : alternateUrl} />}
+    <link rel="alternate" hreflang="ar-AE" href={isArabic ? canonicalURL : alternateUrl} />
     <link rel="alternate" hreflang="x-default" href={isArabic ? alternateUrl : canonicalURL} />
     <link
       rel="alternate"
@@ -227,7 +225,7 @@ const altHref = lab(alternatePath);
     }
   </head>
   <body>
-    <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={heroForm ? '#quote' : studioQuoteHref} phone="showroom" />
+    <HeaderStorefront nav={labNav} altHref={altHref} quoteHref={heroForm ? '#quote' : studioQuoteHref(locale)} phone="showroom" />
     {
       app ? (
         <slot />

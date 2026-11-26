@@ -14,7 +14,8 @@
  * list of panel toggle buttons next to it, so nobody depends on precise taps.
  * No DOM access at module top level, so it is safe to import on the server.
  */
-import { panels, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId } from '../panels';
+import { quoteLabel, quoteNumber } from '../labels';
+import { bodyTypes, panels, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId } from '../panels';
 
 type Geo = {
   /** Side profile height (roof to ground). */
@@ -232,7 +233,7 @@ function layout(body: BodyType, profileOnly: boolean) {
   return { g, h: g.sh * 2 + topH + GAP * 2 + 4, left: 2, top: 2 + g.sh + GAP, right: 2 + g.sh + GAP + topH + GAP };
 }
 
-function svgMarkup(body: BodyType, mode: CarViewerOptions['mode'], uid: string) {
+function svgMarkup(body: BodyType, mode: CarViewerOptions['mode'], uid: string, arabic: boolean) {
   const profileOnly = mode === 'look';
   const { g, h, left, top, right } = layout(body, profileOnly);
   const interactive: ReadonlySet<PanelId> =
@@ -242,8 +243,8 @@ function svgMarkup(body: BodyType, mode: CarViewerOptions['mode'], uid: string) 
     inner += pieceMarkup(topPiece(g), PAD_X, top, interactive);
     inner += pieceMarkup(sidePiece(g, 'r'), PAD_X, right, interactive);
     inner +=
-      `<text class="cv-label" x="4" y="${left + g.sh / 2 + 5}">L</text>` +
-      `<text class="cv-label" x="4" y="${right + g.sh / 2 + 5}">R</text>`;
+      `<text class="cv-label" x="4" y="${left + g.sh / 2 + 5}">${arabic ? 'يسار' : 'L'}</text>` +
+      `<text class="cv-label" x="4" y="${right + g.sh / 2 + 5}">${arabic ? 'يمين' : 'R'}</text>`;
   }
   const defs = `<defs>
     <pattern id="${uid}-film" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
@@ -340,9 +341,9 @@ export async function mount(el: HTMLElement, initial: CarViewerOptions): Promise
 
   let renderedKey = '';
   const render = () => {
-    const key = `${opts.body}|${opts.mode === 'look' ? 'look' : 'full'}|${opts.mode}`;
+    const key = `${opts.body}|${opts.mode === 'look' ? 'look' : 'full'}|${opts.mode}|${opts.locale}`;
     if (key !== renderedKey) {
-      const { markup, viewBox } = svgMarkup(opts.body, opts.mode, uid);
+      const { markup, viewBox } = svgMarkup(opts.body, opts.mode, uid, opts.locale === 'ar');
       svg.setAttribute('viewBox', viewBox);
       svg.innerHTML = markup;
       renderedKey = key;
@@ -403,6 +404,14 @@ export async function mount(el: HTMLElement, initial: CarViewerOptions): Promise
 const bodyNames: Record<BodyType, string> = { sedan: 'sedan', coupe: 'coupe', suv: 'SUV', pickup: 'pickup' };
 
 function describe(o: CarViewerOptions): string {
+  if (o.locale === 'ar') {
+    const shape = bodyTypes.find((b) => b.id === o.body)!;
+    const car = `رسم توضيحي للسيارة (${quoteLabel(shape.label, 'ar')})`;
+    if (o.mode === 'look') return `${car} من الجانب.`;
+    if (o.mode === 'tint') return `${car} من الأعلى والجانبين. نسبة نفاذ الضوء: ${quoteNumber(o.tintVlt ?? 100, 'ar')}٪.`;
+    const names = panels.filter((p) => o.selected.has(p.id)).map((p) => quoteLabel(p.label, 'ar'));
+    return names.length ? `${car}. الأجزاء المحددة: ${names.join('، ')}.` : `${car}. لم تُحدَّد أي أجزاء بعد.`;
+  }
   const car = `Drawing of a ${bodyNames[o.body]}`;
   if (o.mode === 'look') return `${car}, side view.`;
   if (o.mode === 'tint') return `${car} from above and both sides, windows shaded to ${o.tintVlt ?? 'no'}% visible light.`;

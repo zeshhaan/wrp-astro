@@ -142,9 +142,9 @@ const hero = copy.hero.image.src;
 
   <PostCards locale={locale} link={link} heading={copy.posts.heading} subheading={copy.posts.subheading} />
 
-  <EndCta heading={copy.cta.h2} text={copy.cta.text} href={studioQuoteHref}>
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} href={studioQuoteHref(locale)}>
     <div class="end-actions">
-      <a class="st-btn st-btn--primary" href={studioQuoteHref} data-quote>
+      <a class="st-btn st-btn--primary" href={studioQuoteHref(locale)} data-quote>
         {copy.cta.quote}
         <Icon name="arrow-right" size={18} class="flip" />
       </a>

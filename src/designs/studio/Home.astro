@@ -53,7 +53,7 @@ const candidates = {
   h: { Candidate: HeaderStorefront, props: { phone: 'filmstrip' } },
 } as const;
 const { Candidate, props: candidateProps } = candidates[header];
-const quoteHref = studioQuoteHref;
+const quoteHref = studioQuoteHref(locale);
 const title = 'Paint Protection Film (PPF) in Dubai | WRP Detailing Studio, Al Qusais';
 const description =
   'Self-healing STEK and Avery Dennison PPF, ceramic coating, window tint and detailing in Al Qusais, Dubai. Up to 10-year warranty. 5.0 on Google.';

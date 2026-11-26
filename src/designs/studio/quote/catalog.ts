@@ -1,12 +1,14 @@
 /**
  * Server-side: everything the quote flow shows, read from data.ts and the
- * English service .mdx files, flattened to plain JSON for the client.
+ * localized service .mdx files, flattened to plain JSON for the client.
  *
  * Price rules (same as the live site): only data.ts `from` prices and the wash
  * levels (the one page with showPackages: true) are shown. Package prices in the
  * PPF / ceramic / polish / tint .mdx are NOT shown; we use their names and
  * inclusions only.
  */
+import { quoteLabel } from './labels';
+import type { Locale } from '@/i18n/translations';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { contact, proof, services } from '../../data';
 import { ppfPresets, tintOptions } from './panels';
@@ -20,24 +22,28 @@ const bySlug = (slug: string) => {
   return s;
 };
 
-export async function buildCatalog(): Promise<Catalog> {
-  const all = await getCollection('services', (e: Svc) => !e.id.startsWith('ar/'));
+export async function buildCatalog(locale: Locale = 'en'): Promise<Catalog> {
+  const all = await getCollection('services');
   const mdx = (slug: string) => {
     const e = all.find((x) => x.id === slug || x.id === `${slug}.mdx`);
     if (!e) throw new Error(`quote: missing ${slug}.mdx`);
     return e.data;
   };
   const ppf = mdx('paint-protection-film');
+  const prefix = locale === 'ar' ? 'ar/' : '';
+  const label = (text: string) => quoteLabel(text, locale);
   const ceramic = mdx('ceramic-coating');
-  const polish = mdx('polish');
+  const ceramicCopy = mdx(prefix + 'ceramic-coating');
+  const polish = mdx(prefix + 'polish');
   const wash = mdx('premium-car-wash');
+  const washCopy = mdx(prefix + 'premium-car-wash');
   const tint = mdx('window-film');
 
   const feat = (d: Svc['data'], name: string) => d.packages?.find((p) => p.name === name)?.features ?? [];
 
   const svc = (id: ServiceId, slug: string | null, over: Partial<Catalog['services'][number]> = {}) => {
     const s = slug ? bySlug(slug) : null;
-    return {
+    const service = {
       id,
       name: s?.name ?? '',
       short: s?.short ?? '',
@@ -48,18 +54,20 @@ export async function buildCatalog(): Promise<Catalog> {
       line: s?.line ?? '',
       ...over,
     };
+    return { ...service, name: label(service.name), time: label(service.time) };
   };
 
   const washLevels = (wash.packages ?? []).map((p, i) => ({
     level: (i + 1) as 1 | 2 | 3,
-    name: p.name,
-    tagline: (p as { tagline?: string }).tagline ?? '',
+    name: washCopy.packages?.[i]?.name ?? p.name,
+    tagline: washCopy.packages?.[i]?.tagline ?? p.tagline ?? '',
     sedan: p.price,
     suv: (p as { priceSuv?: number }).priceSuv ?? p.price,
     features: p.features,
   }));
 
   return {
+    locale,
     services: [
       svc('ppf', 'paint-protection-film', { name: 'Paint protection film', short: 'PPF', line: 'Clear, self-healing film that takes the stone chips.' }),
       svc('ceramic', 'ceramic-coating', { name: 'Ceramic coating', line: 'A hard glass layer that keeps the gloss and sheds dirt.' }),
@@ -80,13 +88,17 @@ export async function buildCatalog(): Promise<Catalog> {
       }),
     ],
     ppf: {
-      presets: ppfPresets.map((p) => ({ ...p, features: feat(ppf, p.name) })),
+      presets: ppfPresets.map((p) => ({ ...p, name: label(p.name), note: label(p.note), features: feat(ppf, p.name) })),
       facts: bySlug('paint-protection-film').facts,
       films: proof.films,
       ceramicOnFilm: ceramic.faqs?.find((f) => /over PPF/i.test(f.question))?.answer ?? '',
     },
     ceramic: {
-      packages: (ceramic.packages ?? []).map((p) => ({ id: p.name.split(' ')[0].toLowerCase(), name: p.name, features: p.features })),
+      packages: (ceramic.packages ?? []).map((p, i) => ({
+        id: p.name.split(' ')[0].toLowerCase(),
+        name: ceramicCopy.packages?.[i]?.name ?? p.name,
+        features: ceramicCopy.packages?.[i]?.features ?? p.features,
+      })),
       facts: bySlug('ceramic-coating').facts,
     },
     polish: {
@@ -94,11 +106,11 @@ export async function buildCatalog(): Promise<Catalog> {
     },
     wash: { levels: washLevels },
     tint: {
-      options: tintOptions.map((o) => ({ ...o, features: feat(tint, o.name) })),
+      options: tintOptions.map((o) => ({ ...o, name: label(o.name), heat: label(o.heat), note: label(o.note), features: feat(tint, o.name) })),
     },
     contact: {
       whatsapp: contact.whatsapp,
-      hours: contact.hours,
+      hours: locale === 'ar' ? 'نفتح من الساعة ٩ صباحاً حتى ٩:٣٠ مساءً كل يوم ما عدا الجمعة' : contact.hours,
       schedule: contact.schedule,
     },
   };

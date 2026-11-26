@@ -25,6 +25,29 @@ describe('quoteLeadFields', () => {
     expect(fields.notes).toContain('Name: Sara');
   });
 
+  test('Arabic enquiries preserve the selected service, price, language and contact details', () => {
+    const arabicCatalog: Catalog = {
+      ...catalog,
+      locale: 'ar',
+      services: [{ id: 'wash', name: 'العناية الشاملة', short: '', from: 100, time: '', minutes: 0, href: '', line: '' }],
+      wash: { levels: [{ level: 1, name: 'المستوى الأول', tagline: 'صيانة أساسية', sedan: 100, suv: 120, features: [] }] },
+    };
+    const s = freshState();
+    s.body = 'suv';
+    s.services = ['wash'];
+    s.wash.level = 1;
+    s.you.name = 'مريم';
+    s.you.phone = '٠٥٠ ١٢٣ ٤٥٦٧';
+    s.when.day = '2026-12-05';
+    const lead = quoteLeadFields(s, arabicCatalog);
+    expect(lead.locale).toBe('ar');
+    expect(lead.phone).toBe('050 123 4567');
+    expect(lead.service).toBe('العناية الشاملة');
+    expect(lead.notes).toContain('١٢٠ د.إ.');
+    expect(lead.notes).toContain('السبت');
+    expect(lead.notes).toContain('مريم');
+  });
+
   test('keeps every field inside the quote action limits', () => {
     const s = freshState();
     s.make = 'x'.repeat(300);

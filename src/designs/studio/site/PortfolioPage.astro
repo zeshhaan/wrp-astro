@@ -147,7 +147,7 @@ const { photos, slides, viewService } = await loadWork(locale);
 
   <Lightbox slides={slides} label={copy.h1} linkLabel={viewService} />
 
-  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(locale, copy.cta.button)} href={studioQuoteHref} />
+  <EndCta heading={copy.cta.h2} text={copy.cta.text} button={say(locale, copy.cta.button)} href={studioQuoteHref(locale)} />
 </StudioPage>
 
 <style>

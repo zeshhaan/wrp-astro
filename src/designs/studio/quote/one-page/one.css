@@ -714,3 +714,8 @@
     display: none;
   }
 }
+
+:lang(ar) .qo-h1,
+:lang(ar) .qo-h2 {
+  line-height: 1.45;
+}

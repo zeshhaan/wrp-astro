@@ -62,8 +62,7 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      // The Arabic quote URL serves a copy of the English configurator.
-      filter: (page) => !page.includes('/design-lab/') && !page.endsWith('/ar/quote/'),
+      filter: (page) => !page.includes('/design-lab/'),
       customPages: [
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',

@@ -42,7 +42,7 @@ const links = [
         {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
       </ul>
     </nav>
-    <a class="st-btn st-btn--primary head__cta" href={studioQuoteHref}>Get a quick quote</a>
+    <a class="st-btn st-btn--primary head__cta" href={studioQuoteHref()}>Get a quick quote</a>
     <button
       class="head__menu"
       type="button"
@@ -71,7 +71,7 @@ const links = [
     </ul>
   </nav>
   <div class="drawer__actions">
-    <a class="st-btn st-btn--primary" href={studioQuoteHref}>Get a quick quote</a>
+    <a class="st-btn st-btn--primary" href={studioQuoteHref()}>Get a quick quote</a>
     <a class="st-btn st-btn--light" href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
     <a class="drawer__phone" href={contact.phoneHref}><Icon name="phone" size={18} />{contact.phoneDisplay}</a>
     <p class="drawer__hours">{contact.hours}.</p>

@@ -35,6 +35,7 @@ const STATIC_AR_PAGES = [
   { title: 'الصفحة الرئيسية العربية', url: `${SITE_URL}/ar/`, description: 'الواجهة العربية الرئيسية للموقع.' },
   { title: 'فهرس المدونة العربية', url: `${SITE_URL}/ar/blog/`, description: 'فهرس المدونة العربية لأدلة PPF والسيراميك والتظليل والتلميع.' },
   { title: 'اتصل بنا', url: `${SITE_URL}/ar/contact-us/`, description: 'صفحة التواصل العربية.' },
+  { title: 'طلب عرض سعر', url: `${SITE_URL}/ar/quote/`, description: 'اختر سيارتك وخدمات العناية المطلوبة واطلب عرض سعر من الاستوديو.' },
   { title: 'عن WRP', url: `${SITE_URL}/ar/more-about-wrp/`, description: 'صفحة تعريفية عربية عن الاستوديو.' },
   { title: 'معرض الأعمال', url: `${SITE_URL}/ar/portfolio/`, description: 'معرض الأعمال العربي.' },
   { title: 'المراجعات', url: `${SITE_URL}/ar/reviews/`, description: 'مركز المراجعات والشهادات باللغة العربية.' },

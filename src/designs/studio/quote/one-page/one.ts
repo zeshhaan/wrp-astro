@@ -5,6 +5,7 @@
  * ../state.ts; this file only binds them to
  * one long form and a viewer that follows whichever section you are working in.
  */
+import { latinDigits, quoteLabel, quoteNumber } from '../labels';
 import { actions } from 'astro:actions';
 import { panels, ppfPresets, tintOptions, wrapParts, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';
 import {
@@ -16,7 +17,6 @@ import {
   estimateLabel,
   formatDay,
   freshState,
-  lines,
   loadDraft,
   paintChips,
   priceClass,
@@ -38,6 +38,8 @@ import { mount as mount2D, panelsFor } from '../viewer/CarViewer2D';
 const KEY = 'wrp-studio-quote-onepage-v1';
 let S: QuoteState = freshState();
 let C: Catalog;
+const copy = (english: string, arabic: string) => C.locale === 'ar' ? arabic : english;
+const number = (value: number) => quoteNumber(value, C.locale ?? 'en');
 let form: HTMLFormElement;
 let submitting = false;
 // One id per request, kept across retries so a resend never makes a second lead.
@@ -52,8 +54,6 @@ const input = (name: string, value?: string) =>
 export function start() {
   C = JSON.parse(q('#qo-catalog')!.textContent || '{}') as Catalog;
   form = q<HTMLFormElement>('#qo-form')!;
-  // Sending needs this script (it builds the request), so the button waits for it.
-  q<HTMLButtonElement>('button[type="submit"]', form)!.disabled = false;
   const draft = loadDraft(KEY);
   if (draft && !draft.sent) S = draft;
   // Sensible defaults the step flow asks for on their own screens.
@@ -75,6 +75,8 @@ export function start() {
   q('[data-qo-wa]')!.addEventListener('click', onWhatsApp);
   q('[data-qo-restart]')!.addEventListener('click', restart);
   sync();
+  // Sending needs this script (it builds the request), so the button waits for it.
+  q<HTMLButtonElement>('button[type="submit"]', form)!.disabled = false;
   void mountViewer();
 }
 
@@ -83,7 +85,7 @@ export function start() {
 function fixHeaderLinks() {
   qa<HTMLAnchorElement>('.head a[href^="#"], .drawer a[href^="#"], .foot a[href^="#"]').forEach((a) => {
     const id = a.getAttribute('href')!.slice(1);
-    if (!document.getElementById(id) || id === 'main') a.href = `/${id === 'main' ? '' : `#${id}`}`;
+    if (!document.getElementById(id) || id === 'main') a.href = `${copy('/', '/ar/')}${id === 'main' ? '' : `#${id}`}`;
   });
 }
 
@@ -177,7 +179,8 @@ function onChange(e: Event) {
     case 'ppfPreset':
       S.ppf.preset = v;
       S.ppf.panels = presetFor(v);
-      announce(`${ppfPresets.find((p) => p.id === v)?.name}: ${S.ppf.panels.length} panels covered.`);
+      const presetName = C.ppf.presets.find((p) => p.id === v)?.name;
+      announce(copy(`${presetName}: ${S.ppf.panels.length} panels covered.`, `${presetName}، عدد الأجزاء المشمولة: ${number(S.ppf.panels.length)}.`));
       break;
     case 'ppfPanel':
       S.ppf.panels = panels.map((p) => p.id).filter((id) => input('ppfPanel', id)?.checked);
@@ -259,7 +262,8 @@ function onInput(e: Event) {
         check('body', guess);
         if (S.ppf.preset) S.ppf.panels = presetFor(S.ppf.preset);
         hint.hidden = false;
-        hint.textContent = `We picked “${q(`input[name="body"][value="${guess}"]`, form)!.closest('label')!.querySelector('.qo-body__name')!.textContent}” for you. Change it above if that’s wrong.`;
+        const bodyLabel = q(`input[name="body"][value="${guess}"]`, form)!.closest('label')!.querySelector('.qo-body__name')!.textContent;
+        hint.textContent = copy(`We picked “${bodyLabel}” for you. Change it above if that’s wrong.`, `حدّدنا «${bodyLabel}» بناءً على الطراز. يمكنك تغيير الاختيار أعلاه.`);
       }
       break;
     }
@@ -325,13 +329,13 @@ function sync(full = true) {
     qa<HTMLElement>('[data-qo-panel]').forEach((l) => (l.hidden = !avail.has(l.dataset.qoPanel as PanelId)));
     qa<HTMLInputElement>('input[name="ppfPanel"]', form).forEach((i) => (i.checked = S.ppf.panels.includes(i.value as PanelId)));
     qa<HTMLInputElement>('input[name="ppfPreset"]', form).forEach((i) => (i.checked = i.value === S.ppf.preset));
-    q('[data-qo-panel-count]')!.textContent = S.ppf.panels.length ? `(${S.ppf.panels.length} selected)` : '';
+    q('[data-qo-panel-count]')!.textContent = S.ppf.panels.length ? copy(`(${S.ppf.panels.length} selected)`, `(عدد الأجزاء المحددة: ${number(S.ppf.panels.length)})`) : '';
     qa<HTMLInputElement>('input[name="wrapPart"]', form).forEach((i) => (i.checked = S.wrap.parts.includes(i.value as PanelId)));
     // Wash prices follow the car's size
     const cls = priceClass(S);
     qa<HTMLElement>('[data-qo-wash-price]').forEach((el) => {
       const n = Number(cls === 'suv' ? el.dataset.suv : el.dataset.sedan);
-      el.textContent = cls ? aed(n) : `From ${aed(n)}`;
+      el.textContent = cls ? aed(n, C.locale) : `${copy('From', 'ابتداءً من')} ${aed(n, C.locale)}`;
     });
     q('[data-qo-paint-other]')!.hidden = S.paint !== 'other';
     q('[data-qo-area]')!.hidden = S.when.handover !== 'collect';
@@ -344,11 +348,11 @@ function sync(full = true) {
 
 function renderDays() {
   const now = dubaiNow(C.contact.schedule.timeZone);
-  const days = bookableDays(now, C.contact.schedule.closedDays, 14);
+  const days = bookableDays(now, C.contact.schedule.closedDays, 14, C.locale);
   q('[data-qo-days]')!.innerHTML = days
     .map(
       (d) =>
-        `<label class="qo-day"${d.disabled ? ' data-disabled' : ''}><input class="visually-hidden" type="radio" name="day" value="${d.date}"${d.disabled ? ' disabled' : ''} aria-label="${formatDay(d.date, { weekday: 'long', day: 'numeric', month: 'long' })}${d.reason ? `, ${d.reason.toLowerCase()}` : ''}"><span><small>${d.top}</small><b>${d.mid}</b><small>${d.reason || d.bottom}</small></span></label>`,
+        `<label class="qo-day"${d.disabled ? ' data-disabled' : ''}><input class="visually-hidden" type="radio" name="day" value="${d.date}"${d.disabled ? ' disabled' : ''} aria-label="${formatDay(d.date, { weekday: 'long', day: 'numeric', month: 'long' }, C.locale)}${d.reason ? `, ${d.reason.toLowerCase()}` : ''}"><span><small>${d.top}</small><b>${d.mid}</b><small>${d.reason || d.bottom}</small></span></label>`,
     )
     .join('');
 }
@@ -371,23 +375,26 @@ const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 function renderSummary() {
   const e = estimate(S, C);
   const label = estimateLabel(S, C);
-  const count = !S.body && !e.count ? 'Nothing chosen yet' : `${e.count} ${e.count === 1 ? 'service' : 'services'}${S.body ? ` · ${vehicleText(S)}` : ''}`;
+  const services = copy(`${e.count} ${e.count === 1 ? 'service' : 'services'}`, `عدد الخدمات: ${number(e.count)}`);
+  const car = vehicleText(S, C.locale);
+  const count = !S.body && !e.count ? copy('Nothing chosen yet', 'لم تحدد أي خيارات بعد') : `${services}${S.body ? ` · ${car}` : ''}`;
   qa('[data-qo-count]').forEach((el) => (el.textContent = count));
-  qa('[data-qo-total]').forEach((el) => (el.textContent = e.count ? label : S.body ? 'Now pick services' : 'Start with your car'));
+  qa('[data-qo-total]').forEach((el) => (el.textContent = e.count ? label : S.body ? copy('Now pick services', 'اختر الخدمات المطلوبة') : copy('Start with your car', 'ابدأ باختيار سيارتك')));
 
-  const ls = lines(S, C);
+  const ls = e.lines;
   const rows = ls
     .map(
       (l) =>
         `<li><span class="qo-sum__name">${esc(l.title)}<small>${esc(l.detail.join(' · '))}</small></span><span class="qo-sum__price">${esc(l.price)}</span></li>`,
     )
     .join('');
+  const extra = copy(`Plus ${e.inspect} ${e.inspect === 1 ? 'item' : 'items'} priced after inspection. `, `خدمات إضافية يُحدَّد سعرها بعد المعاينة: ${number(e.inspect)}. `);
   const total = e.count
-    ? `<p class="qo-sum__total"><span>Estimated starting total</span><b>${esc(label)}</b></p><p class="qo-help">${
-        e.inspect ? `Plus ${e.inspect} ${e.inspect === 1 ? 'item' : 'items'} priced after inspection. ` : ''
-      }An estimate, not a quote: we confirm the price once we’ve seen your car.</p>`
-    : '<p class="qo-help">Choose your car and at least one service to see an estimate.</p>';
-  q('[data-qo-summary]')!.innerHTML = `${S.body ? `<p class="qo-sum__car">${esc(vehicleText(S))}</p>` : ''}${rows ? `<ul class="qo-sum" role="list">${rows}</ul>` : ''}${total}`;
+    ? `<p class="qo-sum__total"><span>${copy('Estimated starting total', 'التكلفة التقديرية الأولية')}</span><b>${esc(label)}</b></p><p class="qo-help">${
+        e.inspect ? extra : ''
+      }${copy('An estimate, not a quote: we confirm the price once we’ve seen your car.', 'هذا تقدير أولي. نؤكّد السعر النهائي بعد معاينة سيارتك.')}</p>`
+    : `<p class="qo-help">${copy('Choose your car and at least one service to see an estimate.', 'اختر نوع سيارتك وخدمة واحدة على الأقل لعرض التكلفة التقديرية.')}</p>`;
+  q('[data-qo-summary]')!.innerHTML = `${S.body ? `<p class="qo-sum__car">${esc(car)}</p>` : ''}${rows ? `<ul class="qo-sum" role="list">${rows}</ul>` : ''}${total}`;
   q<HTMLAnchorElement>('[data-qo-wa]')!.href = `${C.contact.whatsapp}?text=${encodeURIComponent(requestText(S, C, { whatsapp: true }))}`;
 }
 
@@ -403,7 +410,7 @@ function setView(mode: ViewerMode) {
   view = mode;
   qa<HTMLButtonElement>('[data-qo-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.qoView === view)));
   q('[data-qo-hint]')!.textContent =
-    view === 'ppf' || view === 'wrap' ? 'Tap a panel on the car to add or remove it.' : view === 'tint' ? 'Drag to look through the windows.' : 'Drag to turn the car.';
+    view === 'ppf' || view === 'wrap' ? copy('Tap a panel on the car to add or remove it.', 'اضغط على أحد أجزاء السيارة لإضافته أو إزالته.') : view === 'tint' ? copy('Drag to look through the windows.', 'اسحب لمعاينة التظليل من زوايا مختلفة.') : copy('Drag to turn the car.', 'اسحب لتدوير السيارة.');
   updateViewer();
 }
 
@@ -418,6 +425,7 @@ function viewerOptions(): CarViewerOptions {
   if (tint?.id === 'ultimate') tintGlass.add('windscreen');
   const preset = ppfPresets.find((p) => p.id === S.ppf.preset);
   return {
+    locale: C.locale,
     body: S.body ?? 'sedan',
     mode: view,
     selected: new Set(view === 'ppf' ? S.ppf.panels : view === 'wrap' ? S.wrap.parts : []),
@@ -454,17 +462,18 @@ async function mountViewer() {
 }
 
 function togglePanel(id: PanelId) {
-  const label = panels.find((p) => p.id === id)?.label ?? id;
+  const label = quoteLabel(panels.find((p) => p.id === id)?.label ?? id, C.locale);
+  const change = (on: boolean) => copy(`${label} ${on ? 'added' : 'removed'}.`, `${on ? 'تمت إضافة' : 'تمت إزالة'} ${label}.`);
   if (view === 'wrap') {
     if (!wrapParts.includes(id)) return;
     const on = !S.wrap.parts.includes(id);
     S.wrap.parts = panels.map((p) => p.id).filter((p) => (p === id ? on : S.wrap.parts.includes(p)));
-    announce(`${label} ${on ? 'added' : 'removed'}.`);
+    announce(change(on));
   } else if (view === 'ppf') {
     const on = !S.ppf.panels.includes(id);
     S.ppf.panels = panels.map((p) => p.id).filter((p) => (p === id ? on : S.ppf.panels.includes(p)));
     S.ppf.preset = matchPreset();
-    announce(`${label} ${on ? 'added' : 'removed'}. ${S.ppf.panels.length} panels covered.`);
+    announce(`${change(on)} ${copy(`${S.ppf.panels.length} panels covered.`, `عدد الأجزاء المشمولة: ${number(S.ppf.panels.length)}.`)}`);
   } else return;
   sync();
 }
@@ -476,8 +485,9 @@ function fieldOk(i: HTMLInputElement | HTMLTextAreaElement): boolean {
   const v = i.value.trim();
   if (i.name === 'name') return v.length >= 2;
   if (i.name === 'phone') {
-    const d = phoneDigits(v);
-    return /^[+\d][\d\s()-]*$/.test(v) && d.length >= 9 && d.length <= 15;
+    const phone = latinDigits(v);
+    const d = phoneDigits(phone);
+    return /^[+\d][\d\s()-]*$/.test(phone) && d.length >= 9 && d.length <= 15;
   }
   if (i.name === 'email') return !v || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
   return true;
@@ -535,7 +545,7 @@ function showProblems(list: Problem[]) {
     return;
   }
   box.hidden = false;
-  box.innerHTML = `<p>Almost there. Still needed:</p><ul role="list">${list.map((p) => `<li><a href="${p.target}">${esc(p.text)}</a></li>`).join('')}</ul>`;
+  box.innerHTML = `<p>${copy('Almost there. Still needed:', 'لإكمال الطلب، يرجى مراجعة ما يلي:')}</p><ul role="list">${list.map((p) => `<li><a href="${p.target}">${esc(quoteLabel(p.text, C.locale))}</a></li>`).join('')}</ul>`;
   const first = q(list[0].target);
   first?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
   const focusable = first?.matches('input, select, textarea') ? first : first?.querySelector<HTMLElement>('input:not([disabled]), select, textarea');
@@ -587,10 +597,10 @@ function onSubmit(e: SubmitEvent) {
       requestId = crypto.randomUUID();
       finish('form');
       const status = q('[data-qo-status]')!;
-      status.textContent = PREVIEW_NOTE;
+      status.textContent = copy(PREVIEW_NOTE, 'هذه معاينة للنموذج. تم التحقق من البيانات دون حفظ الطلب أو إرساله.');
       status.hidden = result.saved || result.ignored;
     })
-    .catch(() => showProblems([{ text: 'That didn’t send. Please try again, or send it on WhatsApp instead.', target: '#qo-send' }]))
+    .catch(() => showProblems([{ text: copy('That didn’t send. Please try again, or send it on WhatsApp instead.', 'تعذّر إرسال الطلب. حاول مجدداً أو أرسله عبر واتساب.'), target: '#qo-send' }]))
     .finally(() => {
       btn.disabled = false;
       submitting = false;
@@ -601,11 +611,15 @@ function finish(via: 'form' | 'whatsapp') {
   S.sent = true;
   saveDraft(S, KEY);
   const first = S.you.name.trim().split(/\s+/)[0];
-  q('[data-qo-done-title]')!.textContent = via === 'whatsapp' ? 'Over to WhatsApp' : 'Request sent';
-  q('[data-qo-done-text]')!.textContent =
-    via === 'whatsapp'
-      ? `${first ? `Thanks, ${first}. ` : ''}Your request is typed out in WhatsApp: press send there and we’ll reply with a price and a time.`
-      : `${first ? `Thanks, ${first}. ` : ''}We’ll ${S.you.contact === 'call' ? 'call you' : 'message you on WhatsApp'} with a price for your car and a confirmed time.`;
+  q('[data-qo-done-title]')!.textContent = via === 'whatsapp' ? copy('Over to WhatsApp', 'أكمل الإرسال في واتساب') : copy('Request sent', 'تم إرسال الطلب');
+  const thanks = first ? copy(`Thanks, ${first}. `, `شكراً لك يا ${first}. `) : '';
+  const reply = S.you.contact === 'call'
+    ? copy('call you', 'سنتصل بك')
+    : copy('message you on WhatsApp', 'سنراسلك عبر واتساب');
+  const next = via === 'whatsapp'
+    ? copy('Your request is typed out in WhatsApp: press send there and we’ll reply with a price and a time.', 'طلبك جاهز في واتساب. اضغط على إرسال هناك وسنردّ عليك بالسعر والموعد.')
+    : copy(`We’ll ${reply} with a price for your car and a confirmed time.`, `${reply} لإبلاغك بالسعر وتأكيد الموعد.`);
+  q('[data-qo-done-text]')!.textContent = thanks + next;
   q('[data-qo-done]')!.hidden = false;
   q('[data-qo-actions]')!.hidden = via === 'form';
 }
