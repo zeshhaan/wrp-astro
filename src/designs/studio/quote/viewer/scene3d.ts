@@ -39,6 +39,7 @@ import {
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { quoteLabel, quoteNumber } from '../labels';
 import { bodyTypes, panels, type BodyType, type CarViewerHandle, type CarViewerOptions, type GlassId, type PanelId, type ViewerMode } from '../panels';
 
 const FILM = '#ed1c24'; // YACO red marks the film
@@ -377,6 +378,22 @@ export async function createViewer(el: HTMLElement, initial: CarViewerOptions, e
   const updateLabel = () => {
     const body = bodyTypes.find((b) => b.id === model.body)?.label.toLowerCase() ?? model.body;
     const names = (ids: Iterable<PanelId>) => [...ids].filter((id) => model.panels.has(id)).map((id) => panelLabel.get(id) ?? id);
+    if (opts.locale === 'ar') {
+      const shape = bodyTypes.find((b) => b.id === model.body)!;
+      const parts = (ids: Iterable<PanelId>) => names(ids).map((name) => quoteLabel(name, 'ar')).join('، ');
+      const description = [`مجسّم ثلاثي الأبعاد للسيارة (${quoteLabel(shape.label, 'ar')}).`];
+      if (opts.mode === 'ppf' || opts.mode === 'wrap') {
+        const covered = parts(selected);
+        description.push(covered ? `الأجزاء المحددة: ${covered}.` : 'لم تُحدَّد أي أجزاء بعد.');
+        const partly = opts.mode === 'ppf' && parts([...partial].filter((id) => !selected.has(id)));
+        if (partly) description.push(`تغطية جزئية: ${partly}.`);
+      } else if (opts.mode === 'tint') {
+        description.push(`نسبة نفاذ الضوء عبر الزجاج الجانبي والخلفي: ${quoteNumber(Math.round(opts.tintVlt ?? FACTORY_VLT), 'ar')}٪.`);
+      }
+      description.push('اسحب لتدوير السيارة واضغط مرتين لإعادة ضبط المعاينة.');
+      canvas.setAttribute('aria-label', description.join(' '));
+      return;
+    }
     let text = `3D model of a ${body}.`;
     if (opts.mode === 'ppf') {
       const s = names(selected);

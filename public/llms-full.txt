@@ -31,6 +31,7 @@
 - [الصفحة الرئيسية العربية](https://wrpdetailing.ae/ar/): الواجهة العربية الرئيسية للموقع.
 - [فهرس المدونة العربية](https://wrpdetailing.ae/ar/blog/): فهرس المدونة العربية لأدلة PPF والسيراميك والتظليل والتلميع.
 - [اتصل بنا](https://wrpdetailing.ae/ar/contact-us/): صفحة التواصل العربية.
+- [طلب عرض سعر](https://wrpdetailing.ae/ar/quote/): اختر سيارتك وخدمات العناية المطلوبة واطلب عرض سعر من الاستوديو.
 - [عن WRP](https://wrpdetailing.ae/ar/more-about-wrp/): صفحة تعريفية عربية عن الاستوديو.
 - [معرض الأعمال](https://wrpdetailing.ae/ar/portfolio/): معرض الأعمال العربي.
 - [المراجعات](https://wrpdetailing.ae/ar/reviews/): مركز المراجعات والشهادات باللغة العربية.

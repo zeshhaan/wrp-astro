@@ -140,7 +140,7 @@ const breadcrumbs = [
 const heroBase = imgBase(heroImage);
 // With a form in the hero, every quote button on the page leads to it instead
 // of the separate quote page (and the hero drops its own button).
-const quoteHref = heroForm ? '#quote' : studioQuoteHref;
+const quoteHref = heroForm ? '#quote' : studioQuoteHref(locale);
 ---
 
 <StudioPage

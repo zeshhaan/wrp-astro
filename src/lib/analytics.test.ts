@@ -110,6 +110,7 @@ function configurator(reply: () => Promise<ActionReply>, honeypot = '') {
     crypto: { randomUUID: () => `request-${++ids}` },
     location: { pathname: '/design-lab/studio/quote/' },
     PREVIEW_NOTE: 'preview-note',
+    copy: (english: string) => english,
     S: {},
     C: {},
     quoteLeadFields: () => ({ name: 'Sara', phone: '050 123 4567', email: '' }),

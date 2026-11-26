@@ -10,7 +10,7 @@
 export const labPrefix = '/design-lab/studio';
 
 /** The quote configurator, where every "Get a quick quote" button goes. */
-export const studioQuoteHref = '/quote/';
+export const studioQuoteHref = (locale: 'en' | 'ar' = 'en') => locale === 'ar' ? '/ar/quote/' : '/quote/';
 
 /** Whether a page is a Design Lab page, which keeps its links in the lab. */
 export const isLabPath = (pathname: string) => pathname.startsWith(`${labPrefix}/`) || pathname.startsWith(`/ar${labPrefix}/`);

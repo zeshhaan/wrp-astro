@@ -6,8 +6,6 @@
  * A configurator: the 3D car stays in view while every choice sits in one
  * scrolling panel of chips, like the car-viewer test page. State, prices and
  * the WhatsApp text come from ../state.ts.
- *
- * The configurator is currently available in English only.
  */
 import StudioPage from '../../site/StudioPage.astro';
 import QIcon from '../QIcon.astro';
@@ -15,17 +13,23 @@ import { buildCatalog } from '../catalog';
 import { bodyTypes, panels, wrapParts } from '../panels';
 import { interiorItems, interiorMaterials, paintChips, polishConditions, slots, wrapFinishes } from '../state';
 import { carModels } from '../models';
+import type { Locale } from '@/i18n/translations';
+import { quoteLabel, quoteAmount, quoteNumber } from '../labels';
 import '../quote.css';
 import './one.css';
 
 interface Props {
-  noindex?: boolean;
+  locale?: Locale;
 }
 
-const catalog = await buildCatalog();
+const { locale = 'en' } = Astro.props;
+const ar = locale === 'ar';
+const t = (english: string, arabic: string) => ar ? arabic : english;
+const label = (text: string) => quoteLabel(text, locale);
+const catalog = await buildCatalog(locale);
 const thisYear = 2026;
 const years = Array.from({ length: thisYear + 1 - 1995 }, (_, i) => String(thisYear + 1 - i));
-const aed = (n: number) => `AED ${n.toLocaleString('en-US')}`;
+const aed = (n: number) => quoteAmount(n, locale);
 const svc = (id: string) => catalog.services.find((s) => s.id === id)!;
 const panelGroups = [
   { id: 'front', label: 'Front' },
@@ -37,19 +41,17 @@ const panelGroups = [
 
 <StudioPage
   app
-  noindex={Astro.props.noindex}
-  livePath="/quote/"
-  hasAlternateLocale={false}
-  title="Get a quote on one page · WRP Detailing Dubai"
-  description="Choose your car, the services and the details on one page, see the price build up on a 3D car, and send it on WhatsApp."
+  locale={locale}
+  title={t("Get a quote on one page · WRP Detailing Dubai", "اطلب عرض سعر للعناية بسيارتك في دبي | WRP")}
+  description={t("Choose your car, the services and the details on one page, see the price build up on a 3D car, and send it on WhatsApp.", "اختر سيارتك وخدمات العناية التي تحتاجها واطّلع على السعر التقديري. أرسل طلبك إلى استوديو WRP في دبي عبر النموذج أو واتساب.")}
 >
   <main id="main" class="qo" tabindex="-1" data-qo>
-    <form id="qo-form" class="qo-form" method="post" novalidate aria-label="Quote request">
+    <form id="qo-form" class="qo-form" method="post" novalidate aria-label={t("Quote request", "طلب عرض سعر")}>
       <div class="st-wrap qo-head">
-        <p class="qo-eyebrow">Get a quote</p>
-        <h1 class="qo-h1">Build your quote</h1>
+        <p class="qo-eyebrow">{t("Get a quote", "طلب عرض سعر")}</p>
+        <h1 class="qo-h1">{t("Build your quote", "احصل على عرض سعر لسيارتك")}</h1>
         <p class="qo-lede">
-          Pick your car and what it needs; the price builds up as you go. Takes about two minutes.
+          {t("Pick your car and what it needs; the price builds up as you go. Takes about two minutes.", "اختر نوع سيارتك والخدمات التي تحتاجها ليظهر لك السعر التقديري. يستغرق الطلب نحو دقيقتين.")}
         </p>
       </div>
 
@@ -58,62 +60,62 @@ const panelGroups = [
         <div class="qo-stagecol">
           <div class="qo-stage">
             <div class="qo-viewer" data-qo-viewer></div>
-            <div class="qo-views" role="group" aria-label="What the car shows" data-qo-views>
-              <button type="button" class="qo-view" data-qo-view="look" aria-pressed="true">Colour</button>
-              <button type="button" class="qo-view" data-qo-view="ppf" aria-pressed="false" hidden>PPF</button>
-              <button type="button" class="qo-view" data-qo-view="wrap" aria-pressed="false" hidden>Wrap</button>
-              <button type="button" class="qo-view" data-qo-view="tint" aria-pressed="false" hidden>Tint</button>
+            <div class="qo-views" role="group" aria-label={t("What the car shows", "خيارات معاينة السيارة")} data-qo-views>
+              <button type="button" class="qo-view" data-qo-view="look" aria-pressed="true">{t("Colour", "اللون")}</button>
+              <button type="button" class="qo-view" data-qo-view="ppf" aria-pressed="false" hidden>{t("PPF", "فيلم الحماية")}</button>
+              <button type="button" class="qo-view" data-qo-view="wrap" aria-pressed="false" hidden>{t("Wrap", "التغليف")}</button>
+              <button type="button" class="qo-view" data-qo-view="tint" aria-pressed="false" hidden>{t("Tint", "التظليل")}</button>
             </div>
-            <p class="qo-stage__hint" data-qo-hint>Drag to turn the car.</p>
+            <p class="qo-stage__hint" data-qo-hint>{t("Drag to turn the car.", "اسحب لتدوير السيارة.")}</p>
           </div>
           <p class="qo-credit" data-qo-credit hidden>
-            3D car: <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">Comrade1280</a>,
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified by WRP.
+            {t("3D car:", "مجسّم السيارة من تصميم")} <a href="https://skfb.ly/6sUFy" target="_blank" rel="noopener">Comrade1280</a>,
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, {t("modified by WRP.", "بتعديل من WRP.")}
           </p>
           <div class="qo-mini" aria-live="polite">
-            <span class="qo-mini__count" data-qo-count>Nothing chosen yet</span>
-            <span class="qo-mini__total" data-qo-total>Start with your car</span>
+            <span class="qo-mini__count" data-qo-count>{t("Nothing chosen yet", "لم تحدد أي خيارات بعد")}</span>
+            <span class="qo-mini__total" data-qo-total>{t("Start with your car", "ابدأ باختيار سيارتك")}</span>
           </div>
         </div>
 
         <div class="qo-panel">
           <!-- 1. Car -->
           <section class="qo-sec" id="qo-car" aria-labelledby="qo-car-h" data-qo-mode="look">
-            <h2 class="qo-h2" id="qo-car-h"><span class="qo-n">1</span>Your car</h2>
+            <h2 class="qo-h2" id="qo-car-h"><span class="qo-n">{quoteNumber(1, locale)}</span>{t("Your car", "سيارتك")}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Shape</legend>
+              <legend class="qo-legend">{t("Shape", "نوع الهيكل")}</legend>
               <div class="qo-bodies">
                 {
                   bodyTypes.map((b) => (
                     <label class="qo-body">
                       <input class="visually-hidden" type="radio" name="body" value={b.id} />
                       <img src={`/models/cars/thumbs/${b.id}.webp`} alt="" width="960" height="420" decoding="async" />
-                      <span class="qo-body__name">{b.label}</span>
-                      <span class="qo-body__hint">{b.hint}</span>
+                      <span class="qo-body__name">{label(b.label)}</span>
+                      <span class="qo-body__hint">{label(b.hint)}</span>
                     </label>
                   ))
                 }
               </div>
-              <p class="qo-help">SUVs and large cars take longer, so a few prices differ by size.</p>
+              <p class="qo-help">{t("SUVs and large cars take longer, so a few prices differ by size.", "تحتاج السيارات الكبيرة وسيارات الدفع الرباعي إلى وقت أطول، لذلك تختلف بعض الأسعار بحسب الحجم.")}</p>
             </fieldset>
             <div class="qo-row">
               <div class="qo-input qo-input--grow">
-                <label for="qo-make">Make & model <span class="qo-optional">optional</span></label>
-                <input id="qo-make" name="make" type="text" list="qo-models" autocomplete="off" autocapitalize="words" placeholder="e.g. Toyota Land Cruiser" />
+                <label for="qo-make">{t("Make & model", "الشركة والطراز")} <span class="qo-optional">{t("optional", "اختياري")}</span></label>
+                <input id="qo-make" name="make" type="text" list="qo-models" autocomplete="off" autocapitalize="words" placeholder={t("e.g. Toyota Land Cruiser", "مثلاً تويوتا لاند كروزر")} />
                 <datalist id="qo-models">{carModels.map((m) => <option value={m.name} />)}</datalist>
               </div>
               <div class="qo-input qo-input--year">
-                <label for="qo-year">Year <span class="qo-optional">optional</span></label>
+                <label for="qo-year">{t("Year", "سنة الصنع")} <span class="qo-optional">{t("optional", "اختياري")}</span></label>
                 <select id="qo-year" name="year">
-                  <option value="">Year</option>
-                  {years.map((y) => <option value={y}>{y}</option>)}
-                  <option value="older">Older</option>
+                  <option value="">{t("Year", "سنة الصنع")}</option>
+                  {years.map((y) => <option value={y}>{quoteNumber(Number(y), locale, false)}</option>)}
+                  <option value="older">{t("Older", "أقدم من ذلك")}</option>
                 </select>
               </div>
             </div>
             <p class="qo-help" data-qo-model-hint aria-live="polite" hidden></p>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Colour <span class="qo-optional">optional</span></legend>
+              <legend class="qo-legend">{t("Colour", "اللون")} <span class="qo-optional">{t("optional", "اختياري")}</span></legend>
               <div class="qo-chips">
                 {
                   paintChips.map((c) => (
@@ -121,23 +123,23 @@ const panelGroups = [
                       <input class="visually-hidden" type="radio" name="paint" value={c.id} />
                       <span>
                         <i class="qo-dot" style={`--c:${c.hex}`} data-other={c.id === 'other' ? '' : undefined} />
-                        {c.label}
+                        {label(c.label)}
                       </span>
                     </label>
                   ))
                 }
               </div>
               <div class="qo-input" data-qo-paint-other hidden>
-                <label for="qo-paint-other">Which colour?</label>
-                <input id="qo-paint-other" name="paintOther" type="text" maxlength="40" placeholder="e.g. Nardo grey" />
+                <label for="qo-paint-other">{t("Which colour?", "ما لون السيارة؟")}</label>
+                <input id="qo-paint-other" name="paintOther" type="text" maxlength="40" placeholder={t("e.g. Nardo grey", "مثلاً رمادي ناردو")} />
               </div>
             </fieldset>
           </section>
 
           <!-- 2. Services -->
           <section class="qo-sec" id="qo-services" aria-labelledby="qo-services-h" data-qo-mode="look">
-            <h2 class="qo-h2" id="qo-services-h"><span class="qo-n">2</span>What it needs</h2>
-            <p class="qo-help qo-help--top">Choose one or more.</p>
+            <h2 class="qo-h2" id="qo-services-h"><span class="qo-n">{quoteNumber(2, locale)}</span>{t("What it needs", "الخدمات المطلوبة")}</h2>
+            <p class="qo-help qo-help--top">{t("Choose one or more.", "يمكنك اختيار أكثر من خدمة.")}</p>
             <div class="qo-opts qo-opts--2">
               {
                 catalog.services.map((s) => (
@@ -147,7 +149,7 @@ const panelGroups = [
                       <span class="qo-opt__name">{s.name}</span>
                       <span class="qo-opt__tick" aria-hidden="true"><QIcon name="check" size={14} /></span>
                     </span>
-                    <span class="qo-opt__meta">{s.from ? `From ${aed(s.from)}` : 'Priced after inspection'} · {s.time}</span>
+                    <span class="qo-opt__meta">{s.from ? `${t("From", "ابتداءً من")} ${aed(s.from)}` : t('Priced after inspection', 'يُحدَّد السعر بعد المعاينة')} · {s.time}</span>
                   </label>
                 ))
               }
@@ -158,7 +160,7 @@ const panelGroups = [
           <section class="qo-sec" id="qo-ppf" aria-labelledby="qo-ppf-h" data-qo-service="ppf" data-qo-mode="ppf" hidden>
             <h2 class="qo-h2" id="qo-ppf-h"><span class="qo-n">·</span>{svc('ppf').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Coverage</legend>
+              <legend class="qo-legend">{t("Coverage", "مساحة التغطية")}</legend>
               <div class="qo-opts">
                 {
                   catalog.ppf.presets.map((p) => (
@@ -174,19 +176,19 @@ const panelGroups = [
                 }
               </div>
               <details class="qo-more" data-qo-panels>
-                <summary>Choose panels one by one <span class="qo-count" data-qo-panel-count></span></summary>
-                <p class="qo-help">Or tap panels on the car.</p>
+                <summary>{t("Choose panels one by one", "اختر أجزاء الهيكل بشكل منفصل")} <span class="qo-count" data-qo-panel-count></span></summary>
+                <p class="qo-help">{t("Or tap panels on the car.", "يمكنك أيضاً الضغط على الأجزاء في مجسّم السيارة.")}</p>
                 <div class="qo-panels">
                   {
                     panelGroups.map((g) => (
-                      <div class="qo-panels__group" role="group" aria-label={g.label}>
-                        <p class="qo-panels__label" aria-hidden="true">{g.label}</p>
+                      <div class="qo-panels__group" role="group" aria-label={label(g.label)}>
+                        <p class="qo-panels__label" aria-hidden="true">{label(g.label)}</p>
                         {panels
                           .filter((p) => p.group === g.id)
                           .map((p) => (
                             <label class="qo-check" data-qo-panel={p.id}>
                               <input type="checkbox" name="ppfPanel" value={p.id} />
-                              {p.label}
+                              {label(p.label)}
                             </label>
                           ))}
                       </div>
@@ -196,16 +198,16 @@ const panelGroups = [
               </details>
             </fieldset>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Finish</legend>
+              <legend class="qo-legend">{t("Finish", "نوع اللمسة النهائية")}</legend>
               <div class="qo-chips">
-                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFinish" value="gloss" /><span>Gloss</span></label>
-                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFinish" value="matte" /><span>Matte (satin)</span></label>
+                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFinish" value="gloss" /><span>{t("Gloss", "لامع")}</span></label>
+                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFinish" value="matte" /><span>{t("Matte (satin)", "مطفي (ساتان)")}</span></label>
               </div>
             </fieldset>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Film</legend>
+              <legend class="qo-legend">{t("Film", "نوع الفيلم")}</legend>
               <div class="qo-chips">
-                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFilm" value="recommend" /><span>Recommend for me</span></label>
+                <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFilm" value="recommend" /><span>{t("Recommend for me", "أرغب في توصيتكم")}</span></label>
                 {catalog.ppf.films.map((f, i) => (
                   <label class="qo-chip"><input class="visually-hidden" type="radio" name="ppfFilm" value={i === 0 ? 'avery' : 'stek'} /><span>{f.name}</span></label>
                 ))}
@@ -214,19 +216,19 @@ const panelGroups = [
             </fieldset>
             <label class="qo-toggle">
               <input type="checkbox" name="ppfCeramic" />
-              <span>Add ceramic coating on top of the film <span class="qo-optional">priced after inspection</span></span>
+              <span>{t("Add ceramic coating on top of the film", "إضافة طلاء سيراميك فوق الفيلم")} <span class="qo-optional">{t("priced after inspection", "يُحدَّد السعر بعد المعاينة")}</span></span>
             </label>
           </section>
 
           <section class="qo-sec" id="qo-ceramic" aria-labelledby="qo-ceramic-h" data-qo-service="ceramic" data-qo-mode="look" hidden>
             <h2 class="qo-h2" id="qo-ceramic-h"><span class="qo-n">·</span>{svc('ceramic').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Package</legend>
+              <legend class="qo-legend">{t("Package", "الباقة")}</legend>
               <div class="qo-opts">
                 <label class="qo-opt">
                   <input class="visually-hidden" type="radio" name="ceramicPkg" value="recommend" />
-                  <span class="qo-opt__top"><span class="qo-opt__name">Recommend for me</span><span class="qo-opt__tick" aria-hidden="true"><QIcon name="check" size={14} /></span></span>
-                  <span class="qo-opt__meta">We look at the paint and suggest one.</span>
+                  <span class="qo-opt__top"><span class="qo-opt__name">{t("Recommend for me", "أرغب في توصيتكم")}</span><span class="qo-opt__tick" aria-hidden="true"><QIcon name="check" size={14} /></span></span>
+                  <span class="qo-opt__meta">{t("We look at the paint and suggest one.", "نفحص الطلاء ونقترح الباقة المناسبة.")}</span>
                 </label>
                 {
                   catalog.ceramic.packages.map((p) => (
@@ -242,23 +244,23 @@ const panelGroups = [
                 }
               </div>
             </fieldset>
-            <label class="qo-toggle"><input type="checkbox" name="ceramicWheels" /><span>Wheels and glass too</span></label>
+            <label class="qo-toggle"><input type="checkbox" name="ceramicWheels" /><span>{t("Wheels and glass too", "إضافة الجنوط والزجاج")}</span></label>
           </section>
 
           <section class="qo-sec" id="qo-polish" aria-labelledby="qo-polish-h" data-qo-service="polish" data-qo-mode="look" hidden>
             <h2 class="qo-h2" id="qo-polish-h"><span class="qo-n">·</span>{svc('polish').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">How does the paint look?</legend>
+              <legend class="qo-legend">{t("How does the paint look?", "ما حالة طلاء سيارتك؟")}</legend>
               <div class="qo-opts qo-opts--2">
                 {
                   polishConditions.map((c) => (
                     <label class="qo-opt">
                       <input class="visually-hidden" type="radio" name="polish" value={c.id} />
                       <span class="qo-opt__top">
-                        <span class="qo-opt__name">{c.label}</span>
+                        <span class="qo-opt__name">{label(c.label)}</span>
                         <span class="qo-opt__tick" aria-hidden="true"><QIcon name="check" size={14} /></span>
                       </span>
-                      <span class="qo-opt__meta">{c.hint}</span>
+                      <span class="qo-opt__meta">{label(c.hint)}</span>
                     </label>
                   ))
                 }
@@ -269,7 +271,7 @@ const panelGroups = [
           <section class="qo-sec" id="qo-wash" aria-labelledby="qo-wash-h" data-qo-service="wash" data-qo-mode="look" hidden>
             <h2 class="qo-h2" id="qo-wash-h"><span class="qo-n">·</span>{svc('wash').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Level</legend>
+              <legend class="qo-legend">{t("Level", "مستوى العناية")}</legend>
               <div class="qo-opts">
                 {
                   catalog.wash.levels.map((l) => (
@@ -292,7 +294,7 @@ const panelGroups = [
           <section class="qo-sec" id="qo-tint" aria-labelledby="qo-tint-h" data-qo-service="tint" data-qo-mode="tint" hidden>
             <h2 class="qo-h2" id="qo-tint-h"><span class="qo-n">·</span>{svc('tint').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Film</legend>
+              <legend class="qo-legend">{t("Film", "نوع الفيلم")}</legend>
               <div class="qo-opts">
                 {
                   catalog.tint.options.map((o) => (
@@ -300,7 +302,7 @@ const panelGroups = [
                       <input class="visually-hidden" type="radio" name="tint" value={o.id} />
                       <span class="qo-opt__top">
                         <span class="qo-opt__name">{o.name}</span>
-                        <span class="qo-opt__price">{o.vlt}% VLT</span>
+                        <span class="qo-opt__price">{ar ? `نفاذ الضوء ${quoteNumber(o.vlt, locale)}٪` : `${o.vlt}% VLT`}</span>
                       </span>
                       <span class="qo-opt__meta">{o.heat}. {o.note}</span>
                     </label>
@@ -313,27 +315,27 @@ const panelGroups = [
           <section class="qo-sec" id="qo-interior" aria-labelledby="qo-interior-h" data-qo-service="interior" data-qo-mode="look" hidden>
             <h2 class="qo-h2" id="qo-interior-h"><span class="qo-n">·</span>{svc('interior').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">What would you like done?</legend>
+              <legend class="qo-legend">{t("What would you like done?", "ما الأعمال المطلوبة؟")}</legend>
               <div class="qo-opts qo-opts--2">
                 {
                   interiorItems.map((i) => (
                     <label class="qo-opt">
                       <input class="visually-hidden" type="checkbox" name="interiorItem" value={i.id} />
                       <span class="qo-opt__top">
-                        <span class="qo-opt__name">{i.label}</span>
+                        <span class="qo-opt__name">{label(i.label)}</span>
                         <span class="qo-opt__tick" aria-hidden="true"><QIcon name="check" size={14} /></span>
                       </span>
-                      <span class="qo-opt__meta">{i.note}</span>
+                      <span class="qo-opt__meta">{label(i.note)}</span>
                     </label>
                   ))
                 }
               </div>
             </fieldset>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Material <span class="qo-optional">optional</span></legend>
+              <legend class="qo-legend">{t("Material", "الخامة")} <span class="qo-optional">{t("optional", "اختياري")}</span></legend>
               <div class="qo-chips">
                 {interiorMaterials.map((m) => (
-                  <label class="qo-chip"><input class="visually-hidden" type="radio" name="interiorMaterial" value={m.id} /><span>{m.label}</span></label>
+                  <label class="qo-chip"><input class="visually-hidden" type="radio" name="interiorMaterial" value={m.id} /><span>{label(m.label)}</span></label>
                 ))}
               </div>
             </fieldset>
@@ -342,30 +344,30 @@ const panelGroups = [
           <section class="qo-sec" id="qo-wrap" aria-labelledby="qo-wrap-h" data-qo-service="wrap" data-qo-mode="wrap" hidden>
             <h2 class="qo-h2" id="qo-wrap-h"><span class="qo-n">·</span>{svc('wrap').name}</h2>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Parts to wrap <span class="qo-optional">or tap them on the car</span></legend>
+              <legend class="qo-legend">{t("Parts to wrap", "الأجزاء المراد تغليفها")} <span class="qo-optional">{t("or tap them on the car", "أو اضغط عليها في مجسّم السيارة")}</span></legend>
               <div class="qo-chips">
                 {panels
                   .filter((p) => wrapParts.includes(p.id))
                   .map((p) => (
                     <label class="qo-chip" data-qo-panel={p.id}>
                       <input class="visually-hidden" type="checkbox" name="wrapPart" value={p.id} />
-                      <span>{p.label}</span>
+                      <span>{label(p.label)}</span>
                     </label>
                   ))}
               </div>
             </fieldset>
             <fieldset class="qo-field">
-              <legend class="qo-legend">Finish</legend>
+              <legend class="qo-legend">{t("Finish", "نوع اللمسة النهائية")}</legend>
               <div class="qo-chips">
                 {wrapFinishes.map((f) => (
                   <label class="qo-chip">
                     <input class="visually-hidden" type="radio" name="wrapFinish" value={f.id} />
-                    <span><i class="qo-dot" style={`--c:${f.hex}`} />{f.label}</span>
+                    <span><i class="qo-dot" style={`--c:${f.hex}`} />{label(f.label)}</span>
                   </label>
                 ))}
               </div>
             </fieldset>
-            <label class="qo-toggle"><input type="checkbox" name="chromeDelete" /><span>Chrome delete (window trims, badges, grille)</span></label>
+            <label class="qo-toggle"><input type="checkbox" name="chromeDelete" /><span>{t("Chrome delete (window trims, badges, grille)", "تغطية الكروم (إطارات النوافذ والشعارات والشبك الأمامي)")}</span></label>
           </section>
         </div>
       </div>
@@ -373,87 +375,87 @@ const panelGroups = [
       <!-- When, you, send: full width, the car no longer follows. -->
       <div class="st-wrap qo-finish">
         <section class="qo-sec" id="qo-when" aria-labelledby="qo-when-h">
-          <h2 class="qo-h2" id="qo-when-h"><span class="qo-n">3</span>When suits you</h2>
+          <h2 class="qo-h2" id="qo-when-h"><span class="qo-n">{quoteNumber(3, locale)}</span>{t("When suits you", "الموعد المناسب لك")}</h2>
           <fieldset class="qo-field">
-            <legend class="qo-legend">Day</legend>
-            <div class="qo-days" data-qo-days role="radiogroup" aria-label="Day"></div>
+            <legend class="qo-legend">{t("Day", "اليوم")}</legend>
+            <div class="qo-days" data-qo-days role="radiogroup" aria-label={t("Day", "اليوم")}></div>
           </fieldset>
           <fieldset class="qo-field">
-            <legend class="qo-legend">Time</legend>
+            <legend class="qo-legend">{t("Time", "الوقت")}</legend>
             <div class="qo-chips">
               {slots.map((s) => (
-                <label class="qo-chip"><input class="visually-hidden" type="radio" name="slot" value={s.id} /><span>{s.label} <small>{s.range}</small></span></label>
+                <label class="qo-chip"><input class="visually-hidden" type="radio" name="slot" value={s.id} /><span>{label(s.label)} <small>{label(s.range)}</small></span></label>
               ))}
             </div>
           </fieldset>
           <fieldset class="qo-field">
-            <legend class="qo-legend">Handover</legend>
+            <legend class="qo-legend">{t("Handover", "تسليم السيارة")}</legend>
             <div class="qo-chips">
-              <label class="qo-chip"><input class="visually-hidden" type="radio" name="handover" value="drop" /><span>I’ll drop it off</span></label>
-              <label class="qo-chip"><input class="visually-hidden" type="radio" name="handover" value="collect" /><span>Please collect it</span></label>
+              <label class="qo-chip"><input class="visually-hidden" type="radio" name="handover" value="drop" /><span>{t("I’ll drop it off", "سأوصلها إلى الاستوديو")}</span></label>
+              <label class="qo-chip"><input class="visually-hidden" type="radio" name="handover" value="collect" /><span>{t("Please collect it", "أرغب في استلامها من موقعي")}</span></label>
             </div>
             <div class="qo-input" data-qo-area hidden>
-              <label for="qo-area">Where from? <span class="qo-optional">area</span></label>
-              <input id="qo-area" name="area" type="text" maxlength="80" autocomplete="address-level2" placeholder="e.g. Dubai Marina" />
-              <p class="qo-help">Collection is on request; we confirm it with you.</p>
+              <label for="qo-area">{t("Where from?", "من أين نستلم السيارة؟")} <span class="qo-optional">{t("area", "المنطقة")}</span></label>
+              <input id="qo-area" name="area" type="text" maxlength="80" autocomplete="address-level2" placeholder={t("e.g. Dubai Marina", "مثلاً دبي مارينا")} />
+              <p class="qo-help">{t("Collection is on request; we confirm it with you.", "تتوفر خدمة استلام السيارة عند الطلب، وسنتواصل معك لتأكيدها.")}</p>
             </div>
           </fieldset>
           <p class="qo-help">{catalog.contact.hours}.</p>
         </section>
 
         <section class="qo-sec" id="qo-you" aria-labelledby="qo-you-h">
-          <h2 class="qo-h2" id="qo-you-h"><span class="qo-n">4</span>Your details</h2>
+          <h2 class="qo-h2" id="qo-you-h"><span class="qo-n">{quoteNumber(4, locale)}</span>{t("Your details", "بيانات التواصل")}</h2>
           <div class="qo-input">
-            <label for="qo-name">Name</label>
+            <label for="qo-name">{t("Name", "الاسم")}</label>
             <input id="qo-name" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="100" required aria-describedby="qo-name-err" />
-            <p class="qo-err" id="qo-name-err">Please tell us your name.</p>
+            <p class="qo-err" id="qo-name-err">{t("Please tell us your name.", "يرجى إدخال اسمك.")}</p>
           </div>
           <div class="qo-input">
-            <label for="qo-phone">Mobile</label>
-            <input id="qo-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="050 123 4567" required aria-describedby="qo-phone-err" />
-            <p class="qo-err" id="qo-phone-err">Please enter a mobile number we can reach, e.g. 050 123 4567.</p>
+            <label for="qo-phone">{t("Mobile", "رقم الجوال")}</label>
+            <input id="qo-phone" name="phone" type="tel" dir="ltr" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="050 123 4567" required aria-describedby="qo-phone-err" />
+            <p class="qo-err" id="qo-phone-err">{t("Please enter a mobile number we can reach, e.g. 050 123 4567.", "أدخل رقم جوال يمكننا التواصل معك عليه، مثل 050 123 4567.")}</p>
           </div>
           <div class="qo-input">
-            <label for="qo-email">Email <span class="qo-optional">optional</span></label>
-            <input id="qo-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="120" aria-describedby="qo-email-err" />
-            <p class="qo-err" id="qo-email-err">That email doesn’t look complete, e.g. name@example.com.</p>
+            <label for="qo-email">{t("Email", "البريد الإلكتروني")} <span class="qo-optional">{t("optional", "اختياري")}</span></label>
+            <input id="qo-email" name="email" type="email" dir="ltr" autocomplete="email" inputmode="email" maxlength="120" aria-describedby="qo-email-err" />
+            <p class="qo-err" id="qo-email-err">{t("That email doesn’t look complete, e.g. name@example.com.", "تحقّق من عنوان البريد الإلكتروني، مثل name@example.com.")}</p>
           </div>
           <fieldset class="qo-field">
-            <legend class="qo-legend">Best way to reach you</legend>
+            <legend class="qo-legend">{t("Best way to reach you", "كيف تفضّل أن نتواصل معك؟")}</legend>
             <div class="qo-chips">
-              <label class="qo-chip"><input class="visually-hidden" type="radio" name="contactPref" value="whatsapp" /><span>WhatsApp</span></label>
-              <label class="qo-chip"><input class="visually-hidden" type="radio" name="contactPref" value="call" /><span>Phone call</span></label>
+              <label class="qo-chip"><input class="visually-hidden" type="radio" name="contactPref" value="whatsapp" /><span>{t("WhatsApp", "واتساب")}</span></label>
+              <label class="qo-chip"><input class="visually-hidden" type="radio" name="contactPref" value="call" /><span>{t("Phone call", "مكالمة هاتفية")}</span></label>
             </div>
           </fieldset>
           <div class="qo-input">
-            <label for="qo-notes">Anything else? <span class="qo-optional">optional</span></label>
-            <textarea id="qo-notes" name="notes" rows="3" maxlength="1000" placeholder="Existing marks, dents, a deadline, a question…"></textarea>
+            <label for="qo-notes">{t("Anything else?", "هل تود إضافة أي تفاصيل؟")} <span class="qo-optional">{t("optional", "اختياري")}</span></label>
+            <textarea id="qo-notes" name="notes" rows="3" maxlength="1000" placeholder={t("Existing marks, dents, a deadline, a question…", "خدوش أو انبعاجات، موعد تحتاج السيارة قبله، أو سؤال تود طرحه…")}></textarea>
           </div>
           <label class="qo-toggle qo-consent">
             <input type="checkbox" name="consent" required aria-describedby="qo-consent-err" />
-            <span>WRP may contact me about this quote by WhatsApp, phone or email. <a href="/privacy/" target="_blank" rel="noopener">Privacy policy</a></span>
+            <span>{t("WRP may contact me about this quote by WhatsApp, phone or email.", "أوافق على أن يتواصل معي فريق WRP بخصوص عرض السعر عبر واتساب أو الهاتف أو البريد الإلكتروني.")} <a href={ar ? "/ar/privacy/" : "/privacy/"} target="_blank" rel="noopener">{t("Privacy policy", "سياسة الخصوصية")}</a></span>
           </label>
-          <p class="qo-err" id="qo-consent-err">Please tick this so we can reply to you.</p>
+          <p class="qo-err" id="qo-consent-err">{t("Please tick this so we can reply to you.", "ضع علامة في المربع حتى نتمكّن من الرد عليك.")}</p>
           <div class="qo-honeypot" aria-hidden="true">
-            <label for="qo-form-check">Leave this field empty</label>
+            <label for="qo-form-check">{t("Leave this field empty", "اترك هذا الحقل فارغاً")}</label>
             <input id="qo-form-check" name="form_check" type="text" tabindex="-1" autocomplete="off" />
           </div>
         </section>
 
         <section class="qo-sec qo-send" id="qo-send" aria-labelledby="qo-send-h">
-          <h2 class="qo-h2" id="qo-send-h"><span class="qo-n">5</span>Your quote</h2>
+          <h2 class="qo-h2" id="qo-send-h"><span class="qo-n">{quoteNumber(5, locale)}</span>{t("Your quote", "عرض السعر")}</h2>
           <div class="qo-summary" data-qo-summary></div>
           <div class="qo-problems" data-qo-problems role="alert" hidden></div>
           <div class="qo-actions" data-qo-actions>
-            <a class="st-btn st-btn--primary" data-qo-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener"><QIcon name="whatsapp" size={20} />Send on WhatsApp</a>
-            <button type="submit" class="st-btn st-btn--light" disabled>Send request</button>
+            <a class="st-btn st-btn--primary" data-qo-wa href={catalog.contact.whatsapp} target="_blank" rel="noopener"><QIcon name="whatsapp" size={20} />{t("Send on WhatsApp", "إرسال عبر واتساب")}</a>
+            <button type="submit" class="st-btn st-btn--light" disabled>{t("Send request", "إرسال الطلب")}</button>
           </div>
-          <p class="qo-help">This is a request, not a booking: nothing is charged. We reply with a price for your car and confirm the time.</p>
+          <p class="qo-help">{t("This is a request, not a booking: nothing is charged. We reply with a price for your car and confirm the time.", "طلب عرض السعر مجاني ولا يؤكّد الحجز. سنردّ عليك بسعر الخدمة لسيارتك ونؤكّد الموعد معك.")}</p>
           <p class="qo-status" data-qo-status role="status" hidden></p>
           <div class="qo-done" data-qo-done hidden>
-            <p class="qo-done__title" data-qo-done-title>Request sent</p>
+            <p class="qo-done__title" data-qo-done-title>{t("Request sent", "تم إرسال الطلب")}</p>
             <p data-qo-done-text></p>
-            <button type="button" class="qo-textbtn" data-qo-restart>Start a new quote</button>
+            <button type="button" class="qo-textbtn" data-qo-restart>{t("Start a new quote", "ابدأ طلباً جديداً")}</button>
           </div>
         </section>
       </div>
@@ -461,10 +463,10 @@ const panelGroups = [
 
     <div class="qo-bar" data-qo-bar>
       <div class="qo-bar__sum">
-        <span class="qo-bar__count" data-qo-count>Nothing chosen yet</span>
-        <span class="qo-bar__total" data-qo-total>Start with your car</span>
+        <span class="qo-bar__count" data-qo-count>{t("Nothing chosen yet", "لم تحدد أي خيارات بعد")}</span>
+        <span class="qo-bar__total" data-qo-total>{t("Start with your car", "ابدأ باختيار سيارتك")}</span>
       </div>
-      <a class="st-btn st-btn--primary qo-bar__go" href="#qo-send" data-qo-bar-go>Review & send</a>
+      <a class="st-btn st-btn--primary qo-bar__go" href="#qo-send" data-qo-bar-go>{t("Review & send", "مراجعة الطلب وإرساله")}</a>
     </div>
   </main>
 
