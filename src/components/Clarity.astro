@@ -1,0 +1,19 @@
+<script is:inline>
+  (() => {
+    if (window.clarity) return;
+    window.clarity = function () {
+      (window.clarity.q ||= []).push(arguments);
+    };
+    function loadClarity() {
+      const tag = document.createElement('script');
+      tag.async = true;
+      tag.src = 'https://www.clarity.ms/tag/u18n0h2k1x';
+      document.head.appendChild(tag);
+    }
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(loadClarity, { timeout: 3000 });
+    } else {
+      window.setTimeout(loadClarity, 2000);
+    }
+  })();
+</script>

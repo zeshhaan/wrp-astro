@@ -7,6 +7,7 @@ import GoogleReviewBadge from '../components/GoogleReviewBadge.astro';
 import LanguageBanner from '../components/LanguageBanner.astro';
 import TallyPopup from '../components/TallyPopup.astro';
 import Analytics from '../components/Analytics.astro';
+import Clarity from '../components/Clarity.astro';
 import Attribution from '../components/Attribution.astro';
 import { SEO } from 'astro-seo';
 import { ClientRouter } from 'astro:transitions';
@@ -196,22 +197,7 @@ const extendMeta = [
     <Attribution />
     <Analytics />
 
-    <!-- Microsoft Clarity (deferred) -->
-    <script type="text/javascript">
-      // Defer Clarity loading to after initial page render
-      function loadClarity() {
-        (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "u18n0h2k1x");
-      }
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadClarity, { timeout: 3000 });
-      } else {
-        setTimeout(loadClarity, 2000);
-      }
-    </script>
+    <Clarity />
 
     <style>
       [x-cloak] {
