@@ -6,9 +6,10 @@
  * More than one photo crossfades every 5 seconds (paused for reduced motion).
  */
 import type { Review } from '@/lib/reviews';
-import { getBestReviewForService, getReviewImageAlt } from '@/lib/reviews';
+import { getBestReviewForService, getReviewImageAlt, reviewDate, reviewStars } from '@/lib/reviews';
 import { t, type Locale } from '@/i18n/translations';
 import Icon from '../../Icon.astro';
+import { translatedExcerpt } from '../../review-excerpts-ar';
 
 interface Props {
   serviceSlug?: string;
@@ -20,6 +21,7 @@ const { serviceSlug, review: given, locale = 'en' } = Astro.props;
 const review = given ?? (serviceSlug ? getBestReviewForService(serviceSlug) : undefined);
 const photos = review?.localImages ?? [];
 const quote = review ? review.highlightQuote || review.text.split('.').slice(0, 2).join('.') + '.' : '';
+const translation = locale === 'ar' ? translatedExcerpt(quote) : undefined;
 const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 ---
 
@@ -32,7 +34,7 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
             {photos.map((img, i) => (
               <img
                 src={`/${img}`}
-                alt={getReviewImageAlt(review, i)}
+                alt={getReviewImageAlt(review, i, locale)}
                 width="600"
                 height="450"
                 loading="lazy"
@@ -43,11 +45,11 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
           </div>
         )}
         <figure class="rq__body">
-          <span class="rq__stars" role="img" aria-label={`${review.stars} out of 5 stars`}>
+          <span class="rq__stars" role="img" aria-label={reviewStars(review.stars, locale)}>
             {Array.from({ length: review.stars }, () => <Icon name="star" size={18} />)}
           </span>
           <blockquote>
-            <p class="rq__quote">"{quote}"</p>
+            <p class="rq__quote" dir="auto">{translation ? `«${translation}»` : `"${quote}"`}</p>
           </blockquote>
           <figcaption class="rq__who">
             <span class="rq__avatar" aria-hidden="true">
@@ -64,10 +66,11 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
             <span>
               <span class="rq__name">{review.reviewerName}</span>
               <span class="rq__meta">
-                {t(locale, 'reviews.verified')} · {review.date}
+                {t(locale, 'reviews.verified')} · {reviewDate(review.date, locale)}
               </span>
             </span>
           </figcaption>
+          {translation && <details><summary>مترجم عن الإنجليزية · اقرأ النص الأصلي</summary><p lang="en" dir="ltr">{quote}</p></details>}
         </figure>
       </div>
     </section>
@@ -88,6 +91,9 @@ const initials = review?.reviewerName.split(' ').map((n) => n[0]).join('').toUpp
 </script>
 
 <style>
+  details { margin-block-start: 1rem; font-size: 0.9rem; }
+  summary { cursor: pointer; text-decoration: underline; }
+  details p { margin-block-start: 0.5rem; }
   .rq__grid {
     display: grid;
     gap: 2.5rem;

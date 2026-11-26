@@ -18,7 +18,7 @@ relatedServices:
 lang: "ar"
 ---
 
-أصبح [فيلم حماية الطلاء](/ar/services/paint-protection-film/) من أكثر الطرق شيوعاً لحماية طلاء السيارة من رذاذ الحصى والخدوش والبقع وأضرار الأشعة فوق البنفسجية، مع الحفاظ على اللمعان المصنعي. ومن بين العلامات الكثيرة في السوق، تتصدّر STEK وAvery Dennison باستمرار قائمة الخيارات المتميّزة الأكثر موثوقية.
+إذا حصرت اختيارك بين STEK وAvery Dennison لتركيب [فيلم حماية الطلاء](/ar/services/paint-protection-film/)، فقارن الفيلم المحدّد في كل عرض. نوضح هنا ما يعنيه الفرق في اللمعان والتشطيب والضمان لسيارة تستخدمها في دبي.
 
 يوضّح هذا الدليل كيف تتقارنان في العوامل التي تهمّ فعلاً: المتانة، وأداء الإصلاح الذاتي، وخيارات اللمسة النهائية، والضمان، والسماكة، والقيمة الإجمالية، حتى تقرّر أيّهما أنسب لسيارتك.
 
@@ -30,7 +30,7 @@ lang: "ar"
        a box around one logo and not the other. -->
   <div class="brand-logos" style="display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,6vw,3.5rem);flex-wrap:wrap;padding:2.25rem 1.5rem;border:1px solid rgba(0,0,0,0.09);border-radius:12px;background:#fff;">
     <img src="/logos/stek.png" alt="شعار علامة STEK لفيلم حماية الطلاء" width="384" height="90" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
-    <span style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#999;">vs</span>
+    <span style="font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:#999;">مقابل</span>
     <img src="/logos/avery-dennison.png" alt="شعار علامة Avery Dennison" width="260" height="85" loading="lazy" decoding="async" style="height:42px;width:auto;max-width:45%;" />
   </div>
   <figcaption style="text-align:center;font-size:0.85rem;color:#888;margin-top:0.6rem;">علامتان متميّزتان لفيلم حماية الطلاء، بُنيتا على تاريخين مختلفين تماماً.</figcaption>

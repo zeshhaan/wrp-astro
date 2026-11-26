@@ -121,7 +121,7 @@ const need = (field: Field) => required.includes(field);
           form.reset();
           document.dispatchEvent(new CustomEvent('wrp:lead', { detail: { form: 'contact_page' } }));
         } else {
-          error.textContent = result.error || defaultError;
+          error.textContent = document.documentElement.lang === 'ar' ? defaultError : result.error || defaultError;
           error.hidden = false;
         }
       } catch {

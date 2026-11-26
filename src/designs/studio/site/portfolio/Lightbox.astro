@@ -11,13 +11,14 @@ import Icon from '../../Icon.astro';
 export type Slide = { src: string; thumb?: string; title: string; subtitle: string; href?: string };
 
 interface Props {
+  locale: 'en' | 'ar';
   slides: Slide[];
   label: string;
   /** Text of the link to a slide's `href`, e.g. "View Service". */
   linkLabel?: string;
 }
 
-const { slides, label, linkLabel } = Astro.props;
+const { slides, label, linkLabel, locale } = Astro.props;
 ---
 
 <dialog class="lb" aria-label={label} data-lb>
@@ -39,7 +40,7 @@ const { slides, label, linkLabel } = Astro.props;
     {
       slides.map((s, i) => (
         <li>
-          <button type="button" class="lb__thumb" data-lb-go={i} aria-label={`${s.title} ${i + 1}`}>
+          <button type="button" class="lb__thumb" data-lb-go={i} aria-label={locale === 'ar' ? `الصورة ${(i + 1).toLocaleString('ar-EG')}، ${s.title}` : `${s.title} ${i + 1}`}>
             <img src={s.thumb ?? s.src} alt="" loading="lazy" width="48" height="64" />
           </button>
         </li>
@@ -47,10 +48,10 @@ const { slides, label, linkLabel } = Astro.props;
     }
   </ol>
   <form method="dialog">
-    <button class="lb__btn lb__close" aria-label="Close"><Icon name="close" size={22} /></button>
+    <button class="lb__btn lb__close" aria-label={locale === 'ar' ? 'إغلاق' : 'Close'}><Icon name="close" size={22} /></button>
   </form>
-  <button type="button" class="lb__btn lb__prev" aria-label="Previous photo" data-lb-prev><Icon name="arrow-left" size={22} /></button>
-  <button type="button" class="lb__btn lb__next" aria-label="Next photo" data-lb-next><Icon name="arrow-right" size={22} /></button>
+  <button type="button" class="lb__btn lb__prev" aria-label={locale === 'ar' ? 'الصورة السابقة' : 'Previous photo'} data-lb-prev><Icon name="arrow-left" size={22} /></button>
+  <button type="button" class="lb__btn lb__next" aria-label={locale === 'ar' ? 'الصورة التالية' : 'Next photo'} data-lb-next><Icon name="arrow-right" size={22} /></button>
   <script type="application/json" data-lb-slides set:html={JSON.stringify(slides)} />
 </dialog>
 
@@ -72,7 +73,7 @@ const { slides, label, linkLabel } = Astro.props;
       img.alt = `${slide.title} ${slide.subtitle}`;
       title.textContent = slide.title;
       sub.textContent = slide.subtitle;
-      n.textContent = `${index + 1} / ${slides.length}`;
+      n.textContent = `${(index + 1).toLocaleString(document.documentElement.lang === 'ar' ? 'ar-EG' : 'en')} / ${slides.length.toLocaleString(document.documentElement.lang === 'ar' ? 'ar-EG' : 'en')}`;
       if (link) {
         link.hidden = !slide.href;
         if (slide.href) link.href = slide.href;

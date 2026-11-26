@@ -1,7 +1,7 @@
 ---
 /**
  * Studio version of the legal pages: Privacy, Terms (English and Arabic) and
- * Credits (English only, as live). Title, description, H1 and breadcrumbs are
+ * Credits in both languages. Title, description, H1 and breadcrumbs are
  * the live page's; the body is the live markup, copied into
  * content/legal/<page>-<locale>.astro, in Studio type.
  */
@@ -11,7 +11,7 @@ import PrivacyEn from './content/legal/privacy-en.astro';
 import PrivacyAr from './content/legal/privacy-ar.astro';
 import TermsEn from './content/legal/terms-en.astro';
 import TermsAr from './content/legal/terms-ar.astro';
-import CreditsEn from './content/legal/credits-en.astro';
+import Credits from './content/legal/credits.astro';
 import { localizeUrl } from '@/i18n/utils';
 import type { Locale } from '@/i18n/translations';
 import { isLabPath, toLab } from './routes';
@@ -52,7 +52,15 @@ const pages = {
     h1: 'Credits',
     crumbs: ['Home', 'Credits'],
     crumbPath: '/credits/',
-    Body: CreditsEn,
+    Body: Credits,
+  },
+  'credits/ar': {
+    title: 'شكر وتقدير | استوديو WRP',
+    description: 'تعرّف على أصحاب الصور ومجسّمات السيارات والخطوط والبرامج التي نستخدمها في موقع WRP.',
+    h1: 'شكر وتقدير',
+    crumbs: ['@t:common.home', '@t:nav.credits'],
+    crumbPath: '/credits/',
+    Body: Credits,
   },
   'privacy/ar': {
     title: 'سياسة الخصوصية | WRP Detailing Studio',
@@ -84,7 +92,7 @@ const { Body } = page;
   </section>
   <section class="lg st-white">
     <div class="lg__col">
-      <Body link={link} />
+      {slug === 'credits' ? <Credits locale={locale} link={link} /> : <Body link={link} />}
     </div>
   </section>
 </StudioPage>

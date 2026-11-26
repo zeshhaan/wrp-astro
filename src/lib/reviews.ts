@@ -1,3 +1,5 @@
+import { toLocalNum } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
 import reviewsData from '../../data/google-reviews.json';
 
 export interface Review {
@@ -94,12 +96,40 @@ const serviceNameMap: Record<string, string> = {
 };
 
 /** Build descriptive alt text for review images (SEO + AI-friendly) */
-export function getReviewImageAlt(review: Review, photoIndex: number): string {
+export function getReviewImageAlt(review: Review, photoIndex: number, locale: Locale = 'en'): string {
+  if (locale === 'ar') {
+    return `سيارة ${review.reviewerName} بعد العناية بها في WRP. الصورة ${toLocalNum(photoIndex + 1, locale)} من ${toLocalNum(review.localImages.length || 1, locale)} في تقييم العميل.`;
+  }
   const services = review.serviceTags
     ?.map(tag => serviceNameMap[tag] || tag.replace(/-/g, ' '))
     .join(' and ') || 'car detailing';
   const total = review.localImages?.length || 1;
   return `${review.reviewerName}'s vehicle after ${services} at WRP Detailing Studio — verified customer review photo ${photoIndex + 1} of ${total}`;
+}
+
+const reviewMonthAr = new Intl.DateTimeFormat('ar-AE-u-ca-gregory-nu-arab', {
+  month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+
+export function reviewDate(value: string, locale: Locale): string {
+  if (locale === 'en' || !/^[A-Z][a-z]+ [0-9]{4}$/.test(value)) return value;
+  const time = Date.parse(`1 ${value} 12:00:00 GMT`);
+  return Number.isFinite(time) ? reviewMonthAr.format(time) : value;
+}
+
+export function reviewerInfo(value: string, locale: Locale): string {
+  if (locale === 'en') return value;
+  return value.split(' · ').map((part) => {
+    if (part === 'Local Guide') return 'مرشد محلي';
+    const count = /^(\d+) (reviews?|photos?)$/.exec(part);
+    if (!count) return part;
+    const label = count[2].startsWith('review') ? 'التقييمات' : 'الصور';
+    return `${label}: ${toLocalNum(count[1], locale)}`;
+  }).join(' · ');
+}
+
+export function reviewStars(stars: number, locale: Locale): string {
+  return locale === 'ar' ? `${toLocalNum(stars, locale)} من ٥ نجوم` : `${stars} out of 5 stars`;
 }
 
 /** Get reviews suitable for marquee display (compact, with text) */

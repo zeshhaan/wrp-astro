@@ -30,7 +30,7 @@ const w = nav.words;
       <span class="visually-hidden">{w.close}</span>
     </button>
   </div>
-  <nav aria-label="Main (mobile)">
+  <nav aria-label={nav.locale === 'ar' ? 'القائمة الرئيسية' : 'Main (mobile)'}>
     <p class="sr-sheet__label">{nav.servicesLabel}</p>
     <ul role="list" class="sr-sheet__cards">
       {

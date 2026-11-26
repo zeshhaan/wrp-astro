@@ -50,19 +50,29 @@ export default defineConfig({
     locales: ['en', 'ar'],
     routing: {
       prefixDefaultLocale: false,
-      fallbackType: 'rewrite',
-    },
-    fallback: {
-      ar: 'en',
     },
   },
   vite: {
     plugins: [tailwindcss()],
   },
   integrations: [
+    {
+      name: 'local-design-lab',
+      hooks: {
+        'astro:config:setup': ({ command, injectRoute }) => {
+          if (command !== 'dev') return;
+          for (const file of [
+            'index.astro', 'studio/[...page].ts', 'studio/car-viewer.astro',
+            'studio/headers/index.astro', 'studio/headers/[...slug].astro',
+          ]) {
+            const path = file.replace(/\.(astro|ts)$/, '').replace(/(^|\/)index$/, '');
+            injectRoute({ pattern: '/design-lab/' + path, entrypoint: './src/dev/design-lab/' + file });
+          }
+        },
+      },
+    },
     mdx(),
     sitemap({
-      filter: (page) => !page.includes('/design-lab/'),
       customPages: [
         'https://wrpdetailing.ae/llms.txt',
         'https://wrpdetailing.ae/llms-full.txt',

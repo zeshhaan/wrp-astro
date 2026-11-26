@@ -1,23 +1,19 @@
 ---
 /**
- * The Arabic service pages, /ar/services/<slug>/, in the Studio design: the
- * Arabic entry where one exists, otherwise the English one.
+ * The Arabic service pages, /ar/services/<slug>/, in the Studio design: from their translated entries.
  */
-import { getCollection } from 'astro:content';
+import { getBaseSlug, getLocalizedServices } from '@/i18n/content';
 import type { GetStaticPaths } from 'astro';
 import ServicePage from '@/designs/studio/site/ServicePage.astro';
 
 export const prerender = true;
 
 export const getStaticPaths = (async () => {
-  const services = await getCollection('services');
-  const arabic = services.filter((s) => s.id.startsWith('ar/'));
-  return services
-    .filter((s) => !s.id.startsWith('ar/'))
-    .map((service) => ({
-      params: { slug: service.id },
-      props: { service: arabic.find((s) => s.id === `ar/${service.id}`) ?? service },
-    }));
+  const services = await getLocalizedServices('ar');
+  return services.map((service) => ({
+    params: { slug: getBaseSlug(service.id) },
+    props: { service },
+  }));
 }) satisfies GetStaticPaths;
 
 const { service } = Astro.props;

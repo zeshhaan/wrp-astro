@@ -11,8 +11,9 @@
 import Picture from '../../../shared/Picture.astro';
 import { scrimStops } from '../../../shared/easedGradient';
 import Icon from '../../Icon.astro';
+import { blog } from '../content/blog';
 import FormattedDate from '@/components/FormattedDate.astro';
-import { localizeUrl } from '@/i18n/utils';
+import { localizeUrl, toLocalNum } from '@/i18n/utils';
 import { t, type Locale } from '@/i18n/translations';
 import { getLocalizedBlogPosts } from '@/i18n/content';
 
@@ -36,13 +37,7 @@ const related = all
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, latest ? count : 3);
 
-const categoryLabels: Record<string, string> = {
-  guide: 'Guide',
-  news: 'News',
-  update: 'Update',
-  event: 'Event',
-  listicle: 'Listicle',
-};
+const categoryLabels: Record<string, string> = blog[locale].categoryLabels;
 const coverBase = (src: string) => src.replace(/\.(jpe?g|png|webp)$/i, '');
 const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 18, to: 78, max: 0.94 })}, rgb(12 13 15 / 0.94) 100%)`;
 ---
@@ -72,7 +67,7 @@ const scrim = `linear-gradient(to bottom, ${scrimStops({ rgb: '12 13 15', from: 
               <p class="pc__meta">
                 {post.data.category && <span class="pc__cat">{categoryLabels[post.data.category] || post.data.category}</span>}
                 <FormattedDate date={post.data.pubDate} locale={locale} />
-                {post.data.readingTime && <span>{post.data.readingTime} min</span>}
+                {post.data.readingTime && <span>{toLocalNum(post.data.readingTime, locale)} {blog[locale].min}</span>}
               </p>
               <h3 class="pc__title">
                 <a href={link(localizeUrl(`/blog/${post.id.replace(/^ar\//, '')}/`, locale))}>{post.data.title}</a>

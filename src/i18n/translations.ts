@@ -296,7 +296,7 @@ export const translations = {
     'nav.contact': 'اتصل بنا',
     'nav.privacy': 'الخصوصية',
     'nav.terms': 'الشروط',
-    'nav.credits': 'الاعتمادات',
+    'nav.credits': 'شكر وتقدير',
     'nav.requestEstimate': 'اطلب تقدير سعر',
     'nav.hours': 'السبت–الخميس ٩ ص – ٩:٣٠ م',
 
@@ -349,7 +349,7 @@ export const translations = {
     'reviews.readMore': 'اقرأ المزيد',
     'reviews.showLess': 'عرض أقل',
     'reviews.whatClientsSay': 'ماذا يقول عملاؤنا',
-    'reviews.realGoogle': 'تقييمات حقيقية من عملاء موثّقين على جوجل',
+    'reviews.realGoogle': 'تقييمات من Google، كما كتبها أصحابها بلغتها الأصلية',
     'reviews.seeAllReviews': 'عرض جميع التقييمات',
     'reviews.verifiedOnGoogle': 'تقييمات موثّقة على جوجل',
     'reviews.statsRating': 'التقييم',

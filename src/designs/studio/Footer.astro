@@ -25,7 +25,7 @@ const num = (n: string | number) => toLocalNum(n, locale);
 // Arabic labels are the live site's translations wherever it has them.
 const w = ar
   ? {
-      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التفصيل، تظليل النوافذ والتنجيد من الاستوديو الخاص بنا في القصيص، دبي.',
+      blurb: 'فيلم حماية الطلاء، طلاء السيراميك، التلميع، تظليل الزجاج والتنجيد في استوديونا في القصيص، دبي.',
       pillars: ['غلّف', 'عزّز', 'احمِ'],
       comma: '، ',
       services: t(locale, 'nav.services'),
@@ -67,12 +67,11 @@ const siteLinks = ar
       { label: 'Contact us', href: pages.contact },
       { label: 'The WRP Lounge', href: `${home}#lounge` },
     ];
-// Credits has no Arabic page; Arabic visitors get the English one.
 const legal = ar
   ? [
       { label: t(locale, 'nav.privacy'), href: localizeUrl(pages.privacy, locale) },
       { label: t(locale, 'nav.terms'), href: localizeUrl(pages.terms, locale) },
-      { label: t(locale, 'nav.credits'), href: pages.credits },
+      { label: t(locale, 'nav.credits'), href: localizeUrl(pages.credits, locale) },
     ]
   : [
       { label: 'Privacy', href: pages.privacy },
@@ -100,7 +99,7 @@ const otherHref = altHref ?? (ar ? '/' : pages.arabic);
       </p>
       <ul class="foot__social" role="list">
         <li><a href={contact.instagram} target="_blank" rel="noopener"><Icon name="instagram" size={18} />{contact.instagramHandle}</a></li>
-        <li><a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a></li>
+        <li><a href={whatsappQuote} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />{ar ? 'واتساب' : 'WhatsApp'}</a></li>
       </ul>
     </div>
     <nav class="foot__col" aria-labelledby="foot-services">

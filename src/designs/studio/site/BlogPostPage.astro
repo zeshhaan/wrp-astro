@@ -33,14 +33,14 @@ const livePath = localizeUrl(`/blog/${slug}/`, locale);
 // The live layout's words, as it has them.
 const ar = locale === 'ar';
 const authorNote = ar
-  ? 'أُعد هذا الدليل بواسطة فريق WRP Detailing Studio استناداً إلى أعمال التركيب اليومية، وأسئلة العملاء المتكرّرة، وظروف القيادة الفعلية في دبي.'
+  ? 'كتب فريق WRP هذا الدليل من واقع العمل اليومي في الاستوديو والأسئلة التي يسألنا إياها أصحاب السيارات في دبي.'
   : 'This guide was prepared by the WRP Detailing Studio team using day-to-day installation work, recurring client questions, and real Dubai driving conditions.';
 const freshnessNote = ar
-  ? 'نراجع أدلتنا عند تغيّر الممارسات، أو الباقات، أو تعليمات العناية، أو المعلومات المحلية ذات الصلة.'
+  ? 'نراجع الدليل عندما تتغيّر الباقات أو طريقة التركيب أو تعليمات العناية في دبي.'
   : 'We review guides when service practices, package details, aftercare advice, or relevant local guidance materially changes.';
-const trustHeading = ar ? 'لماذا يمكن الوثوق بهذا الدليل' : 'Why trust this guide';
-const sourcesHeading = ar ? 'إشارات الموثوقية' : 'Trust signals';
-const coverageHeading = ar ? 'نطاق الخبرة' : 'Coverage';
+const trustHeading = ar ? 'من كتب هذا الدليل؟' : 'Why trust this guide';
+const sourcesHeading = ar ? 'متى نحدّث الدليل؟' : 'Trust signals';
+const coverageHeading = ar ? 'خبرتنا في الاستوديو' : 'Coverage';
 const coverage = ar
   ? 'PPF، طلاء السيراميك، التظليل، التلميع، والعناية الداخلية للسيارات في دبي.'
   : 'PPF, ceramic coating, window tinting, paint correction, and interior care for vehicles in Dubai.';
@@ -88,7 +88,7 @@ const heroBase = heroImage ? heroImage.replace(/\.(jpe?g|png|webp|avif)$/, '') :
 ---
 
 <StudioPage
-  title={`${title} | WRP Blog`}
+  title={`${title} | ${ar ? 'مدونة WRP' : 'WRP Blog'}`}
   description={description}
   locale={locale}
   livePath={livePath}

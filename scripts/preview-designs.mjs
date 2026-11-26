@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 /**
- * Deploy the Design Lab to Cloudflare Worker Previews: one Preview per design
- * in src/designs/registry.ts (now just Studio, served at `/` as design-studio),
- * plus one "design-lab" Preview with every page under /design-lab/.
+ * Deploy the registered designs to Cloudflare Worker Previews: one Preview per design
+ * in src/designs/registry.ts (now just Studio, served at `/` as design-studio).
  *
- *   node scripts/preview-designs.mjs              # every design + the lab
+ *   node scripts/preview-designs.mjs              # every design
  *   node scripts/preview-designs.mjs --only studio
  *   node scripts/preview-designs.mjs --dry-run    # print the commands only
  *   node scripts/preview-designs.mjs --ci         # Workers Builds deploy command
  *
  * --ci is for a Workers Builds Preview whose build command already ran
  * `bun run build`: it first publishes that build as the branch's own Preview
- * (the Design Lab), then rebuilds and publishes one Preview per concept.
+ * and then rebuilds and publishes one Preview per concept.
  *
  * Needs Wrangler >= 4.135 (Worker Previews) and a logged-in `wrangler`
  * (or CLOUDFLARE_API_TOKEN). Production is never touched: `wrangler preview`
@@ -68,11 +67,10 @@ function deploy(name, designEnv, { build = true } = {}) {
 }
 
 const results = [];
-if (ci) results.push(['branch (lab)', deploy(null, {}, { build: false })]);
+if (ci) results.push(['branch', deploy(null, {}, { build: false })]);
 for (const id of concepts) {
   results.push([`design-${id}`, deploy(`design-${id}`, { PUBLIC_WRP_DESIGN: id })]);
 }
-if (!only && !ci) results.push(['design-lab', deploy('design-lab', { PUBLIC_WRP_DESIGN: '' })]);
 
 console.log('\nDesign Lab Previews');
 for (const [name, url] of results) console.log(`  ${name.padEnd(18)} ${url ?? '(dry run)'}`);
