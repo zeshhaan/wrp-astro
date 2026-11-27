@@ -2,7 +2,7 @@
 title: "First 30 Days After PPF, Window Tint, or Ceramic Coating: What to Do and Avoid"
 description: "A clear 30-day aftercare plan for Paint Protection Film (PPF), window tinting, and ceramic coating so your protection performs the way it should."
 pubDate: 2026-02-15
-updatedDate: 2026-03-16
+updatedDate: 2026-11-27
 category: guide
 tags:
   - ppf
@@ -23,7 +23,7 @@ relatedServices:
 
 Protection services work best when the first month is handled correctly.
 
-Many early issues people blame on "bad products" are actually aftercare mistakes in the first week.
+Before leaving the studio, write down three dates from the installer: when the car can be washed, when the side windows can be lowered, and when the inside of the tinted glass can be cleaned. If the car has both film and coating, use the later wash date for panels with both treatments.
 
 > **Quick answer:** Give the materials time to cure, avoid aggressive washing early, and follow a simple staged routine for the first 30 days.
 
@@ -35,7 +35,7 @@ Many early issues people blame on "bad products" are actually aftercare mistakes
 
 - Park in a clean, shaded area when possible.
 - Let installers' curing guidance lead your routine.
-- Expect minor temporary visual effects (light moisture haze, small edges settling).
+- Some fresh window films show moisture haze while drying. Photograph a lifting PPF edge and contact the installer before washing the panel.
 
 ### Avoid
 
@@ -52,7 +52,7 @@ This period is about stability, not appearance perfection.
 
 ### PPF
 
-- Light hand wash only if needed.
+- Check the exact film before the first wash. For example, XPEL specifies 48 hours for ULTIMATE PLUS and 72 hours for its COLOR PPF. Other products can have different instructions. [XPEL product care](https://www.xpel.com/product-care)
 - Keep pressure away from edges and seams.
 - Avoid aggressive bug/tar chemicals on fresh film.
 
@@ -64,7 +64,7 @@ This period is about stability, not appearance perfection.
 
 ### Ceramic Coating
 
-- Avoid detergent-heavy washing.
+- Follow the first-wash date on the coating handover sheet. Before that date, ask the installer how to remove a fresh contaminant without disturbing the curing surface.
 - Remove obvious bird droppings quickly but gently.
 - Do not apply extra toppers unless advised.
 
@@ -72,7 +72,7 @@ This period is about stability, not appearance perfection.
 
 ## Week 2: Controlled Normalization
 
-At this stage, most cars can return to a normal but careful routine:
+Once the installer has cleared the product for washing, use:
 
 - pH-neutral shampoo
 - clean wash media

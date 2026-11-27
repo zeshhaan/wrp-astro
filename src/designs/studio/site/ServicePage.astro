@@ -483,6 +483,9 @@ const quoteHref = heroForm ? '#quote' : studioQuoteHref(locale);
     {
       !ar && (
         <>
+          {slug === 'ceramic-coating' && (
+            <><a href={link('/blog/ceramic-coating-dubai-guide/')}>Read our guide to ceramic coating costs and aftercare.</a>{' '}</>
+          )}
           {t(locale, 'services.faqMore')} <a href={link(localizeUrl('/contact-us/', locale))}>{t(locale, 'services.faqContact')}</a>
         </>
       )

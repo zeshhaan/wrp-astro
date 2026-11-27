@@ -2,7 +2,7 @@
 title: "Leather & Upholstery Care in Dubai: Practical Advice for Heat, Dust, and Daily Use"
 description: "A practical interior care guide for Dubai drivers covering leather, fabric, and upholstery maintenance, stain response, and when professional care is worth it."
 pubDate: 2026-02-14
-updatedDate: 2026-03-16
+updatedDate: 2026-11-27
 category: guide
 tags:
   - upholstery care
@@ -52,7 +52,7 @@ This combination can cause dryness, surface haze, odor buildup, and premature we
 
 - deeper seat and carpet vacuum
 - safe interior cleaner by material type
-- light conditioner for leather surfaces where needed
+- check the owner’s manual before applying a product to leather or synthetic trim
 
 ### Quarterly (or as-needed)
 
@@ -69,7 +69,7 @@ Consistency beats occasional deep cleaning marathons.
 ### Leather
 
 - Clean gently and regularly; avoid harsh degreasers.
-- Condition with OEM-safe products to preserve softness.
+- Check the seat specification first. Coated leather, synthetic upholstery and suede-like inserts can sit next to one another on the same seat. Use the cleaner specified for each material and test it on a hidden area.
 - Avoid glossy/oily dressings that attract dust.
 
 ### Fabric Seats and Carpets
@@ -80,9 +80,7 @@ Consistency beats occasional deep cleaning marathons.
 
 ### Alcantara/Suede-like Surfaces
 
-- Use soft, dedicated tools.
-- Avoid aggressive brushing and heavy wetting.
-- Use products designed for delicate textile finishes.
+For genuine Alcantara, remove loose dust with a soft brush or vacuum attachment. For routine cleaning, wring out a white cotton cloth dampened with water, wipe gently and leave the surface to air-dry. If coffee spills, blot the excess and work from the edge of the stain inward. Follow the material maker’s instructions for the specific stain. [Alcantara’s car-seat care guide](https://www.alcantara.com/cleaning-maintenance/how-to-clean-alcantara-car-seats/)
 
 ---
 
@@ -121,7 +119,7 @@ Book professional care when you notice:
 - stains that keep returning after DIY attempts
 - heavily used family or daily-driver interiors
 
-See [Leather & Upholstery Care](/services/leather-upholstery/) for service options.
+If the surface colour is worn through on a bolster or a seam has split, another clean will not restore it. Photograph the damage in daylight and ask about [WRP’s upholstery repair and replacement options](/services/leather-upholstery/) before buying a stronger cleaner.
 
 ---
 
