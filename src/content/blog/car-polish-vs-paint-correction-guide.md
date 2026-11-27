@@ -2,7 +2,7 @@
 title: "Car Polish vs Paint Correction: What Your Paint Actually Needs"
 description: "Understand the real difference between car polish and paint correction, when each is needed, and how to choose the right approach in Dubai."
 pubDate: 2026-02-16
-updatedDate: 2026-03-16
+updatedDate: 2026-11-27
 category: guide
 tags:
   - car polish
@@ -83,7 +83,7 @@ Dubai conditions accelerate paint wear:
 
 A measured correction plan can recover finish quality and then make future maintenance easier when combined with protection.
 
-Explore [Car Polish & Paint Correction](/services/polish/) for package levels.
+At WRP, [paint correction is priced after inspection](/services/polish/). Bring the car with the panels accessible and tell the studio about any repainting or previous correction. Ask to compare a small polished test area with the adjacent paint under the same light before agreeing to work on the whole car.
 
 ---
 
@@ -95,7 +95,7 @@ Explore [Car Polish & Paint Correction](/services/polish/) for package levels.
 | Moderate swirls, visible defects | Two-stage correction |
 | Heavy defects, neglected finish | Multi-stage correction with realistic expectations |
 
-Good detailers will inspect first and recommend the least aggressive process that achieves the target result.
+A scratch that shows primer or bare metal needs a paint repair. Polishing around it can improve the surrounding finish, but further cutting removes more clear coat without replacing the missing colour. [3M’s guidance on scratch removal](https://www.3m.com/3M/en_US/p/d/v000087447/) explains where polishing reaches its limit.
 
 ---
 
@@ -116,7 +116,7 @@ After correction, most owners should add one of these:
 - [Ceramic coating](/services/ceramic-coating/) for easier cleaning and environmental resistance
 - [Paint Protection Film (PPF)](/services/paint-protection-film/) on impact zones for physical protection
 
-Correction creates the visual baseline. Protection helps preserve it.
+If you are comparing quotes, the [ceramic coating guide](/blog/ceramic-coating-dubai-guide/) explains how preparation, coverage and curing affect the job.
 
 ---
 
